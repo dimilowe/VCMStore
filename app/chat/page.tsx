@@ -125,7 +125,7 @@ export default function ChatPage() {
                         {message.products.map((product) => (
                           <a
                             key={product.id}
-                            href={`/${product.type}s/${product.slug}`}
+                            href={`/product/${product.slug}`}
                             className="block bg-stone-50 hover:bg-stone-100 transition-colors rounded-lg p-3 border border-stone-200"
                           >
                             <div className="flex items-center justify-between">
