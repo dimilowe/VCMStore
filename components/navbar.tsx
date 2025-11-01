@@ -42,7 +42,7 @@ export function Navbar() {
                 DOWNLOADS
               </Link>
               <Link href="/funnels" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
-                FUNNELS
+                TEMPLATES
               </Link>
               <Link href="/freebies" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
                 FREEBIES
@@ -165,7 +165,7 @@ export function Navbar() {
               className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              FUNNELS
+              TEMPLATES
             </Link>
             <Link 
               href="/freebies" 

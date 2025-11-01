@@ -300,7 +300,7 @@ export default function AdminPage() {
                   >
                     <option value="app">App</option>
                     <option value="download">Download</option>
-                    <option value="funnel">Funnel</option>
+                    <option value="funnel">Template</option>
                     <option value="freebie">Freebie</option>
                     <option value="video">Video</option>
                     <option value="course">Course</option>
