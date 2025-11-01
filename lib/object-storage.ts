@@ -29,7 +29,7 @@ export class ObjectStorageService {
     this.bucketName = process.env.STORAGE_BUCKET || "";
   }
 
-  async getUploadUrl(): Promise<string> {
+  async getUploadUrl(): Promise<{ uploadUrl: string; publicUrl: string }> {
     if (!this.bucketName) {
       throw new Error("STORAGE_BUCKET not set. Create a bucket in Object Storage first.");
     }
@@ -37,21 +37,29 @@ export class ObjectStorageService {
     const objectId = randomUUID();
     const objectName = `products/${objectId}`;
 
-    return this.signObjectURL({
+    const uploadUrl = await this.signObjectURL({
       bucketName: this.bucketName,
       objectName,
       method: "PUT",
       ttlSec: 900, // 15 minutes
     });
+
+    const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${objectName}`;
+
+    return { uploadUrl, publicUrl };
   }
 
-  async getPublicUrl(uploadUrl: string): Promise<string> {
-    // Extract object path from upload URL
-    const url = new URL(uploadUrl);
+  getPublicUrlFromSignedUrl(signedUrl: string): string {
+    // Extract the bucket and object path from a signed URL
+    const url = new URL(signedUrl);
     const pathParts = url.pathname.split("/");
-    const bucketIndex = pathParts.findIndex(p => p === this.bucketName);
     
-    if (bucketIndex === -1) return uploadUrl;
+    // Find bucket name in path
+    const bucketIndex = pathParts.findIndex(p => p === this.bucketName);
+    if (bucketIndex === -1) {
+      // Fallback: return original URL if we can't parse it
+      return signedUrl;
+    }
     
     const objectName = pathParts.slice(bucketIndex + 1).join("/");
     return `https://storage.googleapis.com/${this.bucketName}/${objectName}`;

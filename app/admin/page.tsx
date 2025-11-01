@@ -104,9 +104,24 @@ export default function AdminPage() {
     }
   };
 
+  // Map upload URLs to their corresponding public URLs
+  const [uploadUrlMap, setUploadUrlMap] = useState<Map<string, string>>(new Map());
+
   const handleGetUploadParameters = async () => {
     const res = await fetch("/api/admin/upload", { method: "POST" });
     const data = await res.json();
+    
+    if (!data.uploadUrl || !data.publicUrl) {
+      throw new Error("Failed to get upload URLs");
+    }
+    
+    // Store the mapping from upload URL to public URL
+    setUploadUrlMap((prev) => {
+      const newMap = new Map(prev);
+      newMap.set(data.uploadUrl, data.publicUrl);
+      return newMap;
+    });
+    
     return {
       method: "PUT" as const,
       url: data.uploadUrl,
@@ -115,8 +130,24 @@ export default function AdminPage() {
 
   const handleUploadComplete = (result: any, field: "thumbnail_url" | "download_url") => {
     if (result.successful && result.successful.length > 0) {
-      const uploadUrl = result.successful[0].uploadURL;
-      setFormData((prev) => ({ ...prev, [field]: uploadUrl }));
+      const uploadedFile = result.successful[0];
+      const uploadUrl = uploadedFile.uploadURL;
+      
+      // Find the corresponding public URL from our map
+      const publicUrl = uploadUrlMap.get(uploadUrl);
+      
+      if (publicUrl) {
+        setFormData((prev) => ({ ...prev, [field]: publicUrl }));
+        
+        // Clean up the map entry after using it
+        setUploadUrlMap((prev) => {
+          const newMap = new Map(prev);
+          newMap.delete(uploadUrl);
+          return newMap;
+        });
+      } else {
+        console.error("Could not find public URL for uploaded file");
+      }
     }
   };
 

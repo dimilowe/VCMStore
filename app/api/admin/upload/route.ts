@@ -13,9 +13,9 @@ export async function POST() {
 
   try {
     const storage = new ObjectStorageService();
-    const uploadUrl = await storage.getUploadUrl();
+    const { uploadUrl, publicUrl } = await storage.getUploadUrl();
 
-    return NextResponse.json({ uploadUrl });
+    return NextResponse.json({ uploadUrl, publicUrl });
   } catch (error: any) {
     console.error("Upload URL generation error:", error);
     return NextResponse.json(
