@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react";
-import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -83,8 +82,6 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Navbar />
-
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-4">

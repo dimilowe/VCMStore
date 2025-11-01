@@ -11,14 +11,14 @@ export function Navbar() {
         FREE SHIPPING ON ORDERS $50+ | INSTANT DELIVERY | LIFETIME UPDATES
       </div>
       
-      <div className="container mx-auto px-4 py-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-12">
+      <div className="max-w-7xl mx-auto px-6 py-5">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center space-x-8">
             <Link href="/" className="text-2xl font-bold tracking-wider text-stone-900">
               VCM STORE
             </Link>
             
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6">
               <Link href="/apps" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
                 APPS
               </Link>
