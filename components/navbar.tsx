@@ -24,7 +24,7 @@ export function Navbar() {
   return (
     <nav className="bg-white text-stone-800 border-b border-stone-200">
       <div className="bg-stone-700 text-white text-center py-2 text-xs tracking-wider">
-        FREE SHIPPING ON ORDERS $50+ | INSTANT DELIVERY | LIFETIME UPDATES
+        SUBSCRIBE TO STAY UP TO DATE ON ALL MY LATEST CREATIONS
       </div>
       
       <div className="max-w-7xl mx-auto px-6 py-5">
