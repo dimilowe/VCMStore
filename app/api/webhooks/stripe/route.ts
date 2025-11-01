@@ -3,14 +3,29 @@ import { query } from "@/lib/db";
 import { findOrCreateUserByEmail } from "@/lib/auth";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-10-29.clover",
-});
+function getStripeClient() {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    throw new Error("STRIPE_SECRET_KEY is not configured");
+  }
+  return new Stripe(apiKey, {
+    apiVersion: "2025-10-29.clover",
+  });
+}
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+function getWebhookSecret() {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!secret) {
+    throw new Error("STRIPE_WEBHOOK_SECRET is not configured");
+  }
+  return secret;
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripeClient();
+    const webhookSecret = getWebhookSecret();
+    
     const body = await request.text();
     const signature = request.headers.get("stripe-signature") || "";
 
