@@ -25,26 +25,44 @@ export class ObjectStorageService {
   private bucketName: string;
 
   constructor() {
-    // This will be set via environment variable after creating a bucket
+    // Try to get bucket name from environment variable or use default
     this.bucketName = process.env.STORAGE_BUCKET || "";
+  }
+  
+  async ensureBucket(): Promise<string> {
+    if (this.bucketName) {
+      return this.bucketName;
+    }
+    
+    // List all buckets and use the first one
+    try {
+      const [buckets] = await objectStorageClient.getBuckets();
+      if (buckets && buckets.length > 0) {
+        this.bucketName = buckets[0].name;
+        return this.bucketName;
+      }
+    } catch (error) {
+      console.error("Error getting buckets:", error);
+    }
+    
+    throw new Error("No storage bucket found. Please create a bucket in App Storage.");
   }
 
   async getUploadUrl(): Promise<{ uploadUrl: string; publicUrl: string }> {
-    if (!this.bucketName) {
-      throw new Error("STORAGE_BUCKET not set. Create a bucket in Object Storage first.");
-    }
+    // Ensure we have a bucket
+    const bucketName = await this.ensureBucket();
 
     const objectId = randomUUID();
     const objectName = `products/${objectId}`;
 
     const uploadUrl = await this.signObjectURL({
-      bucketName: this.bucketName,
+      bucketName,
       objectName,
       method: "PUT",
       ttlSec: 900, // 15 minutes
     });
 
-    const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${objectName}`;
+    const publicUrl = `https://storage.googleapis.com/${bucketName}/${objectName}`;
 
     return { uploadUrl, publicUrl };
   }
