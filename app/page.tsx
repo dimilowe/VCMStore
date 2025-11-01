@@ -17,7 +17,7 @@ export default function HomePage() {
         <div className="relative z-10 text-center text-white px-4">
           <Link href="/apps">
             <Button 
-              className="mb-8 bg-yellow-700 hover:bg-yellow-800 text-white border-0 px-8 py-6 text-sm tracking-widest shadow-lg"
+              className="mb-8 bg-yellow-500 hover:bg-yellow-600 text-white border-0 px-8 py-6 text-sm tracking-widest shadow-lg"
             >
               SHOP NOW
             </Button>
@@ -41,7 +41,7 @@ export default function HomePage() {
               <p className="text-stone-600 mb-4">
                 Professional-grade applications built for creators who demand excellence
               </p>
-              <Link href="/apps" className="inline-block text-sm font-medium text-yellow-700 hover:text-yellow-800 underline hover:no-underline">
+              <Link href="/apps" className="inline-block text-sm font-medium text-yellow-500 hover:text-yellow-600 underline hover:no-underline">
                 EXPLORE APPS
               </Link>
             </div>
@@ -51,7 +51,7 @@ export default function HomePage() {
               <p className="text-stone-600 mb-4">
                 Proven sales funnels that turn visitors into customers effortlessly
               </p>
-              <Link href="/funnels" className="inline-block text-sm font-medium text-yellow-700 hover:text-yellow-800 underline hover:no-underline">
+              <Link href="/funnels" className="inline-block text-sm font-medium text-yellow-500 hover:text-yellow-600 underline hover:no-underline">
                 VIEW FUNNELS
               </Link>
             </div>
@@ -61,7 +61,7 @@ export default function HomePage() {
               <p className="text-stone-600 mb-4">
                 Start your journey with our collection of free tools and templates
               </p>
-              <Link href="/freebies" className="inline-block text-sm font-medium text-yellow-700 hover:text-yellow-800 underline hover:no-underline">
+              <Link href="/freebies" className="inline-block text-sm font-medium text-yellow-500 hover:text-yellow-600 underline hover:no-underline">
                 GET FREEBIES
               </Link>
             </div>

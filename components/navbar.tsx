@@ -17,32 +17,32 @@ export function Navbar() {
         </Link>
         
         <div className="hidden md:flex items-center space-x-8">
-          <Link href="/apps" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
+          <Link href="/apps" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
             APPS
           </Link>
-          <Link href="/downloads" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
+          <Link href="/downloads" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
             DOWNLOADS
           </Link>
-          <Link href="/funnels" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
+          <Link href="/funnels" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
             FUNNELS
           </Link>
-          <Link href="/freebies" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
+          <Link href="/freebies" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
             FREEBIES
           </Link>
-          <Link href="/videos" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
+          <Link href="/videos" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
             VIDEOS
           </Link>
-          <Link href="/newsletter" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
+          <Link href="/newsletter" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
             NEWSLETTER
           </Link>
         </div>
         
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="text-stone-800 hover:text-yellow-700">
+          <Button variant="ghost" size="icon" className="text-stone-800 hover:text-yellow-500">
             <Search className="h-5 w-5" />
           </Button>
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="text-stone-800 hover:text-yellow-700">
+            <Button variant="ghost" size="icon" className="text-stone-800 hover:text-yellow-500">
               <User className="h-5 w-5" />
             </Button>
           </Link>

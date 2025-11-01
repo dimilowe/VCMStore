@@ -38,7 +38,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-2 mb-2">
             <CardTitle className="text-base font-semibold tracking-wide text-stone-900">{product.name}</CardTitle>
-            <Badge variant="outline" className="capitalize shrink-0 text-xs border-yellow-700 text-yellow-700">
+            <Badge variant="outline" className="capitalize shrink-0 text-xs border-yellow-500 text-yellow-500">
               {product.type}
             </Badge>
           </div>
@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="text-lg font-bold text-stone-900">
             {isFree ? "Free" : `$${(product.price / 100).toFixed(2)}`}
           </div>
-          <Button variant="ghost" size="sm" className="text-yellow-700 hover:text-yellow-800">
+          <Button variant="ghost" size="sm" className="text-yellow-500 hover:text-yellow-600">
             {isFree ? "Claim" : "View"}
           </Button>
         </CardFooter>

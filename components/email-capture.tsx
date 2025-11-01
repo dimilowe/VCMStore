@@ -73,7 +73,7 @@ export function EmailCapture({ source, title, description }: EmailCaptureProps) 
             disabled={loading}
             className="border-neutral-300"
           />
-          <Button type="submit" disabled={loading} className="bg-yellow-700 hover:bg-yellow-800 text-white">
+          <Button type="submit" disabled={loading} className="bg-yellow-500 hover:bg-yellow-600 text-white">
             {loading ? "..." : "Subscribe"}
           </Button>
         </form>
