@@ -2,45 +2,68 @@ import { EmailCapture } from "@/components/email-capture";
 
 export default function NewsletterPage() {
   return (
-    <div className="container mx-auto px-4 py-20">
-      <div className="max-w-2xl mx-auto text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6">
-          Join the Newsletter
-        </h1>
-        <p className="text-xl text-muted-foreground mb-8">
-          Get exclusive tips, product updates, and special deals delivered to your inbox.
-          No spam, unsubscribe anytime.
-        </p>
+    <div className="min-h-screen bg-neutral-50">
+      <div 
+        className="relative h-[40vh] flex items-center justify-center bg-cover bg-center"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&q=80')",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative z-10 text-center text-white px-4">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-wider mb-4">NEWSLETTER</h1>
+          <p className="text-xl tracking-wide">Join thousands of creators building their empire</p>
+        </div>
       </div>
 
-      <div className="max-w-2xl mx-auto">
-        <EmailCapture 
-          source="newsletter-page" 
-          title="Subscribe Now"
-          description="Join thousands of creators building their businesses"
-        />
-      </div>
+      <div className="container mx-auto px-4 py-20">
+        <div className="max-w-2xl mx-auto">
+          <EmailCapture 
+            source="newsletter-page" 
+            title="STAY IN THE LOOP"
+            description="Get exclusive tools, early access, and insider tips delivered weekly."
+          />
+        </div>
 
-      <div className="max-w-2xl mx-auto mt-16">
-        <h2 className="text-2xl font-bold mb-6">What you'll get:</h2>
-        <ul className="space-y-4">
-          <li className="flex items-start">
-            <span className="mr-3 text-primary">✓</span>
-            <span>Weekly tips and strategies for digital creators</span>
-          </li>
-          <li className="flex items-start">
-            <span className="mr-3 text-primary">✓</span>
-            <span>Early access to new products and features</span>
-          </li>
-          <li className="flex items-start">
-            <span className="mr-3 text-primary">✓</span>
-            <span>Exclusive discounts and special offers</span>
-          </li>
-          <li className="flex items-start">
-            <span className="mr-3 text-primary">✓</span>
-            <span>Case studies from successful creators</span>
-          </li>
-        </ul>
+        <div className="max-w-3xl mx-auto mt-20">
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-xl font-bold mb-4 tracking-wide">WEEKLY INSIGHTS</h3>
+              <ul className="space-y-3 text-neutral-700">
+                <li className="flex items-start">
+                  <span className="mr-3 font-bold">→</span>
+                  <span>Proven strategies from 6-figure creators</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 font-bold">→</span>
+                  <span>Behind-the-scenes case studies</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 font-bold">→</span>
+                  <span>Market trends and opportunities</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-bold mb-4 tracking-wide">EXCLUSIVE ACCESS</h3>
+              <ul className="space-y-3 text-neutral-700">
+                <li className="flex items-start">
+                  <span className="mr-3 font-bold">→</span>
+                  <span>Early product launches and beta access</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 font-bold">→</span>
+                  <span>Subscriber-only discounts up to 50% off</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 font-bold">→</span>
+                  <span>Free templates and resources monthly</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
