@@ -29,6 +29,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    // Only include image if it's a full URL (Stripe requirement)
+    const imageUrl = product.thumbnail_url?.startsWith('http') ? product.thumbnail_url : undefined;
+    
     const session = await stripe.checkout.sessions.create({
       mode: product.price_type === "subscription" ? "subscription" : "payment",
       line_items: [
@@ -38,7 +41,7 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: product.name,
               description: product.description,
-              images: product.thumbnail_url ? [product.thumbnail_url] : [],
+              ...(imageUrl && { images: [imageUrl] }),
             },
             unit_amount: Math.round(product.price),
             ...(product.price_type === "subscription" && {
