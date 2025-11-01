@@ -2,15 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { query } from "@/lib/db";
 
-// This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
-const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+  const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+  const baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+  
+  if (!apiKey || !baseURL) {
+    throw new Error("AI Integrations not configured");
+  }
+  
+  return new OpenAI({
+    baseURL,
+    apiKey,
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
     const { message, messages } = await request.json();
+    
+    const openai = getOpenAIClient();
 
     // Fetch all available products from the store
     const productsResult = await query(
@@ -55,7 +65,7 @@ When recommending products, use this format in your response:
 
 Be conversational and strategic - you're a business consultant, not just a product catalog.`;
 
-    // Call OpenAI API
+    // Call OpenAI API (using Replit AI Integrations)
     const completion = await openai.chat.completions.create({
       model: "gpt-5", // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
       messages: [
