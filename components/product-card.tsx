@@ -26,11 +26,11 @@ export function ProductCard({ product }: ProductCardProps) {
       <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border-stone-200 group">
         <CardHeader className="p-0">
           {product.thumbnail_url && (
-            <div className="aspect-[4/5] bg-neutral-100 overflow-hidden">
+            <div className="aspect-[4/5] bg-stone-50 overflow-hidden">
               <img
                 src={product.thumbnail_url}
                 alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
               />
             </div>
           )}

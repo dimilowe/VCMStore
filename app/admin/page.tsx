@@ -371,11 +371,13 @@ export default function AdminPage() {
             <Card key={product.id}>
               <CardHeader>
                 {product.thumbnail_url && (
-                  <img
-                    src={product.thumbnail_url}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded mb-4"
-                  />
+                  <div className="w-full h-48 bg-stone-50 rounded mb-4 flex items-center justify-center">
+                    <img
+                      src={product.thumbnail_url}
+                      alt={product.name}
+                      className="max-w-full max-h-full object-contain rounded"
+                    />
+                  </div>
                 )}
                 <CardTitle className="text-lg">{product.name}</CardTitle>
                 <div className="flex gap-2 mt-2">

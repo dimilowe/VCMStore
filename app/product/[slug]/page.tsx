@@ -41,11 +41,11 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <div className="grid lg:grid-cols-2 gap-12 mb-16">
         <div>
           {product.thumbnail_url && (
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden mb-6">
+            <div className="aspect-video bg-stone-50 rounded-lg overflow-hidden mb-6 flex items-center justify-center">
               <img
                 src={product.thumbnail_url}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           )}
