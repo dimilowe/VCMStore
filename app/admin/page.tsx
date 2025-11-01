@@ -105,29 +105,28 @@ export default function AdminPage() {
   };
 
   const handleFileUpload = async (file: File): Promise<string> => {
-    // Get presigned upload URL from backend
-    const res = await fetch("/api/admin/upload", { method: "POST" });
-    const data = await res.json();
+    // Create form data with file
+    const formData = new FormData();
+    formData.append("file", file);
     
-    if (!data.uploadUrl || !data.publicUrl) {
-      throw new Error("Failed to get upload URLs");
-    }
-    
-    // Upload file to object storage
-    const uploadRes = await fetch(data.uploadUrl, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-Type": file.type,
-      },
+    // Upload file directly to backend
+    const res = await fetch("/api/admin/upload", {
+      method: "POST",
+      body: formData,
     });
     
-    if (!uploadRes.ok) {
+    if (!res.ok) {
       throw new Error("Failed to upload file");
     }
     
-    // Return the public URL
-    return data.publicUrl;
+    const data = await res.json();
+    
+    if (!data.fileUrl) {
+      throw new Error("No file URL returned");
+    }
+    
+    // Return the file URL
+    return data.fileUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
