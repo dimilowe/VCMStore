@@ -1,10 +1,26 @@
 import { randomUUID } from "crypto";
-import { Client } from "@replit/object-storage";
+import { Storage } from "@google-cloud/storage";
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
-// Initialize the Replit object storage client
-const replitStorageClient = new Client();
+// Initialize the Google Cloud Storage client with Replit credentials
+const objectStorageClient = new Storage({
+  credentials: {
+    audience: "replit",
+    subject_token_type: "access_token",
+    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+    type: "external_account",
+    credential_source: {
+      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+      format: {
+        type: "json",
+        subject_token_field_name: "access_token",
+      },
+    },
+    universe_domain: "googleapis.com",
+  },
+  projectId: "",
+});
 
 export class ObjectStorageService {
   private bucketName: string = "Uploads";
@@ -20,7 +36,6 @@ export class ObjectStorageService {
 
   async getUploadUrl(): Promise<{ uploadUrl: string; publicUrl: string }> {
     const bucketName = this.getBucketName();
-
     const objectId = randomUUID();
     const objectName = `products/${objectId}`;
 
@@ -82,8 +97,9 @@ export class ObjectStorageService {
     );
 
     if (!response.ok) {
+      const errorText = await response.text();
       throw new Error(
-        `Failed to sign object URL, status: ${response.status}`
+        `Failed to sign object URL, status: ${response.status}, error: ${errorText}`
       );
     }
 
