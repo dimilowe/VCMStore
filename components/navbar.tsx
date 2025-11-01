@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 
 export function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -129,12 +130,74 @@ export function Navbar() {
               )}
             </div>
             
-            <Button variant="ghost" size="icon" className="md:hidden text-neutral-800">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden text-stone-800 hover:text-yellow-500"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
               <Menu className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
+      
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-stone-200 bg-white">
+          <div className="px-6 py-4 space-y-3">
+            <Link 
+              href="/apps" 
+              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              APPS
+            </Link>
+            <Link 
+              href="/downloads" 
+              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              DOWNLOADS
+            </Link>
+            <Link 
+              href="/funnels" 
+              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              FUNNELS
+            </Link>
+            <Link 
+              href="/freebies" 
+              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              FREEBIES
+            </Link>
+            <Link 
+              href="/videos" 
+              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              VIDEOS
+            </Link>
+            <Link 
+              href="/newsletter" 
+              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              NEWSLETTER
+            </Link>
+            <Link 
+              href="/chat" 
+              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              AI CHAT
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
