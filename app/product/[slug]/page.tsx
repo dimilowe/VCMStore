@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ProductRecommendations } from "@/components/product-recommendations";
 import { ClaimButton } from "@/components/claim-button";
+import ReactMarkdown from 'react-markdown';
 
 interface Product {
   id: string;
@@ -60,9 +61,22 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
           </div>
 
-          <p className="text-lg text-muted-foreground mb-8">
-            {product.description}
-          </p>
+          <div className="prose prose-stone max-w-none text-lg text-muted-foreground mb-8">
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => <p className="mb-4">{children}</p>,
+                strong: ({ children }) => <strong className="font-semibold text-stone-900">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                h1: ({ children }) => <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>,
+                h2: ({ children }) => <h3 className="text-xl font-semibold mt-5 mb-2">{children}</h3>,
+                h3: ({ children }) => <h4 className="text-lg font-semibold mt-4 mb-2">{children}</h4>,
+                ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
+              }}
+            >
+              {product.description}
+            </ReactMarkdown>
+          </div>
 
           <Card className="p-6 mb-6">
             <div className="text-center mb-6">
