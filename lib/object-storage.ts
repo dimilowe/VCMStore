@@ -1,56 +1,71 @@
-import { Storage } from "@google-cloud/storage";
 import { randomUUID } from "crypto";
+import { Client } from "@replit/object-storage";
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
-export const objectStorageClient = new Storage({
-  credentials: {
-    audience: "replit",
-    subject_token_type: "access_token",
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: "external_account",
-    credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-      format: {
-        type: "json",
-        subject_token_field_name: "access_token",
-      },
-    },
-    universe_domain: "googleapis.com",
-  },
-  projectId: "",
-});
+// Initialize the Replit object storage client
+const replitStorageClient = new Client();
 
 export class ObjectStorageService {
-  private bucketName: string;
+  private bucketName: string | null = null;
 
   constructor() {
-    // Try to get bucket name from environment variable or use default
-    this.bucketName = process.env.STORAGE_BUCKET || "";
+    // Bucket name will be detected on first use
   }
   
-  async ensureBucket(): Promise<string> {
+  async getBucketName(): Promise<string> {
     if (this.bucketName) {
       return this.bucketName;
     }
     
-    // List all buckets and use the first one
+    // Get bucket from Replit client
     try {
-      const [buckets] = await objectStorageClient.getBuckets();
-      if (buckets && buckets.length > 0) {
-        this.bucketName = buckets[0].name;
-        return this.bucketName;
-      }
+      // The client.list() call will automatically connect to the bucket
+      // and we can extract its name from the response
+      await replitStorageClient.list();
+      
+      // The bucket is now initialized, extract its name from any subsequent operation
+      // For now, use a simple fallback that we'll update
+      this.bucketName = await this.detectBucketName();
+      return this.bucketName;
     } catch (error) {
-      console.error("Error getting buckets:", error);
+      console.error("Error accessing storage:", error);
+      throw new Error("No storage bucket found. Please create a bucket in App Storage.");
+    }
+  }
+  
+  private async detectBucketName(): Promise<string> {
+    // List objects to get bucket info
+    const response = await replitStorageClient.list();
+    if (response.ok && response.value.length > 0) {
+      // Extract bucket name from the first object's URL
+      const firstObject = response.value[0];
+      if (firstObject.bucket) {
+        return firstObject.bucket;
+      }
     }
     
-    throw new Error("No storage bucket found. Please create a bucket in App Storage.");
+    // If no objects exist, we need to upload a test object to get the bucket name
+    // Or use environment variable as fallback
+    if (process.env.STORAGE_BUCKET) {
+      return process.env.STORAGE_BUCKET;
+    }
+    
+    // Default bucket pattern used by Replit
+    // The bucket will be automatically created when we upload
+    const testKey = `.test-${randomUUID()}`;
+    await replitStorageClient.uploadFromText(testKey, "test");
+    const uploadedObj = await replitStorageClient.list({ prefix: testKey });
+    if (uploadedObj.ok && uploadedObj.value.length > 0 && uploadedObj.value[0].bucket) {
+      await replitStorageClient.delete(testKey); // Clean up
+      return uploadedObj.value[0].bucket;
+    }
+    
+    throw new Error("Could not detect bucket name");
   }
 
   async getUploadUrl(): Promise<{ uploadUrl: string; publicUrl: string }> {
-    // Ensure we have a bucket
-    const bucketName = await this.ensureBucket();
+    const bucketName = await this.getBucketName();
 
     const objectId = randomUUID();
     const objectName = `products/${objectId}`;

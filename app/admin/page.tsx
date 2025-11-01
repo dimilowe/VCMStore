@@ -329,7 +329,7 @@ export default function AdminPage() {
                       return url;
                     }}
                     accept="image/*"
-                    maxSize={5242880}
+                    maxSize={20971520}
                     currentUrl={formData.thumbnail_url}
                     onRemove={() => setFormData({ ...formData, thumbnail_url: "" })}
                     placeholder="Drop your image here or click to browse"
@@ -345,7 +345,7 @@ export default function AdminPage() {
                       setFormData({ ...formData, download_url: url });
                       return url;
                     }}
-                    maxSize={52428800}
+                    maxSize={524288000}
                     currentUrl={formData.download_url}
                     onRemove={() => setFormData({ ...formData, download_url: "" })}
                     placeholder="Drop your file here or click to browse"
