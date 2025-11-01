@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ObjectUploader } from "@/components/object-uploader";
-import { Plus, Edit, Trash2, Upload } from "lucide-react";
+import { InlineUploader } from "@/components/inline-uploader";
+import { Plus, Edit, Trash2 } from "lucide-react";
 
 interface Product {
   id: string;
@@ -104,10 +104,8 @@ export default function AdminPage() {
     }
   };
 
-  // Map upload URLs to their corresponding public URLs
-  const [uploadUrlMap, setUploadUrlMap] = useState<Map<string, string>>(new Map());
-
-  const handleGetUploadParameters = async () => {
+  const handleFileUpload = async (file: File): Promise<string> => {
+    // Get presigned upload URL from backend
     const res = await fetch("/api/admin/upload", { method: "POST" });
     const data = await res.json();
     
@@ -115,40 +113,21 @@ export default function AdminPage() {
       throw new Error("Failed to get upload URLs");
     }
     
-    // Store the mapping from upload URL to public URL
-    setUploadUrlMap((prev) => {
-      const newMap = new Map(prev);
-      newMap.set(data.uploadUrl, data.publicUrl);
-      return newMap;
+    // Upload file to object storage
+    const uploadRes = await fetch(data.uploadUrl, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-Type": file.type,
+      },
     });
     
-    return {
-      method: "PUT" as const,
-      url: data.uploadUrl,
-    };
-  };
-
-  const handleUploadComplete = (result: any, field: "thumbnail_url" | "download_url") => {
-    if (result.successful && result.successful.length > 0) {
-      const uploadedFile = result.successful[0];
-      const uploadUrl = uploadedFile.uploadURL;
-      
-      // Find the corresponding public URL from our map
-      const publicUrl = uploadUrlMap.get(uploadUrl);
-      
-      if (publicUrl) {
-        setFormData((prev) => ({ ...prev, [field]: publicUrl }));
-        
-        // Clean up the map entry after using it
-        setUploadUrlMap((prev) => {
-          const newMap = new Map(prev);
-          newMap.delete(uploadUrl);
-          return newMap;
-        });
-      } else {
-        console.error("Could not find public URL for uploaded file");
-      }
+    if (!uploadRes.ok) {
+      throw new Error("Failed to upload file");
     }
+    
+    // Return the public URL
+    return data.publicUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -343,44 +322,35 @@ export default function AdminPage() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Thumbnail Image</label>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      placeholder="Thumbnail URL"
-                      value={formData.thumbnail_url}
-                      onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
-                    />
-                    <ObjectUploader
-                      maxNumberOfFiles={1}
-                      maxFileSize={5242880}
-                      onGetUploadParameters={handleGetUploadParameters}
-                      onComplete={(result) => handleUploadComplete(result, "thumbnail_url")}
-                      buttonClassName="bg-stone-700 hover:bg-stone-800"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload
-                    </ObjectUploader>
-                  </div>
+                  <InlineUploader
+                    onUpload={async (file) => {
+                      const url = await handleFileUpload(file);
+                      setFormData({ ...formData, thumbnail_url: url });
+                      return url;
+                    }}
+                    accept="image/*"
+                    maxSize={5242880}
+                    currentUrl={formData.thumbnail_url}
+                    onRemove={() => setFormData({ ...formData, thumbnail_url: "" })}
+                    placeholder="Drop your image here or click to browse"
+                    showPreview={true}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Download File (for freebies/downloads)</label>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      placeholder="Download URL"
-                      value={formData.download_url}
-                      onChange={(e) => setFormData({ ...formData, download_url: e.target.value })}
-                    />
-                    <ObjectUploader
-                      maxNumberOfFiles={1}
-                      maxFileSize={52428800}
-                      onGetUploadParameters={handleGetUploadParameters}
-                      onComplete={(result) => handleUploadComplete(result, "download_url")}
-                      buttonClassName="bg-stone-700 hover:bg-stone-800"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload
-                    </ObjectUploader>
-                  </div>
+                  <InlineUploader
+                    onUpload={async (file) => {
+                      const url = await handleFileUpload(file);
+                      setFormData({ ...formData, download_url: url });
+                      return url;
+                    }}
+                    maxSize={52428800}
+                    currentUrl={formData.download_url}
+                    onRemove={() => setFormData({ ...formData, download_url: "" })}
+                    placeholder="Drop your file here or click to browse"
+                    showPreview={false}
+                  />
                 </div>
 
                 <div className="flex gap-2">
