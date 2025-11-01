@@ -166,7 +166,7 @@ export default function AdminPage() {
       description: product.description,
       type: product.type,
       price_type: product.price_type,
-      price: product.price,
+      price: Math.round(parseFloat(product.price as any) * 100),
       thumbnail_url: product.thumbnail_url || "",
       download_url: product.download_url || "",
       visibility: product.visibility,
@@ -313,9 +313,10 @@ export default function AdminPage() {
 
                   <Input
                     type="number"
-                    placeholder="Price (in cents)"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
+                    step="0.01"
+                    placeholder="Price (in dollars)"
+                    value={formData.price / 100}
+                    onChange={(e) => setFormData({ ...formData, price: Math.round(parseFloat(e.target.value) * 100) || 0 })}
                   />
                 </div>
 
