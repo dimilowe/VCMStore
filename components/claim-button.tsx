@@ -9,9 +9,11 @@ interface Product {
   id: string;
   slug: string;
   name: string;
+  type: string;
   price_type: string;
   price: number;
   stripe_price_id: string;
+  external_url?: string | null;
 }
 
 interface ClaimButtonProps {
@@ -24,8 +26,15 @@ export function ClaimButton({ product }: ClaimButtonProps) {
   const router = useRouter();
 
   const isFree = product.price_type === "free" || product.price === 0;
+  const hasExternalUrl = product.external_url && product.external_url.trim() !== "";
 
   const handleClick = async () => {
+    // If it's an app with an external URL, redirect there
+    if (hasExternalUrl && product.external_url) {
+      window.open(product.external_url, '_blank');
+      return;
+    }
+    
     if (isFree) {
       setShowAuthModal(true);
     } else {
@@ -74,7 +83,7 @@ export function ClaimButton({ product }: ClaimButtonProps) {
         onClick={handleClick}
         disabled={loading}
       >
-        {loading ? "Processing..." : isFree ? "Get it Free" : "Buy Now"}
+        {loading ? "Processing..." : hasExternalUrl ? "Check It Out" : isFree ? "Get it Free" : "Buy Now"}
       </Button>
 
       {showAuthModal && (

@@ -25,15 +25,16 @@ export async function PUT(
       price,
       thumbnail_url,
       download_url,
+      external_url,
       visibility,
     } = await request.json();
 
     const result = await query(
       `UPDATE products 
        SET slug = $1, name = $2, description = $3, type = $4, price_type = $5, 
-           price = $6, thumbnail_url = $7, download_url = $8, visibility = $9,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $10
+           price = $6, thumbnail_url = $7, download_url = $8, external_url = $9, 
+           visibility = $10, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $11
        RETURNING *`,
       [
         slug,
@@ -44,6 +45,7 @@ export async function PUT(
         price,
         thumbnail_url,
         download_url,
+        external_url,
         visibility,
         id,
       ]

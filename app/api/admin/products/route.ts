@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
       price,
       thumbnail_url,
       download_url,
+      external_url,
       visibility,
     } = await request.json();
 
@@ -55,8 +56,8 @@ export async function POST(request: NextRequest) {
 
     const result = await query(
       `INSERT INTO products 
-        (slug, name, description, type, price_type, price, thumbnail_url, download_url, visibility)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        (slug, name, description, type, price_type, price, thumbnail_url, download_url, external_url, visibility)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [
         slug,
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
         price || 0,
         thumbnail_url || null,
         download_url || null,
+        external_url || null,
         visibility || "public",
       ]
     );

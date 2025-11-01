@@ -20,6 +20,7 @@ interface Product {
   price: number;
   thumbnail_url: string | null;
   download_url: string | null;
+  external_url: string | null;
   visibility: string;
 }
 
@@ -42,6 +43,7 @@ export default function AdminPage() {
     price: 0,
     thumbnail_url: "",
     download_url: "",
+    external_url: "",
     visibility: "public",
   });
 
@@ -169,6 +171,7 @@ export default function AdminPage() {
       price: Math.round(parseFloat(product.price as any) * 100),
       thumbnail_url: product.thumbnail_url || "",
       download_url: product.download_url || "",
+      external_url: product.external_url || "",
       visibility: product.visibility,
     });
     setShowForm(true);
@@ -203,6 +206,7 @@ export default function AdminPage() {
       price: 0,
       thumbnail_url: "",
       download_url: "",
+      external_url: "",
       visibility: "public",
     });
     setEditingProduct(null);
@@ -336,6 +340,18 @@ export default function AdminPage() {
                     showPreview={true}
                   />
                 </div>
+
+                {formData.type === "app" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">External URL (for apps)</label>
+                    <Input
+                      placeholder="https://your-app-url.com"
+                      value={formData.external_url}
+                      onChange={(e) => setFormData({ ...formData, external_url: e.target.value })}
+                    />
+                    <p className="text-xs text-stone-500">The URL where users will be redirected when they click "Check It Out"</p>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Download File (for freebies/downloads)</label>
