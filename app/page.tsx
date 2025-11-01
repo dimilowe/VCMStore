@@ -17,7 +17,7 @@ export default function HomePage() {
         <div className="relative z-10 text-center text-white px-4">
           <Link href="/apps">
             <Button 
-              className="mb-8 bg-amber-600 hover:bg-amber-700 text-white border-0 px-8 py-6 text-sm tracking-widest shadow-lg"
+              className="mb-8 bg-yellow-700 hover:bg-yellow-800 text-white border-0 px-8 py-6 text-sm tracking-widest shadow-lg"
             >
               SHOP NOW
             </Button>
@@ -33,35 +33,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-neutral-100 py-20">
+      <section className="bg-stone-100 py-20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
             <div className="text-center">
-              <h3 className="text-xl font-bold mb-3 tracking-wide text-neutral-900">PREMIUM APPS</h3>
-              <p className="text-neutral-600 mb-4">
+              <h3 className="text-xl font-bold mb-3 tracking-wide text-stone-900">PREMIUM APPS</h3>
+              <p className="text-stone-600 mb-4">
                 Professional-grade applications built for creators who demand excellence
               </p>
-              <Link href="/apps" className="inline-block text-sm font-medium text-amber-600 hover:text-amber-700 underline hover:no-underline">
+              <Link href="/apps" className="inline-block text-sm font-medium text-yellow-700 hover:text-yellow-800 underline hover:no-underline">
                 EXPLORE APPS
               </Link>
             </div>
             
             <div className="text-center">
-              <h3 className="text-xl font-bold mb-3 tracking-wide text-neutral-900">CONVERSION FUNNELS</h3>
-              <p className="text-neutral-600 mb-4">
+              <h3 className="text-xl font-bold mb-3 tracking-wide text-stone-900">CONVERSION FUNNELS</h3>
+              <p className="text-stone-600 mb-4">
                 Proven sales funnels that turn visitors into customers effortlessly
               </p>
-              <Link href="/funnels" className="inline-block text-sm font-medium text-amber-600 hover:text-amber-700 underline hover:no-underline">
+              <Link href="/funnels" className="inline-block text-sm font-medium text-yellow-700 hover:text-yellow-800 underline hover:no-underline">
                 VIEW FUNNELS
               </Link>
             </div>
             
             <div className="text-center">
-              <h3 className="text-xl font-bold mb-3 tracking-wide text-neutral-900">FREE RESOURCES</h3>
-              <p className="text-neutral-600 mb-4">
+              <h3 className="text-xl font-bold mb-3 tracking-wide text-stone-900">FREE RESOURCES</h3>
+              <p className="text-stone-600 mb-4">
                 Start your journey with our collection of free tools and templates
               </p>
-              <Link href="/freebies" className="inline-block text-sm font-medium text-amber-600 hover:text-amber-700 underline hover:no-underline">
+              <Link href="/freebies" className="inline-block text-sm font-medium text-yellow-700 hover:text-yellow-800 underline hover:no-underline">
                 GET FREEBIES
               </Link>
             </div>
@@ -69,7 +69,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white py-20 border-t border-neutral-200">
+      <section className="bg-stone-50 py-20 border-t border-stone-200">
         <div className="max-w-2xl mx-auto px-4">
           <EmailCapture 
             source="homepage" 

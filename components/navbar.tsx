@@ -6,43 +6,43 @@ import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   return (
-    <nav className="bg-white text-neutral-800 border-b border-neutral-200">
-      <div className="bg-amber-600 text-white text-center py-2 text-xs tracking-wider">
+    <nav className="bg-white text-stone-800 border-b border-stone-200">
+      <div className="bg-stone-700 text-white text-center py-2 text-xs tracking-wider">
         FREE SHIPPING ON ORDERS $50+ | INSTANT DELIVERY | LIFETIME UPDATES
       </div>
       
       <div className="container mx-auto px-4 py-5 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold tracking-wider text-neutral-900">
+        <Link href="/" className="text-2xl font-bold tracking-wider text-stone-900">
           VCM STORE
         </Link>
         
         <div className="hidden md:flex items-center space-x-8">
-          <Link href="/apps" className="text-sm font-medium tracking-wide hover:text-amber-600 transition-colors">
+          <Link href="/apps" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
             APPS
           </Link>
-          <Link href="/downloads" className="text-sm font-medium tracking-wide hover:text-amber-600 transition-colors">
+          <Link href="/downloads" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
             DOWNLOADS
           </Link>
-          <Link href="/funnels" className="text-sm font-medium tracking-wide hover:text-amber-600 transition-colors">
+          <Link href="/funnels" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
             FUNNELS
           </Link>
-          <Link href="/freebies" className="text-sm font-medium tracking-wide hover:text-amber-600 transition-colors">
+          <Link href="/freebies" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
             FREEBIES
           </Link>
-          <Link href="/videos" className="text-sm font-medium tracking-wide hover:text-amber-600 transition-colors">
+          <Link href="/videos" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
             VIDEOS
           </Link>
-          <Link href="/newsletter" className="text-sm font-medium tracking-wide hover:text-amber-600 transition-colors">
+          <Link href="/newsletter" className="text-sm font-medium tracking-wide hover:text-yellow-700 transition-colors">
             NEWSLETTER
           </Link>
         </div>
         
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="text-neutral-800 hover:text-amber-600">
+          <Button variant="ghost" size="icon" className="text-stone-800 hover:text-yellow-700">
             <Search className="h-5 w-5" />
           </Button>
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="text-neutral-800 hover:text-amber-600">
+            <Button variant="ghost" size="icon" className="text-stone-800 hover:text-yellow-700">
               <User className="h-5 w-5" />
             </Button>
           </Link>

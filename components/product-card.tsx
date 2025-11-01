@@ -23,7 +23,7 @@ export function ProductCard({ product }: ProductCardProps) {
   
   return (
     <Link href={`/product/${product.slug}`}>
-      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border-neutral-200 group">
+      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border-stone-200 group">
         <CardHeader className="p-0">
           {product.thumbnail_url && (
             <div className="aspect-[4/5] bg-neutral-100 overflow-hidden">
@@ -37,20 +37,20 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardHeader>
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-2 mb-2">
-            <CardTitle className="text-base font-semibold tracking-wide text-neutral-900">{product.name}</CardTitle>
-            <Badge variant="outline" className="capitalize shrink-0 text-xs border-amber-600 text-amber-600">
+            <CardTitle className="text-base font-semibold tracking-wide text-stone-900">{product.name}</CardTitle>
+            <Badge variant="outline" className="capitalize shrink-0 text-xs border-yellow-700 text-yellow-700">
               {product.type}
             </Badge>
           </div>
-          <p className="text-sm text-neutral-600 line-clamp-2">
+          <p className="text-sm text-stone-600 line-clamp-2">
             {product.description}
           </p>
         </CardContent>
         <CardFooter className="p-6 pt-0 flex items-center justify-between">
-          <div className="text-lg font-bold text-neutral-900">
+          <div className="text-lg font-bold text-stone-900">
             {isFree ? "Free" : `$${(product.price / 100).toFixed(2)}`}
           </div>
-          <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700">
+          <Button variant="ghost" size="sm" className="text-yellow-700 hover:text-yellow-800">
             {isFree ? "Claim" : "View"}
           </Button>
         </CardFooter>

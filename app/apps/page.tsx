@@ -41,7 +41,7 @@ export default async function AppsPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 bg-neutral-50">
+      <div className="container mx-auto px-4 py-16 bg-stone-50">
         {apps.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-lg text-neutral-600">No apps available yet. Check back soon!</p>

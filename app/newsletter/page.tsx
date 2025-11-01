@@ -16,7 +16,7 @@ export default function NewsletterPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-20 bg-neutral-50">
+      <div className="container mx-auto px-4 py-20 bg-stone-50">
         <div className="max-w-2xl mx-auto">
           <EmailCapture 
             source="newsletter-page" 
@@ -28,8 +28,8 @@ export default function NewsletterPage() {
         <div className="max-w-3xl mx-auto mt-20">
           <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <h3 className="text-xl font-bold mb-4 tracking-wide text-neutral-900">WEEKLY INSIGHTS</h3>
-              <ul className="space-y-3 text-neutral-600">
+              <h3 className="text-xl font-bold mb-4 tracking-wide text-stone-900">WEEKLY INSIGHTS</h3>
+              <ul className="space-y-3 text-stone-600">
                 <li className="flex items-start">
                   <span className="mr-3 font-bold">→</span>
                   <span>Proven strategies from 6-figure creators</span>
@@ -46,8 +46,8 @@ export default function NewsletterPage() {
             </div>
             
             <div>
-              <h3 className="text-xl font-bold mb-4 tracking-wide text-neutral-900">EXCLUSIVE ACCESS</h3>
-              <ul className="space-y-3 text-neutral-600">
+              <h3 className="text-xl font-bold mb-4 tracking-wide text-stone-900">EXCLUSIVE ACCESS</h3>
+              <ul className="space-y-3 text-stone-600">
                 <li className="flex items-start">
                   <span className="mr-3 font-bold">→</span>
                   <span>Early product launches and beta access</span>
