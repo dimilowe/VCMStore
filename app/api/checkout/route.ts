@@ -33,7 +33,20 @@ export async function POST(request: NextRequest) {
       mode: product.price_type === "subscription" ? "subscription" : "payment",
       line_items: [
         {
-          price: product.stripe_price_id,
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: product.name,
+              description: product.description,
+              images: product.thumbnail_url ? [product.thumbnail_url] : [],
+            },
+            unit_amount: Math.round(product.price),
+            ...(product.price_type === "subscription" && {
+              recurring: {
+                interval: "month",
+              },
+            }),
+          },
           quantity: 1,
         },
       ],

@@ -65,7 +65,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </p>
 
           <Card className="p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="text-center mb-6">
               <div className="text-3xl font-bold">
                 {isFree ? "Free" : `$${(product.price / 100).toFixed(2)}`}
               </div>
