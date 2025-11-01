@@ -55,10 +55,10 @@ export function EmailCapture({ source, title, description }: EmailCaptureProps) 
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title || "Stay Updated"}</CardTitle>
-        <CardDescription>
+    <Card className="border-neutral-200 shadow-sm">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl tracking-wide text-neutral-900">{title || "Stay Updated"}</CardTitle>
+        <CardDescription className="text-neutral-600">
           {description || "Get the latest products, tips, and exclusive deals."}
         </CardDescription>
       </CardHeader>
@@ -71,8 +71,9 @@ export function EmailCapture({ source, title, description }: EmailCaptureProps) 
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={loading}
+            className="border-neutral-300"
           />
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className="bg-amber-600 hover:bg-amber-700 text-white">
             {loading ? "..." : "Subscribe"}
           </Button>
         </form>

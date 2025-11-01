@@ -27,17 +27,17 @@ export default async function FunnelsPage() {
   const funnels = await getFunnels();
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-white">
       <div 
         className="relative h-[40vh] flex items-center justify-center bg-cover bg-center"
         style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&q=80')",
         }}
       >
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/50 to-neutral-900/70" />
         <div className="relative z-10 text-center text-white px-4">
           <h1 className="text-5xl md:text-6xl font-bold tracking-wider mb-4">FUNNELS</h1>
-          <p className="text-xl tracking-wide">Conversion-optimized sales systems</p>
+          <p className="text-xl tracking-wide text-neutral-100">Conversion-optimized sales systems</p>
         </div>
       </div>
 

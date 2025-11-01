@@ -27,21 +27,21 @@ export default async function AppsPage() {
   const apps = await getApps();
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-white">
       <div 
         className="relative h-[40vh] flex items-center justify-center bg-cover bg-center"
         style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1920&q=80')",
         }}
       >
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/50 to-neutral-900/70" />
         <div className="relative z-10 text-center text-white px-4">
           <h1 className="text-5xl md:text-6xl font-bold tracking-wider mb-4">APPS</h1>
-          <p className="text-xl tracking-wide">Professional tools for your creator business</p>
+          <p className="text-xl tracking-wide text-neutral-100">Professional tools for your creator business</p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-16 bg-neutral-50">
         {apps.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-lg text-neutral-600">No apps available yet. Check back soon!</p>
