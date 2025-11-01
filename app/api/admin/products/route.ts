@@ -5,7 +5,7 @@ import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 import { query } from "@/lib/db";
 
 export async function GET() {
-  const session = await getIronSession<AdminSessionData>(cookies(), sessionOptions);
+  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
 
   if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -26,7 +26,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getIronSession<AdminSessionData>(cookies(), sessionOptions);
+  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
 
   if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Set session
-    const session = await getIronSession<AdminSessionData>(cookies(), sessionOptions);
+    const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
     session.isAdmin = true;
     await session.save();
 

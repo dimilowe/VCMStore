@@ -4,6 +4,6 @@ import { cookies } from "next/headers";
 import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 
 export async function GET() {
-  const session = await getIronSession<AdminSessionData>(cookies(), sessionOptions);
+  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
   return NextResponse.json({ isAdmin: session.isAdmin || false });
 }

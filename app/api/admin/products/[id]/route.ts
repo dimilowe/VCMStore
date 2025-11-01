@@ -8,7 +8,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getIronSession<AdminSessionData>(cookies(), sessionOptions);
+  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
 
   if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -67,7 +67,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getIronSession<AdminSessionData>(cookies(), sessionOptions);
+  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
 
   if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -5,7 +5,7 @@ import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 import { ObjectStorageService } from "@/lib/object-storage";
 
 export async function POST() {
-  const session = await getIronSession<AdminSessionData>(cookies(), sessionOptions);
+  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
 
   if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
