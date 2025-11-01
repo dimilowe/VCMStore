@@ -6,6 +6,14 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
 
+// Allowed file extensions for uploads
+const ALLOWED_EXTENSIONS = [
+  'pdf', 'zip', 'jpg', 'jpeg', 'png', 'gif', 'webp',
+  'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+  'mp3', 'mp4', 'mov', 'avi', 'mkv', 'wav',
+  'txt', 'md', 'csv', 'json'
+];
+
 export async function POST(request: NextRequest) {
   const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
 
@@ -21,10 +29,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    // Validate file extension
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+      return NextResponse.json({ 
+        error: `File type .${ext} not allowed. Allowed types: ${ALLOWED_EXTENSIONS.join(', ')}` 
+      }, { status: 400 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const ext = file.name.split('.').pop();
     const filename = `${randomUUID()}.${ext}`;
     const uploadDir = join(process.cwd(), 'uploads');
     
