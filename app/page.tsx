@@ -47,12 +47,12 @@ export default function HomePage() {
             </div>
             
             <div className="text-center">
-              <h3 className="text-xl font-bold mb-3 tracking-wide text-stone-900">CONVERSION FUNNELS</h3>
+              <h3 className="text-xl font-bold mb-3 tracking-wide text-stone-900">CONVERSION TEMPLATES</h3>
               <p className="text-stone-600 mb-4">
-                Proven sales funnels that turn visitors into customers effortlessly
+                Proven sales templates that turn visitors into customers effortlessly
               </p>
               <Link href="/funnels" className="inline-block text-sm font-medium text-yellow-500 hover:text-yellow-600 underline hover:no-underline">
-                VIEW FUNNELS
+                VIEW TEMPLATES
               </Link>
             </div>
             
