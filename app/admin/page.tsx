@@ -59,7 +59,9 @@ export default function AdminPage() {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch("/api/admin/check");
+      const res = await fetch("/api/admin/check", {
+        credentials: 'include'
+      });
       const data = await res.json();
       setIsAuthenticated(data.isAdmin);
     } catch (error) {
@@ -76,13 +78,14 @@ export default function AdminPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
+        credentials: 'include'
       });
 
       if (res.ok) {
         setPassword("");
         setIsAuthenticated(true);
         // Small delay to ensure session cookie is set
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
         // Load products directly
         await loadProducts();
       } else {
@@ -95,14 +98,19 @@ export default function AdminPage() {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch("/api/admin/logout", { 
+      method: "POST",
+      credentials: 'include'
+    });
     setIsAuthenticated(false);
     router.refresh();
   };
 
   const loadProducts = async () => {
     try {
-      const res = await fetch("/api/admin/products");
+      const res = await fetch("/api/admin/products", {
+        credentials: 'include'
+      });
       const data = await res.json();
       if (!res.ok) {
         console.error("Failed to load products - Status:", res.status, "Data:", data);
