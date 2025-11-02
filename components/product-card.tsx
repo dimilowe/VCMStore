@@ -51,7 +51,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {isFree ? "Free" : `$${(product.price / 100).toFixed(2)}`}
           </div>
           <Button variant="ghost" size="sm" className="text-yellow-500 hover:text-yellow-600">
-            {isFree ? "Claim" : "View"}
+            View
           </Button>
         </CardFooter>
       </Card>
