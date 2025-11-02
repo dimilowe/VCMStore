@@ -40,6 +40,8 @@ export async function POST(request: NextRequest) {
     session.isAdmin = true;
     await session.save();
 
+    console.log("Login successful - Session saved with isAdmin:", session.isAdmin);
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Login error:", error);

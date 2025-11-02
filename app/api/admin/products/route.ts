@@ -7,7 +7,10 @@ import { query } from "@/lib/db";
 export async function GET() {
   const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
 
+  console.log("GET /api/admin/products - Session isAdmin:", session.isAdmin);
+
   if (!session.isAdmin) {
+    console.error("Unauthorized access attempt - isAdmin is false or undefined");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
