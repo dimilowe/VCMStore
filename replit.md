@@ -78,21 +78,23 @@ npm run dev
 ```
 
 ### Environment Variables
-- `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` - Replit-managed PostgreSQL database (auto-provided)
+- `DATABASE_URL` - Neon PostgreSQL connection string (shared across dev and production)
 - `STRIPE_SECRET_KEY` - Stripe secret key
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
 - `SESSION_SECRET` - Session encryption key
 
 ### Database Configuration
-**IMPORTANT**: This project uses the **Replit-managed PostgreSQL database** exclusively.
+**IMPORTANT**: This project uses an **external Neon PostgreSQL database** shared across all environments.
 
-- ✅ Database connection uses `PG*` environment variables (PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD)
-- ✅ These variables are automatically provided and managed by Replit's database integration
-- ✅ Same database is used in both development and production
-- ✅ Supports Replit's automatic rollback features
-- ❌ Do NOT add external DATABASE_URL - it will cause conflicts and different databases in dev/prod
+- ✅ Database connection uses `DATABASE_URL` environment variable
+- ✅ **Same database for both development and production** - changes sync automatically
+- ✅ Products, users, and all data persist across environments
+- ❌ Do NOT use Replit-managed database or PG* variables - they create separate dev/prod databases
+- ❌ Ignore any auto-generated PG* environment variables (PGHOST, PGPORT, etc.)
 
-**Code Implementation**: See `lib/db.ts` which connects using PG* variables for the Replit-managed database.
+**Connection String**: `postgresql://neondb_owner:***@ep-shiny-base-af5mqw3w.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require`
+
+**Code Implementation**: See `lib/db.ts` which connects using DATABASE_URL for the shared Neon database.
 
 ## Recent Changes
 - 2025-11-01: Initial project setup with Next.js 14, database schema, and all core pages
