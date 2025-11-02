@@ -79,8 +79,10 @@ export default function AdminPage() {
       });
 
       if (res.ok) {
-        setIsAuthenticated(true);
         setPassword("");
+        // Wait a moment for the session cookie to be set, then re-check auth
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await checkAuth();
       } else {
         alert("Invalid password");
       }
