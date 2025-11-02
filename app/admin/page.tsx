@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -406,11 +407,14 @@ export default function AdminPage() {
             <Card key={product.id}>
               <CardHeader>
                 {product.thumbnail_url && (
-                  <div className="w-full h-48 bg-stone-50 rounded mb-4 flex items-center justify-center">
-                    <img
+                  <div className="w-full h-48 bg-stone-50 rounded mb-4 relative overflow-hidden">
+                    <Image
                       src={product.thumbnail_url}
                       alt={product.name}
-                      className="max-w-full max-h-full object-contain rounded"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-contain rounded"
+                      unoptimized
                     />
                   </div>
                 )}
