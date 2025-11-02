@@ -36,7 +36,7 @@ export default async function FunnelsPage() {
       >
         <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/50 to-neutral-900/70" />
         <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-wider mb-4">FUNNELS</h1>
+          <h1 className="text-5xl md:text-6xl font-bold tracking-wider mb-4">TEMPLATES</h1>
           <p className="text-xl tracking-wide text-neutral-100">Conversion-optimized sales systems</p>
         </div>
       </div>
@@ -44,7 +44,7 @@ export default async function FunnelsPage() {
       <div className="container mx-auto px-4 py-16">
         {funnels.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-lg text-neutral-600">No funnels available yet. Check back soon!</p>
+            <p className="text-lg text-neutral-600">No templates available yet. Check back soon!</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
