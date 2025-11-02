@@ -79,7 +79,7 @@ export function ClaimButton({ product }: ClaimButtonProps) {
     <>
       <Button
         size="lg"
-        className={`w-full ${hasExternalUrl ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-stone-900 font-semibold' : ''}`}
+        className={`w-full ${hasExternalUrl || !isFree ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-stone-900 font-semibold' : ''}`}
         onClick={handleClick}
         disabled={loading}
       >
