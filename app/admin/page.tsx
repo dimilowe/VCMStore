@@ -80,9 +80,11 @@ export default function AdminPage() {
 
       if (res.ok) {
         setPassword("");
-        // Wait a moment for the session cookie to be set, then re-check auth
-        await new Promise(resolve => setTimeout(resolve, 100));
-        await checkAuth();
+        setIsAuthenticated(true);
+        // Small delay to ensure session cookie is set
+        await new Promise(resolve => setTimeout(resolve, 200));
+        // Load products directly
+        await loadProducts();
       } else {
         alert("Invalid password");
       }
