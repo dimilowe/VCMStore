@@ -1,11 +1,13 @@
 import { Pool } from 'pg';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL must be set');
-}
-
+// Use Replit-managed database via PG* environment variables
+// These are automatically provided by Replit's database integration
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  host: process.env.PGHOST,
+  port: parseInt(process.env.PGPORT || '5432'),
+  database: process.env.PGDATABASE,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
