@@ -78,10 +78,21 @@ npm run dev
 ```
 
 ### Environment Variables
-- `DATABASE_URL` - PostgreSQL connection string
+- `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` - Replit-managed PostgreSQL database (auto-provided)
 - `STRIPE_SECRET_KEY` - Stripe secret key
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
 - `SESSION_SECRET` - Session encryption key
+
+### Database Configuration
+**IMPORTANT**: This project uses the **Replit-managed PostgreSQL database** exclusively.
+
+- ✅ Database connection uses `PG*` environment variables (PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD)
+- ✅ These variables are automatically provided and managed by Replit's database integration
+- ✅ Same database is used in both development and production
+- ✅ Supports Replit's automatic rollback features
+- ❌ Do NOT add external DATABASE_URL - it will cause conflicts and different databases in dev/prod
+
+**Code Implementation**: See `lib/db.ts` which connects using PG* variables for the Replit-managed database.
 
 ## Recent Changes
 - 2025-11-01: Initial project setup with Next.js 14, database schema, and all core pages
