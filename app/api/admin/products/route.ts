@@ -5,20 +5,26 @@ import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 import { query } from "@/lib/db";
 
 export async function GET() {
-  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
+  const cookieStore = await cookies();
+  const session = await getIronSession<AdminSessionData>(cookieStore, sessionOptions);
 
   console.log("GET /api/admin/products - Session isAdmin:", session.isAdmin);
+  console.log("Cookies present:", cookieStore.getAll().map(c => c.name));
 
   if (!session.isAdmin) {
     console.error("Unauthorized access attempt - isAdmin is false or undefined");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    return response;
   }
 
   try {
     const result = await query(
       "SELECT * FROM products ORDER BY created_at DESC"
     );
-    return NextResponse.json({ products: result.rows });
+    const response = NextResponse.json({ products: result.rows });
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    return response;
   } catch (error) {
     console.error("Failed to fetch products:", error);
     return NextResponse.json(

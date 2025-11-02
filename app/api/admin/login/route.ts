@@ -42,7 +42,9 @@ export async function POST(request: NextRequest) {
 
     console.log("Login successful - Session saved with isAdmin:", session.isAdmin);
 
-    return NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true });
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
