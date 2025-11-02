@@ -1,14 +1,14 @@
 import { Pool } from 'pg';
 
-// Use Replit-managed database via PG* environment variables
-// These are automatically provided by Replit's database integration
+// Use Neon database via DATABASE_URL for both dev and production
+// This ensures one shared database across all environments
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL must be set');
+}
+
 export const pool = new Pool({
-  host: process.env.PGHOST,
-  port: parseInt(process.env.PGPORT || '5432'),
-  database: process.env.PGDATABASE,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
 
 export async function query(text: string, params?: any[]) {
