@@ -104,9 +104,16 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/products");
       const data = await res.json();
+      if (!res.ok) {
+        console.error("Failed to load products - Status:", res.status, "Data:", data);
+        alert(`Failed to load products: ${data.error || 'Unknown error'}`);
+        return;
+      }
+      console.log("Products loaded successfully:", data.products?.length || 0, "products");
       setProducts(data.products || []);
     } catch (error) {
       console.error("Failed to load products:", error);
+      alert("Failed to load products - check console for details");
     }
   };
 
