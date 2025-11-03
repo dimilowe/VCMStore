@@ -1,15 +1,18 @@
-import { Pool } from 'pg';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import ws from "ws";
 
-// Use Neon database via DATABASE_URL for both dev and production
-// This ensures one shared database across all environments
+// Configure Neon for serverless environments (like APE)
+neonConfig.webSocketConstructor = ws;
+
 if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL must be set');
+  throw new Error(
+    "DATABASE_URL must be set. Did you forget to provision a database?",
+  );
 }
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+// Use Neon serverless driver for both dev and production
+// This ensures one shared database across all environments
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export async function query(text: string, params?: any[]) {
   const start = Date.now();
