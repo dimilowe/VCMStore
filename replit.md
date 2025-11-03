@@ -101,6 +101,14 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-03: **Migrated to Replit Object Storage** - Fixed image storage for production deployment
+  - All product images and downloads now stored in Replit Object Storage
+  - Created `/api/files/[filename]` route to serve files from Object Storage
+  - Fixed Next.js 15+ async params compatibility issue
+  - Disabled Next.js image optimization to prevent URL mangling
+  - Upload system configured to use `@replit/object-storage` package
+  - Images accessible on both dev and production environments
+  - Note: Product images need to be re-uploaded through admin interface
 - 2025-11-03: **Switched to external Neon database** - Configured shared database for dev and production
   - Created external Neon PostgreSQL database (same setup as APE)
   - All 7 tables created: products, users, posts, entitlements, purchases, subscribers, profiles
