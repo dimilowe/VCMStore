@@ -2,6 +2,11 @@ import { query } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+import { UserSessionData, userSessionOptions } from "@/lib/user-session";
+import { redirect } from "next/navigation";
+import { SessionManager } from "@/components/SessionManager";
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +16,7 @@ interface Entitlement {
   product_slug: string;
   product_type: string;
   thumbnail_url: string;
+  download_url: string;
   created_at: Date;
 }
 
@@ -22,6 +28,7 @@ async function getUserEntitlements(userId: string): Promise<Entitlement[]> {
       p.slug as product_slug,
       p.type as product_type,
       p.thumbnail_url,
+      p.download_url,
       e.created_at
      FROM entitlements e
      JOIN products p ON e.product_id = p.id
@@ -32,9 +39,27 @@ async function getUserEntitlements(userId: string): Promise<Entitlement[]> {
   return result.rows;
 }
 
-export default async function DashboardPage() {
-  const userId = "00000000-0000-0000-0000-000000000000";
-  const entitlements = await getUserEntitlements(userId);
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ success?: string; session_id?: string }> }) {
+  const params = await searchParams;
+  const session = await getIronSession<UserSessionData>(await cookies(), userSessionOptions);
+  
+  if (!session.isLoggedIn || !session.userId) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <SessionManager sessionId={params.session_id} />
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-lg text-muted-foreground mb-4">
+              Please wait while we set up your account...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const entitlements = await getUserEntitlements(session.userId);
+  const showSuccess = params.success === 'true';
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -44,6 +69,14 @@ export default async function DashboardPage() {
           Access all your purchased products and courses
         </p>
       </div>
+
+      {showSuccess && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-green-800 font-medium">
+            ✅ Purchase successful! Your product is ready to download.
+          </p>
+        </div>
+      )}
 
       {entitlements.length === 0 ? (
         <Card>
@@ -62,35 +95,39 @@ export default async function DashboardPage() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {entitlements.map((item) => (
-            <Link
-              key={item.product_id}
-              href={`/${item.product_type}s/${item.product_slug}`}
-            >
-              <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
-                {item.thumbnail_url && (
-                  <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
-                    <img
-                      src={item.thumbnail_url}
-                      alt={item.product_name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+            <Card key={item.product_id} className="h-full hover:shadow-lg transition-shadow">
+              {item.thumbnail_url && (
+                <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
+                  <img
+                    src={item.thumbnail_url}
+                    alt={item.product_name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle className="text-lg">{item.product_name}</CardTitle>
+                  <Badge variant="secondary" className="capitalize shrink-0">
+                    {item.product_type}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Added {new Date(item.created_at).toLocaleDateString()}
+                </p>
+                {item.download_url && (
+                  <a
+                    href={item.download_url}
+                    download
+                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-yellow-500 text-white hover:bg-yellow-600 h-10 px-4 py-2 w-full"
+                  >
+                    Download Now
+                  </a>
                 )}
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg">{item.product_name}</CardTitle>
-                    <Badge variant="secondary" className="capitalize shrink-0">
-                      {item.product_type}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Added {new Date(item.created_at).toLocaleDateString()}
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
