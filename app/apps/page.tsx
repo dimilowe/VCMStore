@@ -2,6 +2,8 @@ import { query } from "@/lib/db";
 import { ProductCard } from "@/components/product-card";
 import { EmailCapture } from "@/components/email-capture";
 
+export const dynamic = 'force-dynamic';
+
 interface Product {
   id: string;
   slug: string;

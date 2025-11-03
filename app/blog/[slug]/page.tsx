@@ -5,6 +5,8 @@ import { EmailCapture } from "@/components/email-capture";
 import { ProductCard } from "@/components/product-card";
 import ReactMarkdown from "react-markdown";
 
+export const dynamic = 'force-dynamic';
+
 interface Post {
   id: string;
   slug: string;

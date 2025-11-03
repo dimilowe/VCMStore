@@ -7,6 +7,8 @@ import { ProductRecommendations } from "@/components/product-recommendations";
 import { ClaimButton } from "@/components/claim-button";
 import ReactMarkdown from 'react-markdown';
 
+export const dynamic = 'force-dynamic';
+
 interface Product {
   id: string;
   slug: string;
