@@ -29,7 +29,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Only include image if it's a full URL (Stripe requirement)
+    const host = request.headers.get('host') || 'localhost:3000';
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
+
     const imageUrl = product.thumbnail_url?.startsWith('http') ? product.thumbnail_url : undefined;
     
     const session = await stripe.checkout.sessions.create({
@@ -53,8 +56,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/dashboard?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/product/${product.slug}?canceled=true`,
+      success_url: `${baseUrl}/dashboard?success=true`,
+      cancel_url: `${baseUrl}/product/${product.slug}?canceled=true`,
       metadata: {
         productId: product.id,
       },
