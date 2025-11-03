@@ -78,7 +78,7 @@ npm run dev
 ```
 
 ### Environment Variables
-- `DATABASE_URL`, `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE` - Replit-managed PostgreSQL (auto-configured)
+- `DATABASE_URL` - External Neon PostgreSQL connection string (shared across dev and production)
 - `STRIPE_SECRET_KEY` - Stripe secret key
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
 - `SESSION_SECRET` - Session encryption key
@@ -86,22 +86,26 @@ npm run dev
 - `STORAGE_BUCKET` - Object storage bucket name for file uploads
 
 ### Database Configuration
-**IMPORTANT**: This project uses **Replit-managed PostgreSQL database** (Neon-backed).
+**IMPORTANT**: This project uses an **external Neon PostgreSQL database** shared across all environments.
 
-- ✅ Database connection uses environment variables (DATABASE_URL or PG* variables)
-- ✅ **Separate databases for development and production** - safe testing environment
-- ✅ Development database visible in Replit Database tab during development
-- ✅ Production database automatically created when you publish your app
-- ✅ Schema changes in dev are applied to production on publish
+- ✅ Database connection uses `DATABASE_URL` environment variable
+- ✅ **One shared database for both development and production** - changes sync instantly
+- ✅ Products, users, and all data persist across environments
+- ✅ What you add in testing immediately appears on the live site
+- ✅ Same setup as APE - external Neon database for unified data
 
-**Current Status**: Fresh database created on 2025-11-03 with all required tables.
+**Current Status**: External Neon database set up on 2025-11-03 with all required tables.
 
-**Code Implementation**: See `lib/db.ts` which connects using DATABASE_URL with automatic retry logic for Neon's auto-suspend feature.
+**Connection**: `postgresql://neondb_owner:***@ep-shiny-sun-ade9bu1b-pooler.c-2.us-east-1.aws.neon.tech/neondb`
+
+**Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
-- 2025-11-03: **Database completely reset** - Created fresh Replit-managed PostgreSQL database with clean schema
-  - All 7 tables recreated: products, users, posts, entitlements, purchases, subscribers, profiles
-  - Fixed database connection issues by switching to Replit-managed database
+- 2025-11-03: **Switched to external Neon database** - Configured shared database for dev and production
+  - Created external Neon PostgreSQL database (same setup as APE)
+  - All 7 tables created: products, users, posts, entitlements, purchases, subscribers, profiles
+  - One unified database - changes in testing instantly appear on live site
+  - Removed retry logic (not needed for external Neon)
   - Server restarted and working properly
 - 2025-11-01: Initial project setup with Next.js 14, database schema, and all core pages
   - Database tables created for products, users, entitlements, posts, subscribers
