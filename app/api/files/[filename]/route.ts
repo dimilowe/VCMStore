@@ -9,7 +9,18 @@ export async function GET(
     const { filename } = await params;
     
     const storage = new Client();
-    const fileData = await storage.downloadAsBytes(filename);
+    const result = await storage.downloadAsBytes(filename);
+    
+    // Replit Object Storage uses a Result pattern
+    if (!result.ok) {
+      console.error("File download error:", result.error);
+      return NextResponse.json(
+        { error: "File not found" },
+        { status: 404 }
+      );
+    }
+    
+    const buffer = result.value;
     
     const ext = filename.split('.').pop()?.toLowerCase();
     const contentTypeMap: Record<string, string> = {
@@ -26,7 +37,7 @@ export async function GET(
     
     const contentType = contentTypeMap[ext || ''] || 'application/octet-stream';
     
-    return new NextResponse(fileData, {
+    return new NextResponse(buffer, {
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=31536000, immutable',
