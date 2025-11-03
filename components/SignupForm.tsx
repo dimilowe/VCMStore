@@ -6,13 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-interface LoginFormProps {
+interface SignupFormProps {
   prefillEmail?: string;
 }
 
-export function LoginForm({ prefillEmail }: LoginFormProps) {
+export function SignupForm({ prefillEmail }: SignupFormProps) {
   const [email, setEmail] = useState(prefillEmail || '');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -22,8 +23,15 @@ export function LoginForm({ prefillEmail }: LoginFormProps) {
     setLoading(true);
     setError('');
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await fetch('/api/auth/login', {
+      // Signup and create session
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -33,9 +41,15 @@ export function LoginForm({ prefillEmail }: LoginFormProps) {
       const data = await res.json();
 
       if (data.success) {
+        // Claim pending purchases
+        await fetch('/api/auth/claim-purchases', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        
         router.refresh();
       } else {
-        setError(data.error || 'Login failed');
+        setError(data.error || 'Signup failed');
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');
@@ -47,9 +61,9 @@ export function LoginForm({ prefillEmail }: LoginFormProps) {
   return (
     <Card className="max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Welcome Back</CardTitle>
+        <CardTitle>Complete Your Purchase</CardTitle>
         <CardDescription>
-          Login to access your purchased products
+          Create your account to access your purchase
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -67,9 +81,20 @@ export function LoginForm({ prefillEmail }: LoginFormProps) {
           <div>
             <Input
               type="password"
-              placeholder="Password"
+              placeholder="Password (min 8 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              minLength={8}
+            />
+          </div>
+          <div>
+            <Input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={loading}
               minLength={8}
@@ -83,7 +108,7 @@ export function LoginForm({ prefillEmail }: LoginFormProps) {
             className="w-full bg-yellow-500 hover:bg-yellow-600"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Creating Account...' : 'Create Account & Access Purchase'}
           </Button>
         </form>
       </CardContent>

@@ -32,19 +32,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No email found" }, { status: 400 });
     }
 
-    const user = await findOrCreateUserByEmail(customerEmail);
-    
-    const session = await getIronSession<UserSessionData>(await cookies(), userSessionOptions);
-    session.userId = user.id;
-    session.email = user.email;
-    session.isLoggedIn = true;
-    await session.save();
+    // Check if user exists
+    const { query } = await import("@/lib/db");
+    const result = await query(
+      "SELECT id, email FROM users WHERE email = $1",
+      [customerEmail.toLowerCase().trim()]
+    );
 
-    return NextResponse.json({ success: true, userId: user.id });
+    if (result.rows.length > 0) {
+      // User exists - return their info so they can login
+      return NextResponse.json({ 
+        userExists: true, 
+        email: customerEmail 
+      });
+    } else {
+      // User doesn't exist - return email so they can sign up
+      return NextResponse.json({ 
+        userExists: false, 
+        email: customerEmail 
+      });
+    }
   } catch (error) {
-    console.error("Session creation error:", error);
+    console.error("Session check error:", error);
     return NextResponse.json(
-      { error: "Failed to create session" },
+      { error: "Failed to check session" },
       { status: 500 }
     );
   }

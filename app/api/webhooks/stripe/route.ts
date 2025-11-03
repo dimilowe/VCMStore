@@ -49,20 +49,37 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Missing data" }, { status: 400 });
       }
 
-      const user = await findOrCreateUserByEmail(customerEmail);
-
-      await query(
-        `INSERT INTO purchases (user_id, product_id, stripe_payment_id, amount, status) 
-         VALUES ($1, $2, $3, $4, $5)`,
-        [user.id, productId, session.payment_intent, session.amount_total, "completed"]
+      // Check if user exists
+      const userResult = await query(
+        "SELECT id FROM users WHERE email = $1",
+        [customerEmail.toLowerCase().trim()]
       );
 
-      await query(
-        `INSERT INTO entitlements (user_id, product_id, source) 
-         VALUES ($1, $2, $3)
-         ON CONFLICT (user_id, product_id) DO NOTHING`,
-        [user.id, productId, "purchase"]
-      );
+      if (userResult.rows.length > 0) {
+        // User exists, grant entitlement
+        const userId = userResult.rows[0].id;
+
+        await query(
+          `INSERT INTO purchases (user_id, product_id, stripe_payment_id, amount, status) 
+           VALUES ($1, $2, $3, $4, $5)`,
+          [userId, productId, session.payment_intent, session.amount_total, "completed"]
+        );
+
+        await query(
+          `INSERT INTO entitlements (user_id, product_id, source) 
+           VALUES ($1, $2, $3)
+           ON CONFLICT (user_id, product_id) DO NOTHING`,
+          [userId, productId, "purchase"]
+        );
+      } else {
+        // User doesn't exist - store pending purchase
+        // The purchase will be claimed when they create their account
+        await query(
+          `INSERT INTO purchases (user_id, product_id, stripe_payment_id, amount, status) 
+           VALUES ($1, $2, $3, $4, $5)`,
+          ['00000000-0000-0000-0000-000000000000', productId, session.payment_intent, session.amount_total, "pending"]
+        );
+      }
     }
 
     return NextResponse.json({ received: true });

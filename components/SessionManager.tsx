@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { LoginForm } from './LoginForm';
+import { SignupForm } from './SignupForm';
+import { Card, CardContent } from './ui/card';
 
 export function SessionManager({ sessionId }: { sessionId?: string }) {
-  const router = useRouter();
+  const [status, setStatus] = useState<'loading' | 'signup' | 'login' | 'error'>('loading');
+  const [email, setEmail] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (sessionId) {
@@ -16,15 +20,65 @@ export function SessionManager({ sessionId }: { sessionId?: string }) {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data.success) {
-            router.refresh();
+          if (data.userExists === true) {
+            setStatus('login');
+            setEmail(data.email);
+          } else if (data.userExists === false) {
+            setStatus('signup');
+            setEmail(data.email);
+          } else if (data.error) {
+            setStatus('error');
+            setError(data.error);
           }
         })
         .catch((error) => {
-          console.error('Session creation failed:', error);
+          console.error('Session check failed:', error);
+          setStatus('error');
+          setError('Failed to verify purchase. Please try again.');
         });
     }
-  }, [sessionId, router]);
+  }, [sessionId]);
+
+  if (status === 'loading') {
+    return (
+      <Card className="max-w-md mx-auto">
+        <CardContent className="py-12 text-center">
+          <p className="text-lg text-muted-foreground">
+            Verifying your purchase...
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <Card className="max-w-md mx-auto">
+        <CardContent className="py-12 text-center">
+          <p className="text-lg text-red-600 mb-4">{error}</p>
+          <p className="text-sm text-muted-foreground">
+            Please contact support if this issue persists.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (status === 'signup') {
+    return <SignupForm prefillEmail={email} />;
+  }
+
+  if (status === 'login') {
+    return (
+      <div className="space-y-4">
+        <div className="text-center mb-6">
+          <p className="text-lg text-green-600 font-medium">✅ Purchase successful!</p>
+          <p className="text-muted-foreground">Login to access your product</p>
+        </div>
+        <LoginForm prefillEmail={email} />
+      </div>
+    );
+  }
 
   return null;
 }
