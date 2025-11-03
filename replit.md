@@ -101,6 +101,15 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-03: **Implemented Email + Password Authentication** - Complete post-purchase authentication system
+  - Users create accounts AFTER purchasing (browse anonymously, authenticate only when buying)
+  - Signup: Email + password (8+ characters), hashed with bcrypt, auto-login after signup
+  - Login: Email + password verification with proper session management
+  - Pending purchase system: Webhook stores purchases with NULL user_id when user doesn't exist
+  - Claim purchases: After signup/login, pending purchases are matched to user via Stripe payment intent
+  - SessionManager: Detects if user exists → shows signup or login form accordingly
+  - iron-session: Cookie-based session management for secure authentication
+  - Purchase flow: Stripe checkout → redirect → signup/login → claim purchases → access dashboard
 - 2025-11-03: **Migrated to Replit Object Storage** - Fixed image storage for production deployment
   - All product images and downloads now stored in Replit Object Storage
   - Created `/api/files/[filename]` route to serve files from Object Storage
@@ -125,9 +134,33 @@ npm run dev
 ## User Preferences
 None specified yet.
 
+## Authentication Flow
+
+### Purchase Flow (New Customers)
+1. Customer browses products anonymously (no account required)
+2. Customer clicks "Buy Now" → Stripe Checkout (collects email)
+3. Stripe redirects to `/dashboard?session_id=XXX`
+4. SessionManager checks if email exists in users table
+5. If no account exists → SignupForm (email prefilled, set password)
+6. User creates account → Auto-login with iron-session
+7. Claim purchases endpoint matches pending purchases by Stripe payment intent email
+8. Purchases transferred from NULL user_id to new user's ID
+9. Entitlements granted → User sees purchased products in dashboard
+
+### Login Flow (Returning Customers)
+1. Customer visits `/dashboard`
+2. If no session → LoginForm displayed
+3. Enter email + password → Verify with bcrypt
+4. Create iron-session → Redirect to dashboard with purchases
+
+### Security Features
+- Passwords hashed with bcrypt (min 8 characters)
+- iron-session for secure cookie-based authentication
+- Pending purchases stored with NULL user_id until claimed
+- Email matching via Stripe payment intent for claim verification
+
 ## Next Steps
 - Add real AI integration (OpenAI/Anthropic)
-- Implement session management with cookies/JWT
 - Add email sending for purchase confirmations
 - Create admin panel for product management
 - Add product search and filtering
