@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { Client } from "@replit/object-storage";
 import { randomUUID } from "crypto";
 
 // Allowed file extensions for uploads
@@ -41,14 +40,11 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     const filename = `${randomUUID()}.${ext}`;
-    const uploadDir = join(process.cwd(), 'uploads');
     
-    await mkdir(uploadDir, { recursive: true });
-    
-    const filepath = join(uploadDir, filename);
-    await writeFile(filepath, buffer);
+    const storage = new Client();
+    await storage.uploadFromBytes(filename, buffer);
 
-    const fileUrl = `/uploads/${filename}`;
+    const fileUrl = `/api/files/${filename}`;
     
     return NextResponse.json({ 
       success: true,
