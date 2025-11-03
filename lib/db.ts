@@ -17,33 +17,9 @@ export const pool = new Pool({
   connectionTimeoutMillis: 30000,
 });
 
-async function executeWithRetry<T>(
-  operation: () => Promise<T>,
-  retries = 5
-): Promise<T> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      return await operation();
-    } catch (error: any) {
-      const isLastAttempt = i === retries - 1;
-      const isSuspendError = error?.message?.includes('endpoint') && 
-                            error?.message?.includes('disabled');
-      
-      if (isLastAttempt || !isSuspendError) {
-        throw error;
-      }
-      
-      const delay = 2000 * (i + 1);
-      console.log(`Database connection retry ${i + 1}/${retries} after ${delay}ms (endpoint waking up)`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-  throw new Error('Max retries exceeded');
-}
-
 export async function query(text: string, params?: any[]) {
   const start = Date.now();
-  const res = await executeWithRetry(() => pool.query(text, params));
+  const res = await pool.query(text, params);
   const duration = Date.now() - start;
   console.log('executed query', { text, duration, rows: res.rowCount });
   return res;
