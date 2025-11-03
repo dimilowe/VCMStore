@@ -33,6 +33,7 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isMigrating, setIsMigrating] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -105,6 +106,32 @@ export default function AdminPage() {
     });
     setIsAuthenticated(false);
     router.refresh();
+  };
+
+  const handleMigrateImages = async () => {
+    if (!confirm("Migrate all existing images from local storage to object storage? This will update all product URLs.")) {
+      return;
+    }
+    
+    setIsMigrating(true);
+    try {
+      const res = await fetch("/api/admin/migrate-images", {
+        method: "POST",
+        credentials: 'include'
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        alert(`Migration complete!\n\nMigrated: ${data.migratedCount} files\nSkipped: ${data.skippedCount} files\nUpdated: ${data.updatedCount} database records`);
+        await loadProducts();
+      } else {
+        alert(`Migration failed: ${data.error}`);
+      }
+    } catch (error: any) {
+      alert(`Migration error: ${error.message}`);
+    } finally {
+      setIsMigrating(false);
+    }
   };
 
   const loadProducts = async () => {
@@ -273,6 +300,13 @@ export default function AdminPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold tracking-wide">Admin Dashboard</h1>
           <div className="flex gap-4">
+            <Button 
+              onClick={handleMigrateImages} 
+              variant="outline"
+              disabled={isMigrating}
+            >
+              {isMigrating ? "Migrating..." : "Migrate Images"}
+            </Button>
             <Button onClick={() => setShowForm(true)} className="bg-yellow-500 hover:bg-yellow-600">
               <Plus className="mr-2 h-4 w-4" />
               Add Product
