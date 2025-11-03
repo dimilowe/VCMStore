@@ -5,8 +5,8 @@ import Link from "next/link";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { UserSessionData, userSessionOptions } from "@/lib/user-session";
-import { redirect } from "next/navigation";
 import { SessionManager } from "@/components/SessionManager";
+import { LoginForm } from "@/components/LoginForm";
 
 export const dynamic = 'force-dynamic';
 
@@ -44,18 +44,32 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const session = await getIronSession<UserSessionData>(await cookies(), userSessionOptions);
   
   if (!session.isLoggedIn || !session.userId) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <SessionManager sessionId={params.session_id} />
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-lg text-muted-foreground mb-4">
-              Please wait while we set up your account...
+    if (params.session_id) {
+      return (
+        <div className="container mx-auto px-4 py-12">
+          <SessionManager sessionId={params.session_id} />
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="text-lg text-muted-foreground mb-4">
+                Please wait while we set up your account...
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    } else {
+      return (
+        <div className="container mx-auto px-4 py-12">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold mb-2">My Dashboard</h1>
+            <p className="text-xl text-muted-foreground">
+              Access your purchased products
             </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+          </div>
+          <LoginForm />
+        </div>
+      );
+    }
   }
 
   const entitlements = await getUserEntitlements(session.userId);
