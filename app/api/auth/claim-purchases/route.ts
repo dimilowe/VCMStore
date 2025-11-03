@@ -36,13 +36,12 @@ export async function POST(request: NextRequest) {
     const userEmail = userResult.rows[0].email;
     const stripe = getStripeClient();
 
-    // Find pending purchases
+    // Find pending purchases (with NULL user_id)
     const pendingResult = await query(
       `SELECT id, product_id, stripe_payment_intent_id
        FROM purchases
        WHERE status = 'pending'
-       AND user_id = $1`,
-      ['00000000-0000-0000-0000-000000000000']
+       AND user_id IS NULL`
     );
 
     let claimed = 0;

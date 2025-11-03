@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         const userId = userResult.rows[0].id;
 
         await query(
-          `INSERT INTO purchases (user_id, product_id, stripe_payment_id, amount, status) 
+          `INSERT INTO purchases (user_id, product_id, stripe_payment_intent_id, amount, status) 
            VALUES ($1, $2, $3, $4, $5)`,
           [userId, productId, session.payment_intent, session.amount_total, "completed"]
         );
@@ -72,12 +72,12 @@ export async function POST(request: NextRequest) {
           [userId, productId, "purchase"]
         );
       } else {
-        // User doesn't exist - store pending purchase
+        // User doesn't exist - store pending purchase with NULL user_id
         // The purchase will be claimed when they create their account
         await query(
-          `INSERT INTO purchases (user_id, product_id, stripe_payment_id, amount, status) 
+          `INSERT INTO purchases (user_id, product_id, stripe_payment_intent_id, amount, status) 
            VALUES ($1, $2, $3, $4, $5)`,
-          ['00000000-0000-0000-0000-000000000000', productId, session.payment_intent, session.amount_total, "pending"]
+          [null, productId, session.payment_intent, session.amount_total, "pending"]
         );
       }
     }
