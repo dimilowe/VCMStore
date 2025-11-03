@@ -14,12 +14,12 @@ if (!process.env.DATABASE_URL) {
 // This ensures one shared database across all environments
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  connectionTimeoutMillis: 15000,
+  connectionTimeoutMillis: 30000,
 });
 
 async function executeWithRetry<T>(
   operation: () => Promise<T>,
-  retries = 3
+  retries = 5
 ): Promise<T> {
   for (let i = 0; i < retries; i++) {
     try {
@@ -33,7 +33,7 @@ async function executeWithRetry<T>(
         throw error;
       }
       
-      const delay = 1000 * (i + 1);
+      const delay = 2000 * (i + 1);
       console.log(`Database connection retry ${i + 1}/${retries} after ${delay}ms (endpoint waking up)`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
