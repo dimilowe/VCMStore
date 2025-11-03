@@ -20,7 +20,7 @@ export async function GET(
       );
     }
     
-    const buffer = result.value;
+    const bufferData = result.value;
     
     const ext = filename.split('.').pop()?.toLowerCase();
     const contentTypeMap: Record<string, string> = {
@@ -37,7 +37,12 @@ export async function GET(
     
     const contentType = contentTypeMap[ext || ''] || 'application/octet-stream';
     
-    return new NextResponse(buffer, {
+    // Convert buffer array to Uint8Array for NextResponse compatibility
+    // The result.value is an array of Buffers, so we need to extract the first one
+    const buffer = Array.isArray(bufferData) ? bufferData[0] : bufferData;
+    const uint8Array = new Uint8Array(buffer);
+    
+    return new NextResponse(uint8Array, {
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=31536000, immutable',
