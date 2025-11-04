@@ -61,7 +61,8 @@ export function SignupForm({ prefillEmail }: SignupFormProps) {
           });
         }
         
-        router.refresh();
+        // Force full page reload to update navbar state
+        window.location.href = '/dashboard';
       } else {
         setError(data.error || 'Signup failed');
       }

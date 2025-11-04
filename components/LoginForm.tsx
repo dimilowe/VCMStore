@@ -53,7 +53,8 @@ export function LoginForm({ prefillEmail }: LoginFormProps) {
           });
         }
         
-        router.refresh();
+        // Force full page reload to update navbar state
+        window.location.href = '/dashboard';
       } else {
         setError(data.error || 'Login failed');
       }
