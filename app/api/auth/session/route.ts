@@ -117,6 +117,7 @@ export async function GET() {
         isLoggedIn: true,
         userId: session.userId,
         email: session.email,
+        isAdmin: session.isAdmin || false,
       });
     }
     

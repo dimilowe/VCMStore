@@ -10,6 +10,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -32,10 +33,12 @@ export function Navbar() {
       .then((res) => res.json())
       .then((data) => {
         setIsLoggedIn(data.isLoggedIn || false);
+        setIsAdmin(data.isAdmin || false);
         setIsCheckingSession(false);
       })
       .catch(() => {
         setIsLoggedIn(false);
+        setIsAdmin(false);
         setIsCheckingSession(false);
       });
   }, []);
@@ -106,12 +109,14 @@ export function Navbar() {
                             </div>
                           </Link>
                           
-                          <Link href="/admin" onClick={() => setIsProfileOpen(false)}>
-                            <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
-                              <ShieldCheck className="h-4 w-4 text-yellow-600" />
-                              <span className="text-sm font-medium tracking-wide text-stone-800">ADMIN</span>
-                            </div>
-                          </Link>
+                          {isAdmin && (
+                            <Link href="/admin" onClick={() => setIsProfileOpen(false)}>
+                              <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
+                                <ShieldCheck className="h-4 w-4 text-yellow-600" />
+                                <span className="text-sm font-medium tracking-wide text-stone-800">ADMIN</span>
+                              </div>
+                            </Link>
+                          )}
                           
                           <div className="border-t border-stone-200 my-2"></div>
                           

@@ -5,6 +5,7 @@ export interface User {
   id: string;
   email: string;
   created_at: Date;
+  is_admin?: boolean;
 }
 
 export async function createUser(email: string, password: string): Promise<User> {
@@ -27,7 +28,7 @@ export async function createUser(email: string, password: string): Promise<User>
 
 export async function verifyPassword(email: string, password: string): Promise<User | null> {
   const result = await query(
-    'SELECT id, email, password_hash, created_at FROM users WHERE email = $1',
+    'SELECT id, email, password_hash, created_at, is_admin FROM users WHERE email = $1',
     [email]
   );
   
@@ -46,6 +47,7 @@ export async function verifyPassword(email: string, password: string): Promise<U
     id: user.id,
     email: user.email,
     created_at: user.created_at,
+    is_admin: user.is_admin,
   };
 }
 
