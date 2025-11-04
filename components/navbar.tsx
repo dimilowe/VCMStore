@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Search, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut } from "lucide-react";
+import { User, Search, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 
@@ -9,6 +9,8 @@ export function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,6 +21,23 @@ export function Navbar() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Check session status on mount
+  useEffect(() => {
+    fetch('/api/auth/session', {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setIsLoggedIn(data.isLoggedIn || false);
+        setIsCheckingSession(false);
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setIsCheckingSession(false);
+      });
   }, []);
 
   return (
@@ -64,71 +83,88 @@ export function Navbar() {
               <Search className="h-5 w-5" />
             </Button>
             
-            <div className="relative" ref={dropdownRef}>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-stone-800 hover:text-yellow-500"
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-              >
-                <User className="h-5 w-5" />
-              </Button>
-              
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-stone-200 shadow-lg z-50">
-                  <div className="py-2">
-                    <Link href="/dashboard" onClick={() => setIsProfileOpen(false)}>
-                      <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
-                        <LayoutDashboard className="h-4 w-4 text-stone-600" />
-                        <span className="text-sm font-medium tracking-wide text-stone-800">DASHBOARD</span>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/admin" onClick={() => setIsProfileOpen(false)}>
-                      <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
-                        <ShieldCheck className="h-4 w-4 text-yellow-600" />
-                        <span className="text-sm font-medium tracking-wide text-stone-800">ADMIN</span>
-                      </div>
-                    </Link>
-                    
-                    <div className="border-t border-stone-200 my-2"></div>
-                    
-                    <Link href="/settings" onClick={() => setIsProfileOpen(false)}>
-                      <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
-                        <Settings className="h-4 w-4 text-stone-600" />
-                        <span className="text-sm font-medium tracking-wide text-stone-800">SETTINGS</span>
-                      </div>
-                    </Link>
-                    
-                    <button 
-                      onClick={async () => {
-                        if (isLoggingOut) return;
-                        setIsLoggingOut(true);
-                        setIsProfileOpen(false);
-                        try {
-                          const response = await fetch('/api/admin/logout', { method: 'POST' });
-                          if (!response.ok) {
-                            console.error('Logout failed:', response.statusText);
-                          }
-                        } catch (error) {
-                          console.error('Logout error:', error);
-                        }
-                        window.location.href = '/';
-                      }}
-                      disabled={isLoggingOut}
-                      className="w-full"
+            {!isCheckingSession && (
+              <>
+                {isLoggedIn ? (
+                  <div className="relative" ref={dropdownRef}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-stone-800 hover:text-yellow-500"
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
                     >
-                      <div className={`flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer ${isLoggingOut ? 'opacity-50' : ''}`}>
-                        <LogOut className="h-4 w-4 text-stone-600" />
-                        <span className="text-sm font-medium tracking-wide text-stone-800">
-                          {isLoggingOut ? 'SIGNING OUT...' : 'SIGN OUT'}
-                        </span>
+                      <User className="h-5 w-5" />
+                    </Button>
+                    
+                    {isProfileOpen && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-stone-200 shadow-lg z-50">
+                        <div className="py-2">
+                          <Link href="/dashboard" onClick={() => setIsProfileOpen(false)}>
+                            <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
+                              <LayoutDashboard className="h-4 w-4 text-stone-600" />
+                              <span className="text-sm font-medium tracking-wide text-stone-800">DASHBOARD</span>
+                            </div>
+                          </Link>
+                          
+                          <Link href="/admin" onClick={() => setIsProfileOpen(false)}>
+                            <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
+                              <ShieldCheck className="h-4 w-4 text-yellow-600" />
+                              <span className="text-sm font-medium tracking-wide text-stone-800">ADMIN</span>
+                            </div>
+                          </Link>
+                          
+                          <div className="border-t border-stone-200 my-2"></div>
+                          
+                          <Link href="/settings" onClick={() => setIsProfileOpen(false)}>
+                            <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer">
+                              <Settings className="h-4 w-4 text-stone-600" />
+                              <span className="text-sm font-medium tracking-wide text-stone-800">SETTINGS</span>
+                            </div>
+                          </Link>
+                          
+                          <button 
+                            onClick={async () => {
+                              if (isLoggingOut) return;
+                              setIsLoggingOut(true);
+                              setIsProfileOpen(false);
+                              try {
+                                const response = await fetch('/api/admin/logout', { method: 'POST' });
+                                if (!response.ok) {
+                                  console.error('Logout failed:', response.statusText);
+                                }
+                              } catch (error) {
+                                console.error('Logout error:', error);
+                              }
+                              setIsLoggedIn(false);
+                              window.location.href = '/';
+                            }}
+                            disabled={isLoggingOut}
+                            className="w-full"
+                          >
+                            <div className={`flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer ${isLoggingOut ? 'opacity-50' : ''}`}>
+                              <LogOut className="h-4 w-4 text-stone-600" />
+                              <span className="text-sm font-medium tracking-wide text-stone-800">
+                                {isLoggingOut ? 'SIGNING OUT...' : 'SIGN OUT'}
+                              </span>
+                            </div>
+                          </button>
+                        </div>
                       </div>
-                    </button>
+                    )}
                   </div>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <Link href="/login">
+                    <Button 
+                      variant="ghost" 
+                      className="text-stone-800 hover:text-yellow-500 font-medium tracking-wide"
+                    >
+                      <LogIn className="h-4 w-4 mr-2" />
+                      SIGN IN
+                    </Button>
+                  </Link>
+                )}
+              </>
+            )}
             
             <Button 
               variant="ghost" 
