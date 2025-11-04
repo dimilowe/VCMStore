@@ -4,6 +4,7 @@ import { UserSessionData, userSessionOptions } from "@/lib/user-session";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PasswordChangeForm } from "@/components/PasswordChangeForm";
+import { EmailChangeForm } from "@/components/EmailChangeForm";
 import { query } from "@/lib/db";
 
 export default async function SettingsPage() {
@@ -39,10 +40,6 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Email Address</label>
-              <p className="text-lg">{user.email}</p>
-            </div>
-            <div>
               <label className="text-sm font-medium text-muted-foreground">Member Since</label>
               <p className="text-lg">{new Date(user.created_at).toLocaleDateString('en-US', { 
                 year: 'numeric', 
@@ -50,6 +47,17 @@ export default async function SettingsPage() {
                 day: 'numeric' 
               })}</p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Email Update */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Change Email Address</CardTitle>
+            <CardDescription>Update the email address associated with your account</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EmailChangeForm currentEmail={user.email} />
           </CardContent>
         </Card>
 

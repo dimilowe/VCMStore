@@ -128,7 +128,7 @@ export function Navbar() {
                               setIsLoggingOut(true);
                               setIsProfileOpen(false);
                               try {
-                                const response = await fetch('/api/admin/logout', { method: 'POST' });
+                                const response = await fetch('/api/auth/logout', { method: 'POST' });
                                 if (!response.ok) {
                                   console.error('Logout failed:', response.statusText);
                                 }
