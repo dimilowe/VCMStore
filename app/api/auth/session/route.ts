@@ -27,13 +27,60 @@ export async function POST(request: NextRequest) {
     const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId);
     
     const customerEmail = checkoutSession.customer_email || checkoutSession.customer_details?.email;
+    const productId = checkoutSession.metadata?.productId;
+    const paymentIntentId = checkoutSession.payment_intent;
+    const amount = checkoutSession.amount_total;
     
     if (!customerEmail) {
       return NextResponse.json({ error: "No email found" }, { status: 400 });
     }
 
-    // Check if user exists
+    if (!productId || !paymentIntentId) {
+      return NextResponse.json({ error: "Invalid purchase data" }, { status: 400 });
+    }
+
     const { query } = await import("@/lib/db");
+
+    // Record the purchase immediately (if not already recorded)
+    const existingPurchase = await query(
+      "SELECT id FROM purchases WHERE stripe_payment_intent_id = $1",
+      [paymentIntentId]
+    );
+
+    if (existingPurchase.rows.length === 0) {
+      // Check if user exists
+      const userResult = await query(
+        "SELECT id FROM users WHERE email = $1",
+        [customerEmail.toLowerCase().trim()]
+      );
+
+      if (userResult.rows.length > 0) {
+        // User exists - record purchase with their ID and grant entitlement
+        const userId = userResult.rows[0].id;
+
+        await query(
+          `INSERT INTO purchases (user_id, product_id, stripe_payment_intent_id, amount, status) 
+           VALUES ($1, $2, $3, $4, $5)`,
+          [userId, productId, paymentIntentId, amount, "completed"]
+        );
+
+        await query(
+          `INSERT INTO entitlements (user_id, product_id, source) 
+           VALUES ($1, $2, $3)
+           ON CONFLICT (user_id, product_id) DO NOTHING`,
+          [userId, productId, "purchase"]
+        );
+      } else {
+        // User doesn't exist - store pending purchase
+        await query(
+          `INSERT INTO purchases (user_id, product_id, stripe_payment_intent_id, amount, status) 
+           VALUES ($1, $2, $3, $4, $5)`,
+          [null, productId, paymentIntentId, amount, "pending"]
+        );
+      }
+    }
+
+    // Check if user exists and return appropriate response
     const result = await query(
       "SELECT id, email FROM users WHERE email = $1",
       [customerEmail.toLowerCase().trim()]
