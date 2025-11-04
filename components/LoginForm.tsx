@@ -33,6 +33,26 @@ export function LoginForm({ prefillEmail }: LoginFormProps) {
       const data = await res.json();
 
       if (data.success) {
+        // Check for new purchases and trigger downloads
+        const claimRes = await fetch('/api/auth/claim-purchases', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        
+        const claimData = await claimRes.json();
+        
+        // Trigger automatic downloads for any newly claimed products
+        if (claimData.downloadUrls && claimData.downloadUrls.length > 0) {
+          claimData.downloadUrls.forEach((url: string, index: number) => {
+            setTimeout(() => {
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = '';
+              link.click();
+            }, index * 500); // Stagger downloads by 500ms
+          });
+        }
+        
         router.refresh();
       } else {
         setError(data.error || 'Login failed');

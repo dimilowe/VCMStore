@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
     );
 
     let claimed = 0;
+    const downloadUrls: string[] = [];
 
     // Check each pending purchase to see if it matches this user's email
     for (const purchase of pendingResult.rows) {
@@ -80,6 +81,16 @@ export async function POST(request: NextRequest) {
             [session.userId, purchase.product_id]
           );
 
+          // Get product download URL
+          const productResult = await query(
+            "SELECT download_url FROM products WHERE id = $1",
+            [purchase.product_id]
+          );
+
+          if (productResult.rows.length > 0 && productResult.rows[0].download_url) {
+            downloadUrls.push(productResult.rows[0].download_url);
+          }
+
           claimed++;
         }
       } catch (err) {
@@ -87,7 +98,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ claimed });
+    return NextResponse.json({ claimed, downloadUrls });
   } catch (error) {
     console.error("Claim purchases error:", error);
     return NextResponse.json(

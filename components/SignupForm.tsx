@@ -42,10 +42,24 @@ export function SignupForm({ prefillEmail }: SignupFormProps) {
 
       if (data.success) {
         // Claim pending purchases
-        await fetch('/api/auth/claim-purchases', {
+        const claimRes = await fetch('/api/auth/claim-purchases', {
           method: 'POST',
           credentials: 'include',
         });
+        
+        const claimData = await claimRes.json();
+        
+        // Trigger automatic downloads for claimed products
+        if (claimData.downloadUrls && claimData.downloadUrls.length > 0) {
+          claimData.downloadUrls.forEach((url: string, index: number) => {
+            setTimeout(() => {
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = '';
+              link.click();
+            }, index * 500); // Stagger downloads by 500ms
+          });
+        }
         
         router.refresh();
       } else {
