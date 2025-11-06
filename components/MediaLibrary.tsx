@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Loader2, Image as ImageIcon, Upload } from 'lucide-react';
+import { X, Loader2, Image as ImageIcon, Upload, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface MediaLibraryProps {
@@ -86,6 +86,38 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
     }
   };
 
+  const handleDelete = async (filename: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent selecting the image
+    
+    if (!confirm('Are you sure you want to delete this image? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/media/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename }),
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Remove from local state
+        setImages(images.filter(img => img.filename !== filename));
+        // Clear selection if this was the selected image
+        if (selectedUrl === `/api/files/${filename}`) {
+          setSelectedUrl('');
+        }
+      } else {
+        setError(data.error || 'Failed to delete image');
+      }
+    } catch (err) {
+      setError('Failed to delete image');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
@@ -152,7 +184,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
                 <div
                   key={image.filename}
                   onClick={() => setSelectedUrl(image.url)}
-                  className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-4 transition-all ${
+                  className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-4 transition-all group ${
                     selectedUrl === image.url
                       ? 'border-blue-500 shadow-lg'
                       : 'border-transparent hover:border-stone-300'
@@ -163,6 +195,16 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
                     alt={image.filename}
                     className="w-full h-full object-cover"
                   />
+                  
+                  {/* Delete button - appears on hover */}
+                  <button
+                    onClick={(e) => handleDelete(image.filename, e)}
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    title="Delete image"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+
                   {selectedUrl === image.url && (
                     <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">

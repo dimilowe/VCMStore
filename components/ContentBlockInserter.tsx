@@ -34,7 +34,8 @@ export function ContentBlockInserter({ onInsert }: BlockInserterProps) {
   const [galleryUrls, setGalleryUrls] = useState('');
 
   const handleInsertImage = (imageUrl: string) => {
-    const html = `<img src="${imageUrl}" alt="Image" class="w-full rounded-lg my-6" />`;
+    // Insert image with proper paragraph wrapping for Tiptap
+    const html = `<p><img src="${imageUrl}" alt="Image" /></p>`;
     onInsert(html);
     setActiveModal(null);
     setShowMediaLibrary(false);
