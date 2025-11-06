@@ -178,11 +178,11 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   };
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-white overflow-hidden">
       {/* Main Editor Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Bar */}
-        <div className="border-b px-6 py-3 flex items-center justify-between bg-white">
+        <div className="flex-shrink-0 border-b px-6 py-3 flex items-center justify-between bg-white">
           <Link href="/admin/blog" className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900">
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -245,7 +245,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-80 border-l bg-white overflow-y-auto">
+      <div className="w-80 flex-shrink-0 border-l bg-white overflow-y-auto">
         <div className="p-6 space-y-6">
           {/* Publish Section */}
           <div className="space-y-3">
