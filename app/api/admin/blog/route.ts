@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { adminSessionOptions, AdminSessionData } from "@/lib/session";
+import { UserSessionData, userSessionOptions } from "@/lib/user-session";
 import { query } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getIronSession<AdminSessionData>(await cookies(), adminSessionOptions);
+    const session = await getIronSession<UserSessionData>(await cookies(), userSessionOptions);
     
-    if (!session.isLoggedIn) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    if (!session.isLoggedIn || !session.isAdmin) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     const { title, slug, content, excerpt, meta_description, featured_image_url, published_at } = await request.json();

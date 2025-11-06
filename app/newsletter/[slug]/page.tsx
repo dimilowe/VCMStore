@@ -31,13 +31,14 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
     return null;
   }
   
-  // Increment view count
+  return result.rows[0];
+}
+
+async function incrementViewCount(postId: number): Promise<void> {
   await query(
     `UPDATE blog_posts SET view_count = view_count + 1 WHERE id = $1`,
-    [result.rows[0].id]
+    [postId]
   );
-  
-  return result.rows[0];
 }
 
 async function getRelatedPosts(currentPostId: number): Promise<BlogPost[]> {
@@ -82,6 +83,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!post) {
     notFound();
   }
+  
+  // Increment view count only once during page render
+  await incrementViewCount(post.id);
   
   const relatedPosts = await getRelatedPosts(post.id);
   

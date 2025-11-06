@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { adminSessionOptions, AdminSessionData } from "@/lib/session";
+import { UserSessionData, userSessionOptions } from "@/lib/user-session";
 import { query } from "@/lib/db";
 
 export async function PUT(
@@ -9,10 +9,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getIronSession<AdminSessionData>(await cookies(), adminSessionOptions);
+    const session = await getIronSession<UserSessionData>(await cookies(), userSessionOptions);
     
-    if (!session.isLoggedIn) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    if (!session.isLoggedIn || !session.isAdmin) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -61,10 +61,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getIronSession<AdminSessionData>(await cookies(), adminSessionOptions);
+    const session = await getIronSession<UserSessionData>(await cookies(), userSessionOptions);
     
-    if (!session.isLoggedIn) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    if (!session.isLoggedIn || !session.isAdmin) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     const { id } = await params;
