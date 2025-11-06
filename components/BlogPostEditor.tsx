@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Eye, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
+import { ContentBlockInserter } from '@/components/ContentBlockInserter';
 
 interface BlogPost {
   id?: number;
@@ -37,6 +38,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const [error, setError] = useState('');
   const [excerptOpen, setExcerptOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
   const generateSlug = (text: string) => {
@@ -44,6 +46,29 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
+  };
+
+  const handleInsertBlock = (html: string) => {
+    const textarea = contentRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const currentContent = content;
+    
+    // Insert at cursor position with newlines for proper spacing
+    const beforeCursor = currentContent.substring(0, start);
+    const afterCursor = currentContent.substring(end);
+    const newContent = beforeCursor + '\n\n' + html + '\n\n' + afterCursor;
+    
+    setContent(newContent);
+    
+    // Set cursor position after inserted content
+    setTimeout(() => {
+      const newPosition = start + html.length + 4;
+      textarea.focus();
+      textarea.setSelectionRange(newPosition, newPosition);
+    }, 0);
   };
 
   const handleTitleChange = (newTitle: string) => {
@@ -179,12 +204,16 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
             />
           </div>
 
+          {/* Insert Toolbar */}
+          <ContentBlockInserter onInsert={handleInsertBlock} />
+
           {/* Content Editor */}
-          <div className="prose max-w-none">
+          <div className="prose max-w-none px-4">
             <Textarea
+              ref={contentRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Start writing your post... You can use HTML tags like <h2>, <p>, <strong>, <ul>, etc."
+              placeholder="Start writing your post... Use the toolbar above to insert images, videos, and more!"
               disabled={loading}
               className="w-full min-h-[500px] border-none outline-none resize-none text-base leading-relaxed"
             />
