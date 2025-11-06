@@ -275,16 +275,19 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           <div className="border-t pt-6">
             {/* Slug */}
             <div className="space-y-3 mb-6">
-              <h3 className="font-semibold text-sm">Slug</h3>
+              <h3 className="font-semibold text-sm">URL Slug</h3>
               <Input
                 value={slug}
                 onChange={(e) => setSlug(generateSlug(e.target.value))}
-                placeholder="post-url-slug"
+                placeholder="Auto-generated from title..."
                 disabled={loading}
-                className="text-sm"
+                className="text-sm font-mono"
               />
               <p className="text-xs text-stone-500">
-                /newsletter/{slug || 'your-slug'}
+                Preview: /newsletter/{slug || 'auto-generated-from-title'}
+              </p>
+              <p className="text-xs text-yellow-700 bg-yellow-50 p-2 rounded border border-yellow-200">
+                💡 Auto-generates from your title for SEO. Edit manually if needed.
               </p>
             </div>
 
