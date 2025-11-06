@@ -15,6 +15,9 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState('');
   const [useUrl, setUseUrl] = useState(!!value);
+  
+  // Hard width limit to prevent sidebar expansion
+  const containerMaxWidth = '268px'; // 320px sidebar - 24px padding on each side
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -163,8 +166,13 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
               )}
             </div>
           ) : (
-            <div className="relative rounded-lg overflow-hidden border max-w-full">
-              <img src={value} alt="Featured" className="w-full h-32 object-cover block" />
+            <div className="relative rounded-lg overflow-hidden border" style={{ maxWidth: containerMaxWidth }}>
+              <img 
+                src={value} 
+                alt="Featured" 
+                className="w-full h-32 object-cover block"
+                style={{ maxWidth: containerMaxWidth }}
+              />
               <button
                 type="button"
                 onClick={() => onChange('')}
@@ -187,8 +195,13 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
             className="w-full px-3 py-2 border rounded-lg text-sm"
           />
           {value && (
-            <div className="rounded-lg overflow-hidden border max-w-full">
-              <img src={value} alt="Featured" className="w-full h-32 object-cover block" />
+            <div className="rounded-lg overflow-hidden border" style={{ maxWidth: containerMaxWidth }}>
+              <img 
+                src={value} 
+                alt="Featured" 
+                className="w-full h-32 object-cover block"
+                style={{ maxWidth: containerMaxWidth }}
+              />
             </div>
           )}
         </>
