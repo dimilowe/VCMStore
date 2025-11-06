@@ -63,6 +63,9 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
   useEffect(() => {
     if (editor && onEditorReady) {
       const insertHtml = (html: string) => {
+        // Check if html is valid
+        if (!html) return;
+        
         // Check if this is an image tag
         const imgMatch = html.match(/<img[^>]+src="([^"]+)"/);
         if (imgMatch) {
