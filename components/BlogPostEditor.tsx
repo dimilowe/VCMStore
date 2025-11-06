@@ -188,23 +188,58 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
             Back
           </Link>
           <div className="flex items-center gap-3">
-            <Button
+            <button
               onClick={handleSaveDraft}
-              variant="outline"
-              size="sm"
               disabled={loading || !title || !content}
-              className="border-stone-300 hover:bg-stone-50"
+              style={{
+                padding: '8px 16px',
+                border: '1px solid #d6d3d1',
+                borderRadius: '6px',
+                backgroundColor: 'white',
+                color: '#57534e',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: loading || !title || !content ? 'not-allowed' : 'pointer',
+                opacity: loading || !title || !content ? 0.5 : 1,
+              }}
+              onMouseOver={(e) => {
+                if (!loading && title && content) {
+                  e.currentTarget.style.backgroundColor = '#fafaf9';
+                }
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+              }}
             >
               Save Draft
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={handlePublish}
-              size="sm"
               disabled={loading || !title || !content}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm disabled:bg-stone-300 disabled:text-stone-500"
+              style={{
+                padding: '8px 16px',
+                border: 'none',
+                borderRadius: '6px',
+                backgroundColor: loading || !title || !content ? '#d6d3d1' : '#2563eb',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: loading || !title || !content ? 'not-allowed' : 'pointer',
+                boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+              }}
+              onMouseOver={(e) => {
+                if (!loading && title && content) {
+                  e.currentTarget.style.backgroundColor = '#1d4ed8';
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!loading && title && content) {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                }
+              }}
             >
               {publishedAt && new Date(publishedAt) > new Date() ? 'Schedule' : 'Publish'}
-            </Button>
+            </button>
           </div>
         </div>
 
