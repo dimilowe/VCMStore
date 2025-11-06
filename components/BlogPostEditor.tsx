@@ -245,8 +245,8 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-80 flex-shrink-0 border-l bg-white overflow-y-auto">
-        <div className="p-6 space-y-6">
+      <div className="w-80 max-w-80 flex-shrink-0 border-l bg-white overflow-y-auto overflow-x-hidden">
+        <div className="p-6 space-y-6 max-w-full">
           {/* Publish Section */}
           <div className="space-y-3">
             <h3 className="font-semibold text-sm">Publish</h3>

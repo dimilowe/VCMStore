@@ -148,28 +148,27 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
                     id="featured-image-upload"
                     disabled={uploading || disabled}
                   />
-                  <label htmlFor="featured-image-upload">
+                  <label htmlFor="featured-image-upload" className="cursor-pointer">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="cursor-pointer text-xs"
-                      asChild
+                      className="text-xs pointer-events-none"
                       disabled={disabled}
                     >
-                      <span>Choose File</span>
+                      Choose File
                     </Button>
                   </label>
                 </>
               )}
             </div>
           ) : (
-            <div className="relative rounded-lg overflow-hidden border">
-              <img src={value} alt="Featured" className="w-full h-32 object-cover" />
+            <div className="relative rounded-lg overflow-hidden border max-w-full">
+              <img src={value} alt="Featured" className="w-full h-32 object-cover block" />
               <button
                 type="button"
                 onClick={() => onChange('')}
-                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600"
+                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 flex-shrink-0"
                 disabled={disabled}
               >
                 <X className="w-3 h-3" />
@@ -188,8 +187,8 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
             className="w-full px-3 py-2 border rounded-lg text-sm"
           />
           {value && (
-            <div className="rounded-lg overflow-hidden border">
-              <img src={value} alt="Featured" className="w-full h-32 object-cover" />
+            <div className="rounded-lg overflow-hidden border max-w-full">
+              <img src={value} alt="Featured" className="w-full h-32 object-cover block" />
             </div>
           )}
         </>
