@@ -7,22 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Eye } from "lucide-react";
 
 function formatContent(content: string): string {
-  // Split content by double newlines to identify paragraphs
-  const paragraphs = content.split(/\n\n+/);
-  
-  return paragraphs.map(para => {
-    const trimmed = para.trim();
-    if (!trimmed) return '';
-    
-    // If it's already HTML (starts with <), keep it as is
-    if (trimmed.startsWith('<')) {
-      return trimmed;
-    }
-    
-    // Otherwise, wrap in <p> and convert single newlines to <br>
-    const withBreaks = trimmed.replace(/\n/g, '<br>');
-    return `<p>${withBreaks}</p>`;
-  }).join('\n\n');
+  // Tiptap already outputs HTML, so just return it as-is
+  return content;
 }
 
 interface BlogPost {
