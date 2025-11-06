@@ -6,6 +6,25 @@ import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Eye } from "lucide-react";
 
+function formatContent(content: string): string {
+  // Split content by double newlines to identify paragraphs
+  const paragraphs = content.split(/\n\n+/);
+  
+  return paragraphs.map(para => {
+    const trimmed = para.trim();
+    if (!trimmed) return '';
+    
+    // If it's already HTML (starts with <), keep it as is
+    if (trimmed.startsWith('<')) {
+      return trimmed;
+    }
+    
+    // Otherwise, wrap in <p> and convert single newlines to <br>
+    const withBreaks = trimmed.replace(/\n/g, '<br>');
+    return `<p>${withBreaks}</p>`;
+  }).join('\n\n');
+}
+
 interface BlogPost {
   id: number;
   title: string;
@@ -140,7 +159,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               
               <div 
                 className="prose prose-lg max-w-none prose-headings:text-stone-900 prose-p:text-stone-700 prose-a:text-yellow-600 hover:prose-a:text-yellow-700 prose-strong:text-stone-900"
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
               />
               
               {/* Newsletter CTA */}
