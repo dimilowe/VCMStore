@@ -9,6 +9,7 @@ import { Save, Eye, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { ContentBlockInserter } from '@/components/ContentBlockInserter';
 import { CategorySelector } from '@/components/CategorySelector';
+import { FeaturedImageUploader } from '@/components/FeaturedImageUploader';
 
 interface BlogPost {
   id?: number;
@@ -292,23 +293,12 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
             </div>
 
             {/* Featured Image */}
-            <div className="space-y-3 mb-6">
-              <h3 className="font-semibold text-sm">Featured Image</h3>
-              <Input
+            <div className="mb-6">
+              <FeaturedImageUploader
                 value={featuredImageUrl}
-                onChange={(e) => setFeaturedImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
+                onChange={setFeaturedImageUrl}
                 disabled={loading}
-                className="text-sm"
               />
-              <p className="text-xs text-stone-500">
-                Image URL for social sharing
-              </p>
-              {featuredImageUrl && (
-                <div className="mt-2 rounded border overflow-hidden">
-                  <img src={featuredImageUrl} alt="Featured" className="w-full h-32 object-cover" />
-                </div>
-              )}
             </div>
 
             {/* Categories */}

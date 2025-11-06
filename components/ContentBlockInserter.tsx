@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUploader } from '@/components/ImageUploader';
 import { 
   Image as ImageIcon, 
   Video, 
@@ -22,8 +23,6 @@ interface BlockInserterProps {
 
 export function ContentBlockInserter({ onInsert }: BlockInserterProps) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState('');
-  const [imageAlt, setImageAlt] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [quoteText, setQuoteText] = useState('');
   const [quoteAuthor, setQuoteAuthor] = useState('');
@@ -32,13 +31,10 @@ export function ContentBlockInserter({ onInsert }: BlockInserterProps) {
   const [linkUrl, setLinkUrl] = useState('');
   const [galleryUrls, setGalleryUrls] = useState('');
 
-  const handleInsertImage = () => {
-    if (!imageUrl) return;
-    const html = `<img src="${imageUrl}" alt="${imageAlt || 'Image'}" class="w-full rounded-lg my-6" />`;
+  const handleInsertImage = (imageUrl: string) => {
+    const html = `<img src="${imageUrl}" alt="Image" class="w-full rounded-lg my-6" />`;
     onInsert(html);
     setActiveModal(null);
-    setImageUrl('');
-    setImageAlt('');
   };
 
   const handleInsertVideo = () => {
@@ -206,42 +202,10 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
 
       {/* Modals */}
       {activeModal === 'image' && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Insert Image</h3>
-              <button onClick={() => setActiveModal(null)}>
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium block mb-2">Image URL *</label>
-                <Input
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium block mb-2">Alt Text</label>
-                <Input
-                  value={imageAlt}
-                  onChange={(e) => setImageAlt(e.target.value)}
-                  placeholder="Description of image"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleInsertImage} className="flex-1 bg-blue-600 hover:bg-blue-700">
-                  Insert
-                </Button>
-                <Button onClick={() => setActiveModal(null)} variant="outline">
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ImageUploader
+          onUploadComplete={handleInsertImage}
+          onCancel={() => setActiveModal(null)}
+        />
       )}
 
       {activeModal === 'video' && (
