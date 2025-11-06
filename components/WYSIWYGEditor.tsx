@@ -22,9 +22,10 @@ interface WYSIWYGEditorProps {
   content: string;
   onChange: (html: string) => void;
   onInsertImage?: (url: string) => void;
+  onEditorReady?: (insertHtml: (html: string) => void) => void;
 }
 
-export function WYSIWYGEditor({ content, onChange, onInsertImage }: WYSIWYGEditorProps) {
+export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady }: WYSIWYGEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -57,6 +58,16 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage }: WYSIWYGEdito
       editor.commands.setContent(content);
     }
   }, [content, editor]);
+
+  // Expose insertHtml function to parent component
+  useEffect(() => {
+    if (editor && onEditorReady) {
+      const insertHtml = (html: string) => {
+        editor.chain().focus().insertContent(html).run();
+      };
+      onEditorReady(insertHtml);
+    }
+  }, [editor, onEditorReady]);
 
   if (!editor) {
     return <div className="min-h-[500px] px-4 py-2">Loading editor...</div>;

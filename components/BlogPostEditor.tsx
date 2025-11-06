@@ -44,6 +44,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const [excerptOpen, setExcerptOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
   const router = useRouter();
+  const [editorInsertHtml, setEditorInsertHtml] = useState<((html: string) => void) | null>(null);
 
   // Load existing categories for this post
   useEffect(() => {
@@ -71,8 +72,13 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   };
 
   const handleInsertBlock = (html: string) => {
-    // Simply append the HTML to content
-    setContent(content + '\n\n' + html + '\n\n');
+    // Insert at cursor position using Tiptap editor
+    if (editorInsertHtml) {
+      editorInsertHtml(html);
+    } else {
+      // Fallback: append to content if editor not ready
+      setContent(content + '\n\n' + html + '\n\n');
+    }
   };
 
   const handleTitleChange = (newTitle: string) => {
@@ -267,6 +273,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           <WYSIWYGEditor
             content={content}
             onChange={setContent}
+            onEditorReady={setEditorInsertHtml}
           />
         </div>
       </div>
