@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Metadata } from "next";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import { CategoryFilter } from "@/components/CategoryFilter";
 
 export const metadata: Metadata = {
   title: "Blog & Newsletter | VCM Store",
@@ -23,22 +24,83 @@ interface BlogPost {
   featured_image_url: string | null;
   published_at: Date;
   view_count: number;
+  categories: { id: number; name: string; slug: string }[];
 }
 
-async function getBlogPosts(): Promise<BlogPost[]> {
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  post_count: number;
+}
+
+async function getBlogPosts(categorySlug?: string): Promise<BlogPost[]> {
+  let sql = `
+    SELECT 
+      bp.id, 
+      bp.title, 
+      bp.slug, 
+      bp.excerpt, 
+      bp.featured_image_url, 
+      bp.published_at, 
+      bp.view_count,
+      COALESCE(
+        json_agg(
+          json_build_object('id', c.id, 'name', c.name, 'slug', c.slug)
+        ) FILTER (WHERE c.id IS NOT NULL),
+        '[]'
+      ) as categories
+    FROM blog_posts bp
+    LEFT JOIN blog_post_categories bpc ON bp.id = bpc.blog_post_id
+    LEFT JOIN categories c ON bpc.category_id = c.id
+    WHERE bp.published_at IS NOT NULL AND bp.published_at <= NOW()
+  `;
+
+  if (categorySlug) {
+    sql += ` AND bp.id IN (
+      SELECT blog_post_id FROM blog_post_categories 
+      WHERE category_id = (SELECT id FROM categories WHERE slug = $1)
+    )`;
+  }
+
+  sql += `
+    GROUP BY bp.id
+    ORDER BY bp.published_at DESC
+    LIMIT 50
+  `;
+
+  const result = await query(sql, categorySlug ? [categorySlug] : []);
+  return result.rows;
+}
+
+async function getCategories(): Promise<Category[]> {
   const result = await query(
-    `SELECT id, title, slug, excerpt, featured_image_url, published_at, view_count
-     FROM blog_posts 
-     WHERE published_at IS NOT NULL AND published_at <= NOW()
-     ORDER BY published_at DESC
-     LIMIT 50`,
+    `SELECT 
+      c.id, 
+      c.name, 
+      c.slug,
+      COUNT(bpc.blog_post_id) as post_count
+     FROM categories c
+     LEFT JOIN blog_post_categories bpc ON c.id = bpc.category_id
+     LEFT JOIN blog_posts bp ON bpc.blog_post_id = bp.id 
+       AND bp.published_at IS NOT NULL 
+       AND bp.published_at <= NOW()
+     GROUP BY c.id
+     HAVING COUNT(bpc.blog_post_id) > 0
+     ORDER BY c.name ASC`,
     []
   );
   return result.rows;
 }
 
-export default async function NewsletterPage() {
-  const posts = await getBlogPosts();
+export default async function NewsletterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
+  const posts = await getBlogPosts(category);
+  const categories = await getCategories();
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -60,18 +122,37 @@ export default async function NewsletterPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content - Blog Posts */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Category Filter */}
+            {categories.length > 0 && (
+              <CategoryFilter categories={categories} selectedCategory={category} />
+            )}
+
             <div>
-              <h2 className="text-3xl font-bold mb-6">Latest Articles</h2>
+              <h2 className="text-3xl font-bold mb-6">
+                {category 
+                  ? `${categories.find(c => c.slug === category)?.name || 'Category'} Articles`
+                  : 'Latest Articles'
+                }
+              </h2>
               
               {posts.length === 0 ? (
                 <Card>
                   <CardContent className="py-12 text-center">
                     <p className="text-lg text-muted-foreground mb-4">
-                      No blog posts yet. Check back soon for valuable insights!
+                      {category 
+                        ? 'No articles in this category yet.'
+                        : 'No blog posts yet. Check back soon for valuable insights!'
+                      }
                     </p>
-                    <Link href="/" className="text-yellow-600 hover:text-yellow-700 font-medium">
-                      Browse Products →
-                    </Link>
+                    {category ? (
+                      <Link href="/newsletter" className="text-yellow-600 hover:text-yellow-700 font-medium">
+                        ← View All Articles
+                      </Link>
+                    ) : (
+                      <Link href="/" className="text-yellow-600 hover:text-yellow-700 font-medium">
+                        Browse Products →
+                      </Link>
+                    )}
                   </CardContent>
                 </Card>
               ) : (
@@ -111,6 +192,19 @@ export default async function NewsletterPage() {
                                   {post.excerpt}
                                 </CardDescription>
                               )}
+                              {post.categories && post.categories.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                  {post.categories.map((cat) => (
+                                    <Badge 
+                                      key={cat.id} 
+                                      variant="secondary"
+                                      className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                    >
+                                      {cat.name}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
                             </CardHeader>
                           </div>
                         </div>
@@ -122,7 +216,7 @@ export default async function NewsletterPage() {
             </div>
           </div>
 
-          {/* Sidebar - Newsletter Signup */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
               <Card className="border-2 border-yellow-500">
@@ -136,6 +230,41 @@ export default async function NewsletterPage() {
                   <NewsletterSignup />
                 </CardContent>
               </Card>
+
+              {/* Categories Sidebar */}
+              {categories.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Categories</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {categories.map((cat) => (
+                        <Link 
+                          key={cat.id} 
+                          href={`/newsletter?category=${cat.slug}`}
+                          className={`block px-3 py-2 rounded hover:bg-stone-100 transition-colors ${
+                            category === cat.slug ? 'bg-yellow-100 text-yellow-800 font-medium' : ''
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>{cat.name}</span>
+                            <Badge variant="outline">{cat.post_count}</Badge>
+                          </div>
+                        </Link>
+                      ))}
+                      {category && (
+                        <Link 
+                          href="/newsletter"
+                          className="block px-3 py-2 text-sm text-yellow-600 hover:text-yellow-700 font-medium"
+                        >
+                          ← View All
+                        </Link>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Popular Posts */}
               {posts.length > 3 && (
