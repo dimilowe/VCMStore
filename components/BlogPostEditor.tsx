@@ -259,15 +259,29 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
               </div>
               <div className="pt-2">
                 <label className="text-xs text-stone-600 block mb-1">Schedule for:</label>
-                <Input
-                  type="datetime-local"
-                  value={publishedAt}
-                  onChange={(e) => setPublishedAt(e.target.value)}
-                  disabled={loading}
-                  className="text-sm"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    type="datetime-local"
+                    value={publishedAt}
+                    onChange={(e) => setPublishedAt(e.target.value)}
+                    disabled={loading}
+                    className="text-sm flex-1"
+                  />
+                  {publishedAt && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPublishedAt('')}
+                      disabled={loading}
+                      className="px-3"
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
                 <p className="text-xs text-stone-500 mt-1">
-                  Leave empty to publish immediately
+                  {publishedAt ? 'Click Clear to publish immediately' : 'Leave empty to publish immediately'}
                 </p>
               </div>
             </div>
