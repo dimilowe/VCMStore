@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { EmailCapture } from "@/components/email-capture";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 
 export default function HomePage() {
   return (
@@ -78,6 +79,23 @@ export default function HomePage() {
           />
         </div>
       </section>
+
+      <footer className="bg-white border-t border-stone-200 py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <p className="text-stone-600 text-sm">
+                © {new Date().getFullYear()} VCM Store. All rights reserved.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <p className="text-stone-600 text-sm hidden md:block">Have feedback or suggestions?</p>
+              <FeedbackDialog />
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
