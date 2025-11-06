@@ -25,25 +25,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // The Replit Object Storage returns an array of objects with 'name' property
     const allFiles = filesResult.value;
     
     // Filter for image files only
     const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    const imageFiles = allFiles.filter((file: { key: string }) => {
-      const ext = file.key.split('.').pop()?.toLowerCase();
+    const imageFiles = allFiles.filter((file: any) => {
+      // file.name is the filename
+      const filename = file.name || file.key || file;
+      if (typeof filename !== 'string') return false;
+      
+      const ext = filename.split('.').pop()?.toLowerCase();
       return ext && imageExtensions.includes(ext);
     });
 
     // Convert to URLs and add metadata
-    const images = imageFiles.map((file: { key: string }) => ({
-      filename: file.key,
-      url: `/api/files/${file.key}`,
-      uploadedAt: file.key.includes('blog-') ? 
-        parseInt(file.key.split('-')[1]) : Date.now()
-    }));
+    const images = imageFiles.map((file: any) => {
+      const filename = file.name || file.key || file;
+      return {
+        filename: filename,
+        url: `/api/files/${filename}`,
+        uploadedAt: filename.includes('blog-') ? 
+          parseInt(filename.split('-')[1]) : Date.now()
+      };
+    });
 
     // Sort by upload date (newest first)
-    images.sort((a: { uploadedAt: number }, b: { uploadedAt: number }) => b.uploadedAt - a.uploadedAt);
+    images.sort((a: any, b: any) => b.uploadedAt - a.uploadedAt);
 
     return NextResponse.json({ 
       success: true, 
