@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Get all published products
   const productsResult = await query(
-    `SELECT slug, created_at FROM products WHERE status = 'active' ORDER BY created_at DESC`
+    `SELECT slug, created_at FROM products WHERE visibility = 'public' ORDER BY created_at DESC`
   );
 
   // Get all published blog posts
