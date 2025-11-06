@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineUploader } from "@/components/inline-uploader";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, BookOpen } from "lucide-react";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -300,6 +301,12 @@ export default function AdminPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold tracking-wide">Admin Dashboard</h1>
           <div className="flex gap-4">
+            <Link href="/admin/blog">
+              <Button variant="outline">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Manage Blog
+              </Button>
+            </Link>
             <Button 
               onClick={handleMigrateImages} 
               variant="outline"
