@@ -193,14 +193,15 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
               variant="outline"
               size="sm"
               disabled={loading || !title || !content}
+              className="border-stone-300 hover:bg-stone-50"
             >
               Save Draft
             </Button>
             <Button
               onClick={handlePublish}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
               size="sm"
               disabled={loading || !title || !content}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm disabled:bg-stone-300 disabled:text-stone-500"
             >
               {publishedAt && new Date(publishedAt) > new Date() ? 'Schedule' : 'Publish'}
             </Button>
