@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const { title, slug, content, excerpt, meta_description, featured_image_url, published_at } = await request.json();
+    const { title, slug, content, excerpt, meta_description, featured_image_url, published_at, category_ids } = await request.json();
 
     if (!title || !slug || !content) {
       return NextResponse.json(
@@ -41,7 +41,19 @@ export async function POST(request: NextRequest) {
       [title, slug, content, excerpt, meta_description, featured_image_url, session.userId, published_at]
     );
 
-    return NextResponse.json({ success: true, id: result.rows[0].id });
+    const postId = result.rows[0].id;
+
+    // Add categories
+    if (category_ids && category_ids.length > 0) {
+      for (const categoryId of category_ids) {
+        await query(
+          "INSERT INTO blog_post_categories (blog_post_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+          [postId, categoryId]
+        );
+      }
+    }
+
+    return NextResponse.json({ success: true, id: postId });
   } catch (error) {
     console.error("Create blog post error:", error);
     return NextResponse.json(

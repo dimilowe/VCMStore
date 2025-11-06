@@ -16,7 +16,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const { title, slug, content, excerpt, meta_description, featured_image_url, published_at } = await request.json();
+    const { title, slug, content, excerpt, meta_description, featured_image_url, published_at, category_ids } = await request.json();
 
     if (!title || !slug || !content) {
       return NextResponse.json(
@@ -45,6 +45,18 @@ export async function PUT(
        WHERE id = $8`,
       [title, slug, content, excerpt, meta_description, featured_image_url, published_at, id]
     );
+
+    // Update categories - remove old ones and add new ones
+    await query("DELETE FROM blog_post_categories WHERE blog_post_id = $1", [id]);
+    
+    if (category_ids && category_ids.length > 0) {
+      for (const categoryId of category_ids) {
+        await query(
+          "INSERT INTO blog_post_categories (blog_post_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+          [id, categoryId]
+        );
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

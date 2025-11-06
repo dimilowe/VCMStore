@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Save, Eye, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { ContentBlockInserter } from '@/components/ContentBlockInserter';
+import { CategorySelector } from '@/components/CategorySelector';
 
 interface BlogPost {
   id?: number;
@@ -34,12 +35,31 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const [publishedAt, setPublishedAt] = useState(
     post?.published_at ? new Date(post.published_at).toISOString().slice(0, 16) : ''
   );
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [excerptOpen, setExcerptOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
+
+  // Load existing categories for this post
+  useEffect(() => {
+    if (post?.id) {
+      loadPostCategories();
+    }
+  }, [post?.id]);
+
+  const loadPostCategories = async () => {
+    if (!post?.id) return;
+    try {
+      const res = await fetch(`/api/admin/blog/${post.id}/categories`);
+      const data = await res.json();
+      setSelectedCategories(data.categoryIds || []);
+    } catch (error) {
+      console.error('Failed to load post categories:', error);
+    }
+  };
 
   const generateSlug = (text: string) => {
     return text
@@ -97,6 +117,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           meta_description: metaDescription || null,
           featured_image_url: featuredImageUrl || null,
           published_at: null,
+          category_ids: selectedCategories,
         }),
         credentials: 'include',
       });
@@ -135,6 +156,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           meta_description: metaDescription || null,
           featured_image_url: featuredImageUrl || null,
           published_at: publishedAt || new Date().toISOString(),
+          category_ids: selectedCategories,
         }),
         credentials: 'include',
       });
@@ -284,6 +306,14 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
                   <img src={featuredImageUrl} alt="Featured" className="w-full h-32 object-cover" />
                 </div>
               )}
+            </div>
+
+            {/* Categories */}
+            <div className="border-t pt-6 mb-6">
+              <CategorySelector 
+                selectedCategories={selectedCategories}
+                onCategoriesChange={setSelectedCategories}
+              />
             </div>
 
             {/* Excerpt - Collapsible */}
