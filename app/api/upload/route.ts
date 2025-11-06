@@ -60,9 +60,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate public URL using the storage bucket URL
-    const bucketName = process.env.STORAGE_BUCKET || 'default';
-    const publicUrl = `https://storage.replit.com/${bucketName}/${fileName}`;
+    // Generate URL via our proxy endpoint
+    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+      : 'http://localhost:5000';
+    const publicUrl = `${baseUrl}/api/images/${fileName}`;
 
     return NextResponse.json({ 
       success: true, 
