@@ -15,7 +15,8 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - **Public-first browsing**: All content visible without login
 - **Browse-first, account-later**: Authentication only required on claim/purchase
 - **Product catalog**: Apps, courses, downloads, funnels, and freebies
-- **Blog system**: Markdown-based blog with email capture
+- **Blog system**: SEO-optimized blog with WordPress-style editor, image uploads, and categories
+- **Feedback system**: User feedback form with bug reports, feature requests, improvements, and general feedback
 - **AI Strategy chat**: Mock AI that suggests products based on keywords
 - **Email capture**: Newsletter subscription throughout the site
 - **Stripe integration**: Payments with webhook-based fulfillment
@@ -28,8 +29,11 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `profiles`: Extended user data
 - `entitlements`: User access to products
 - `purchases`: Purchase history
-- `posts`: Blog content with markdown support
+- `blog_posts`: SEO-optimized blog posts with featured images, categories, and scheduling
+- `categories`: Blog post categories
+- `blog_post_categories`: Many-to-many relationship between posts and categories
 - `subscribers`: Email newsletter list
+- `feedback`: User feedback submissions (bug reports, feature requests, improvements)
 
 ## Project Structure
 
@@ -101,6 +105,22 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-06: **Added Feedback System** - User feedback form with categorized submissions
+  - Created feedback database table to store submissions
+  - Built FeedbackDialog component with 4 feedback types (bug, feature, improvement, general)
+  - Added feedback button to homepage footer with premium white/gray/gold styling
+  - Created API endpoint for secure feedback submission
+  - Includes optional email field for follow-up and priority levels
+  - Successfully tested and verified submissions are saved to database
+- 2025-11-06: **Transformed Newsletter into Full Blog System** - SEO-optimized WordPress-style blog
+  - WordPress-style content editor with rich text formatting toolbar
+  - Image upload capabilities (featured images and inline content images)
+  - Category system with many-to-many relationships
+  - Post scheduling and draft management
+  - SEO optimization: custom slugs, meta descriptions, sitemap.xml, robots.txt
+  - Google Search Console verification (meta tag + HTML file)
+  - First blog post "Testing1" published successfully at /newsletter/testing1
+  - Fixed sidebar layout locked at 320px width to prevent expansion during uploads
 - 2025-11-03: **Implemented Email + Password Authentication** - Complete post-purchase authentication system
   - Users create accounts AFTER purchasing (browse anonymously, authenticate only when buying)
   - Signup: Email + password (8+ characters), hashed with bcrypt, auto-login after signup
