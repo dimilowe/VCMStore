@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/ImageUploader';
+import { MediaLibrary } from '@/components/MediaLibrary';
 import { 
   Image as ImageIcon, 
   Video, 
@@ -23,6 +24,7 @@ interface BlockInserterProps {
 
 export function ContentBlockInserter({ onInsert }: BlockInserterProps) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
   const [quoteText, setQuoteText] = useState('');
   const [quoteAuthor, setQuoteAuthor] = useState('');
@@ -35,6 +37,11 @@ export function ContentBlockInserter({ onInsert }: BlockInserterProps) {
     const html = `<img src="${imageUrl}" alt="Image" class="w-full rounded-lg my-6" />`;
     onInsert(html);
     setActiveModal(null);
+    setShowMediaLibrary(false);
+  };
+
+  const handleMediaLibrarySelect = (url: string) => {
+    handleInsertImage(url);
   };
 
   const handleInsertVideo = () => {
@@ -122,8 +129,8 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => setActiveModal('image')}
-          className="gap-2"
+          onClick={() => setShowMediaLibrary(true)}
+          className="gap-2 bg-blue-50 hover:bg-blue-100 border-blue-200"
         >
           <ImageIcon className="w-4 h-4" />
           Image
@@ -200,11 +207,11 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
         </Button>
       </div>
 
-      {/* Modals */}
-      {activeModal === 'image' && (
-        <ImageUploader
-          onUploadComplete={handleInsertImage}
-          onCancel={() => setActiveModal(null)}
+      {/* Media Library Modal */}
+      {showMediaLibrary && (
+        <MediaLibrary
+          onSelect={handleMediaLibrarySelect}
+          onClose={() => setShowMediaLibrary(false)}
         />
       )}
 
