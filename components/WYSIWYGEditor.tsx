@@ -43,7 +43,7 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage }: WYSIWYGEdito
     content: content,
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] px-4 py-2',
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] px-4 py-2 prose-p:mb-6 prose-headings:mt-8 prose-headings:mb-4 prose-ul:my-6 prose-ol:my-6',
       },
     },
     onUpdate: ({ editor }) => {
