@@ -84,22 +84,38 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
         // Check if html is valid
         if (!html) return;
         
-        // Restore saved selection if available
+        // Get the position to insert at
+        let insertPos = editor.state.selection.from;
+        
+        // If we have a saved selection, use that position
         if (savedSelection) {
-          editor.view.dispatch(
-            editor.state.tr.setSelection(savedSelection)
-          );
+          insertPos = savedSelection.from;
         }
         
         // Check if this is an image tag
         const imgMatch = html.match(/<img[^>]+src="([^"]+)"/);
+        
+        // Create a transaction that inserts at the saved position
+        const { state } = editor;
+        const { tr } = state;
+        
         if (imgMatch) {
-          // Use Tiptap's native image insertion at the restored position
-          editor.chain().focus().setImage({ src: imgMatch[1] }).run();
+          // Create image node and insert at specific position
+          const imageNode = state.schema.nodes.image.create({ src: imgMatch[1] });
+          tr.insert(insertPos, imageNode);
         } else {
-          // For other HTML content, use insertContent
-          editor.chain().focus().insertContent(html).run();
+          // Parse HTML and insert at specific position
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const content = doc.body.innerHTML;
+          tr.insertText(content, insertPos);
         }
+        
+        // Apply the transaction
+        editor.view.dispatch(tr);
+        
+        // Focus editor and move cursor after inserted content
+        editor.commands.focus();
         
         // Clear saved selection after use
         savedSelection = null;
