@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { ContentBlockInserter } from '@/components/ContentBlockInserter';
 import { CategorySelector } from '@/components/CategorySelector';
 import { FeaturedImageUploader } from '@/components/FeaturedImageUploader';
-import { TextFormattingToolbar } from '@/components/TextFormattingToolbar';
+import { WYSIWYGEditor } from '@/components/WYSIWYGEditor';
 
 interface BlogPost {
   id?: number;
@@ -42,12 +42,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const [error, setError] = useState('');
   const [excerptOpen, setExcerptOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
-
-  // Undo/Redo history
-  const [history, setHistory] = useState<string[]>([content]);
-  const [historyIndex, setHistoryIndex] = useState(0);
 
   // Load existing categories for this post
   useEffect(() => {
@@ -67,99 +62,6 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
     }
   };
 
-  // Update history when content changes (with debounce)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (content !== history[historyIndex]) {
-        const newHistory = history.slice(0, historyIndex + 1);
-        newHistory.push(content);
-        // Limit history to 50 entries
-        if (newHistory.length > 50) {
-          newHistory.shift();
-        } else {
-          setHistoryIndex(historyIndex + 1);
-        }
-        setHistory(newHistory);
-      }
-    }, 500);
-    return () => clearTimeout(timeoutId);
-  }, [content]);
-
-  // Keyboard shortcuts for undo/redo
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault();
-        handleUndo();
-      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'Z' || (e.shiftKey && e.key === 'z'))) {
-        e.preventDefault();
-        handleRedo();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-        e.preventDefault();
-        handleFormat('<strong>', '</strong>');
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
-        e.preventDefault();
-        handleFormat('<em>', '</em>');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [historyIndex, history]);
-
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      setContent(history[newIndex]);
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      setContent(history[newIndex]);
-    }
-  };
-
-  const handleFormat = (openTag: string, closeTag: string = '') => {
-    const textarea = contentRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-    
-    // If no text is selected, insert tags at cursor
-    if (start === end) {
-      const beforeCursor = content.substring(0, start);
-      const afterCursor = content.substring(end);
-      const newContent = beforeCursor + openTag + closeTag + afterCursor;
-      setContent(newContent);
-      
-      // Place cursor between tags
-      setTimeout(() => {
-        textarea.focus();
-        const newPosition = start + openTag.length;
-        textarea.setSelectionRange(newPosition, newPosition);
-      }, 0);
-    } else {
-      // Wrap selected text
-      const beforeSelection = content.substring(0, start);
-      const afterSelection = content.substring(end);
-      const newContent = beforeSelection + openTag + selectedText + closeTag + afterSelection;
-      setContent(newContent);
-      
-      // Select the formatted text
-      setTimeout(() => {
-        textarea.focus();
-        const newStart = start + openTag.length;
-        const newEnd = newStart + selectedText.length;
-        textarea.setSelectionRange(newStart, newEnd);
-      }, 0);
-    }
-  };
-
   const generateSlug = (text: string) => {
     return text
       .toLowerCase()
@@ -168,26 +70,8 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   };
 
   const handleInsertBlock = (html: string) => {
-    const textarea = contentRef.current;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const currentContent = content;
-    
-    // Insert at cursor position with newlines for proper spacing
-    const beforeCursor = currentContent.substring(0, start);
-    const afterCursor = currentContent.substring(end);
-    const newContent = beforeCursor + '\n\n' + html + '\n\n' + afterCursor;
-    
-    setContent(newContent);
-    
-    // Set cursor position after inserted content
-    setTimeout(() => {
-      const newPosition = start + html.length + 4;
-      textarea.focus();
-      textarea.setSelectionRange(newPosition, newPosition);
-    }, 0);
+    // Simply append the HTML to content
+    setContent(content + '\n\n' + html + '\n\n');
   };
 
   const handleTitleChange = (newTitle: string) => {
@@ -364,26 +248,11 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           {/* Insert Toolbar */}
           <ContentBlockInserter onInsert={handleInsertBlock} />
 
-          {/* Text Formatting Toolbar */}
-          <TextFormattingToolbar
-            onFormat={handleFormat}
-            onUndo={handleUndo}
-            onRedo={handleRedo}
-            canUndo={historyIndex > 0}
-            canRedo={historyIndex < history.length - 1}
+          {/* WYSIWYG Editor - Shows actual rendered content like WordPress */}
+          <WYSIWYGEditor
+            content={content}
+            onChange={setContent}
           />
-
-          {/* Content Editor */}
-          <div className="prose max-w-none px-4">
-            <Textarea
-              ref={contentRef}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Start writing your post... Use the toolbar above to insert images, videos, and more!"
-              disabled={loading}
-              className="w-full min-h-[500px] border-none outline-none resize-none text-base leading-relaxed"
-            />
-          </div>
         </div>
       </div>
 
