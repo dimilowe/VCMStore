@@ -25,6 +25,9 @@ interface WYSIWYGEditorProps {
   onEditorReady?: (insertHtml: (html: string) => void) => void;
 }
 
+// Store cursor position globally
+let savedSelection: any = null;
+
 export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady }: WYSIWYGEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
@@ -59,6 +62,21 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
     }
   }, [content, editor]);
 
+  // Save cursor position when editor loses focus
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleBlur = () => {
+      savedSelection = editor.state.selection;
+    };
+
+    editor.on('blur', handleBlur);
+
+    return () => {
+      editor.off('blur', handleBlur);
+    };
+  }, [editor]);
+
   // Expose insertHtml function to parent component
   useEffect(() => {
     if (editor && onEditorReady) {
@@ -66,15 +84,25 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
         // Check if html is valid
         if (!html) return;
         
+        // Restore saved selection if available
+        if (savedSelection) {
+          editor.view.dispatch(
+            editor.state.tr.setSelection(savedSelection)
+          );
+        }
+        
         // Check if this is an image tag
         const imgMatch = html.match(/<img[^>]+src="([^"]+)"/);
         if (imgMatch) {
-          // Use Tiptap's native image insertion
+          // Use Tiptap's native image insertion at the restored position
           editor.chain().focus().setImage({ src: imgMatch[1] }).run();
         } else {
           // For other HTML content, use insertContent
           editor.chain().focus().insertContent(html).run();
         }
+        
+        // Clear saved selection after use
+        savedSelection = null;
       };
       onEditorReady(insertHtml);
     }
