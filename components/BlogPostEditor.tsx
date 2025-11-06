@@ -44,7 +44,8 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const [excerptOpen, setExcerptOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
   const router = useRouter();
-  const [editorInsertHtml, setEditorInsertHtml] = useState<((html: string) => void) | null>(null);
+  const editorInsertHtmlRef = useRef<((html: string) => void) | null>(null);
+  const editorSavePositionRef = useRef<(() => void) | null>(null);
 
   // Load existing categories for this post
   useEffect(() => {
@@ -72,12 +73,20 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   };
 
   const handleInsertBlock = (html: string) => {
+    console.log('handleInsertBlock called');
     // Insert at cursor position using Tiptap editor
-    if (editorInsertHtml) {
-      editorInsertHtml(html);
+    if (editorInsertHtmlRef.current) {
+      editorInsertHtmlRef.current(html);
     } else {
       // Fallback: append to content if editor not ready
       setContent(content + '\n\n' + html + '\n\n');
+    }
+  };
+
+  const handleBeforeInsert = () => {
+    // Save the cursor position before opening modal
+    if (editorSavePositionRef.current) {
+      editorSavePositionRef.current();
     }
   };
 
@@ -267,13 +276,19 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           </div>
 
           {/* Insert Toolbar */}
-          <ContentBlockInserter onInsert={handleInsertBlock} />
+          <ContentBlockInserter 
+            onInsert={handleInsertBlock}
+            onBeforeInsert={handleBeforeInsert}
+          />
 
           {/* WYSIWYG Editor - Shows actual rendered content like WordPress */}
           <WYSIWYGEditor
             content={content}
             onChange={setContent}
-            onEditorReady={setEditorInsertHtml}
+            onEditorReady={(insertFn, saveFn) => {
+              editorInsertHtmlRef.current = insertFn;
+              editorSavePositionRef.current = saveFn;
+            }}
           />
         </div>
       </div>

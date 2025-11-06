@@ -20,9 +20,10 @@ import {
 
 interface BlockInserterProps {
   onInsert: (html: string) => void;
+  onBeforeInsert?: () => void;
 }
 
-export function ContentBlockInserter({ onInsert }: BlockInserterProps) {
+export function ContentBlockInserter({ onInsert, onBeforeInsert }: BlockInserterProps) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
@@ -130,7 +131,10 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => setShowMediaLibrary(true)}
+          onClick={() => {
+            onBeforeInsert?.();
+            setShowMediaLibrary(true);
+          }}
           className="gap-2 bg-blue-50 hover:bg-blue-100 border-blue-200"
         >
           <ImageIcon className="w-4 h-4" />

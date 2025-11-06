@@ -22,11 +22,8 @@ interface WYSIWYGEditorProps {
   content: string;
   onChange: (html: string) => void;
   onInsertImage?: (url: string) => void;
-  onEditorReady?: (insertHtml: (html: string) => void) => void;
+  onEditorReady?: (insertHtml: (html: string) => void, savePosition: () => void) => void;
 }
-
-// Store cursor position globally
-let savedSelection: any = null;
 
 export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady }: WYSIWYGEditorProps) {
   const editor = useEditor({
@@ -62,51 +59,51 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
     }
   }, [content, editor]);
 
-  // Save cursor position when editor loses focus
-  useEffect(() => {
-    if (!editor) return;
-
-    const handleBlur = () => {
-      savedSelection = editor.state.selection;
-    };
-
-    editor.on('blur', handleBlur);
-
-    return () => {
-      editor.off('blur', handleBlur);
-    };
-  }, [editor]);
-
-  // Expose insertHtml function to parent component
+  // Expose insertHtml and savePosition functions to parent component
   useEffect(() => {
     if (editor && onEditorReady) {
+      let savedPosition: number | null = null;
+      
+      const savePosition = () => {
+        // Save the current cursor position
+        savedPosition = editor.state.selection.from;
+        console.log('Saved position:', savedPosition);
+      };
+      
       const insertHtml = (html: string) => {
+        console.log('insertHtml called with:', html?.substring(0, 50));
+        
         // Check if html is valid
         if (!html) return;
-        
-        // Restore the saved selection before inserting
-        if (savedSelection) {
-          const { view } = editor;
-          const { state } = view;
-          const tr = state.tr.setSelection(savedSelection);
-          view.dispatch(tr);
-        }
         
         // Check if this is an image tag
         const imgMatch = html.match(/<img[^>]+src="([^"]+)"/);
         
         if (imgMatch) {
-          // Use TipTap's command API - it handles cursor position automatically
+          // If we have a saved position, move cursor there first
+          if (savedPosition !== null) {
+            console.log('Restoring to position:', savedPosition);
+            editor.commands.focus();
+            editor.commands.setTextSelection(savedPosition);
+          }
+          
+          // Use TipTap's command API - insert at current cursor position
           editor.chain().focus().setImage({ src: imgMatch[1] }).run();
+          
+          // Clear saved position
+          savedPosition = null;
         } else {
-          // For other HTML content, use insertContent
+          // For other HTML content
+          if (savedPosition !== null) {
+            editor.commands.focus();
+            editor.commands.setTextSelection(savedPosition);
+          }
           editor.chain().focus().insertContent(html).run();
+          savedPosition = null;
         }
-        
-        // Clear saved selection
-        savedSelection = null;
       };
-      onEditorReady(insertHtml);
+      
+      onEditorReady(insertHtml, savePosition);
     }
   }, [editor, onEditorReady]);
 
