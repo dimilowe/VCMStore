@@ -40,6 +40,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [excerptOpen, setExcerptOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
   const router = useRouter();
@@ -84,6 +85,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const handleSaveDraft = async () => {
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
       const endpoint = post ? `/api/admin/blog/${post.id}` : '/api/admin/blog';
@@ -108,8 +110,16 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       const data = await res.json();
 
       if (data.success) {
-        router.push('/admin/blog');
-        router.refresh();
+        // If this was a NEW post, redirect to edit page with the new ID
+        if (!post && data.postId) {
+          router.push(`/admin/blog/edit/${data.postId}`);
+          router.refresh();
+        } else {
+          // If editing existing post, stay on page and show success message
+          setSuccess('Draft saved successfully! ✓');
+          // Clear success message after 3 seconds
+          setTimeout(() => setSuccess(''), 3000);
+        }
       } else {
         setError(data.error || 'Failed to save draft');
       }
@@ -230,6 +240,11 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-6">
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded mb-6">
+              {success}
             </div>
           )}
 
