@@ -39,17 +39,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique filename
+    // Generate unique filename (same pattern as products)
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 8);
     const extension = file.name.split('.').pop() || 'jpg';
-    const fileName = `blog-images/${timestamp}-${randomString}.${extension}`;
+    const fileName = `blog-${timestamp}-${randomString}.${extension}`;
 
     // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Upload to Replit Object Storage
+    // Upload to Replit Object Storage (flat structure, no folders)
     const uploadResult = await client.uploadFromBytes(fileName, buffer);
 
     if (!uploadResult.ok) {
@@ -60,11 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate URL via our proxy endpoint
-    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-      ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-      : 'http://localhost:5000';
-    const publicUrl = `${baseUrl}/api/images/${fileName}`;
+    // Use the same /api/files endpoint as products
+    const publicUrl = `/api/files/${fileName}`;
 
     return NextResponse.json({ 
       success: true, 
