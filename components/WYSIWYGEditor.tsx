@@ -63,7 +63,15 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
   useEffect(() => {
     if (editor && onEditorReady) {
       const insertHtml = (html: string) => {
-        editor.chain().focus().insertContent(html).run();
+        // Check if this is an image tag
+        const imgMatch = html.match(/<img[^>]+src="([^"]+)"/);
+        if (imgMatch) {
+          // Use Tiptap's native image insertion
+          editor.chain().focus().setImage({ src: imgMatch[1] }).run();
+        } else {
+          // For other HTML content, use insertContent
+          editor.chain().focus().insertContent(html).run();
+        }
       };
       onEditorReady(insertHtml);
     }
