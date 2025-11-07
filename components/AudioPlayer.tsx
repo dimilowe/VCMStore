@@ -69,18 +69,37 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
+      
+      // Defensive check: If duration wasn't set during metadata load,
+      // try to get it now during playback
+      if (duration === 0) {
+        const audioDuration = audioRef.current.duration;
+        if (isFinite(audioDuration) && audioDuration > 0) {
+          setDuration(audioDuration);
+        }
+      }
     }
   };
 
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
-      setDuration(audioRef.current.duration);
+      const audioDuration = audioRef.current.duration;
+      
+      // Only set duration if it's a valid finite number
+      // Streamed MP3s sometimes report NaN or Infinity initially
+      if (isFinite(audioDuration) && audioDuration > 0) {
+        setDuration(audioDuration);
+      }
     }
   };
 
   const handleEnded = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     setIsPlaying(false);
-    setCurrentTime(0);
+    // Don't reset currentTime to 0 - some browsers treat this as a seek
+    // and auto-restart playback. Leave it at the end position.
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
