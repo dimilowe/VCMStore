@@ -145,12 +145,26 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
     const currentIndex = speeds.indexOf(playbackSpeed);
     const nextIndex = (currentIndex + 1) % speeds.length;
     const newSpeed = speeds[nextIndex];
-    setPlaybackSpeed(newSpeed);
+    
+    console.log(`[AudioPlayer] Changing speed from ${playbackSpeed}x to ${newSpeed}x`);
+    console.log(`[AudioPlayer] Audio element exists:`, !!audioRef.current);
     
     if (audioRef.current) {
+      console.log(`[AudioPlayer] Current playbackRate before:`, audioRef.current.playbackRate);
       audioRef.current.playbackRate = newSpeed;
-      console.log(`Playback speed changed to ${newSpeed}x`);
+      console.log(`[AudioPlayer] Current playbackRate after:`, audioRef.current.playbackRate);
+      
+      // Force the rate again after a tiny delay to ensure it sticks
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.playbackRate = newSpeed;
+        }
+      }, 50);
+    } else {
+      console.error('[AudioPlayer] No audio element found!');
     }
+    
+    setPlaybackSpeed(newSpeed);
   };
 
   const formatTime = (seconds: number) => {
