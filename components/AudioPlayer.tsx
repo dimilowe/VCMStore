@@ -118,6 +118,9 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
       if (isFinite(audioDuration) && audioDuration > 0) {
         setDuration(audioDuration);
       }
+      
+      // Apply the current playback speed when audio is ready
+      audioRef.current.playbackRate = playbackSpeed;
     }
   };
 
@@ -146,6 +149,7 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
     
     if (audioRef.current) {
       audioRef.current.playbackRate = newSpeed;
+      console.log(`Playback speed changed to ${newSpeed}x`);
     }
   };
 
