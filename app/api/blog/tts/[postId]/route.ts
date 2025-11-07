@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { stripHtmlForTTS, generateContentHash } from '@/lib/textToSpeech';
-import { getSignedUrl } from '@replit/object-storage';
+import { Client } from '@replit/object-storage';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const storage = new Client();
 
 interface BlogPost {
   id: number;
@@ -38,16 +40,12 @@ export async function GET(
     const cacheKey = `blog-audio-${postId}-${contentHash}.mp3`;
     
     // Check if audio already exists in object storage
-    try {
-      const existingUrl = await getSignedUrl(cacheKey);
-      if (existingUrl) {
-        return NextResponse.json({ 
-          audioUrl: `/api/files/${cacheKey}`,
-          cached: true 
-        });
-      }
-    } catch (error) {
-      // File doesn't exist, continue to generate
+    const existingFile = await storage.downloadAsBytes(cacheKey);
+    if (existingFile.ok) {
+      return NextResponse.json({ 
+        audioUrl: `/api/files/${cacheKey}`,
+        cached: true 
+      });
     }
     
     // Strip HTML and prepare text for TTS
@@ -69,23 +67,15 @@ export async function GET(
     const buffer = Buffer.from(arrayBuffer);
     
     // Save to Replit Object Storage
-    const { uploadUrl } = await fetch(
-      `${process.env.REPLIT_DB_URL?.replace('db.', 'object-storage.')}?key=${encodeURIComponent(cacheKey)}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'audio/mpeg',
-        },
-      }
-    ).then(res => res.json());
+    const uploadResult = await storage.uploadFromBytes(cacheKey, buffer);
     
-    await fetch(uploadUrl, {
-      method: 'PUT',
-      body: buffer,
-      headers: {
-        'Content-Type': 'audio/mpeg',
-      },
-    });
+    if (!uploadResult.ok) {
+      console.error('Storage upload error:', uploadResult.error);
+      return NextResponse.json(
+        { error: 'Failed to store audio file' },
+        { status: 500 }
+      );
+    }
     
     // Return proxy URL
     return NextResponse.json({ 

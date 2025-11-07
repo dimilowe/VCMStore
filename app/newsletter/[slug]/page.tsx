@@ -5,6 +5,7 @@ import Link from "next/link";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Eye } from "lucide-react";
+import { AudioPlayer } from "@/components/AudioPlayer";
 
 function formatContent(content: string): string {
   // Tiptap already outputs HTML, so just return it as-is
@@ -142,6 +143,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   </div>
                 </div>
               </header>
+              
+              {/* Audio Player */}
+              <div className="mb-8">
+                <AudioPlayer postId={post.id} />
+              </div>
               
               <div 
                 className="prose prose-lg max-w-none 
