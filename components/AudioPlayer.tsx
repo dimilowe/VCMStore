@@ -14,19 +14,29 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [selectedVoice, setSelectedVoice] = useState<string>('nova');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const speeds = [1, 1.25, 1.5, 2];
+  const voices = [
+    { id: 'nova', name: 'Nova', description: 'Natural, warm female' },
+    { id: 'alloy', name: 'Alloy', description: 'Balanced, neutral' },
+    { id: 'echo', name: 'Echo', description: 'Clear male' },
+    { id: 'fable', name: 'Fable', description: 'Expressive British' },
+    { id: 'onyx', name: 'Onyx', description: 'Deep male' },
+    { id: 'shimmer', name: 'Shimmer', description: 'Bright female' },
+  ];
 
-  const loadAudio = async () => {
+  const loadAudio = async (voice?: string) => {
+    const voiceToUse = voice || selectedVoice;
     setIsLoading(true);
     setError(null);
     
     try {
-      const response = await fetch(`/api/blog/tts/${postId}`);
+      const response = await fetch(`/api/blog/tts/${postId}?voice=${voiceToUse}`);
       
       if (!response.ok) {
         throw new Error('Failed to generate audio');
@@ -41,6 +51,24 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleVoiceChange = async (newVoice: string) => {
+    // Pause current audio if playing
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    
+    setSelectedVoice(newVoice);
+    setIsPlaying(false);
+    
+    // Reset and reload audio with new voice
+    setAudioUrl(null);
+    setCurrentTime(0);
+    setDuration(0);
+    
+    // Pass the new voice directly to avoid state timing issues
+    await loadAudio(newVoice);
   };
 
   const togglePlayPause = async () => {
@@ -131,9 +159,8 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
   useEffect(() => {
     if (audioUrl && audioRef.current) {
       audioRef.current.playbackRate = playbackSpeed;
-      // Don't autoplay - wait for user to click play
     }
-  }, [audioUrl]);
+  }, [audioUrl, playbackSpeed]);
 
   return (
     <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-lg p-6 shadow-md">
@@ -176,6 +203,29 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
           {error}
         </div>
       )}
+
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-stone-700 mb-2">
+          Voice
+        </label>
+        <select
+          value={selectedVoice}
+          onChange={(e) => handleVoiceChange(e.target.value)}
+          disabled={isLoading}
+          className="w-full px-4 py-2 bg-white border-2 border-yellow-300 rounded-lg text-stone-900 focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {voices.map((voice) => (
+            <option key={voice.id} value={voice.id}>
+              {voice.name} - {voice.description}
+            </option>
+          ))}
+        </select>
+        {audioUrl && (
+          <p className="mt-1 text-xs text-stone-500">
+            Changing voice will reload the audio
+          </p>
+        )}
+      </div>
 
       {audioUrl && (
         <>

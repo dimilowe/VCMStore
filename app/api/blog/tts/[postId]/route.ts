@@ -23,6 +23,14 @@ export async function GET(
   try {
     const { postId } = await params;
     
+    // Get voice parameter from query string (default to 'nova')
+    const { searchParams } = new URL(request.url);
+    const requestedVoice = searchParams.get('voice') || 'nova';
+    
+    // Validate voice is one of the allowed OpenAI voices
+    const allowedVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+    const voice = allowedVoices.includes(requestedVoice) ? requestedVoice : 'nova';
+    
     // Fetch blog post
     const result = await query(
       'SELECT id, title, content FROM blog_posts WHERE id = $1',
@@ -36,7 +44,6 @@ export async function GET(
     const post: BlogPost = result.rows[0];
     
     // Generate cache key based on title + content hash + voice
-    const voice = 'nova';
     const contentHash = generateContentHash(post.title, post.content, voice);
     const cacheKey = `blog-audio-${postId}-${contentHash}.mp3`;
     
@@ -87,7 +94,7 @@ export async function GET(
     // Generate audio using OpenAI TTS
     const mp3Response = await openai.audio.speech.create({
       model: 'tts-1',
-      voice: voice, // Natural, warm female voice
+      voice: voice,
       input: fullText,
       speed: 1.0,
     });
