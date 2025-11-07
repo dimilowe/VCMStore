@@ -60,7 +60,29 @@ export async function GET(
     const textContent = stripHtmlForTTS(post.content);
     
     // Add title at the beginning
-    const fullText = `${post.title}.\n\n${textContent}`;
+    let fullText = `${post.title}.\n\n${textContent}`;
+    
+    // OpenAI TTS has a 4096 character limit - truncate if needed
+    const MAX_CHARS = 4000; // Leave some buffer
+    if (fullText.length > MAX_CHARS) {
+      const originalLength = fullText.length;
+      
+      // Find the last complete sentence within the limit
+      const truncated = fullText.substring(0, MAX_CHARS);
+      const lastPeriod = truncated.lastIndexOf('.');
+      const lastQuestion = truncated.lastIndexOf('?');
+      const lastExclamation = truncated.lastIndexOf('!');
+      
+      const lastSentenceEnd = Math.max(lastPeriod, lastQuestion, lastExclamation);
+      
+      if (lastSentenceEnd > 0) {
+        fullText = truncated.substring(0, lastSentenceEnd + 1);
+      } else {
+        fullText = truncated + '...';
+      }
+      
+      console.log(`Truncated blog post ${postId} from ${originalLength} to ${fullText.length} characters`);
+    }
     
     // Generate audio using OpenAI TTS
     const mp3Response = await openai.audio.speech.create({
