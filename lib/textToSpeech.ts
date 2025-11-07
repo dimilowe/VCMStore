@@ -33,11 +33,12 @@ export function stripHtmlForTTS(html: string): string {
   return text;
 }
 
-export function generateContentHash(content: string): string {
-  // Simple hash function for cache keys
+export function generateContentHash(title: string, content: string, voice: string = 'nova'): string {
+  // Hash both title and content to invalidate cache on title changes
+  const combined = `${title}|${content}|${voice}`;
   let hash = 0;
-  for (let i = 0; i < content.length; i++) {
-    const char = content.charCodeAt(i);
+  for (let i = 0; i < combined.length; i++) {
+    const char = combined.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash; // Convert to 32bit integer
   }

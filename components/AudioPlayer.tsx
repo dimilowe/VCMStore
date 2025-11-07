@@ -52,10 +52,17 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        setIsPlaying(false);
       } else {
-        audioRef.current.play();
+        try {
+          await audioRef.current.play();
+          setIsPlaying(true);
+        } catch (err) {
+          console.error('Playback failed:', err);
+          setError('Playback failed. Please try again.');
+          setIsPlaying(false);
+        }
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -105,8 +112,7 @@ export function AudioPlayer({ postId }: AudioPlayerProps) {
   useEffect(() => {
     if (audioUrl && audioRef.current) {
       audioRef.current.playbackRate = playbackSpeed;
-      audioRef.current.play();
-      setIsPlaying(true);
+      // Don't autoplay - wait for user to click play
     }
   }, [audioUrl]);
 

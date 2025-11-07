@@ -35,17 +35,25 @@ export async function GET(
     
     const post: BlogPost = result.rows[0];
     
-    // Generate cache key based on content hash
-    const contentHash = generateContentHash(post.content);
+    // Generate cache key based on title + content hash + voice
+    const voice = 'nova';
+    const contentHash = generateContentHash(post.title, post.content, voice);
     const cacheKey = `blog-audio-${postId}-${contentHash}.mp3`;
     
     // Check if audio already exists in object storage
-    const existingFile = await storage.downloadAsBytes(cacheKey);
-    if (existingFile.ok) {
-      return NextResponse.json({ 
-        audioUrl: `/api/files/${cacheKey}`,
-        cached: true 
-      });
+    try {
+      const existingFile = await storage.downloadAsBytes(cacheKey);
+      if (existingFile.ok) {
+        console.log(`Cache hit for blog post ${postId}`);
+        return NextResponse.json({ 
+          audioUrl: `/api/files/${cacheKey}`,
+          cached: true 
+        });
+      }
+    } catch (storageError) {
+      // Distinguish between cache miss and storage errors
+      console.log(`Cache miss for blog post ${postId}, generating new audio`);
+      // Continue to generate audio
     }
     
     // Strip HTML and prepare text for TTS
@@ -57,10 +65,12 @@ export async function GET(
     // Generate audio using OpenAI TTS
     const mp3Response = await openai.audio.speech.create({
       model: 'tts-1',
-      voice: 'nova', // Natural, warm female voice
+      voice: voice, // Natural, warm female voice
       input: fullText,
       speed: 1.0,
     });
+    
+    console.log(`Generated new TTS audio for blog post ${postId}`);
     
     // Convert response to buffer
     const arrayBuffer = await mp3Response.arrayBuffer();
