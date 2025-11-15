@@ -39,6 +39,40 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   }
 
   const isFree = product.price_type === "free" || product.price === 0;
+  
+  // Convert plain text formatting to markdown
+  const formatDescription = (text: string) => {
+    const lines = text.split('\n');
+    const formatted: string[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const nextLine = i < lines.length - 1 ? lines[i + 1].trim() : '';
+      
+      // Skip empty lines but preserve as paragraph breaks
+      if (line === '') {
+        formatted.push('');
+        continue;
+      }
+      
+      // Detect section headings (short lines that seem like titles)
+      // Keywords that indicate major sections
+      const sectionKeywords = ['What It Does', 'Who It\'s For', 'Why It Matters', 'Bottom Line', 'How It Works'];
+      if (sectionKeywords.some(keyword => line.includes(keyword))) {
+        formatted.push(`\n## ${line}\n`);
+      }
+      // Detect sub-headings (title case lines under 50 chars with descriptive next line)
+      else if (line.length < 50 && nextLine.length > 0 && !line.includes('—') && !line.includes('.') && /^[A-Z]/.test(line)) {
+        formatted.push(`\n### ${line}\n`);
+      }
+      // Regular paragraph text
+      else {
+        formatted.push(line);
+      }
+    }
+    
+    return formatted.join('\n');
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -76,7 +110,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
               }}
             >
-              {product.description}
+              {formatDescription(product.description)}
             </ReactMarkdown>
           </div>
 
