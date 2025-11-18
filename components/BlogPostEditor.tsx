@@ -43,9 +43,12 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   const [success, setSuccess] = useState('');
   const [excerptOpen, setExcerptOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(post ? new Date() : null);
+  const [autoSaving, setAutoSaving] = useState(false);
   const router = useRouter();
   const editorInsertHtmlRef = useRef<((html: string) => void) | null>(null);
   const editorSavePositionRef = useRef<(() => void) | null>(null);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load existing categories for this post
   useEffect(() => {
@@ -53,6 +56,61 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       loadPostCategories();
     }
   }, [post?.id]);
+
+  // Autosave effect - triggers 3 seconds after user stops typing
+  useEffect(() => {
+    // Only autosave if we have an existing post (not a brand new draft)
+    if (!post?.id) return;
+    
+    // Only autosave if there's content to save
+    if (!content && !title) return;
+    
+    // Clear any existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    
+    // Set a new timeout to autosave after 3 seconds of inactivity
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      if (loading || autoSaving) return;
+      
+      setAutoSaving(true);
+      try {
+        const res = await fetch(`/api/admin/blog/${post.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title || 'Untitled Draft',
+            slug: slug || generateSlug(title || 'untitled-draft'),
+            content,
+            excerpt: excerpt || null,
+            meta_description: metaDescription || null,
+            featured_image_url: featuredImageUrl || null,
+            published_at: null, // Keep as draft
+            category_ids: selectedCategories,
+          }),
+          credentials: 'include',
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          setLastSaved(new Date());
+        }
+      } catch (err) {
+        // Silently fail autosave - user can still manually save
+        console.error('Autosave failed:', err);
+      } finally {
+        setAutoSaving(false);
+      }
+    }, 3000); // 3 second delay
+
+    // Cleanup on unmount
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [title, content, excerpt, metaDescription, featuredImageUrl, selectedCategories, slug]);
 
   const loadPostCategories = async () => {
     if (!post?.id) return;
@@ -70,6 +128,22 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
+  };
+
+  const formatTimeAgo = (date: Date) => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    
+    if (seconds < 10) return 'just now';
+    if (seconds < 60) return `${seconds}s ago`;
+    
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
   };
 
   const handleInsertBlock = (html: string) => {
@@ -110,8 +184,8 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title,
-          slug,
+          title: title || 'Untitled Draft',
+          slug: slug || generateSlug(title || 'untitled-draft'),
           content,
           excerpt: excerpt || null,
           meta_description: metaDescription || null,
@@ -125,6 +199,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       const data = await res.json();
 
       if (data.success) {
+        setLastSaved(new Date());
         // If this was a NEW post, redirect to edit page with the new ID
         if (!post && data.postId) {
           router.push(`/admin/blog/edit/${data.postId}`);
@@ -195,31 +270,41 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
             Back
           </Link>
           <div className="flex items-center gap-3">
-            <button
-              onClick={handleSaveDraft}
-              disabled={loading || !title || !content}
-              style={{
-                padding: '8px 16px',
-                border: '1px solid #d6d3d1',
-                borderRadius: '6px',
-                backgroundColor: 'white',
-                color: '#57534e',
-                fontSize: '14px',
-                fontWeight: '500',
-                cursor: loading || !title || !content ? 'not-allowed' : 'pointer',
-                opacity: loading || !title || !content ? 0.5 : 1,
-              }}
-              onMouseOver={(e) => {
-                if (!loading && title && content) {
-                  e.currentTarget.style.backgroundColor = '#fafaf9';
-                }
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
-              }}
-            >
-              Save Draft
-            </button>
+            <div className="flex items-center gap-2">
+              {autoSaving && (
+                <span className="text-xs text-stone-500 italic">Saving...</span>
+              )}
+              {!autoSaving && lastSaved && (
+                <span className="text-xs text-stone-500">
+                  Saved {formatTimeAgo(lastSaved)}
+                </span>
+              )}
+              <button
+                onClick={handleSaveDraft}
+                disabled={loading}
+                style={{
+                  padding: '8px 16px',
+                  border: '1px solid #d6d3d1',
+                  borderRadius: '6px',
+                  backgroundColor: 'white',
+                  color: '#57534e',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.5 : 1,
+                }}
+                onMouseOver={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.backgroundColor = '#fafaf9';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'white';
+                }}
+              >
+                Save Draft
+              </button>
+            </div>
             <button
               onClick={handlePublish}
               disabled={loading || !title || !content}
