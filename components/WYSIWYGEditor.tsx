@@ -120,8 +120,8 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
 
   return (
     <div className="border rounded-lg overflow-hidden bg-white">
-      {/* Formatting Toolbar */}
-      <div className="flex items-center gap-1 p-2 bg-stone-50 border-b flex-wrap">
+      {/* Formatting Toolbar - Sticky so it follows you as you scroll */}
+      <div className="sticky top-0 z-10 flex items-center gap-1 p-2 bg-stone-50 border-b flex-wrap shadow-sm">
         {/* Undo/Redo */}
         <div className="flex gap-1 pr-2 border-r">
           <Button
