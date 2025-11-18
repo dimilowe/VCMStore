@@ -125,8 +125,8 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
 
   return (
     <>
-      {/* Insert Toolbar */}
-      <div className="flex flex-wrap gap-2 p-4 bg-stone-50 border-b">
+      {/* Insert Toolbar - Sticky so it follows you as you scroll */}
+      <div className="sticky top-0 z-10 flex flex-wrap gap-2 p-4 bg-stone-50 border-b shadow-sm">
         <Button
           type="button"
           variant="outline"
