@@ -163,47 +163,62 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
         </div>
 
         {/* Upload Section */}
-        <div 
-          className={`p-6 border-b transition-colors ${
-            isDragging ? 'bg-blue-50 border-blue-300' : 'bg-stone-50'
-          }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <div className="flex items-center gap-3">
-            <Button 
-              type="button" 
-              disabled={uploading} 
-              className="gap-2"
-              onClick={triggerFileInput}
-            >
-              {uploading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4" />
-                  Upload New Image
-                </>
+        <div className="p-6 border-b bg-stone-50">
+          <div 
+            className={`border-2 border-dashed rounded-lg p-6 transition-all ${
+              isDragging 
+                ? 'border-blue-500 bg-blue-50' 
+                : 'border-stone-300 hover:border-stone-400'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-3">
+                <Button 
+                  type="button" 
+                  disabled={uploading} 
+                  className="gap-2"
+                  onClick={triggerFileInput}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Upload New Image
+                    </>
+                  )}
+                </Button>
+                <span className="text-sm text-stone-600">
+                  or drag & drop an image here
+                </span>
+              </div>
+              
+              {isDragging && (
+                <div className="text-blue-600 font-medium flex items-center gap-2">
+                  <Upload className="w-5 h-5" />
+                  Drop your image here
+                </div>
               )}
-            </Button>
-            <span className="text-sm text-stone-600">
-              {isDragging ? 'Drop image here...' : 'Upload or drag & drop an image'}
-            </span>
+            </div>
+            
+            <input
+              id="media-upload-input"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="hidden"
+            />
           </div>
-          <input
-            id="media-upload-input"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="hidden"
-          />
+          
           {error && (
-            <p className="text-sm text-red-600 mt-2">{error}</p>
+            <p className="text-sm text-red-600 mt-3">{error}</p>
           )}
         </div>
 
