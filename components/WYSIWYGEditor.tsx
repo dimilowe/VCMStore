@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
 import { TextStyle } from '@tiptap/extension-text-style';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Bold, 
   Italic, 
@@ -14,7 +14,9 @@ import {
   Undo2,
   Redo2,
   List,
-  ListOrdered
+  ListOrdered,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -26,6 +28,18 @@ interface WYSIWYGEditorProps {
 }
 
 export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady }: WYSIWYGEditorProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('formatting-toolbar-collapsed');
+    if (saved) setIsCollapsed(saved === 'true');
+  }, []);
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem('formatting-toolbar-collapsed', String(newState));
+  };
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -121,10 +135,116 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
   return (
     <>
       {/* Formatting Toolbar - Sticky so it follows you as you scroll */}
-      <div className="sticky top-[144px] z-10 flex items-center gap-1 p-2 bg-stone-50 border border-b-0 rounded-t-lg flex-wrap shadow-sm">
+      {isCollapsed ? (
+        <div className="fixed left-0 top-[350px] z-10 flex flex-col gap-1 p-2 bg-stone-50 border-r shadow-lg rounded-r-lg">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapse}
+            className="w-10 h-10 p-0"
+            title="Expand toolbar"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().undo().run()}
+            disabled={!editor?.can().undo()}
+            className="w-10 h-10 p-0 disabled:opacity-30"
+            title="Undo"
+          >
+            <Undo2 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().redo().run()}
+            disabled={!editor?.can().redo()}
+            className="w-10 h-10 p-0 disabled:opacity-30"
+            title="Redo"
+          >
+            <Redo2 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleBold().run()}
+            className={`w-10 h-10 p-0 ${editor?.isActive('bold') ? 'bg-stone-200' : ''}`}
+            title="Bold"
+          >
+            <Bold className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleItalic().run()}
+            className={`w-10 h-10 p-0 ${editor?.isActive('italic') ? 'bg-stone-200' : ''}`}
+            title="Italic"
+          >
+            <Italic className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleUnderline().run()}
+            className={`w-10 h-10 p-0 ${editor?.isActive('underline') ? 'bg-stone-200' : ''}`}
+            title="Underline"
+          >
+            <UnderlineIcon className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleStrike().run()}
+            className={`w-10 h-10 p-0 ${editor?.isActive('strike') ? 'bg-stone-200' : ''}`}
+            title="Strikethrough"
+          >
+            <Strikethrough className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            className={`w-10 h-10 p-0 ${editor?.isActive('bulletList') ? 'bg-stone-200' : ''}`}
+            title="Bullet List"
+          >
+            <List className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+            className={`w-10 h-10 p-0 ${editor?.isActive('orderedList') ? 'bg-stone-200' : ''}`}
+            title="Numbered List"
+          >
+            <ListOrdered className="w-4 h-4" />
+          </Button>
+        </div>
+      ) : (
+        <div className="sticky top-[144px] z-10 flex items-center gap-1 p-2 bg-stone-50 border border-b-0 rounded-t-lg flex-wrap shadow-sm">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapse}
+            className="mr-2"
+            title="Collapse toolbar"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
 
-        {/* Undo/Redo */}
-        <div className="flex gap-1 pr-2 border-r">
+          {/* Undo/Redo */}
+          <div className="flex gap-1 pr-2 border-r">
           <Button
             type="button"
             variant="ghost"
@@ -269,6 +389,7 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
           </Button>
         </div>
       </div>
+      )}
 
       {/* Editor Content */}
       <div className="border border-t-0 rounded-b-lg bg-white">
