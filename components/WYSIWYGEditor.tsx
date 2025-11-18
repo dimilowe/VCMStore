@@ -136,7 +136,7 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
     <>
       {/* Formatting Toolbar - Sticky so it follows you as you scroll */}
       {isCollapsed ? (
-        <div className="fixed left-0 top-[350px] z-10 flex flex-col gap-1 p-2 bg-stone-50 border-r shadow-lg rounded-r-lg">
+        <div className="fixed right-0 top-[350px] z-10 flex flex-col gap-1 p-2 bg-stone-50 border-l shadow-lg rounded-l-lg">
           <Button
             type="button"
             variant="ghost"
@@ -145,7 +145,7 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
             className="w-10 h-10 p-0"
             title="Expand toolbar"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4" />
           </Button>
           <Button
             type="button"
@@ -240,7 +240,7 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
             className="mr-2"
             title="Collapse toolbar"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4" />
           </Button>
 
           {/* Undo/Redo */}
