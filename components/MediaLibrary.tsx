@@ -21,6 +21,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [selectedUrl, setSelectedUrl] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     loadImages();
@@ -80,6 +81,35 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      handleUpload(file);
+    } else {
+      setError('Please drop an image file');
+    }
+  };
+
+  const triggerFileInput = () => {
+    const input = document.getElementById('media-upload-input') as HTMLInputElement;
+    if (input) {
+      input.click();
+    }
+  };
+
   const handleInsert = () => {
     if (selectedUrl) {
       onSelect(selectedUrl);
@@ -133,34 +163,45 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
         </div>
 
         {/* Upload Section */}
-        <div className="p-6 border-b bg-stone-50">
-          <label className="block">
-            <div className="flex items-center gap-3 cursor-pointer">
-              <Button type="button" disabled={uploading} className="gap-2">
-                {uploading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4" />
-                    Upload New Image
-                  </>
-                )}
-              </Button>
-              <span className="text-sm text-stone-600">
-                Upload a new image to your media library
-              </span>
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              disabled={uploading}
-              className="hidden"
-            />
-          </label>
+        <div 
+          className={`p-6 border-b transition-colors ${
+            isDragging ? 'bg-blue-50 border-blue-300' : 'bg-stone-50'
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div className="flex items-center gap-3">
+            <Button 
+              type="button" 
+              disabled={uploading} 
+              className="gap-2"
+              onClick={triggerFileInput}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Upload New Image
+                </>
+              )}
+            </Button>
+            <span className="text-sm text-stone-600">
+              {isDragging ? 'Drop image here...' : 'Upload or drag & drop an image'}
+            </span>
+          </div>
+          <input
+            id="media-upload-input"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={uploading}
+            className="hidden"
+          />
           {error && (
             <p className="text-sm text-red-600 mt-2">{error}</p>
           )}
