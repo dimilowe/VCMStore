@@ -105,6 +105,11 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-18: **Increased File Upload Limit** - Raised maximum upload size from 10MB to 50MB
+  - Updated server-side validation in `/api/upload/route.ts` to allow 50MB files
+  - Increased client-side limits in all uploader components (ImageUploader, InlineUploader, ObjectUploader)
+  - Enables uploading larger GIFs and high-quality images to Media Library
+  - Updated UI text to display "max 50MB" in upload interfaces
 - 2025-11-06: **Added Feedback System** - User feedback form with categorized submissions
   - Created feedback database table to store submissions
   - Built FeedbackDialog component with 4 feedback types (bug, feature, improvement, general)

@@ -152,7 +152,7 @@ export function ImageUploader({ onUploadComplete, onCancel, defaultUrl = '' }: I
                       Drag and drop an image here
                     </p>
                     <p className="text-xs text-stone-500 mb-4">
-                      or click to browse (max 10MB)
+                      or click to browse (max 50MB)
                     </p>
                     <input
                       type="file"

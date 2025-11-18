@@ -17,7 +17,7 @@ interface InlineUploaderProps {
 export function InlineUploader({
   onUpload,
   accept,
-  maxSize = 10485760, // 10MB default
+  maxSize = 52428800, // 50MB default
   currentUrl,
   onRemove,
   placeholder = "Drop your file here or click to browse",
