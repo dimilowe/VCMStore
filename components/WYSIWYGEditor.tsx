@@ -29,10 +29,21 @@ interface WYSIWYGEditorProps {
 
 export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady }: WYSIWYGEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 350 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const saved = localStorage.getItem('formatting-toolbar-collapsed');
     if (saved) setIsCollapsed(saved === 'true');
+    
+    const savedPosition = localStorage.getItem('formatting-toolbar-position');
+    if (savedPosition) {
+      setPosition(JSON.parse(savedPosition));
+    } else {
+      // Set default position to right side on first load
+      setPosition({ x: window.innerWidth - 60, y: 350 });
+    }
   }, []);
 
   const toggleCollapse = () => {
@@ -40,6 +51,40 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
     setIsCollapsed(newState);
     localStorage.setItem('formatting-toolbar-collapsed', String(newState));
   };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragOffset({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      const newPosition = {
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y
+      };
+      setPosition(newPosition);
+      localStorage.setItem('formatting-toolbar-position', JSON.stringify(newPosition));
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragOffset]);
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -136,7 +181,11 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
     <>
       {/* Formatting Toolbar - Sticky so it follows you as you scroll */}
       {isCollapsed ? (
-        <div className="fixed right-0 top-[350px] z-10 flex flex-col gap-1 p-2 bg-stone-50 border-l shadow-lg rounded-l-lg">
+        <div 
+          className="fixed z-10 flex flex-col gap-1 p-2 bg-stone-50 border shadow-lg rounded-lg cursor-move"
+          style={{ left: `${position.x}px`, top: `${position.y}px` }}
+          onMouseDown={handleMouseDown}
+        >
           <Button
             type="button"
             variant="ghost"

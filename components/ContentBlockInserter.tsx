@@ -36,10 +36,18 @@ export function ContentBlockInserter({ onInsert, onBeforeInsert }: BlockInserter
   const [linkUrl, setLinkUrl] = useState('');
   const [galleryUrls, setGalleryUrls] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 80 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const saved = localStorage.getItem('toolbar-collapsed');
     if (saved) setIsCollapsed(saved === 'true');
+    
+    const savedPosition = localStorage.getItem('toolbar-position');
+    if (savedPosition) {
+      setPosition(JSON.parse(savedPosition));
+    }
   }, []);
 
   const toggleCollapse = () => {
@@ -47,6 +55,40 @@ export function ContentBlockInserter({ onInsert, onBeforeInsert }: BlockInserter
     setIsCollapsed(newState);
     localStorage.setItem('toolbar-collapsed', String(newState));
   };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragOffset({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      const newPosition = {
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y
+      };
+      setPosition(newPosition);
+      localStorage.setItem('toolbar-position', JSON.stringify(newPosition));
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragOffset]);
 
   const handleInsertImage = (imageUrl: string) => {
     // Insert image with proper paragraph wrapping for Tiptap
@@ -141,7 +183,11 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
     <>
       {/* Insert Toolbar - Sticky so it follows you as you scroll */}
       {isCollapsed ? (
-        <div className="fixed left-0 top-[80px] z-20 flex flex-col gap-2 p-2 bg-stone-50 border-r shadow-lg rounded-r-lg">
+        <div 
+          className="fixed z-20 flex flex-col gap-2 p-2 bg-stone-50 border shadow-lg rounded-lg cursor-move"
+          style={{ left: `${position.x}px`, top: `${position.y}px` }}
+          onMouseDown={handleMouseDown}
+        >
           <Button
             type="button"
             variant="ghost"
