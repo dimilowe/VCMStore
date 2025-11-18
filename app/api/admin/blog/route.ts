@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, id: postId });
+    return NextResponse.json({ success: true, postId });
   } catch (error) {
     console.error("Create blog post error:", error);
     return NextResponse.json(
