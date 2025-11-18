@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,7 +15,9 @@ import {
   Heading2,
   Grid3x3,
   Link as LinkIcon,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface BlockInserterProps {
@@ -33,6 +35,18 @@ export function ContentBlockInserter({ onInsert, onBeforeInsert }: BlockInserter
   const [linkText, setLinkText] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [galleryUrls, setGalleryUrls] = useState('');
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('toolbar-collapsed');
+    if (saved) setIsCollapsed(saved === 'true');
+  }, []);
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem('toolbar-collapsed', String(newState));
+  };
 
   const handleInsertImage = (imageUrl: string) => {
     // Insert image with proper paragraph wrapping for Tiptap
@@ -126,7 +140,114 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
   return (
     <>
       {/* Insert Toolbar - Sticky so it follows you as you scroll */}
-      <div className="sticky top-[80px] z-20 flex flex-wrap gap-2 p-4 bg-stone-50 border-b shadow-sm">
+      {isCollapsed ? (
+        <div className="fixed left-0 top-[80px] z-20 flex flex-col gap-2 p-2 bg-stone-50 border-r shadow-lg rounded-r-lg">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapse}
+            className="w-10 h-10 p-0"
+            title="Expand toolbar"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              onBeforeInsert?.();
+              setShowMediaLibrary(true);
+            }}
+            className="w-10 h-10 p-0 bg-blue-50 hover:bg-blue-100"
+            title="Insert Image"
+          >
+            <ImageIcon className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveModal('video')}
+            className="w-10 h-10 p-0"
+            title="Insert Video"
+          >
+            <Video className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveModal('gallery')}
+            className="w-10 h-10 p-0"
+            title="Insert Gallery"
+          >
+            <Grid3x3 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveModal('quote')}
+            className="w-10 h-10 p-0"
+            title="Insert Quote"
+          >
+            <Quote className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveModal('code')}
+            className="w-10 h-10 p-0"
+            title="Insert Code"
+          >
+            <Code className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveModal('link')}
+            className="w-10 h-10 p-0"
+            title="Insert Link"
+          >
+            <LinkIcon className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleInsertHeading}
+            className="w-10 h-10 p-0"
+            title="Insert Heading"
+          >
+            <Heading2 className="w-4 h-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleInsertList}
+            className="w-10 h-10 p-0"
+            title="Insert List"
+          >
+            <List className="w-4 h-4" />
+          </Button>
+        </div>
+      ) : (
+        <div className="sticky top-[80px] z-20 flex flex-wrap gap-2 p-4 bg-stone-50 border-b shadow-sm">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapse}
+            className="gap-2"
+            title="Collapse toolbar"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
         <Button
           type="button"
           variant="outline"
@@ -211,6 +332,7 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
           List
         </Button>
       </div>
+      )}
 
       {/* Media Library Modal */}
       {showMediaLibrary && (
