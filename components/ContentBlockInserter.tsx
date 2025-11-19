@@ -184,8 +184,8 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
       {/* Insert Toolbar - Sticky so it follows you as you scroll */}
       {isCollapsed ? (
         <div 
-          className="fixed z-20 flex flex-col gap-2 p-2 bg-stone-50 border shadow-lg rounded-lg cursor-move"
-          style={{ left: `${position.x}px`, top: `${position.y}px` }}
+          className="lg:fixed z-20 flex flex-row lg:flex-col gap-2 p-2 bg-stone-50 border shadow-lg rounded-lg lg:cursor-move mb-4 lg:mb-0"
+          style={{ left: isCollapsed ? `${position.x}px` : undefined, top: isCollapsed ? `${position.y}px` : undefined }}
           onMouseDown={handleMouseDown}
         >
           <Button
@@ -283,7 +283,7 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
           </Button>
         </div>
       ) : (
-        <div className="sticky top-[80px] z-20 flex flex-wrap gap-2 p-4 bg-stone-50 border-b shadow-sm">
+        <div className="lg:sticky lg:top-[80px] z-20 flex flex-wrap gap-2 p-2 sm:p-3 lg:p-4 bg-stone-50 border-b shadow-sm">
           <Button
             type="button"
             variant="ghost"

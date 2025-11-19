@@ -182,8 +182,8 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
       {/* Formatting Toolbar - Sticky so it follows you as you scroll */}
       {isCollapsed ? (
         <div 
-          className="fixed z-10 flex flex-col gap-1 p-2 bg-stone-50 border shadow-lg rounded-lg cursor-move"
-          style={{ left: `${position.x}px`, top: `${position.y}px` }}
+          className="lg:fixed z-10 flex flex-row lg:flex-col gap-1 p-2 bg-stone-50 border shadow-lg rounded-lg lg:cursor-move mb-4 lg:mb-0"
+          style={{ left: isCollapsed ? `${position.x}px` : undefined, top: isCollapsed ? `${position.y}px` : undefined }}
           onMouseDown={handleMouseDown}
         >
           <Button
@@ -280,7 +280,7 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
           </Button>
         </div>
       ) : (
-        <div className="sticky top-[144px] z-10 flex items-center gap-1 p-2 bg-stone-50 border border-b-0 rounded-t-lg flex-wrap shadow-sm">
+        <div className="lg:sticky lg:top-[144px] z-10 flex items-center gap-1 p-2 bg-stone-50 border border-b-0 rounded-t-lg flex-wrap shadow-sm">
           <Button
             type="button"
             variant="ghost"
