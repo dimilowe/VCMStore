@@ -2,6 +2,9 @@ import { query } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { BlogPostEditor } from "@/components/BlogPostEditor";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface BlogPost {
   id: number;
   title: string;

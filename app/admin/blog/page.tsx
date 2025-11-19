@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Plus, Edit, Eye, Trash2 } from "lucide-react";
 import { DeleteBlogPostButton } from "@/components/DeleteBlogPostButton";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface BlogPost {
   id: number;
   title: string;
