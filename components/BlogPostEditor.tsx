@@ -260,9 +260,9 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-white overflow-hidden">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-white">
       {/* Main Editor Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 min-h-[60vh] lg:min-h-0 lg:overflow-hidden">
         {/* Top Bar */}
         <div className="flex-shrink-0 border-b px-3 sm:px-6 py-3 flex items-center justify-between bg-white">
           <Link href="/admin/blog" className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 text-sm sm:text-base">
@@ -335,7 +335,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
         </div>
 
         {/* Editor Content */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:overflow-y-auto">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-6 text-sm">
               {error}
@@ -378,7 +378,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-full lg:w-80 lg:min-w-80 lg:max-w-80 flex-shrink-0 border-t lg:border-t-0 lg:border-l bg-white overflow-y-auto overflow-x-hidden">
+      <div className="w-full lg:w-80 lg:min-w-80 lg:max-w-80 flex-shrink-0 border-t lg:border-t-0 lg:border-l bg-white lg:overflow-y-auto overflow-x-hidden">
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 w-full max-w-full overflow-hidden">
           {/* Publish Section */}
           <div className="space-y-3">
