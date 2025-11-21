@@ -2,9 +2,9 @@ import { MetadataRoute } from 'next';
 import { query } from '@/lib/db';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.REPL_SLUG 
-    ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
-    : 'http://localhost:5000';
+  // Priority: Custom domain > Replit dev domain > localhost
+  const baseUrl = process.env.SITE_URL || 
+    (process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS}` : 'http://localhost:5000');
 
   // Get all published products
   const productsResult = await query(
