@@ -70,7 +70,6 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/tools/gif-compressor` - Free GIF compression tool (SEO traffic driver)
 - `/tools/image-compressor` - Free JPG/PNG/WebP compression tool
 - `/tools/word-counter` - Free word/character counting tool (100% client-side)
-- `/tools/pd-measure` - Free online PD measurement tool (100% client-side)
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -110,17 +109,6 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
-- 2025-11-26: **Added PD Measure Tool** - Online pupillary distance measurement tool
-  - Created `/tools/pd-measure` page with interactive canvas overlay
-  - Upload selfie with credit card as reference object (85.6mm standard width)
-  - Draggable markers: yellow for card edges, blue for pupil centers
-  - Calculates PD in mm based on pixel distance and reference scale
-  - Step indicator showing progress (Upload → Set Scale → Mark Pupils → Get PD)
-  - Copy functionality for easy use with online glasses retailers
-  - 100% client-side processing - photo never leaves user's device
-  - JSON-LD schema for SoftwareApplication and FAQPage
-  - Full SEO content targeting "online tool to measure pd" keywords
-  - Added to navigation dropdown and sitemap
 - 2025-11-26: **Added Word Counter Tool** - Free word/character counting tool
   - Created `/tools/word-counter` page with real-time text analysis
   - Counts words, characters (with/without spaces), sentences, paragraphs
