@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Free Logo Generator Online - Instant & No Watermark',
-  description: 'Create a professional logo online for free. No signup. No watermark. Instant downloads. AI-powered logo generator for your business.',
+  title: 'Free AI Logo Generator - Describe & Create Instantly',
+  description: 'Describe your vision and get 4 unique logo designs instantly. Free AI-powered logo generator with chat interface. No signup, no watermark.',
   openGraph: {
-    title: 'Free Online Logo Generator (No Signup)',
-    description: 'Create professional logos instantly with AI. No signup, no watermark, free downloads.',
+    title: 'Free AI Logo Generator (Chat-Based)',
+    description: 'Describe your vision in natural language. Get 4 unique professional logo designs instantly. No signup required.',
     type: 'website',
   },
 };

@@ -7,19 +7,8 @@ const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
 });
 
-const STYLES: Record<string, string> = {
-  modern: 'modern, clean lines, geometric shapes, contemporary design',
-  minimalist: 'minimalist, simple, clean, minimal elements, whitespace',
-  bold: 'bold, strong, impactful, thick lines, powerful presence',
-  luxury: 'luxury, elegant, sophisticated, premium, refined',
-  playful: 'playful, fun, colorful, friendly, approachable'
-};
-
 interface GenerateRequest {
-  businessName: string;
-  slogan?: string;
-  style: string;
-  iconKeyword?: string;
+  description: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -38,47 +27,46 @@ export async function POST(request: NextRequest) {
     }
 
     const body: GenerateRequest = await request.json();
-    const { businessName, slogan, style, iconKeyword } = body;
+    const { description } = body;
 
-    if (!businessName || businessName.trim().length === 0) {
+    if (!description || description.trim().length === 0) {
       return NextResponse.json(
-        { error: 'Business name is required' },
+        { error: 'Please describe the logo you want' },
         { status: 400 }
       );
     }
 
-    if (businessName.length > 50) {
+    if (description.length > 500) {
       return NextResponse.json(
-        { error: 'Business name must be 50 characters or less' },
+        { error: 'Description must be 500 characters or less' },
         { status: 400 }
       );
     }
 
-    const styleDescription = STYLES[style] || STYLES.modern;
-
-    let prompt = `Design a clean, professional logo for a brand called "${businessName.trim()}". `;
-    prompt += `Style: ${styleDescription}. `;
-    
-    if (slogan && slogan.trim()) {
-      prompt += `The brand's slogan is "${slogan.trim()}". `;
-    }
-    
-    if (iconKeyword && iconKeyword.trim()) {
-      prompt += `Include an icon concept based on: ${iconKeyword.trim()}. `;
-    }
-    
-    prompt += `Create a minimalist, vector-style logo with simple shapes and flat colors. `;
-    prompt += `The logo should be on a pure white background. `;
-    prompt += `Professional quality, suitable for business use. `;
-    prompt += `No text watermarks, no photographer credits, no signatures.`;
+    const basePrompt = `Create a professional logo design based on this description: "${description.trim()}". 
+Design requirements:
+- Clean, vector-style logo with simple shapes
+- Professional quality suitable for business use
+- Pure white or transparent background
+- No text watermarks, no photographer credits
+- High contrast and clear visibility
+- Scalable design that works at any size`;
 
     const logos: { base64: string; variant: number }[] = [];
     
     for (let i = 0; i < 4; i++) {
       try {
+        const variationPrompt = `${basePrompt}
+
+This is variation ${i + 1} of 4. Create a unique interpretation:
+${i === 0 ? '- Focus on a clean, minimalist approach' : ''}
+${i === 1 ? '- Try a more bold and impactful design' : ''}
+${i === 2 ? '- Create an icon-focused version' : ''}
+${i === 3 ? '- Design a more abstract or artistic interpretation' : ''}`;
+
         const response = await openai.images.generate({
           model: 'gpt-image-1',
-          prompt: prompt + ` Variation ${i + 1} with unique design approach.`,
+          prompt: variationPrompt,
           size: '1024x1024',
         });
         
@@ -93,18 +81,16 @@ export async function POST(request: NextRequest) {
 
     if (logos.length === 0) {
       return NextResponse.json(
-        { error: 'Failed to generate logos. Please try again.' },
+        { error: 'Failed to generate logos. Please try a different description.' },
         { status: 500 }
       );
     }
 
-    console.log(`[Logo Generator] Generated ${logos.length} logos for "${businessName.trim()}" (style: ${style})`);
+    console.log(`[Logo Generator] Generated ${logos.length} logos for: "${description.trim().slice(0, 50)}..."`);
 
     return NextResponse.json({
       success: true,
       logos,
-      businessName: businessName.trim(),
-      style,
       remaining: rateLimit.remaining
     });
 

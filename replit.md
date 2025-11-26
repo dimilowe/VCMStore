@@ -110,15 +110,15 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
-- 2025-11-26: **Added Logo Generator Tool** - AI-powered logo maker
-  - Created `/tools/logo-generator` page with business inputs
+- 2025-11-26: **Added Logo Generator Tool** - AI-powered logo maker with chat interface
+  - Created `/tools/logo-generator` with natural language chat input
+  - Users describe their vision in their own words (not form fields)
   - Uses OpenAI gpt-image-1 model via Replit AI Integrations
-  - Generates 4 unique logo variations per request
-  - Style options: modern, minimalist, bold, luxury, playful
-  - Optional icon keyword for guided design direction
-  - PNG download at 1024x1024 resolution
+  - Generates 4 unique variations per request (minimalist, bold, icon-focused, abstract)
+  - Click-to-download PNG files at 1024x1024 resolution
   - Rate limited: 5 generations per hour per IP
-  - Updated rate limiter to support per-tool limits
+  - Example prompts to help users get started
+  - Conversational UI with message history
   - JSON-LD schema for SEO
   - Added to navigation dropdown and sitemap
 - 2025-11-26: **Added Word Counter Tool** - Free word/character counting tool
