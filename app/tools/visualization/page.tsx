@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import ReactFlow, {
   Controls,
   Background,
   useNodesState,
   useEdgesState,
+  useReactFlow,
+  ReactFlowProvider,
   Node,
   Edge,
   MarkerType,
@@ -24,6 +26,90 @@ Social Media Post
   > Short-Form Video
       > QR Code to Funnel
           > APE Paywall`;
+
+function DiagramFlow({ 
+  nodes, 
+  edges, 
+  onNodesChange, 
+  onEdgesChange,
+  onResetView,
+  onToggleDirection,
+  onDownloadPng,
+  direction,
+}: {
+  nodes: Node[];
+  edges: Edge[];
+  onNodesChange: any;
+  onEdgesChange: any;
+  onResetView: () => void;
+  onToggleDirection: () => void;
+  onDownloadPng: () => void;
+  direction: 'LR' | 'TB';
+}) {
+  const { fitView } = useReactFlow();
+
+  const handleResetView = useCallback(() => {
+    fitView({ padding: 0.2, duration: 200 });
+  }, [fitView]);
+
+  return (
+    <>
+      {nodes.length > 0 && (
+        <div className="flex items-center justify-between px-4 py-2 border-b border-stone-200 bg-stone-50">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onToggleDirection}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-all"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              {direction === 'LR' ? 'Left to Right' : 'Top to Bottom'}
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleResetView}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-all"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Reset View
+            </button>
+            <button
+              onClick={onDownloadPng}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-all"
+            >
+              <Download className="w-4 h-4" />
+              Download PNG
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 relative">
+        {nodes.length === 0 ? (
+          <div className="absolute inset-0 flex items-center justify-center text-stone-400">
+            <p>Your diagram will appear here</p>
+          </div>
+        ) : (
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            fitView
+            fitViewOptions={{ padding: 0.2 }}
+            defaultEdgeOptions={{
+              type: 'smoothstep',
+              markerEnd: { type: MarkerType.ArrowClosed },
+            }}
+          >
+            <Controls />
+            <Background color="#e7e5e4" gap={16} />
+          </ReactFlow>
+        )}
+      </div>
+    </>
+  );
+}
 
 export default function VisualizationPage() {
   const [inputText, setInputText] = useState('');
@@ -54,17 +140,6 @@ export default function VisualizationPage() {
     setInputText(EXAMPLE_TEXT);
     setError(null);
   };
-
-  const centerDiagram = useCallback(() => {
-    if (nodes.length > 0) {
-      const layouted = getLayoutedElements(
-        nodes.map((n, i) => ({ id: n.id, label: n.data.label as string, depth: i })),
-        edges.map(e => ({ id: e.id, source: e.source, target: e.target })),
-        direction
-      );
-      setNodes(layouted.nodes as Node[]);
-    }
-  }, [nodes, edges, direction, setNodes]);
 
   const downloadPng = useCallback(() => {
     const flowElement = document.querySelector('.react-flow') as HTMLElement;
@@ -195,59 +270,18 @@ export default function VisualizationPage() {
 
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden h-full min-h-[500px] flex flex-col">
-              {hasGenerated && nodes.length > 0 && (
-                <div className="flex items-center justify-between px-4 py-2 border-b border-stone-200 bg-stone-50">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={toggleDirection}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-all"
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                      {direction === 'LR' ? 'Left to Right' : 'Top to Bottom'}
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={centerDiagram}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-all"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      Reset View
-                    </button>
-                    <button
-                      onClick={downloadPng}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-all"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download PNG
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex-1 relative">
-                {!hasGenerated ? (
-                  <div className="absolute inset-0 flex items-center justify-center text-stone-400">
-                    <p>Your diagram will appear here</p>
-                  </div>
-                ) : (
-                  <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    onNodesChange={onNodesChange}
-                    onEdgesChange={onEdgesChange}
-                    fitView
-                    fitViewOptions={{ padding: 0.2 }}
-                    defaultEdgeOptions={{
-                      type: 'smoothstep',
-                      markerEnd: { type: MarkerType.ArrowClosed },
-                    }}
-                  >
-                    <Controls />
-                    <Background color="#e7e5e4" gap={16} />
-                  </ReactFlow>
-                )}
-              </div>
+              <ReactFlowProvider>
+                <DiagramFlow
+                  nodes={nodes}
+                  edges={edges}
+                  onNodesChange={onNodesChange}
+                  onEdgesChange={onEdgesChange}
+                  onResetView={() => {}}
+                  onToggleDirection={toggleDirection}
+                  onDownloadPng={downloadPng}
+                  direction={direction}
+                />
+              </ReactFlowProvider>
             </div>
           </div>
         </div>

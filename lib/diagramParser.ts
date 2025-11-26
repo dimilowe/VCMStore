@@ -113,8 +113,10 @@ export function getLayoutedElements(
     type: 'smoothstep',
     style: { stroke: '#78716c', strokeWidth: 2 },
     markerEnd: {
-      type: 'arrowclosed' as const,
+      type: 'arrowclosed',
       color: '#78716c',
+      width: 20,
+      height: 20,
     },
   }));
 
