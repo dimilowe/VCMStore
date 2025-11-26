@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { Search, Shuffle, Copy, Check, Sparkles } from 'lucide-react';
+import { Search, Shuffle, Copy, Check, Sparkles, Trash2, Wand2 } from 'lucide-react';
 
 interface EmojiCombo {
   id: number;
@@ -35,6 +35,9 @@ export default function EmojiCombosPage() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [customCombo, setCustomCombo] = useState('');
+  const [customLabel, setCustomLabel] = useState('');
+  const [customCopied, setCustomCopied] = useState(false);
   const cardRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   useEffect(() => {
@@ -86,6 +89,26 @@ export default function EmojiCombosPage() {
     setTimeout(() => {
       setHighlightedId(null);
     }, 1500);
+  };
+
+  const copyCustomCombo = async () => {
+    if (!customCombo.trim()) return;
+    try {
+      await navigator.clipboard.writeText(customCombo);
+      setCustomCopied(true);
+      setToast('Custom combo copied! ✅');
+      setTimeout(() => {
+        setCustomCopied(false);
+        setToast(null);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const clearCustomCombo = () => {
+    setCustomCombo('');
+    setCustomLabel('');
   };
 
   const getCategoryColor = (cat: string) => {
@@ -186,6 +209,83 @@ export default function EmojiCombosPage() {
             ))}
           </div>
         </div>
+
+        <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl border border-violet-200 p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Wand2 className="w-5 h-5 text-violet-600" />
+            <h2 className="text-lg font-semibold text-stone-900">Create Your Own Combo</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+                Your emoji combo
+              </label>
+              <input
+                type="text"
+                value={customCombo}
+                onChange={(e) => setCustomCombo(e.target.value)}
+                placeholder="Type or paste emojis here... 🎨✨💫"
+                className="w-full px-4 py-3 border border-violet-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-2xl bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+                Label (optional)
+              </label>
+              <input
+                type="text"
+                value={customLabel}
+                onChange={(e) => setCustomLabel(e.target.value)}
+                placeholder="Give it a name..."
+                className="w-full px-4 py-3 border border-violet-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-stone-900 bg-white"
+              />
+            </div>
+          </div>
+
+          {customCombo && (
+            <div className="bg-white rounded-xl border border-violet-200 p-4 mb-4">
+              <p className="text-xs text-stone-500 mb-2">Preview</p>
+              <div className="text-4xl mb-1">{customCombo}</div>
+              {customLabel && <p className="text-sm text-stone-500">{customLabel}</p>}
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              onClick={copyCustomCombo}
+              disabled={!customCombo.trim()}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
+                customCopied
+                  ? 'bg-green-500 text-white'
+                  : customCombo.trim()
+                    ? 'bg-violet-500 hover:bg-violet-600 text-white'
+                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+              }`}
+            >
+              {customCopied ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-5 h-5" />
+                  Copy Custom Combo
+                </>
+              )}
+            </button>
+            <button
+              onClick={clearCustomCombo}
+              disabled={!customCombo && !customLabel}
+              className="px-4 py-3 border border-stone-300 hover:bg-stone-50 disabled:opacity-50 disabled:cursor-not-allowed text-stone-600 rounded-xl transition-all"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        <h2 className="text-xl font-semibold text-stone-900 mb-4">Browse Curated Combos</h2>
 
         {filteredCombos.length === 0 ? (
           <div className="bg-stone-50 rounded-2xl p-12 text-center">
