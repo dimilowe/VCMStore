@@ -10,6 +10,7 @@ interface RateLimitConfig {
 const TOOL_LIMITS: Record<string, RateLimitConfig> = {
   default: { maxRequests: 20 },
   'logo-generator': { maxRequests: 5 },
+  'keyword-finder': { maxRequests: 10 },
 };
 
 export function checkRateLimit(

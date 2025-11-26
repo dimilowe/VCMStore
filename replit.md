@@ -71,6 +71,7 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/tools/image-compressor` - Free JPG/PNG/WebP compression tool
 - `/tools/word-counter` - Free word/character counting tool (100% client-side)
 - `/tools/logo-generator` - Free AI-powered logo generator
+- `/tools/keyword-finder` - Free low-competition keyword finder
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -110,6 +111,13 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-26: **Added Keyword Finder Tool** - Low-competition SEO keyword research
+  - Created `/tools/keyword-finder` with AI-powered keyword suggestions
+  - Uses OpenAI chat completions to estimate difficulty, volume, intent
+  - Generates long-tail, low-difficulty keyword opportunities
+  - Sortable results table with copy/CSV export
+  - Rate limited: 10 searches per hour per IP
+  - SEO content explaining the tool and integration with VCM products
 - 2025-11-26: **Added Logo Generator Tool** - AI-powered logo maker with chat interface
   - Created `/tools/logo-generator` with natural language chat input
   - Users describe their vision in their own words (not form fields)

@@ -1,0 +1,453 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { Search, Download, Copy, ArrowUpDown, AlertCircle, Loader2, Check, Sparkles } from 'lucide-react';
+
+interface KeywordIdea {
+  keyword: string;
+  difficulty: number;
+  searchVolume: number;
+  intent: 'informational' | 'transactional' | 'commercial' | 'navigational';
+  contentAngle: string;
+  notes: string;
+}
+
+type SortField = 'difficulty' | 'searchVolume';
+type SortOrder = 'asc' | 'desc';
+
+export default function KeywordFinderPage() {
+  const [seed, setSeed] = useState('');
+  const [maxDifficulty, setMaxDifficulty] = useState(30);
+  const [maxResults, setMaxResults] = useState(50);
+  const [language, setLanguage] = useState('English');
+  const [keywords, setKeywords] = useState<KeywordIdea[]>([]);
+  const [searchedSeed, setSearchedSeed] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [sortField, setSortField] = useState<SortField>('difficulty');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [remaining, setRemaining] = useState<number | null>(null);
+
+  const findKeywords = async () => {
+    if (!seed.trim()) {
+      setError('Please enter a seed keyword or topic');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/keyword-finder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          seed: seed.trim(),
+          maxResults,
+          maxDifficulty,
+          language,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to find keywords');
+      }
+
+      setKeywords(data.keywords);
+      setSearchedSeed(data.seed);
+      setRemaining(data.remaining);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const sortedKeywords = [...keywords].sort((a, b) => {
+    const multiplier = sortOrder === 'asc' ? 1 : -1;
+    return (a[sortField] - b[sortField]) * multiplier;
+  });
+
+  const copyKeywords = async () => {
+    const text = keywords.map(k => k.keyword).join('\n');
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const downloadCSV = () => {
+    const headers = ['Keyword', 'Difficulty', 'Search Volume', 'Intent', 'Content Angle', 'Notes'];
+    const rows = keywords.map(k => [
+      `"${k.keyword}"`,
+      k.difficulty,
+      k.searchVolume,
+      k.intent,
+      `"${k.contentAngle.replace(/"/g, '""')}"`,
+      `"${k.notes.replace(/"/g, '""')}"`
+    ]);
+    
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `keywords-${searchedSeed.replace(/\s+/g, '-')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const getDifficultyColor = (difficulty: number) => {
+    if (difficulty <= 20) return 'bg-green-100 text-green-800';
+    if (difficulty <= 35) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-orange-100 text-orange-800';
+  };
+
+  const getIntentColor = (intent: string) => {
+    switch (intent) {
+      case 'informational': return 'bg-blue-100 text-blue-800';
+      case 'transactional': return 'bg-purple-100 text-purple-800';
+      case 'commercial': return 'bg-pink-100 text-pink-800';
+      case 'navigational': return 'bg-stone-100 text-stone-800';
+      default: return 'bg-stone-100 text-stone-800';
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Free Low-Competition Keyword Finder",
+            "applicationCategory": "SEOApplication",
+            "operatingSystem": "Any",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "description": "AI-powered keyword research tool that finds low-competition, long-tail SEO opportunities.",
+            "featureList": [
+              "Low-competition keyword discovery",
+              "Difficulty and volume estimates",
+              "Search intent classification",
+              "Content angle suggestions",
+              "CSV export",
+              "No signup required"
+            ]
+          })
+        }}
+      />
+
+      <main className="max-w-6xl mx-auto px-4 py-12">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+            Free Low-Competition Keyword Finder
+          </h1>
+          <p className="text-xl text-stone-600 mb-2">
+            Discover SEO keywords you can actually rank for
+          </p>
+          <p className="text-stone-500 max-w-2xl mx-auto">
+            Enter a topic and get long-tail, low-difficulty ideas in seconds. Completely free.
+          </p>
+          <p className="text-xs text-stone-400 mt-3">
+            Estimates only — AI-based, not live SEO API data.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-lg border border-stone-200 p-6 md:p-8 mb-8">
+          <div className="space-y-5">
+            <div>
+              <label htmlFor="seed" className="block text-sm font-medium text-stone-700 mb-1.5">
+                Seed keyword or topic <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="seed"
+                type="text"
+                value={seed}
+                onChange={(e) => setSeed(e.target.value)}
+                placeholder="e.g. 'qr codes for business cards', 'dance content ideas', 'online course marketing'"
+                maxLength={200}
+                className="w-full px-4 py-3 border border-stone-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all text-stone-900"
+                onKeyDown={(e) => e.key === 'Enter' && findKeywords()}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label htmlFor="maxDifficulty" className="block text-sm font-medium text-stone-700 mb-1.5">
+                  Maximum difficulty: {maxDifficulty}
+                </label>
+                <input
+                  id="maxDifficulty"
+                  type="range"
+                  value={maxDifficulty}
+                  onChange={(e) => setMaxDifficulty(Number(e.target.value))}
+                  min={10}
+                  max={60}
+                  step={5}
+                  className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-yellow-500"
+                />
+                <div className="flex justify-between text-xs text-stone-500 mt-1">
+                  <span>Very Easy</span>
+                  <span>Medium</span>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="maxResults" className="block text-sm font-medium text-stone-700 mb-1.5">
+                  Max results
+                </label>
+                <select
+                  id="maxResults"
+                  value={maxResults}
+                  onChange={(e) => setMaxResults(Number(e.target.value))}
+                  className="w-full px-4 py-3 border border-stone-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all text-stone-900 bg-white"
+                >
+                  <option value={20}>20 keywords</option>
+                  <option value={30}>30 keywords</option>
+                  <option value={50}>50 keywords</option>
+                  <option value={75}>75 keywords</option>
+                  <option value={100}>100 keywords</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="language" className="block text-sm font-medium text-stone-700 mb-1.5">
+                  Language
+                </label>
+                <select
+                  id="language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="w-full px-4 py-3 border border-stone-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all text-stone-900 bg-white"
+                >
+                  <option value="English">English</option>
+                  <option value="Spanish">Spanish</option>
+                  <option value="French">French</option>
+                  <option value="German">German</option>
+                  <option value="Portuguese">Portuguese</option>
+                  <option value="Italian">Italian</option>
+                </select>
+              </div>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
+
+            <button
+              onClick={findKeywords}
+              disabled={isLoading || !seed.trim()}
+              className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+                isLoading || !seed.trim()
+                  ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                  : 'bg-yellow-500 hover:bg-yellow-600 text-stone-900'
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Finding keywords...
+                </>
+              ) : (
+                <>
+                  <Search className="w-5 h-5" />
+                  Find low-competition keywords
+                </>
+              )}
+            </button>
+
+            {remaining !== null && (
+              <p className="text-center text-xs text-stone-500">
+                {remaining} searches remaining this hour
+              </p>
+            )}
+          </div>
+        </div>
+
+        {keywords.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg border border-stone-200 p-6 md:p-8 mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <p className="text-stone-700">
+                  Showing <strong>{keywords.length}</strong> low-competition keyword ideas for: <strong>&quot;{searchedSeed}&quot;</strong>
+                </p>
+                <span className="inline-block mt-1 px-2 py-0.5 bg-stone-100 text-stone-600 text-xs rounded">
+                  Max difficulty: {maxDifficulty}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={copyKeywords}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-medium rounded-lg transition-all"
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copied!' : 'Copy all'}
+                </button>
+                <button
+                  onClick={downloadCSV}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium rounded-lg transition-all"
+                >
+                  <Download className="w-4 h-4" />
+                  Download CSV
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-stone-200">
+                    <th className="text-left py-3 px-2 font-medium text-stone-700">Keyword</th>
+                    <th className="text-left py-3 px-2 font-medium text-stone-700">
+                      <button
+                        onClick={() => handleSort('difficulty')}
+                        className="flex items-center gap-1 hover:text-yellow-600"
+                      >
+                        Difficulty
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="text-left py-3 px-2 font-medium text-stone-700">
+                      <button
+                        onClick={() => handleSort('searchVolume')}
+                        className="flex items-center gap-1 hover:text-yellow-600"
+                      >
+                        Volume
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="text-left py-3 px-2 font-medium text-stone-700">Intent</th>
+                    <th className="text-left py-3 px-2 font-medium text-stone-700 hidden lg:table-cell">Content Angle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedKeywords.map((kw, index) => (
+                    <tr key={index} className="border-b border-stone-100 hover:bg-stone-50">
+                      <td className="py-3 px-2">
+                        <div>
+                          <p className="font-medium text-stone-900">{kw.keyword}</p>
+                          <p className="text-xs text-stone-500 lg:hidden mt-1">{kw.contentAngle}</p>
+                        </div>
+                      </td>
+                      <td className="py-3 px-2">
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${getDifficultyColor(kw.difficulty)}`}>
+                          {kw.difficulty}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2 text-stone-700">
+                        {kw.searchVolume.toLocaleString()}/mo
+                      </td>
+                      <td className="py-3 px-2">
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium capitalize ${getIntentColor(kw.intent)}`}>
+                          {kw.intent}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2 text-stone-600 hidden lg:table-cell max-w-xs">
+                        {kw.contentAngle}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {!isLoading && keywords.length === 0 && searchedSeed && (
+          <div className="bg-stone-50 rounded-2xl p-8 text-center mb-8">
+            <p className="text-stone-600">No keywords found. Try a broader topic or increase the maximum difficulty.</p>
+          </div>
+        )}
+
+        <div className="bg-stone-900 rounded-2xl p-8 md:p-10 text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+            Turn Keywords Into Revenue
+          </h2>
+          <p className="text-stone-300 mb-5 max-w-xl mx-auto">
+            Found winning keywords? APE Funnels helps you create landing pages, lead magnets, and payment systems to monetize your SEO traffic.
+          </p>
+          <Link
+            href="/store"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-stone-900 font-semibold rounded-full transition-all"
+          >
+            <Sparkles className="w-5 h-5" />
+            Explore APE Funnels
+          </Link>
+        </div>
+
+        <div className="prose prose-stone max-w-none">
+          <h2 className="text-2xl font-bold text-stone-900 mb-4">
+            What is a Low-Competition Keyword?
+          </h2>
+          <p className="text-stone-600 mb-4">
+            A low-competition keyword is a search phrase where smaller websites have a realistic chance to rank on the first page of Google. These are typically long-tail keywords—more specific, multi-word phrases that larger sites often overlook.
+          </p>
+          <p className="text-stone-600 mb-4">
+            For example, instead of trying to rank for &quot;marketing&quot; (extremely competitive), you might target &quot;email marketing for handmade jewelry shops&quot; (much more achievable). Low-competition keywords usually have lower search volume, but they attract highly targeted visitors who are more likely to convert.
+          </p>
+          <p className="text-stone-600 mb-8">
+            These keywords are ideal for bloggers, creators, indie hackers, and new businesses who want to build organic traffic without competing against established giants.
+          </p>
+
+          <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
+            How This Free Keyword Tool Works
+          </h2>
+          <p className="text-stone-600 mb-4">
+            Our tool uses AI to analyze your topic and generate realistic keyword suggestions. It estimates difficulty based on typical competition patterns and provides approximate search volume buckets to help you prioritize.
+          </p>
+          <p className="text-stone-600 mb-4">
+            Unlike paid SEO tools that pull from live databases, this tool uses AI pattern recognition to suggest opportunities. The estimates are directional—great for brainstorming and discovering angles you might not have considered—but should be validated with additional research for high-stakes decisions.
+          </p>
+          <p className="text-stone-600 mb-8">
+            Each keyword comes with a suggested content angle to help you understand what type of content would best serve searchers looking for that phrase.
+          </p>
+
+          <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
+            How to Use These Keywords With VCM Tools
+          </h2>
+          <ul className="list-disc list-inside text-stone-600 mb-8 space-y-2">
+            <li><strong>Create content</strong> — Turn winning keywords into blog posts, YouTube videos, or landing pages</li>
+            <li><strong>Monetize traffic</strong> — Use APE Funnels to add paywalls, lead magnets, and checkout flows to your content</li>
+            <li><strong>Bridge offline to online</strong> — Use QR Social to connect short-form content or physical products to your SEO assets</li>
+            <li><strong>Optimize your content</strong> — Use our other free tools (Word Counter, Image Compressor, Logo Generator) as part of your content creation workflow</li>
+          </ul>
+        </div>
+      </main>
+
+      <footer className="border-t border-stone-200 py-8 mt-12">
+        <div className="max-w-6xl mx-auto px-4 text-center text-sm text-stone-500">
+          <p className="mb-3">Part of the VCM creator tools. Need a full brand kit? Try APE Funnels.</p>
+          <div className="flex items-center justify-center gap-6 flex-wrap">
+            <Link href="/tools/gif-compressor" className="hover:text-stone-700">GIF Compressor</Link>
+            <Link href="/tools/image-compressor" className="hover:text-stone-700">Image Compressor</Link>
+            <Link href="/tools/word-counter" className="hover:text-stone-700">Word Counter</Link>
+            <Link href="/tools/logo-generator" className="hover:text-stone-700">Logo Generator</Link>
+            <Link href="/store" className="hover:text-stone-700">VCM Store</Link>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}
