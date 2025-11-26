@@ -16,7 +16,7 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - **Browse-first, account-later**: Authentication only required on claim/purchase
 - **Product catalog**: Apps, courses, downloads, funnels, and freebies
 - **Blog system**: SEO-optimized blog with WordPress-style editor, image uploads, and categories
-- **Free Web Tools**: SEO-optimized tools (GIF Compressor, Image Compressor) to drive organic traffic
+- **Free Web Tools**: SEO-optimized tools (GIF Compressor, Image Compressor, Word Counter) to drive organic traffic
 - **Feedback system**: User feedback form with bug reports, feature requests, improvements, and general feedback
 - **AI Strategy chat**: Mock AI that suggests products based on keywords
 - **Email capture**: Newsletter subscription throughout the site
@@ -107,6 +107,14 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-26: **Added Word Counter Tool** - Free word/character counting tool
+  - Created `/tools/word-counter` page with real-time text analysis
+  - Counts words, characters (with/without spaces), sentences, paragraphs
+  - Calculates reading time (200 wpm) and reading level (Flesch-Kincaid)
+  - Keyword density analysis showing top 10 non-stop-words
+  - 100% client-side processing - no server calls, complete privacy
+  - JSON-LD schema for SoftwareApplication and FAQPage
+  - Added to navigation dropdown and sitemap
 - 2025-11-26: **Added Image Compressor Tool** - Free JPG/PNG/WebP compression tool
   - Created `/tools/image-compressor` page with full SEO content
   - Uses Sharp for high-quality lossy and lossless compression
