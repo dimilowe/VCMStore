@@ -73,6 +73,7 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/tools/logo-generator` - Free AI-powered logo generator
 - `/tools/keyword-finder` - Free low-competition keyword finder
 - `/tools/visualization` - Free text-to-diagram visualization tool
+- `/tools/emoji-combos` - Free emoji combination generator
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -112,6 +113,13 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-26: **Added Emoji Combos Tool** - Aesthetic emoji combination generator
+  - Created `/tools/emoji-combos` with 100 curated emoji combinations
+  - Filter by category (cute, aesthetic, funny, flirty, meme, etc.)
+  - Search by keyword (matches combo, label, or tags)
+  - One-click copy to clipboard with toast notification
+  - Random combo button with highlight animation
+  - SEO optimized for "emoji combos" keyword
 - 2025-11-26: **Added Visualization Tool** - Text-to-diagram generator
   - Created `/tools/visualization` with React Flow for diagram rendering
   - Parses indented text to create hierarchical diagrams
