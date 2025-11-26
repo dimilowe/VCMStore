@@ -31,7 +31,8 @@ const navDropdowns: NavDropdown[] = [
     items: [
       { label: "Freebies", href: "/freebies", description: "Free tools & resources" },
       { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
-      { label: "Free Web Tools", href: "/tools/gif-compressor", description: "GIF Compressor & more" },
+      { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files" },
+      { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP" },
     ]
   }
 ];
