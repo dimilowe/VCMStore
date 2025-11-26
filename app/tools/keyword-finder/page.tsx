@@ -135,7 +135,7 @@ export default function KeywordFinderPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Free Low-Competition Keyword Finder",
+            "name": "Free Keyword Tool for SEO",
             "applicationCategory": "SEOApplication",
             "operatingSystem": "Any",
             "offers": {
@@ -143,8 +143,9 @@ export default function KeywordFinderPage() {
               "price": "0",
               "priceCurrency": "USD"
             },
-            "description": "AI-powered keyword research tool that finds low-competition, long-tail SEO opportunities.",
+            "description": "Free keyword tool for SEO that finds low-competition, long-tail keyword opportunities you can actually rank for.",
             "featureList": [
+              "Free keyword research for SEO",
               "Low-competition keyword discovery",
               "Difficulty and volume estimates",
               "Search intent classification",
@@ -159,16 +160,16 @@ export default function KeywordFinderPage() {
       <main className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
-            Free Low-Competition Keyword Finder
+            Free Keyword Tool for SEO
           </h1>
           <p className="text-xl text-stone-600 mb-2">
-            Discover SEO keywords you can actually rank for
+            Find low-competition keywords you can actually rank for
           </p>
           <p className="text-stone-500 max-w-2xl mx-auto">
-            Enter a topic and get long-tail, low-difficulty ideas in seconds. Completely free.
+            Enter any topic and get long-tail keyword ideas with difficulty scores, search volume estimates, and content suggestions. 100% free, no signup required.
           </p>
           <p className="text-xs text-stone-400 mt-3">
-            Estimates only — AI-based, not live SEO API data.
+            AI-powered estimates — not from paid SEO APIs like Ahrefs or Semrush.
           </p>
         </div>
 
@@ -399,33 +400,56 @@ export default function KeywordFinderPage() {
 
         <div className="prose prose-stone max-w-none">
           <h2 className="text-2xl font-bold text-stone-900 mb-4">
+            Why Use a Free Keyword Tool for SEO?
+          </h2>
+          <p className="text-stone-600 mb-4">
+            Keyword research is the foundation of any successful SEO strategy. A good free keyword tool for SEO helps you discover what people are actually searching for—and more importantly, which searches you have a realistic chance of ranking for.
+          </p>
+          <p className="text-stone-600 mb-4">
+            Most beginners make the mistake of targeting high-volume, competitive keywords like &quot;marketing&quot; or &quot;fitness tips.&quot; With our free keyword tool, you&apos;ll find low-competition alternatives like &quot;email marketing for handmade jewelry shops&quot; or &quot;home workout routines for busy parents&quot;—phrases where smaller sites can actually compete.
+          </p>
+          <p className="text-stone-600 mb-8">
+            The best part? You don&apos;t need to pay $100+/month for tools like Ahrefs or Semrush to get started. This free keyword tool for SEO gives you the insights you need to find untapped opportunities and start building organic traffic.
+          </p>
+
+          <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
             What is a Low-Competition Keyword?
           </h2>
           <p className="text-stone-600 mb-4">
-            A low-competition keyword is a search phrase where smaller websites have a realistic chance to rank on the first page of Google. These are typically long-tail keywords—more specific, multi-word phrases that larger sites often overlook.
-          </p>
-          <p className="text-stone-600 mb-4">
-            For example, instead of trying to rank for &quot;marketing&quot; (extremely competitive), you might target &quot;email marketing for handmade jewelry shops&quot; (much more achievable). Low-competition keywords usually have lower search volume, but they attract highly targeted visitors who are more likely to convert.
+            A low-competition keyword is a search phrase where smaller websites have a realistic chance to rank on the first page of Google. These are typically long-tail keywords—more specific, 3-5 word phrases that larger sites often overlook.
           </p>
           <p className="text-stone-600 mb-8">
-            These keywords are ideal for bloggers, creators, indie hackers, and new businesses who want to build organic traffic without competing against established giants.
+            Low-competition keywords usually have lower search volume (10-1,000 searches/month), but they attract highly targeted visitors who are more likely to convert. They&apos;re ideal for bloggers, creators, indie hackers, and small businesses building organic traffic without competing against established giants.
           </p>
 
           <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
             How This Free Keyword Tool Works
           </h2>
           <p className="text-stone-600 mb-4">
-            Our tool uses AI to analyze your topic and generate realistic keyword suggestions. It estimates difficulty based on typical competition patterns and provides approximate search volume buckets to help you prioritize.
+            Our free keyword tool for SEO uses AI to analyze your topic and generate realistic keyword suggestions. Enter any seed keyword or topic, and you&apos;ll get dozens of long-tail variations with estimated difficulty scores, search volumes, and search intent.
           </p>
           <p className="text-stone-600 mb-4">
-            Unlike paid SEO tools that pull from live databases, this tool uses AI pattern recognition to suggest opportunities. The estimates are directional—great for brainstorming and discovering angles you might not have considered—but should be validated with additional research for high-stakes decisions.
+            Unlike paid SEO tools that pull from live databases, this free keyword tool uses AI pattern recognition to suggest opportunities. The estimates are directional—perfect for brainstorming and discovering angles you might not have considered.
           </p>
           <p className="text-stone-600 mb-8">
-            Each keyword comes with a suggested content angle to help you understand what type of content would best serve searchers looking for that phrase.
+            Each keyword comes with a suggested content angle to help you understand what type of article, video, or page would best serve searchers looking for that phrase.
           </p>
 
           <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
-            How to Use These Keywords With VCM Tools
+            Free Keyword Tool vs Paid SEO Tools
+          </h2>
+          <p className="text-stone-600 mb-4">
+            Paid tools like Ahrefs, Semrush, and Moz offer precise data from their search databases—but they cost $99-$449/month. Our free keyword tool for SEO is ideal for:
+          </p>
+          <ul className="list-disc list-inside text-stone-600 mb-8 space-y-2">
+            <li><strong>Beginners</strong> — Learn keyword research without any investment</li>
+            <li><strong>Brainstorming</strong> — Generate content ideas quickly before deeper research</li>
+            <li><strong>Small budgets</strong> — Get directional data when paid tools aren&apos;t an option</li>
+            <li><strong>Niche discovery</strong> — Find unexpected angles AI might surface that databases miss</li>
+          </ul>
+
+          <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
+            How to Use Keywords From This Free SEO Tool
           </h2>
           <ul className="list-disc list-inside text-stone-600 mb-8 space-y-2">
             <li><strong>Create content</strong> — Turn winning keywords into blog posts, YouTube videos, or landing pages</li>
