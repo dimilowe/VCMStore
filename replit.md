@@ -16,6 +16,7 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - **Browse-first, account-later**: Authentication only required on claim/purchase
 - **Product catalog**: Apps, courses, downloads, funnels, and freebies
 - **Blog system**: SEO-optimized blog with WordPress-style editor, image uploads, and categories
+- **Free Web Tools**: SEO-optimized tools (GIF Compressor) to drive organic traffic
 - **Feedback system**: User feedback form with bug reports, feature requests, improvements, and general feedback
 - **AI Strategy chat**: Mock AI that suggests products based on keywords
 - **Email capture**: Newsletter subscription throughout the site
@@ -66,6 +67,7 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/blog/[slug]` - Individual blog post
 - `/newsletter` - Newsletter signup page
 - `/strategy-ai` - AI strategy chat
+- `/tools/gif-compressor` - Free GIF compression tool (SEO traffic driver)
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -105,6 +107,15 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-26: **Added GIF Compressor Tool** - Free web tool to drive SEO traffic
+  - Created `/tools/gif-compressor` page with premium white/gray/gold styling
+  - Three compression levels: Light (best quality), Balanced, Maximum (smallest file)
+  - Uses ffmpeg with palette optimization for quality compression
+  - Rate limiting: 20 compressions per hour per IP
+  - Automatic file cleanup on failure and after 10 minutes
+  - Keyboard accessible drag & drop upload with ARIA labels
+  - SEO-optimized with full content sections (What is, Why, How to, Features, FAQ)
+  - APE product CTA integration for monetization
 - 2025-11-18: **Increased File Upload Limit** - Raised maximum upload size from 10MB to 50MB
   - Updated server-side validation in `/api/upload/route.ts` to allow 50MB files
   - Increased client-side limits in all uploader components (ImageUploader, InlineUploader, ObjectUploader)

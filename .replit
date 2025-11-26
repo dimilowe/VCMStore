@@ -5,6 +5,7 @@ integrations = ["javascript_stripe:1.0.0", "javascript_database:1.0.0", "javascr
 
 [nix]
 channel = "stable-25_05"
+packages = ["ffmpeg"]
 
 [workflows]
 runButton = "Project"
@@ -61,6 +62,10 @@ externalPort = 3002
 [[ports]]
 localPort = 41167
 externalPort = 3000
+
+[[ports]]
+localPort = 41185
+externalPort = 6800
 
 [[ports]]
 localPort = 43093
