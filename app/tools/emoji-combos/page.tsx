@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { Search, Shuffle, Copy, Check, Sparkles, Trash2, Wand2 } from 'lucide-react';
+import { Search, Shuffle, Copy, Check, Sparkles, Trash2, Wand2, Plus, Users } from 'lucide-react';
 
 interface EmojiCombo {
   id: number;
@@ -14,6 +14,7 @@ interface EmojiCombo {
 
 const CATEGORIES = [
   'all',
+  'community',
   'cute',
   'aesthetic',
   'funny',
@@ -38,6 +39,8 @@ export default function EmojiCombosPage() {
   const [customCombo, setCustomCombo] = useState('');
   const [customLabel, setCustomLabel] = useState('');
   const [customCopied, setCustomCopied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const cardRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   useEffect(() => {
@@ -109,10 +112,57 @@ export default function EmojiCombosPage() {
   const clearCustomCombo = () => {
     setCustomCombo('');
     setCustomLabel('');
+    setSubmitSuccess(false);
+  };
+
+  const submitToLibrary = async () => {
+    if (!customCombo.trim() || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/emoji-combos/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          combo: customCombo.trim(),
+          label: customLabel.trim() || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.duplicate) {
+          setToast('This combo already exists in the library');
+        } else {
+          setToast(data.error || 'Failed to add combo');
+        }
+        setTimeout(() => setToast(null), 3000);
+        return;
+      }
+
+      setSubmitSuccess(true);
+      setToast('Added to the library! 🎉');
+      
+      fetch('/api/emoji-combos')
+        .then((res) => res.json())
+        .then((data) => setCombos(data));
+
+      setTimeout(() => {
+        setToast(null);
+      }, 3000);
+    } catch (err) {
+      console.error('Failed to submit:', err);
+      setToast('Failed to add combo');
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getCategoryColor = (cat: string) => {
     const colors: { [key: string]: string } = {
+      community: 'bg-cyan-100 text-cyan-700',
       cute: 'bg-pink-100 text-pink-700',
       aesthetic: 'bg-purple-100 text-purple-700',
       funny: 'bg-yellow-100 text-yellow-700',
@@ -271,7 +321,35 @@ export default function EmojiCombosPage() {
               ) : (
                 <>
                   <Copy className="w-5 h-5" />
-                  Copy Custom Combo
+                  Copy
+                </>
+              )}
+            </button>
+            <button
+              onClick={submitToLibrary}
+              disabled={!customCombo.trim() || isSubmitting || submitSuccess}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
+                submitSuccess
+                  ? 'bg-cyan-500 text-white'
+                  : customCombo.trim() && !isSubmitting
+                    ? 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+              }`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Adding...
+                </>
+              ) : submitSuccess ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  Added!
+                </>
+              ) : (
+                <>
+                  <Plus className="w-5 h-5" />
+                  Add to Library
                 </>
               )}
             </button>
