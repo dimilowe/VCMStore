@@ -1,9 +1,40 @@
 "use client"
 
 import Link from "next/link";
-import { User, Search, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn } from "lucide-react";
+import { User, Search, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
+
+interface DropdownItem {
+  label: string;
+  href: string;
+  description?: string;
+}
+
+interface NavDropdown {
+  label: string;
+  items: DropdownItem[];
+}
+
+const navDropdowns: NavDropdown[] = [
+  {
+    label: "Products",
+    items: [
+      { label: "Apps", href: "/apps", description: "Premium applications for creators" },
+      { label: "Downloads", href: "/downloads", description: "Digital downloads & assets" },
+      { label: "Templates", href: "/funnels", description: "Conversion-focused templates" },
+      { label: "Videos", href: "/videos", description: "Video content & tutorials" },
+    ]
+  },
+  {
+    label: "Resources",
+    items: [
+      { label: "Freebies", href: "/freebies", description: "Free tools & resources" },
+      { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
+      { label: "Free Web Tools", href: "/tools/gif-compressor", description: "GIF Compressor & more" },
+    ]
+  }
+];
 
 export function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -12,19 +43,24 @@ export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Check session status on mount
   useEffect(() => {
     fetch('/api/auth/session', {
       method: 'GET',
@@ -43,6 +79,14 @@ export function Navbar() {
       });
   }, []);
 
+  const handleDropdownEnter = (label: string) => {
+    setOpenDropdown(label);
+  };
+
+  const handleDropdownLeave = () => {
+    setOpenDropdown(null);
+  };
+
   return (
     <nav className="bg-white text-stone-800 border-b border-stone-200">
       <div className="bg-stone-700 text-white text-center py-2 text-xs tracking-wider">
@@ -51,32 +95,65 @@ export function Navbar() {
       
       <div className="max-w-7xl mx-auto px-6 py-5">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-8" ref={navRef}>
             <Link href="/" className="text-2xl font-bold tracking-wider text-stone-900">
               VCM STORE
             </Link>
             
-            <div className="hidden md:flex items-center space-x-6">
-              <Link href="/apps" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
-                APPS
-              </Link>
-              <Link href="/downloads" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
-                DOWNLOADS
-              </Link>
-              <Link href="/funnels" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
-                TEMPLATES
-              </Link>
-              <Link href="/freebies" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
-                FREEBIES
-              </Link>
-              <Link href="/videos" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
-                VIDEOS
-              </Link>
-              <Link href="/newsletter" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
+            <div className="hidden md:flex items-center space-x-1">
+              {navDropdowns.map((dropdown) => (
+                <div
+                  key={dropdown.label}
+                  className="relative"
+                  onMouseEnter={() => handleDropdownEnter(dropdown.label)}
+                  onMouseLeave={handleDropdownLeave}
+                >
+                  <button
+                    className={`flex items-center gap-1 px-4 py-2 text-sm font-medium tracking-wide transition-colors ${
+                      openDropdown === dropdown.label 
+                        ? 'text-yellow-500' 
+                        : 'text-stone-800 hover:text-yellow-500'
+                    }`}
+                  >
+                    {dropdown.label.toUpperCase()}
+                    <ChevronDown className={`h-4 w-4 transition-transform ${
+                      openDropdown === dropdown.label ? 'rotate-180' : ''
+                    }`} />
+                  </button>
+                  
+                  {openDropdown === dropdown.label && (
+                    <div className="absolute top-full left-0 pt-2 z-50">
+                      <div className="bg-white border border-stone-200 shadow-xl min-w-[280px]">
+                        <div className="py-2">
+                          {dropdown.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className="block px-5 py-3 hover:bg-stone-50 transition-colors"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              <span className="block text-sm font-medium text-stone-900 tracking-wide">
+                                {item.label.toUpperCase()}
+                              </span>
+                              {item.description && (
+                                <span className="block text-xs text-stone-500 mt-0.5">
+                                  {item.description}
+                                </span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+              
+              <Link 
+                href="/newsletter" 
+                className="px-4 py-2 text-sm font-medium tracking-wide text-stone-800 hover:text-yellow-500 transition-colors"
+              >
                 NEWSLETTER
-              </Link>
-              <Link href="/chat" className="text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors">
-                AI CHAT
               </Link>
             </div>
           </div>
@@ -177,7 +254,7 @@ export function Navbar() {
               className="md:hidden text-stone-800 hover:text-yellow-500"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              <Menu className="h-5 w-5" />
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
@@ -186,55 +263,52 @@ export function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-stone-200 bg-white">
-          <div className="px-6 py-4 space-y-3">
-            <Link 
-              href="/apps" 
-              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              APPS
-            </Link>
-            <Link 
-              href="/downloads" 
-              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              DOWNLOADS
-            </Link>
-            <Link 
-              href="/funnels" 
-              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              TEMPLATES
-            </Link>
-            <Link 
-              href="/freebies" 
-              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              FREEBIES
-            </Link>
-            <Link 
-              href="/videos" 
-              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              VIDEOS
-            </Link>
+          <div className="px-6 py-4 space-y-1">
+            {navDropdowns.map((dropdown) => (
+              <div key={dropdown.label}>
+                <button
+                  onClick={() => setMobileOpenDropdown(
+                    mobileOpenDropdown === dropdown.label ? null : dropdown.label
+                  )}
+                  className="flex items-center justify-between w-full text-sm font-medium tracking-wide py-3 text-stone-800"
+                >
+                  {dropdown.label.toUpperCase()}
+                  <ChevronDown className={`h-4 w-4 transition-transform ${
+                    mobileOpenDropdown === dropdown.label ? 'rotate-180' : ''
+                  }`} />
+                </button>
+                
+                {mobileOpenDropdown === dropdown.label && (
+                  <div className="pl-4 pb-2 space-y-1">
+                    {dropdown.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="block py-2 text-sm text-stone-600 hover:text-yellow-500 transition-colors"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setMobileOpenDropdown(null);
+                        }}
+                      >
+                        {item.label}
+                        {item.description && (
+                          <span className="block text-xs text-stone-400 mt-0.5">
+                            {item.description}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            
             <Link 
               href="/newsletter" 
-              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
+              className="block text-sm font-medium tracking-wide py-3 text-stone-800 hover:text-yellow-500 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               NEWSLETTER
-            </Link>
-            <Link 
-              href="/chat" 
-              className="block text-sm font-medium tracking-wide hover:text-yellow-500 transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              AI CHAT
             </Link>
           </div>
         </div>
