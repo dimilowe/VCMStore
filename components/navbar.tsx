@@ -36,6 +36,7 @@ const navDropdowns: NavDropdown[] = [
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters" },
       { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker" },
       { label: "Keyword Finder", href: "/tools/keyword-finder", description: "Find low-competition SEO ideas" },
+      { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams" },
     ]
   }
 ];
