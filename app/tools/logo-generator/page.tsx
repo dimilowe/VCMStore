@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Navbar } from '@/components/navbar';
 import { Sparkles, Download, AlertCircle, Loader2, Send, User, Bot } from 'lucide-react';
 
 interface Logo {
@@ -115,7 +114,6 @@ export default function LogoGeneratorPage() {
 
   return (
     <>
-      <Navbar />
       
       <script
         type="application/ld+json"
