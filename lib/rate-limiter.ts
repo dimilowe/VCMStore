@@ -1,18 +1,35 @@
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const MAX_REQUESTS = 20; // 20 compressions per hour
 
-export function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs?: number;
+}
+
+const TOOL_LIMITS: Record<string, RateLimitConfig> = {
+  default: { maxRequests: 20 },
+  'logo-generator': { maxRequests: 5 },
+};
+
+export function checkRateLimit(
+  ip: string, 
+  tool: string = 'default'
+): { allowed: boolean; remaining: number; resetIn: number } {
+  const config = TOOL_LIMITS[tool] || TOOL_LIMITS.default;
+  const maxRequests = config.maxRequests;
+  const windowMs = config.windowMs || WINDOW_MS;
+  
+  const key = `${tool}:${ip}`;
   const now = Date.now();
-  const record = rateLimitMap.get(ip);
+  const record = rateLimitMap.get(key);
   
   if (!record || now > record.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_MS });
-    return { allowed: true, remaining: MAX_REQUESTS - 1, resetIn: WINDOW_MS };
+    rateLimitMap.set(key, { count: 1, resetTime: now + windowMs });
+    return { allowed: true, remaining: maxRequests - 1, resetIn: windowMs };
   }
   
-  if (record.count >= MAX_REQUESTS) {
+  if (record.count >= maxRequests) {
     return { 
       allowed: false, 
       remaining: 0, 
@@ -23,7 +40,7 @@ export function checkRateLimit(ip: string): { allowed: boolean; remaining: numbe
   record.count++;
   return { 
     allowed: true, 
-    remaining: MAX_REQUESTS - record.count, 
+    remaining: maxRequests - record.count, 
     resetIn: record.resetTime - now 
   };
 }

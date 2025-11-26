@@ -34,6 +34,7 @@ const navDropdowns: NavDropdown[] = [
       { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files" },
       { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP" },
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters" },
+      { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker" },
     ]
   }
 ];
