@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, Sparkles, Loader2, RefreshCw, Copy, Check } from 'lucide-react';
+import { Heart, Sparkles, Loader2, Copy, Check, Calendar } from 'lucide-react';
 
 const AREAS = [
   { id: 'body', label: 'Body & Health', emoji: '💪', description: 'Physical self-acceptance' },
@@ -47,15 +47,25 @@ const EXAMPLE_AFFIRMATIONS = [
   "I am enough, even on the days I don't feel like it.",
 ];
 
+function getFormattedDate(): string {
+  return new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
 export default function AffirmationAboutSelfLovePage() {
   const [selectedArea, setSelectedArea] = useState<string>('general');
   const [selectedTone, setSelectedTone] = useState<string>('hype');
-  const [affirmations, setAffirmations] = useState<string[]>([]);
+  const [affirmation, setAffirmation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
-  const generateAffirmations = async () => {
+  const fetchDailyAffirmation = async (area: string, tone: string) => {
     setIsLoading(true);
     setError(null);
 
@@ -63,19 +73,17 @@ export default function AffirmationAboutSelfLovePage() {
       const response = await fetch('/api/affirmation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          area: selectedArea,
-          tone: selectedTone,
-        }),
+        body: JSON.stringify({ area, tone }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate affirmations');
+        throw new Error(data.error || 'Failed to get daily affirmation');
       }
 
-      setAffirmations(data.affirmations);
+      setAffirmation(data.affirmations[0]);
+      setHasLoaded(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
     } finally {
@@ -83,21 +91,39 @@ export default function AffirmationAboutSelfLovePage() {
     }
   };
 
-  const copyAffirmation = async (text: string, index: number) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
+  useEffect(() => {
+    fetchDailyAffirmation(selectedArea, selectedTone);
+  }, []);
+
+  const handleAreaChange = (area: string) => {
+    setSelectedArea(area);
+    fetchDailyAffirmation(area, selectedTone);
   };
+
+  const handleToneChange = (tone: string) => {
+    setSelectedTone(tone);
+    fetchDailyAffirmation(selectedArea, tone);
+  };
+
+  const copyAffirmation = async () => {
+    if (!affirmation) return;
+    await navigator.clipboard.writeText(affirmation);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const selectedAreaData = AREAS.find(a => a.id === selectedArea);
+  const selectedToneData = TONES.find(t => t.id === selectedTone);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'WebApplication',
-        name: 'Real AF Self-Love Affirmation Generator',
+        name: 'Daily Self-Love Affirmation Generator',
         applicationCategory: 'LifestyleApplication',
         operatingSystem: 'Web',
-        description: 'Generate honest, powerful affirmations about self love. Choose your topic and tone for personalized, non-cringey self-love affirmations.',
+        description: 'Get your daily affirmation about self love. A new personalized affirmation every day based on your focus area and preferred tone.',
         offers: {
           '@type': 'Offer',
           price: '0',
@@ -139,6 +165,14 @@ export default function AffirmationAboutSelfLovePage() {
               text: 'Affirmations feel fake when they\'re too far from your current beliefs. The trick is to use affirmations that feel like a stretch but still believable. Our generator creates grounded, realistic affirmations that feel authentic.',
             },
           },
+          {
+            '@type': 'Question',
+            name: 'Why does my affirmation stay the same all day?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Your daily affirmation is designed to stay consistent throughout the day so you can practice and internalize it. A new affirmation is generated at midnight UTC each day. This encourages deeper reflection rather than constantly seeking new affirmations.',
+            },
+          },
         ],
       },
     ],
@@ -156,31 +190,32 @@ export default function AffirmationAboutSelfLovePage() {
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-100 to-pink-100 text-rose-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
               <Heart className="w-4 h-4" />
-              Free Self-Love Tool
+              Free Daily Self-Love Tool
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
               Affirmation About Self Love
             </h1>
             <p className="text-lg text-stone-600 max-w-2xl mx-auto">
-              Get honest, powerful affirmations about self love that you'll actually believe. Choose your focus area and tone, and let our AI generate personalized affirmations without the cringe.
+              Get your daily affirmation about self love. Choose your focus area and tone, and receive a personalized affirmation to carry with you all day. A new affirmation awaits you each morning.
             </p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg border border-stone-200 p-6 md:p-8 mb-8">
             <div className="mb-6">
               <label className="block text-sm font-semibold text-stone-700 mb-3">
-                1. What area do you want to focus on?
+                1. What area do you want to focus on today?
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {AREAS.map((area) => (
                   <button
                     key={area.id}
-                    onClick={() => setSelectedArea(area.id)}
+                    onClick={() => handleAreaChange(area.id)}
+                    disabled={isLoading}
                     className={`p-4 rounded-xl border-2 transition-all text-left ${
                       selectedArea === area.id
                         ? 'border-rose-500 bg-rose-50 shadow-md'
                         : 'border-stone-200 hover:border-stone-300 hover:bg-stone-50'
-                    }`}
+                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="text-2xl mb-1">{area.emoji}</div>
                     <div className="font-semibold text-stone-800 text-sm">{area.label}</div>
@@ -198,12 +233,13 @@ export default function AffirmationAboutSelfLovePage() {
                 {TONES.map((tone) => (
                   <button
                     key={tone.id}
-                    onClick={() => setSelectedTone(tone.id)}
+                    onClick={() => handleToneChange(tone.id)}
+                    disabled={isLoading}
                     className={`p-4 rounded-xl border-2 transition-all text-center ${
                       selectedTone === tone.id
                         ? 'border-rose-500 bg-rose-50 shadow-md'
                         : 'border-stone-200 hover:border-stone-300 hover:bg-stone-50'
-                    }`}
+                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="text-2xl mb-1">{tone.emoji}</div>
                     <div className="font-semibold text-stone-800">{tone.label}</div>
@@ -213,79 +249,93 @@ export default function AffirmationAboutSelfLovePage() {
               </div>
             </div>
 
-            <button
-              onClick={generateAffirmations}
-              disabled={isLoading}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
-                isLoading
-                  ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl'
-              }`}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Writing you something you actually believe...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Generate My Self-Love Affirmation
-                </>
-              )}
-            </button>
-
             {error && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-center">
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-center">
                 {error}
               </div>
             )}
           </div>
 
-          {affirmations.length > 0 && (
-            <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-xl p-6 md:p-8 mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                  <Heart className="w-5 h-5" />
-                  Your Affirmations
-                </h3>
-                <button
-                  onClick={generateAffirmations}
-                  disabled={isLoading}
-                  className="text-white/80 hover:text-white flex items-center gap-1 text-sm"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                  New ones
-                </button>
+          {isLoading && !hasLoaded && (
+            <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-xl p-8 mb-8">
+              <div className="flex flex-col items-center justify-center gap-4">
+                <Loader2 className="w-8 h-8 text-white animate-spin" />
+                <p className="text-white/80 text-center">Finding today's affirmation for you...</p>
               </div>
-              <div className="space-y-3">
-                {affirmations.map((affirmation, index) => (
-                  <div
-                    key={index}
-                    className="bg-white/15 backdrop-blur rounded-xl p-4 flex items-start justify-between gap-3 group"
-                  >
-                    <p className="text-white text-lg font-medium leading-relaxed">
-                      "{affirmation}"
-                    </p>
-                    <button
-                      onClick={() => copyAffirmation(affirmation, index)}
-                      className="text-white/60 hover:text-white shrink-0 p-1"
-                      title="Copy affirmation"
-                    >
-                      {copiedIndex === index ? (
-                        <Check className="w-5 h-5" />
-                      ) : (
-                        <Copy className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <p className="text-white/70 text-sm text-center mt-4">
-                Repeat these to yourself daily. Mean it more each time. ✨
-              </p>
             </div>
           )}
+
+          {affirmation && (
+            <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-xl p-6 md:p-8 mb-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+              
+              <div className="relative">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2 text-white/80 text-sm">
+                    <Calendar className="w-4 h-4" />
+                    {getFormattedDate()}
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80 text-sm">
+                    <span>{selectedAreaData?.emoji}</span>
+                    <span>{selectedAreaData?.label}</span>
+                    <span className="text-white/50">•</span>
+                    <span>{selectedToneData?.emoji}</span>
+                    <span>{selectedToneData?.label}</span>
+                  </div>
+                </div>
+
+                <div className="text-center mb-6">
+                  <h2 className="text-white/80 text-sm font-medium uppercase tracking-wider mb-4">
+                    Today's Affirmation About Self Love
+                  </h2>
+                  <div className="relative">
+                    {isLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/10 rounded-xl">
+                        <Loader2 className="w-6 h-6 text-white animate-spin" />
+                      </div>
+                    )}
+                    <p className={`text-white text-2xl md:text-3xl font-medium leading-relaxed ${isLoading ? 'opacity-30' : ''}`}>
+                      "{affirmation}"
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    onClick={copyAffirmation}
+                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-all text-sm font-medium"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        Copy Affirmation
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-white/60 text-sm text-center mt-6">
+                  Repeat this to yourself throughout the day. Come back tomorrow for a fresh affirmation.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-gradient-to-r from-rose-100 to-pink-100 rounded-2xl p-6 md:p-8 mb-8 text-center">
+            <Sparkles className="w-8 h-8 text-rose-500 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-stone-800 mb-2">
+              Why Daily Affirmations Work
+            </h3>
+            <p className="text-stone-600 text-sm max-w-xl mx-auto">
+              Consistency is the key to rewiring thought patterns. By focusing on one affirmation per day, you give yourself time to truly absorb and practice it. Come back each morning for a fresh affirmation about self love tailored to your needs.
+            </p>
+          </div>
 
           <div className="space-y-12 mt-16">
             <section>
@@ -296,7 +346,7 @@ export default function AffirmationAboutSelfLovePage() {
                 An affirmation about self love is a positive statement you repeat to yourself to build self-worth, confidence, and self-acceptance. Unlike generic positive affirmations, self-love affirmations focus specifically on how you relate to yourself — your boundaries, your worth, and your right to take up space.
               </p>
               <p className="text-stone-600 leading-relaxed">
-                The best affirmations about self love aren't fluffy or fake. They're grounded in reality, feel believable, and help you slowly rewire negative thought patterns. Our generator creates modern, honest affirmations that feel like something you'd actually say to yourself — not something from a cheesy motivational poster.
+                The best affirmations about self love aren't fluffy or fake. They're grounded in reality, feel believable, and help you slowly rewire negative thought patterns. Our daily generator creates modern, honest affirmations that feel like something you'd actually say to yourself — not something from a cheesy motivational poster.
               </p>
             </section>
 
@@ -305,15 +355,15 @@ export default function AffirmationAboutSelfLovePage() {
                 25 Example Affirmations About Self Love
               </h2>
               <p className="text-stone-600 mb-4">
-                Here are 25 powerful affirmations about self love to get you started:
+                Here are 25 powerful affirmations about self love to inspire your daily practice:
               </p>
               <div className="grid md:grid-cols-2 gap-3">
-                {EXAMPLE_AFFIRMATIONS.map((affirmation, index) => (
+                {EXAMPLE_AFFIRMATIONS.map((aff, index) => (
                   <div
                     key={index}
                     className="bg-white rounded-lg p-4 border border-stone-200 hover:border-rose-200 hover:shadow-sm transition-all"
                   >
-                    <p className="text-stone-700 text-sm">"{affirmation}"</p>
+                    <p className="text-stone-700 text-sm">"{aff}"</p>
                   </div>
                 ))}
               </div>
@@ -321,35 +371,35 @@ export default function AffirmationAboutSelfLovePage() {
 
             <section>
               <h2 className="text-2xl font-bold text-stone-900 mb-4">
-                How to Use Self Love Affirmations Without Lying to Yourself
+                How to Use Your Daily Self Love Affirmation
               </h2>
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">1. Choose affirmations that feel like a stretch, not a lie</h3>
-                  <p className="text-stone-600 text-sm">If an affirmation feels completely unbelievable, it won't stick. Start with statements that feel slightly uncomfortable but not impossible.</p>
+                  <h3 className="font-semibold text-stone-800 mb-2">1. Read it first thing in the morning</h3>
+                  <p className="text-stone-600 text-sm">Start your day by reading your daily affirmation about self love. Say it out loud if you can — hearing your own voice reinforces the message.</p>
                 </div>
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">2. Practice consistently, not perfectly</h3>
-                  <p className="text-stone-600 text-sm">You don't need a 30-minute routine. Even repeating your affirmation once in the mirror while brushing your teeth counts.</p>
+                  <h3 className="font-semibold text-stone-800 mb-2">2. Write it down</h3>
+                  <p className="text-stone-600 text-sm">Copy your affirmation into a journal or on a sticky note. The act of writing engages different parts of your brain and deepens the impact.</p>
                 </div>
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">3. Use them in moments of self-doubt</h3>
-                  <p className="text-stone-600 text-sm">The best time to use an affirmation about self love is when you need it most — when your inner critic is being loud.</p>
+                  <h3 className="font-semibold text-stone-800 mb-2">3. Return to it during hard moments</h3>
+                  <p className="text-stone-600 text-sm">When self-doubt creeps in, pull up your daily affirmation. Having the same message all day creates consistency and builds neural pathways.</p>
                 </div>
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">4. Write them down, don't just think them</h3>
-                  <p className="text-stone-600 text-sm">Journaling your affirmations adds another layer of reinforcement. Try writing your top 3 each morning.</p>
+                  <h3 className="font-semibold text-stone-800 mb-2">4. Reflect on it before bed</h3>
+                  <p className="text-stone-600 text-sm">End your day by revisiting your affirmation. Consider how it showed up in your day and what it meant to you.</p>
                 </div>
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">5. Update them as you grow</h3>
-                  <p className="text-stone-600 text-sm">As your self-love journey evolves, so should your affirmations. What felt like a stretch last month might feel natural now.</p>
+                  <h3 className="font-semibold text-stone-800 mb-2">5. Come back tomorrow</h3>
+                  <p className="text-stone-600 text-sm">A new affirmation about self love awaits you each morning. Building this daily ritual creates lasting change over time.</p>
                 </div>
               </div>
             </section>
 
             <section>
               <h2 className="text-2xl font-bold text-stone-900 mb-6">
-                FAQ: Affirmation About Self Love
+                FAQ: Daily Affirmation About Self Love
               </h2>
               <div className="space-y-4">
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
@@ -357,20 +407,20 @@ export default function AffirmationAboutSelfLovePage() {
                   <p className="text-stone-600 text-sm">An affirmation about self love is a positive statement you repeat to yourself to build self-worth and self-acceptance. These affirmations focus on your relationship with yourself — your boundaries, confidence, and inherent value as a person.</p>
                 </div>
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
+                  <h3 className="font-semibold text-stone-800 mb-2">Why does my affirmation stay the same all day?</h3>
+                  <p className="text-stone-600 text-sm">Your daily affirmation is designed to be consistent throughout the day so you can truly practice and internalize it. Research shows that repetition is key to changing thought patterns. A new affirmation is generated at midnight UTC.</p>
+                </div>
+                <div className="bg-white rounded-xl p-5 border border-stone-200">
                   <h3 className="font-semibold text-stone-800 mb-2">Do self love affirmations actually work?</h3>
                   <p className="text-stone-600 text-sm">Research shows that affirmations can help rewire thought patterns over time, especially when the affirmations feel believable and are practiced consistently. The key is using affirmations that resonate with you, not ones that feel fake or forced.</p>
                 </div>
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">How often should I use self love affirmations?</h3>
-                  <p className="text-stone-600 text-sm">Daily practice is ideal. Many people find it helpful to repeat affirmations in the morning, before bed, or during moments of self-doubt. Even 2-3 minutes of intentional practice can make a difference over time.</p>
+                  <h3 className="font-semibold text-stone-800 mb-2">Can I switch focus areas during the day?</h3>
+                  <p className="text-stone-600 text-sm">Absolutely! Each combination of focus area and tone has its own daily affirmation. Feel free to explore different combinations — each one will stay consistent throughout the day.</p>
                 </div>
                 <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">Why do some affirmations feel cringey or fake?</h3>
-                  <p className="text-stone-600 text-sm">Affirmations feel fake when they're too far from your current beliefs. If you don't believe "I am perfect in every way," it's going to feel hollow. Our generator creates grounded, realistic affirmations that feel authentic rather than performative.</p>
-                </div>
-                <div className="bg-white rounded-xl p-5 border border-stone-200">
-                  <h3 className="font-semibold text-stone-800 mb-2">Can I use the same affirmation every day?</h3>
-                  <p className="text-stone-600 text-sm">Absolutely. In fact, repetition is key to making affirmations stick. Find one or two that really resonate and use them until they feel natural. Then you can evolve to new ones as you grow.</p>
+                  <h3 className="font-semibold text-stone-800 mb-2">When does my affirmation refresh?</h3>
+                  <p className="text-stone-600 text-sm">A new affirmation about self love is generated for each focus area and tone combination at midnight UTC each day. Come back tomorrow for a fresh message to carry with you.</p>
                 </div>
               </div>
             </section>
@@ -378,7 +428,7 @@ export default function AffirmationAboutSelfLovePage() {
 
           <div className="text-center mt-12 pt-8 border-t border-stone-200">
             <p className="text-stone-500 text-sm">
-              Free tool by{' '}
+              Free daily tool by{' '}
               <Link href="/" className="text-rose-600 hover:text-rose-700 font-medium">
                 VCM Store
               </Link>
