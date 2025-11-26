@@ -87,6 +87,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily' as const,
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}/tools/affirmation-about-self-love`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+    },
   ];
 
   // Product pages

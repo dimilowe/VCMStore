@@ -77,6 +77,7 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/tools/visualization` - Free text-to-diagram visualization tool
 - `/tools/emoji-combos` - Free emoji combination generator with community library
 - `/tools/horoscope-of-the-day` - Free AI-powered daily horoscope generator
+- `/tools/affirmation-about-self-love` - Free AI self-love affirmation generator
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
