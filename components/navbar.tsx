@@ -38,6 +38,7 @@ const navDropdowns: NavDropdown[] = [
       { label: "Keyword Finder", href: "/tools/keyword-finder", description: "Find low-competition SEO ideas" },
       { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams" },
       { label: "Emoji Combos", href: "/tools/emoji-combos", description: "Copy aesthetic emoji combos" },
+      { label: "Horoscope of the Day", href: "/tools/horoscope-of-the-day", description: "AI daily zodiac readings" },
     ]
   }
 ];

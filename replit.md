@@ -35,6 +35,8 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `blog_post_categories`: Many-to-many relationship between posts and categories
 - `subscribers`: Email newsletter list
 - `feedback`: User feedback submissions (bug reports, feature requests, improvements)
+- `user_emoji_combos`: Community-submitted emoji combinations
+- `daily_horoscopes`: Cached daily horoscope readings by sign and tone
 
 ## Project Structure
 
@@ -73,7 +75,8 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/tools/logo-generator` - Free AI-powered logo generator
 - `/tools/keyword-finder` - Free low-competition keyword finder
 - `/tools/visualization` - Free text-to-diagram visualization tool
-- `/tools/emoji-combos` - Free emoji combination generator
+- `/tools/emoji-combos` - Free emoji combination generator with community library
+- `/tools/horoscope-of-the-day` - Free AI-powered daily horoscope generator
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
