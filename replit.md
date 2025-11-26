@@ -68,6 +68,8 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/newsletter` - Newsletter signup page
 - `/strategy-ai` - AI strategy chat
 - `/tools/gif-compressor` - Free GIF compression tool (SEO traffic driver)
+- `/tools/image-compressor` - Free JPG/PNG/WebP compression tool
+- `/tools/word-counter` - Free word/character counting tool (100% client-side)
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
