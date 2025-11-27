@@ -115,10 +115,34 @@ function QuestionCard({ question }: { question: Question }) {
   );
 }
 
-export default async function AnswersPage() {
-  const [newest, trending] = await Promise.all([
+async function searchQuestions(searchTerm: string): Promise<Question[]> {
+  try {
+    const result = await query(
+      `SELECT id, slug, title, context, answer, author_name, upvote_count, view_count, created_at
+       FROM questions
+       WHERE title ILIKE $1 OR context ILIKE $1
+       ORDER BY upvote_count DESC, created_at DESC
+       LIMIT 20`,
+      [`%${searchTerm}%`]
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
+}
+
+export default async function AnswersPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ q?: string }> 
+}) {
+  const params = await searchParams;
+  const searchQuery = params.q || "";
+
+  const [newest, trending, searchResults] = await Promise.all([
     getNewestQuestions(),
-    getTrendingQuestions()
+    getTrendingQuestions(),
+    searchQuery ? searchQuestions(searchQuery) : Promise.resolve([])
   ]);
 
   return (
@@ -151,47 +175,79 @@ export default async function AnswersPage() {
           </Link>
         </div>
 
-        {/* Content Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Newest Questions */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-5 h-5 text-stone-600" />
-              <h2 className="text-xl font-bold text-stone-900">Newest Questions</h2>
+        {/* Search Results */}
+        {searchQuery && (
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-stone-600" />
+                <h2 className="text-xl font-bold text-stone-900">
+                  Results for "{searchQuery}"
+                </h2>
+              </div>
+              <Link href="/answers" className="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+                Clear search
+              </Link>
             </div>
             <div className="space-y-4">
-              {newest.length > 0 ? (
-                newest.map((q) => <QuestionCard key={q.id} question={q} />)
+              {searchResults.length > 0 ? (
+                searchResults.map((q) => <QuestionCard key={q.id} question={q} />)
               ) : (
                 <div className="bg-white border border-stone-200 rounded-xl p-8 text-center">
-                  <MessageCircleQuestion className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-                  <p className="text-stone-500">No questions yet. Be the first to ask!</p>
+                  <Search className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+                  <p className="text-stone-500">No questions found matching "{searchQuery}"</p>
                   <Link href="/answers/new" className="text-yellow-600 hover:text-yellow-700 font-medium mt-2 inline-flex items-center gap-1">
-                    Ask a Question <ArrowRight className="w-4 h-4" />
+                    Ask this question <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               )}
             </div>
           </div>
+        )}
 
-          {/* Trending Questions */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-stone-600" />
-              <h2 className="text-xl font-bold text-stone-900">Trending Questions</h2>
+        {/* Content Grid - Only show when not searching */}
+        {!searchQuery && (
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Newest Questions */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="w-5 h-5 text-stone-600" />
+                <h2 className="text-xl font-bold text-stone-900">Newest Questions</h2>
+              </div>
+              <div className="space-y-4">
+                {newest.length > 0 ? (
+                  newest.map((q) => <QuestionCard key={q.id} question={q} />)
+                ) : (
+                  <div className="bg-white border border-stone-200 rounded-xl p-8 text-center">
+                    <MessageCircleQuestion className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+                    <p className="text-stone-500">No questions yet. Be the first to ask!</p>
+                    <Link href="/answers/new" className="text-yellow-600 hover:text-yellow-700 font-medium mt-2 inline-flex items-center gap-1">
+                      Ask a Question <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="space-y-4">
-              {trending.length > 0 ? (
-                trending.map((q) => <QuestionCard key={q.id} question={q} />)
-              ) : (
-                <div className="bg-white border border-stone-200 rounded-xl p-8 text-center">
-                  <TrendingUp className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-                  <p className="text-stone-500">Questions with the most engagement will appear here.</p>
-                </div>
-              )}
+
+            {/* Trending Questions */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-5 h-5 text-stone-600" />
+                <h2 className="text-xl font-bold text-stone-900">Trending Questions</h2>
+              </div>
+              <div className="space-y-4">
+                {trending.length > 0 ? (
+                  trending.map((q) => <QuestionCard key={q.id} question={q} />)
+                ) : (
+                  <div className="bg-white border border-stone-200 rounded-xl p-8 text-center">
+                    <TrendingUp className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+                    <p className="text-stone-500">Questions with the most engagement will appear here.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

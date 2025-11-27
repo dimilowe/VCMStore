@@ -41,6 +41,8 @@ VCM Hub is a creator-focused online campus built with Next.js 14, TypeScript, Ta
 - `ideas`: Community-submitted startup ideas
 - `idea_votes`: Upvotes on ideas (one per session)
 - `idea_comments`: Comments on ideas
+- `questions`: VCM Answers Q&A questions for SEO
+- `question_votes`: Upvotes on questions (one per session)
 
 ## Project Structure
 
@@ -85,6 +87,9 @@ VCM Hub is a creator-focused online campus built with Next.js 14, TypeScript, Ta
 - `/ideas` - VCM Ideas Hub - Reddit-style feed for startup ideas
 - `/ideas/new` - Submit a new idea
 - `/ideas/[slug]` - Individual idea detail page with comments
+- `/answers` - VCM Answers - Quora-style Q&A for SEO
+- `/answers/new` - Submit a new question
+- `/answers/[slug]` - Individual question page with SEO schema
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -124,6 +129,15 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-27: **Added VCM Answers** - Quora-style Q&A engine for SEO
+  - Created questions and question_votes database tables
+  - Built /answers landing page with search, newest, and trending sections
+  - Built /answers/new question submission form
+  - Built /answers/[slug] question detail pages with QAPage schema for SEO
+  - Added voting system with session-based one-vote-per-question
+  - Added admin answer capability (dimitrioslowe@gmail.com only)
+  - Integrated into sitemap for Google indexing
+  - Added to homepage ecosystem and hero search
 - 2025-11-27: **Transformed Homepage to Hub/Campus Model** - Complete homepage redesign
   - New hero with big search bar (autocomplete suggestions for tools/products)
   - "Open VCM OS" + "Browse Tools" CTA buttons

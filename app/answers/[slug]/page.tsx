@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Metadata } from "next";
 import { query } from "@/lib/db";
+import { cookies } from "next/headers";
+import { getIronSession } from "iron-session";
 import { 
   ArrowLeft, 
   MessageCircleQuestion, 
@@ -12,6 +14,31 @@ import {
 } from "lucide-react";
 import { VoteButton } from "./VoteButton";
 import { RelatedQuestions } from "./RelatedQuestions";
+import { AdminAnswerForm } from "./AdminAnswerForm";
+
+interface SessionData {
+  userId?: number;
+  email?: string;
+}
+
+const sessionOptions = {
+  password: process.env.SESSION_SECRET || "complex_password_at_least_32_characters_long",
+  cookieName: "vcm_session",
+  cookieOptions: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+  },
+};
+
+async function isAdmin(): Promise<boolean> {
+  try {
+    const cookieStore = cookies();
+    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+    return session.email === "dimitrioslowe@gmail.com";
+  } catch {
+    return false;
+  }
+}
 
 interface Question {
   id: number;
@@ -87,7 +114,10 @@ function formatDate(date: string): string {
 
 export default async function QuestionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const question = await getQuestion(slug);
+  const [question, userIsAdmin] = await Promise.all([
+    getQuestion(slug),
+    isAdmin()
+  ]);
 
   if (!question) {
     notFound();
@@ -207,6 +237,11 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
                     This question hasn't been answered yet. Check back soon!
                   </p>
                 </div>
+              )}
+
+              {/* Admin Answer Form */}
+              {userIsAdmin && (
+                <AdminAnswerForm questionId={question.id} existingAnswer={question.answer} />
               )}
             </div>
           </article>

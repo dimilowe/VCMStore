@@ -19,7 +19,8 @@ const sessionOptions = {
 
 async function isAdmin(): Promise<boolean> {
   try {
-    const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
+    const cookieStore = cookies();
+    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
     return session.email === "dimitrioslowe@gmail.com";
   } catch {
     return false;

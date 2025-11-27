@@ -151,6 +151,7 @@ const ecosystemApps = [
   { name: "C-Score", href: "/product/cscorecals" },
   { name: "VCM Blog", href: "/blog" },
   { name: "Ideas Hub", href: "/ideas" },
+  { name: "VCM Answers", href: "/answers" },
   { name: "Free Tools", href: "/tools" },
   { name: "Funnels", href: "/funnels" },
   { name: "Downloads", href: "/downloads" },

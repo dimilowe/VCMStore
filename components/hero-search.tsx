@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ArrowRight, FileImage, Type, Palette, Star, Heart, Smile, GitBranch, Zap, QrCode, Flame } from "lucide-react";
+import { Search, ArrowRight, FileImage, Type, Palette, Star, Heart, Smile, GitBranch, Zap, QrCode, Flame, MessageCircleQuestion } from "lucide-react";
 
 const searchSuggestions = [
+  { name: "VCM Answers", href: "/answers", icon: MessageCircleQuestion },
   { name: "GIF Compressor", href: "/tools/gif-compressor", icon: FileImage },
   { name: "Image Compressor", href: "/tools/image-compressor", icon: FileImage },
   { name: "Word Counter", href: "/tools/word-counter", icon: Type },
