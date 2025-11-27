@@ -282,7 +282,7 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-stone-900">VCM Media Hub</h2>
-              <Link href="/blog" className="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center gap-1">
+              <Link href="/newsletter" className="text-yellow-600 hover:text-yellow-700 text-sm font-medium flex items-center gap-1">
                 View All <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -290,7 +290,7 @@ export default async function HomePage() {
               {blogPosts.map((post) => (
                 <Link 
                   key={post.slug} 
-                  href={`/blog/${post.slug}`}
+                  href={`/newsletter/${post.slug}`}
                   className="bg-white rounded-xl overflow-hidden border border-stone-200 hover:border-yellow-400 hover:shadow-lg transition-all group"
                 >
                   <div className="aspect-video bg-gradient-to-br from-stone-200 to-stone-300 relative">
