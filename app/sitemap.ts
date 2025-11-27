@@ -24,6 +24,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     `SELECT slug, updated_at FROM ideas ORDER BY created_at DESC`
   );
 
+  // Get all questions (VCM Answers)
+  const questionsResult = await query(
+    `SELECT slug, updated_at FROM questions ORDER BY created_at DESC`
+  );
+
   // Static pages
   const staticPages = [
     {
@@ -104,6 +109,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'hourly' as const,
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}/answers`,
+      lastModified: new Date(),
+      changeFrequency: 'hourly' as const,
+      priority: 0.9,
+    },
   ];
 
   // Product pages
@@ -130,5 +141,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...productPages, ...blogPages, ...ideaPages];
+  // Question pages (VCM Answers)
+  const questionPages = questionsResult.rows.map((question: any) => ({
+    url: `${baseUrl}/answers/${question.slug}`,
+    lastModified: new Date(question.updated_at),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...productPages, ...blogPages, ...ideaPages, ...questionPages];
 }
