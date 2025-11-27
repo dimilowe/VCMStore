@@ -1,7 +1,7 @@
-# VCM Store
+# VCM Hub
 
 ## Overview
-VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScript, Tailwind CSS, and PostgreSQL. The platform allows visitors to browse products, blog posts, and resources without authentication. Users only need to create an account when claiming free products or purchasing paid items.
+VCM Hub is a creator-focused online campus built with Next.js 14, TypeScript, Tailwind CSS, and PostgreSQL. The platform captures attention through free utility tools and content, then converts visitors into users of paid apps and the broader ecosystem. Users can browse all content without authentication, only needing to create an account when claiming free products or purchasing paid items.
 
 ## Architecture
 
@@ -124,6 +124,17 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-27: **Transformed Homepage to Hub/Campus Model** - Complete homepage redesign
+  - New hero: "Tools, ideas, and opportunities for the modern creative"
+  - Featured Tools section highlighting premium apps (QR Social, C-Score, APE)
+  - Microtools/Free Tools grid with 9 free tools
+  - VCM Media Hub section showing latest blog posts
+  - For Creators & Entrepreneurs category section
+  - Ecosystem Overview grid linking to all products
+  - Ideas Hub Highlights showing community ideas
+  - Dark mode email capture section
+  - Created /tools index page with category groupings
+  - Updated branding from "VCM Store" to "VCM"
 - 2025-11-27: **Added VCM Ideas Hub** - Reddit-style community ideas feed
   - Created `/ideas` with Hot/New/Top sorting (hot uses decay algorithm)
   - Idea submission form at `/ideas/new` with structured fields

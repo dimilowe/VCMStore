@@ -106,7 +106,7 @@ export function Navbar() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center space-x-8" ref={navRef}>
             <Link href="/" className="text-2xl font-bold tracking-wider text-stone-900">
-              VCM STORE
+              VCM
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">
