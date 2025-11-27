@@ -32,7 +32,7 @@ const sessionOptions = {
 
 async function isAdmin(): Promise<boolean> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
     return session.email === "dimitrioslowe@gmail.com";
   } catch {
