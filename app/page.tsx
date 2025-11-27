@@ -129,6 +129,7 @@ const featuredTools = [
 
 const freeTools = [
   { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers" },
+  { name: "Ideas Hub", icon: Rocket, href: "/ideas" },
   { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor" },
   { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor" },
   { name: "Word Counter", icon: Type, href: "/tools/word-counter" },
