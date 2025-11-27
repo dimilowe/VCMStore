@@ -19,6 +19,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
      ORDER BY published_at DESC`
   );
 
+  // Get all ideas
+  const ideasResult = await query(
+    `SELECT slug, updated_at FROM ideas ORDER BY created_at DESC`
+  );
+
   // Static pages
   const staticPages = [
     {
@@ -90,7 +95,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       url: `${baseUrl}/tools/affirmation-about-self-love`,
       lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/ideas`,
+      lastModified: new Date(),
+      changeFrequency: 'hourly' as const,
       priority: 0.9,
     },
   ];
@@ -111,5 +122,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...productPages, ...blogPages];
+  // Idea pages
+  const ideaPages = ideasResult.rows.map((idea: any) => ({
+    url: `${baseUrl}/ideas/${idea.slug}`,
+    lastModified: new Date(idea.updated_at),
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...productPages, ...blogPages, ...ideaPages];
 }

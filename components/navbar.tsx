@@ -39,7 +39,8 @@ const navDropdowns: NavDropdown[] = [
       { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams" },
       { label: "Emoji Combos", href: "/tools/emoji-combos", description: "Copy aesthetic emoji combos" },
       { label: "Horoscope of the Day", href: "/tools/horoscope-of-the-day", description: "AI daily zodiac readings" },
-      { label: "Self-Love Affirmations", href: "/tools/affirmation-about-self-love", description: "Real AF affirmation generator" },
+      { label: "Self-Love Affirmations", href: "/tools/affirmation-about-self-love", description: "Daily affirmation generator" },
+      { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },
     ]
   }
 ];

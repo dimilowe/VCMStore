@@ -37,6 +37,10 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `feedback`: User feedback submissions (bug reports, feature requests, improvements)
 - `user_emoji_combos`: Community-submitted emoji combinations
 - `daily_horoscopes`: Cached daily horoscope readings by sign and tone
+- `daily_affirmations`: Cached daily affirmations by area and tone
+- `ideas`: Community-submitted startup ideas
+- `idea_votes`: Upvotes on ideas (one per session)
+- `idea_comments`: Comments on ideas
 
 ## Project Structure
 
@@ -77,7 +81,10 @@ VCM Store is a public-facing creator marketplace built with Next.js 14, TypeScri
 - `/tools/visualization` - Free text-to-diagram visualization tool
 - `/tools/emoji-combos` - Free emoji combination generator with community library
 - `/tools/horoscope-of-the-day` - Free AI-powered daily horoscope generator
-- `/tools/affirmation-about-self-love` - Free AI self-love affirmation generator
+- `/tools/affirmation-about-self-love` - Free daily AI self-love affirmation generator
+- `/ideas` - VCM Ideas Hub - Reddit-style feed for startup ideas
+- `/ideas/new` - Submit a new idea
+- `/ideas/[slug]` - Individual idea detail page with comments
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -117,6 +124,20 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-27: **Added VCM Ideas Hub** - Reddit-style community ideas feed
+  - Created `/ideas` with Hot/New/Top sorting (hot uses decay algorithm)
+  - Idea submission form at `/ideas/new` with structured fields
+  - Idea detail pages at `/ideas/[slug]` with full content sections
+  - Session-based upvoting (toggle on/off, one vote per session per idea)
+  - Anonymous commenting system with real-time updates
+  - Database tables: ideas, idea_votes, idea_comments
+  - SEO optimized with proper meta tags and sitemap entries
+  - Added to navbar Resources dropdown
+- 2025-11-27: **Restructured Affirmation Tool to Daily Model**
+  - Changed from on-demand to daily caching (like horoscope)
+  - Same affirmation all day for each area + tone combo
+  - Refreshes at midnight UTC
+  - Increases user retention and daily return visits
 - 2025-11-26: **Added Emoji Combos Tool** - Aesthetic emoji combination generator
   - Created `/tools/emoji-combos` with 100 curated emoji combinations
   - Filter by category (cute, aesthetic, funny, flirty, meme, etc.)
