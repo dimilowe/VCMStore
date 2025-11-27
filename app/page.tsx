@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { EmailCapture } from "@/components/email-capture";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { query } from "@/lib/db";
+import { HeroSearch } from "@/components/hero-search";
 import { 
   Sparkles, 
   QrCode, 
@@ -16,13 +17,15 @@ import {
   Star,
   Heart,
   ArrowRight,
-  Lightbulb,
   Briefcase,
   Megaphone,
   PenTool,
   Zap,
   TrendingUp,
-  ExternalLink
+  ExternalLink,
+  Rocket,
+  Wrench,
+  Package
 } from "lucide-react";
 
 interface BlogPost {
@@ -37,6 +40,13 @@ interface Idea {
   title: string;
   one_liner: string;
   upvote_count: number;
+}
+
+interface Product {
+  slug: string;
+  name: string;
+  type: string;
+  price: number | null;
 }
 
 async function getLatestBlogPosts(): Promise<BlogPost[]> {
@@ -68,29 +78,52 @@ async function getLatestIdeas(): Promise<Idea[]> {
   }
 }
 
+async function getLatestDrops(): Promise<Product[]> {
+  try {
+    const result = await query(
+      `SELECT slug, name, type, price 
+       FROM products 
+       ORDER BY created_at DESC 
+       LIMIT 5`
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
+}
+
 const featuredTools = [
   {
     name: "QR Social",
-    description: "Generate branded QR codes with tracking and analytics for your content.",
     icon: QrCode,
     href: "/product/qrsocial",
-    color: "bg-gradient-to-br from-blue-500 to-indigo-600"
+    color: "bg-blue-500"
   },
   {
     name: "C-Score",
-    description: "AI calorie coach that tracks your intake with photo recognition.",
     icon: Flame,
     href: "/product/cscorecals",
-    color: "bg-gradient-to-br from-orange-500 to-red-600"
+    color: "bg-orange-500"
   },
   {
     name: "APE",
-    description: "Auto Paywall Everything — monetize any content with smart paywalls.",
     icon: Zap,
     href: "https://ape.vcm.fyi",
-    color: "bg-gradient-to-br from-yellow-500 to-amber-600",
+    color: "bg-yellow-500",
     external: true
-  }
+  },
+  {
+    name: "Logo Gen",
+    icon: Palette,
+    href: "/tools/logo-generator",
+    color: "bg-purple-500"
+  },
+  {
+    name: "Keywords",
+    icon: Search,
+    href: "/tools/keyword-finder",
+    color: "bg-green-500"
+  },
 ];
 
 const freeTools = [
@@ -125,59 +158,102 @@ const ecosystemApps = [
 ];
 
 export default async function HomePage() {
-  const [blogPosts, ideas] = await Promise.all([
+  const [blogPosts, ideas, latestDrops] = await Promise.all([
     getLatestBlogPosts(),
-    getLatestIdeas()
+    getLatestIdeas(),
+    getLatestDrops()
   ]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="py-16 md:py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight mb-6">
-            Tools, ideas, and opportunities for the{" "}
-            <span className="text-yellow-500">modern creative</span>
-          </h1>
-          <p className="text-lg md:text-xl text-stone-600 mb-8 max-w-2xl mx-auto">
-            Everything you need to build, grow, and monetize your creative business — all in one place.
-          </p>
-          <Link href="/store">
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-6 text-lg font-semibold rounded-full shadow-lg">
-              Get Started
-            </Button>
-          </Link>
-        </div>
-      </section>
+      <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-stone-50 to-white">
+        <div className="max-w-4xl mx-auto">
+          {/* Headline */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-stone-900 leading-tight mb-3">
+              Tools, ideas, and opportunities for the{" "}
+              <span className="text-yellow-500">modern creative</span>
+            </h1>
+            <p className="text-stone-600 text-lg">
+              Everything you need to build, grow, and monetize your creative business.
+            </p>
+          </div>
 
-      {/* Featured Tools */}
-      <section className="py-12 px-4 bg-stone-50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-stone-900 mb-8">Featured Tools</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          {/* Big Search Bar */}
+          <HeroSearch />
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+            <Link href="https://ape.vcm.fyi" target="_blank">
+              <Button className="bg-stone-900 hover:bg-stone-800 text-white px-8 py-6 text-base font-semibold rounded-full shadow-lg flex items-center gap-2">
+                <Rocket className="w-5 h-5" />
+                Open VCM OS
+              </Button>
+            </Link>
+            <Link href="/tools">
+              <Button variant="outline" className="border-2 border-stone-300 hover:border-yellow-500 text-stone-800 px-8 py-6 text-base font-semibold rounded-full flex items-center gap-2">
+                <Wrench className="w-5 h-5" />
+                Browse Tools
+              </Button>
+            </Link>
+          </div>
+
+          {/* Featured Tools Row */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            <span className="text-sm text-stone-500 font-medium">Popular:</span>
             {featuredTools.map((tool) => (
-              <Link 
-                key={tool.name} 
+              <Link
+                key={tool.name}
                 href={tool.href}
                 target={tool.external ? "_blank" : undefined}
-                className="bg-white rounded-xl p-6 border border-stone-200 hover:border-yellow-400 hover:shadow-lg transition-all group"
+                className="flex items-center gap-2 bg-white border border-stone-200 rounded-full px-4 py-2 hover:border-yellow-400 hover:shadow-md transition-all group"
               >
-                <div className={`w-12 h-12 ${tool.color} rounded-xl flex items-center justify-center mb-4`}>
-                  <tool.icon className="w-6 h-6 text-white" />
+                <div className={`w-6 h-6 ${tool.color} rounded-full flex items-center justify-center`}>
+                  <tool.icon className="w-3.5 h-3.5 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-stone-900 mb-2 flex items-center gap-2">
+                <span className="text-sm font-medium text-stone-700 group-hover:text-stone-900">
                   {tool.name}
-                  {tool.external && <ExternalLink className="w-4 h-4 text-stone-400" />}
-                </h3>
-                <p className="text-stone-600 text-sm mb-4">{tool.description}</p>
-                <span className="text-yellow-600 text-sm font-medium group-hover:text-yellow-700 flex items-center gap-1">
-                  Learn More <ArrowRight className="w-4 h-4" />
                 </span>
+                {tool.external && <ExternalLink className="w-3 h-3 text-stone-400" />}
               </Link>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Latest Drops Strip */}
+      {latestDrops.length > 0 && (
+        <section className="bg-stone-900 py-4 px-4 overflow-hidden">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 shrink-0">
+                <Package className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm font-bold text-white tracking-wide">LATEST DROPS</span>
+              </div>
+              <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
+                {latestDrops.map((product) => (
+                  <Link
+                    key={product.slug}
+                    href={`/product/${product.slug}`}
+                    className="flex items-center gap-2 bg-stone-800 rounded-full px-4 py-1.5 hover:bg-stone-700 transition-colors shrink-0"
+                  >
+                    <span className="text-sm text-white font-medium">{product.name}</span>
+                    {product.price && product.price > 0 ? (
+                      <span className="text-xs text-yellow-400 font-bold">${product.price}</span>
+                    ) : (
+                      <span className="text-xs text-green-400 font-bold">FREE</span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+              <Link href="/store" className="text-yellow-500 hover:text-yellow-400 text-sm font-medium shrink-0 hidden sm:flex items-center gap-1">
+                View All <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Microtools / Free Tools */}
       <section className="py-12 px-4">
@@ -280,7 +356,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Daily Build Highlights / Ideas Hub */}
+      {/* Ideas Hub Highlights */}
       {ideas.length > 0 && (
         <section className="py-12 px-4">
           <div className="max-w-6xl mx-auto">

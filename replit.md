@@ -125,8 +125,10 @@ npm run dev
 
 ## Recent Changes
 - 2025-11-27: **Transformed Homepage to Hub/Campus Model** - Complete homepage redesign
-  - New hero: "Tools, ideas, and opportunities for the modern creative"
-  - Featured Tools section highlighting premium apps (QR Social, C-Score, APE)
+  - New hero with big search bar (autocomplete suggestions for tools/products)
+  - "Open VCM OS" + "Browse Tools" CTA buttons
+  - Featured tools row showing Popular: QR Social, C-Score, APE, Logo Gen, Keywords
+  - Latest Drops strip (dark bar showing newest products with prices)
   - Microtools/Free Tools grid with 9 free tools
   - VCM Media Hub section showing latest blog posts
   - For Creators & Entrepreneurs category section
@@ -134,6 +136,7 @@ npm run dev
   - Ideas Hub Highlights showing community ideas
   - Dark mode email capture section
   - Created /tools index page with category groupings
+  - Created HeroSearch component with keyboard navigation
   - Updated branding from "VCM Store" to "VCM"
 - 2025-11-27: **Added VCM Ideas Hub** - Reddit-style community ideas feed
   - Created `/ideas` with Hot/New/Top sorting (hot uses decay algorithm)
