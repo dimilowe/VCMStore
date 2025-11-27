@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { cookies } from "next/headers";
 
-function getOrCreateSessionId(): string {
-  const cookieStore = cookies();
+async function getOrCreateSessionId(): Promise<string> {
+  const cookieStore = await cookies();
   let sessionId = cookieStore.get("vcm_answers_session")?.value;
 
   if (!sessionId) {
@@ -25,7 +25,7 @@ export async function POST(
       return NextResponse.json({ error: "Invalid question ID" }, { status: 400 });
     }
 
-    const sessionId = getOrCreateSessionId();
+    const sessionId = await getOrCreateSessionId();
 
     const existingVote = await query(
       `SELECT id FROM question_votes WHERE question_id = $1 AND session_id = $2`,
