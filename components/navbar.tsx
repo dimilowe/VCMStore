@@ -31,6 +31,8 @@ const navDropdowns: NavDropdown[] = [
     items: [
       { label: "Freebies", href: "/freebies", description: "Free tools & resources" },
       { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
+      { label: "VCM Answers", href: "/answers", description: "Community Q&A forum" },
+      { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },
       { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files" },
       { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP" },
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters" },
@@ -40,7 +42,6 @@ const navDropdowns: NavDropdown[] = [
       { label: "Emoji Combos", href: "/tools/emoji-combos", description: "Copy aesthetic emoji combos" },
       { label: "Horoscope of the Day", href: "/tools/horoscope-of-the-day", description: "AI daily zodiac readings" },
       { label: "Self-Love Affirmations", href: "/tools/affirmation-about-self-love", description: "Daily affirmation generator" },
-      { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },
     ]
   }
 ];
