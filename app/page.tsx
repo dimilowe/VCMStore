@@ -25,7 +25,8 @@ import {
   ExternalLink,
   Rocket,
   Wrench,
-  Package
+  Package,
+  MessageCircleQuestion
 } from "lucide-react";
 
 interface BlogPost {
@@ -127,6 +128,7 @@ const featuredTools = [
 ];
 
 const freeTools = [
+  { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers" },
   { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor" },
   { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor" },
   { name: "Word Counter", icon: Type, href: "/tools/word-counter" },
