@@ -26,7 +26,8 @@ import {
   Rocket,
   Wrench,
   Package,
-  MessageCircleQuestion
+  MessageCircleQuestion,
+  LayoutGrid
 } from "lucide-react";
 
 interface BlogPost {
@@ -130,6 +131,7 @@ const featuredTools = [
 const freeTools = [
   { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers" },
   { name: "Ideas Hub", icon: Rocket, href: "/ideas" },
+  { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box" },
   { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor" },
   { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor" },
   { name: "Word Counter", icon: Type, href: "/tools/word-counter" },
@@ -155,6 +157,7 @@ const ecosystemApps = [
   { name: "VCM Blog", href: "/blog" },
   { name: "Ideas Hub", href: "/ideas" },
   { name: "VCM Answers", href: "/answers" },
+  { name: "Resource Box", href: "/tools/resource-box" },
   { name: "Free Tools", href: "/tools" },
   { name: "Funnels", href: "/funnels" },
   { name: "Downloads", href: "/downloads" },

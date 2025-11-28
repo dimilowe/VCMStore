@@ -33,6 +33,7 @@ const navDropdowns: NavDropdown[] = [
       { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
       { label: "VCM Answers", href: "/answers", description: "Community Q&A forum" },
       { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },
+      { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards" },
       { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files" },
       { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP" },
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters" },

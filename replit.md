@@ -43,6 +43,9 @@ VCM Hub is a creator-focused online campus built with Next.js 14, TypeScript, Ta
 - `idea_comments`: Comments on ideas
 - `questions`: VCM Answers Q&A questions for SEO
 - `question_votes`: Upvotes on questions (one per session)
+- `resource_boxes`: Creator resource boxes for link card generator
+- `box_items`: Links within resource boxes
+- `internal_resources`: Pre-defined VCM tools/freebies for resource boxes
 
 ## Project Structure
 
@@ -90,6 +93,9 @@ VCM Hub is a creator-focused online campus built with Next.js 14, TypeScript, Ta
 - `/answers` - VCM Answers - Quora-style Q&A for SEO
 - `/answers/new` - Submit a new question
 - `/answers/[slug]` - Individual question page with SEO schema
+- `/tools/resource-box` - Creator Resource Box - shareable link card generator
+- `/tools/resource-box/[slug]` - Public resource box display
+- `/tools/resource-box/[slug]/embed` - Embeddable resource box for iframes
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
