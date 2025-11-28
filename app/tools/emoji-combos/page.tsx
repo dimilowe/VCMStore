@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Search, Shuffle, Copy, Check, Sparkles, Trash2, Wand2, Plus, Users } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 interface EmojiCombo {
   id: number;
@@ -473,16 +474,13 @@ export default function EmojiCombosPage() {
         </div>
       )}
 
+      <div className="max-w-6xl mx-auto px-4 mt-12">
+        <ExploreMoreTools currentTool="/tools/emoji-combos" />
+      </div>
+
       <footer className="border-t border-stone-200 py-8 mt-12">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-stone-500">
-          <p className="mb-3">Built for creators. Add this to your bookmarks.</p>
-          <div className="flex items-center justify-center gap-6 flex-wrap">
-            <Link href="/tools/visualization" className="hover:text-stone-700">Visualization Tool</Link>
-            <Link href="/tools/keyword-finder" className="hover:text-stone-700">Keyword Finder</Link>
-            <Link href="/tools/logo-generator" className="hover:text-stone-700">Logo Generator</Link>
-            <Link href="/tools/word-counter" className="hover:text-stone-700">Word Counter</Link>
-            <Link href="/store" className="hover:text-stone-700">VCM Store</Link>
-          </div>
+          <p>Built for creators. Add this to your bookmarks.</p>
         </div>
       </footer>
 

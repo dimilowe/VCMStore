@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Upload, Download, FileImage, Zap, Shield, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 type CompressionLevel = 'light' | 'balanced' | 'max';
 
@@ -447,12 +448,17 @@ export default function GifCompressorPage() {
         </div>
       </section>
 
+      {/* Explore More Tools */}
+      <div className="container mx-auto px-4 py-8">
+        <ExploreMoreTools currentTool="/tools/gif-compressor" />
+      </div>
+
       {/* Bottom CTA */}
       <section className="py-16 bg-stone-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Compress Your GIF?</h2>
           <p className="text-stone-400 mb-8 max-w-xl mx-auto">
-            It's free, fast, and requires no sign-up. Start compressing now!
+            It&apos;s free, fast, and requires no sign-up. Start compressing now!
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

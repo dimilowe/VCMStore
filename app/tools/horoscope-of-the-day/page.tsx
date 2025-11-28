@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, Star, Moon, Sun, Loader2, RefreshCw } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 const ZODIAC_SIGNS = [
   { name: 'Aries', symbol: '♈', dates: 'Mar 21 - Apr 19', element: 'fire' },
@@ -380,6 +381,8 @@ export default function HoroscopeOfTheDayPage() {
               </div>
             </section>
           </div>
+
+          <ExploreMoreTools currentTool="/tools/horoscope-of-the-day" />
 
           <div className="text-center mt-12 pt-8 border-t border-stone-200">
             <p className="text-stone-500 text-sm">

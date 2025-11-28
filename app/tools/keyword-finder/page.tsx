@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Search, Download, Copy, ArrowUpDown, AlertCircle, Loader2, Check, Sparkles } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 interface KeywordIdea {
   keyword: string;
@@ -460,16 +461,13 @@ export default function KeywordFinderPage() {
         </div>
       </main>
 
+      <div className="max-w-6xl mx-auto px-4 mt-12">
+        <ExploreMoreTools currentTool="/tools/keyword-finder" />
+      </div>
+
       <footer className="border-t border-stone-200 py-8 mt-12">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-stone-500">
-          <p className="mb-3">Part of the VCM creator tools. Need a full brand kit? Try APE Funnels.</p>
-          <div className="flex items-center justify-center gap-6 flex-wrap">
-            <Link href="/tools/gif-compressor" className="hover:text-stone-700">GIF Compressor</Link>
-            <Link href="/tools/image-compressor" className="hover:text-stone-700">Image Compressor</Link>
-            <Link href="/tools/word-counter" className="hover:text-stone-700">Word Counter</Link>
-            <Link href="/tools/logo-generator" className="hover:text-stone-700">Logo Generator</Link>
-            <Link href="/store" className="hover:text-stone-700">VCM Store</Link>
-          </div>
+          <p>Part of the VCM creator tools. Need a full brand kit? Try APE Funnels.</p>
         </div>
       </footer>
     </>

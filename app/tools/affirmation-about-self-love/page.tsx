@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Sparkles, Loader2, Copy, Check, Calendar } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 const AREAS = [
   { id: 'body', label: 'Body & Health', emoji: '💪', description: 'Physical self-acceptance' },
@@ -425,6 +426,8 @@ export default function AffirmationAboutSelfLovePage() {
               </div>
             </section>
           </div>
+
+          <ExploreMoreTools currentTool="/tools/affirmation-about-self-love" />
 
           <div className="text-center mt-12 pt-8 border-t border-stone-200">
             <p className="text-stone-500 text-sm">

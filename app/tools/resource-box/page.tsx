@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Link2, Sparkles, Code, ExternalLink } from "lucide-react";
 import { query } from "@/lib/db";
 import { ResourceBoxForm } from "./ResourceBoxForm";
+import ExploreMoreTools from "@/components/ExploreMoreTools";
 
 export const metadata: Metadata = {
   title: "Creator Resource Box - Free Link Card Generator | VCM",
@@ -93,6 +94,8 @@ export default async function ResourceBoxPage() {
           <h2 className="text-xl font-bold text-stone-900 mb-6">Create Your Resource Box</h2>
           <ResourceBoxForm tools={tools} freebies={freebies} />
         </div>
+
+        <ExploreMoreTools currentTool="/tools/resource-box" />
       </div>
     </div>
   );

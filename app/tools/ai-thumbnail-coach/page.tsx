@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import ThumbnailCoachClient from "./ThumbnailCoachClient";
+import ExploreMoreTools from "@/components/ExploreMoreTools";
 
 export const metadata: Metadata = {
   title: "Free YouTube Thumbnail Analyzer & Generator Coach | AI Thumbnail Checker",
@@ -570,40 +571,7 @@ export default function AIThumbnailCoachPage() {
           </section>
 
           {/* SECTION 8: Internal Links */}
-          <section className="mt-20 bg-gray-900 rounded-2xl p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Explore More Free Creator Tools
-            </h2>
-            <p className="text-gray-400 mb-6">
-              VCM Hub offers a complete ecosystem of free tools for content creators and entrepreneurs.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/tools/logo-generator" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                AI Logo Generator
-              </Link>
-              <Link href="/tools/keyword-finder" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                Keyword Finder
-              </Link>
-              <Link href="/tools/image-compressor" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                Image Compressor
-              </Link>
-              <Link href="/tools/word-counter" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                Word Counter
-              </Link>
-              <Link href="/tools/gif-compressor" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                GIF Compressor
-              </Link>
-              <Link href="/ideas" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                Ideas Hub
-              </Link>
-              <Link href="/answers" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                VCM Answers
-              </Link>
-              <Link href="https://ape.vcm.fyi" target="_blank" className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-medium transition-colors">
-                Open VCM OS →
-              </Link>
-            </div>
-          </section>
+          <ExploreMoreTools currentTool="/tools/ai-thumbnail-coach" />
 
           {/* Footer Note */}
           <div className="mt-16 text-center">

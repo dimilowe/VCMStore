@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Upload, FileImage, Download, ArrowRight, Check, Zap, Globe, Mail, HardDrive, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 type CompressionLevel = 'light' | 'balanced' | 'max';
 
@@ -518,6 +519,8 @@ export default function ImageCompressorPage() {
               answer="Currently, our tool processes one image at a time. For batch compression needs, consider using desktop software or contact us about our enterprise solutions."
             />
           </div>
+
+          <ExploreMoreTools currentTool="/tools/image-compressor" />
         </article>
       </main>
     </div>

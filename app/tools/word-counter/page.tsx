@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 const STOP_WORDS = new Set([
   'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
@@ -512,12 +513,10 @@ export default function WordCounterPage() {
           </div>
         </article>
 
+        <ExploreMoreTools currentTool="/tools/word-counter" />
+
         <footer className="text-center text-sm text-stone-500 mt-12 pt-8 border-t border-stone-200">
-          <p className="mb-3">Part of the VCM creator tool stack. Build, monetize, and grow with APE & VCM OS.</p>
-          <div className="flex justify-center gap-6">
-            <Link href="/product/ape" className="hover:text-yellow-600 transition-colors">APE - Auto Paywall Everything</Link>
-            <Link href="/tools/image-compressor" className="hover:text-yellow-600 transition-colors">More Free Tools</Link>
-          </div>
+          <p>Part of the VCM creator tool stack. Build, monetize, and grow with APE & VCM OS.</p>
         </footer>
       </main>
     </div>
