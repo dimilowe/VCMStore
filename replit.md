@@ -96,6 +96,7 @@ VCM Hub is a creator-focused online campus built with Next.js 14, TypeScript, Ta
 - `/tools/resource-box` - Creator Resource Box - shareable link card generator
 - `/tools/resource-box/[slug]` - Public resource box display
 - `/tools/resource-box/[slug]/embed` - Embeddable resource box for iframes
+- `/tools/ai-thumbnail-coach` - AI YouTube Thumbnail Coach - thumbnail analyzer with chat
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -135,6 +136,19 @@ npm run dev
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
 ## Recent Changes
+- 2025-11-28: **Added AI Thumbnail Coach** - Free YouTube thumbnail analyzer tool
+  - Upload thumbnail images (PNG, JPEG, WebP up to 5MB)
+  - Uses OpenAI gpt-4o vision model for AI-powered analysis
+  - Scores 6 metrics (0-100): Clarity, Intrigue, Emotion, Contrast, Readability, Composition
+  - Shows overall verdict, what's working, what to improve, and concrete suggestions
+  - Chat interface below analysis for follow-up questions with AI coach
+  - No authentication required - completely free tool
+  - Added to navbar Resources dropdown, homepage tools section, and sitemap
+- 2025-11-28: **Added VCM Resource Box** - Free shareable link card generator
+  - Create resource boxes with up to 4 links (external URLs or VCM internal tools)
+  - Each box gets unique URL and iframe embed code
+  - No authentication required - completely free tool
+  - Database tables: resource_boxes, box_items, internal_resources
 - 2025-11-27: **Added VCM Answers** - Quora-style Q&A engine for SEO
   - Created questions and question_votes database tables
   - Built /answers landing page with search, newest, and trending sections

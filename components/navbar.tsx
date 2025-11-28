@@ -31,6 +31,7 @@ const navDropdowns: NavDropdown[] = [
     items: [
       { label: "Freebies", href: "/freebies", description: "Free tools & resources" },
       { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
+      { label: "AI Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer" },
       { label: "VCM Answers", href: "/answers", description: "Community Q&A forum" },
       { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },
       { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards" },

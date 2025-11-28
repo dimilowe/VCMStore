@@ -3,6 +3,20 @@ import OpenAI from "openai";
 
 export const maxDuration = 60;
 
+function clampScore(value: unknown, fallback: number = 50): number {
+  if (typeof value === "number" && !isNaN(value)) {
+    return Math.max(0, Math.min(100, Math.round(value)));
+  }
+  return fallback;
+}
+
+function ensureStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+  return [];
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -89,40 +103,59 @@ Be honest but constructive. If something is truly bad, say so clearly while offe
       .replace(/```\n?/g, "")
       .trim();
 
-    let analysis;
+    let analysis: any;
     try {
       analysis = JSON.parse(cleanedText);
-    } catch {
+    } catch (parseError) {
       console.error("Failed to parse AI response:", responseText);
       return NextResponse.json(
-        { error: "Failed to analyze thumbnail. Please try again." },
+        { error: "Failed to analyze thumbnail. The AI returned an invalid response. Please try again." },
         { status: 500 }
       );
     }
 
-    if (!analysis.scores || !analysis.overallVerdict) {
+    if (!analysis || typeof analysis !== "object") {
+      console.error("Invalid analysis object:", analysis);
       return NextResponse.json(
         { error: "Invalid analysis format. Please try again." },
         { status: 500 }
       );
     }
 
+    if (!analysis.scores || typeof analysis.scores !== "object") {
+      console.error("Missing scores in analysis:", analysis);
+      return NextResponse.json(
+        { error: "Analysis is missing score data. Please try again." },
+        { status: 500 }
+      );
+    }
+
+    if (!analysis.overallVerdict || typeof analysis.overallVerdict !== "string") {
+      console.error("Missing overallVerdict in analysis:", analysis);
+      return NextResponse.json(
+        { error: "Analysis is missing verdict. Please try again." },
+        { status: 500 }
+      );
+    }
+
+    const validatedAnalysis = {
+      scores: {
+        clarity: clampScore(analysis.scores.clarity),
+        intrigue: clampScore(analysis.scores.intrigue),
+        emotion: clampScore(analysis.scores.emotion),
+        contrast: clampScore(analysis.scores.contrast),
+        readability: clampScore(analysis.scores.readability),
+        composition: clampScore(analysis.scores.composition),
+      },
+      overallVerdict: String(analysis.overallVerdict),
+      whatsWorking: ensureStringArray(analysis.whatsWorking),
+      whatToImprove: ensureStringArray(analysis.whatToImprove),
+      suggestions: ensureStringArray(analysis.suggestions),
+    };
+
     return NextResponse.json({
       success: true,
-      analysis: {
-        scores: {
-          clarity: analysis.scores.clarity || 50,
-          intrigue: analysis.scores.intrigue || 50,
-          emotion: analysis.scores.emotion || 50,
-          contrast: analysis.scores.contrast || 50,
-          readability: analysis.scores.readability || 50,
-          composition: analysis.scores.composition || 50,
-        },
-        overallVerdict: analysis.overallVerdict,
-        whatsWorking: analysis.whatsWorking || [],
-        whatToImprove: analysis.whatToImprove || [],
-        suggestions: analysis.suggestions || [],
-      },
+      analysis: validatedAnalysis,
     });
   } catch (error: any) {
     console.error("Thumbnail analysis error:", error);
