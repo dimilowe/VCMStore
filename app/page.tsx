@@ -193,13 +193,39 @@ export default async function HomePage() {
     <div className="flex flex-col min-h-screen bg-white">
       {/* Hero Section */}
       <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-gray-500 text-lg mb-8">
+        <div className="max-w-5xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
+            Creator Apps
+          </h1>
+          <p className="text-gray-500 text-lg mb-12">
+            Unified tools for modern creators
+          </p>
+
+          {/* Creator Apps Grid - VCM OS Style */}
+          <div className="flex flex-wrap items-center justify-center gap-6 mb-12">
+            {creatorApps.map((app) => (
+              <Link
+                key={app.name}
+                href={app.href}
+                target={app.external ? "_blank" : undefined}
+                className="group flex flex-col items-center"
+              >
+                <div className={`w-24 h-24 md:w-28 md:h-28 ${app.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <app.icon className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                </div>
+                <span className="text-sm font-semibold text-gray-900">{app.name}</span>
+                <span className="text-xs text-gray-500">{app.description}</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Tagline */}
+          <p className="text-gray-500 text-base mb-6">
             Free tools & resources to grow, engage, and monetize your creative business.
           </p>
 
           {/* Search Bar */}
-          <div className="mb-8">
+          <div className="max-w-2xl mx-auto mb-8">
             <HeroSearch />
           </div>
 
