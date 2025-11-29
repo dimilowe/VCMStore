@@ -59,30 +59,30 @@ export default function SubmitIdeaPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link
           href="/ideas"
-          className="inline-flex items-center gap-2 text-stone-600 hover:text-amber-600 mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-amber-600 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Ideas
         </Link>
 
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             <Lightbulb className="w-4 h-4" />
             Share Your Idea
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Submit a New Idea
           </h1>
-          <p className="text-stone-600 max-w-xl mx-auto">
+          <p className="text-gray-600 max-w-xl mx-auto">
             Share an idea you think should exist. The more detail you provide, the more valuable it is for others.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white rounded-2xl shadow-lg border border-stone-200 p-6 md:p-8">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8">
             <div className="space-y-5">
               <div>
-                <label htmlFor="title" className="block text-sm font-semibold text-stone-700 mb-2">
+                <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-2">
                   Idea Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -92,15 +92,15 @@ export default function SubmitIdeaPage() {
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g., AI-Powered Resume Analyzer"
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="one_liner" className="block text-sm font-semibold text-stone-700 mb-2">
+                <label htmlFor="one_liner" className="block text-sm font-semibold text-gray-700 mb-2">
                   One-Liner <span className="text-red-500">*</span>
-                  <span className="font-normal text-stone-500 ml-2">({formData.one_liner.length}/160)</span>
+                  <span className="font-normal text-gray-500 ml-2">({formData.one_liner.length}/160)</span>
                 </label>
                 <input
                   type="text"
@@ -110,13 +110,13 @@ export default function SubmitIdeaPage() {
                   onChange={handleChange}
                   maxLength={160}
                   placeholder="A short, punchy description of the idea"
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="problem" className="block text-sm font-semibold text-stone-700 mb-2">
+                <label htmlFor="problem" className="block text-sm font-semibold text-gray-700 mb-2">
                   The Problem <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -126,13 +126,13 @@ export default function SubmitIdeaPage() {
                   onChange={handleChange}
                   rows={3}
                   placeholder="What problem does this solve? Why is it painful?"
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="who_it_serves" className="block text-sm font-semibold text-stone-700 mb-2">
+                <label htmlFor="who_it_serves" className="block text-sm font-semibold text-gray-700 mb-2">
                   Who It Serves <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -142,13 +142,13 @@ export default function SubmitIdeaPage() {
                   onChange={handleChange}
                   rows={2}
                   placeholder="Who would use this? Be specific about the target audience."
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="solution" className="block text-sm font-semibold text-stone-700 mb-2">
+                <label htmlFor="solution" className="block text-sm font-semibold text-gray-700 mb-2">
                   The Solution <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -158,14 +158,14 @@ export default function SubmitIdeaPage() {
                   onChange={handleChange}
                   rows={3}
                   placeholder="How would this work? What would it look like?"
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="monetization" className="block text-sm font-semibold text-stone-700 mb-2">
-                  Monetization <span className="text-stone-400 font-normal">(optional)</span>
+                <label htmlFor="monetization" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Monetization <span className="text-gray-400 font-normal">(optional)</span>
                 </label>
                 <textarea
                   id="monetization"
@@ -174,13 +174,13 @@ export default function SubmitIdeaPage() {
                   onChange={handleChange}
                   rows={2}
                   placeholder="How could this make money? Subscription, freemium, ads, etc."
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="why_now" className="block text-sm font-semibold text-stone-700 mb-2">
-                  Why Now? <span className="text-stone-400 font-normal">(optional)</span>
+                <label htmlFor="why_now" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Why Now? <span className="text-gray-400 font-normal">(optional)</span>
                 </label>
                 <textarea
                   id="why_now"
@@ -189,13 +189,13 @@ export default function SubmitIdeaPage() {
                   onChange={handleChange}
                   rows={2}
                   placeholder="Why is this the right time for this idea? New technology, trend, regulation?"
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="tags" className="block text-sm font-semibold text-stone-700 mb-2">
-                  Tags <span className="text-stone-400 font-normal">(optional, comma-separated)</span>
+                <label htmlFor="tags" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Tags <span className="text-gray-400 font-normal">(optional, comma-separated)</span>
                 </label>
                 <input
                   type="text"
@@ -204,7 +204,7 @@ export default function SubmitIdeaPage() {
                   value={formData.tags}
                   onChange={handleChange}
                   placeholder="e.g., AI, SaaS, Productivity, B2B"
-                  className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
                 />
               </div>
             </div>
@@ -221,8 +221,8 @@ export default function SubmitIdeaPage() {
             disabled={!isValid || isSubmitting}
             className={`w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-3 ${
               isValid && !isSubmitting
-                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white shadow-lg hover:shadow-xl'
-                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
             {isSubmitting ? (
@@ -239,7 +239,7 @@ export default function SubmitIdeaPage() {
           </button>
         </form>
 
-        <div className="text-center mt-8 text-stone-500 text-sm">
+        <div className="text-center mt-8 text-gray-500 text-sm">
           Your idea will be publicly visible and can be upvoted by others.
         </div>
       </div>

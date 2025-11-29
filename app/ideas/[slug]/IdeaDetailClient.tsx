@@ -156,13 +156,13 @@ export default function IdeaDetailClient({
         <div className="max-w-3xl mx-auto px-4 py-12">
           <Link
             href="/ideas"
-            className="inline-flex items-center gap-2 text-stone-600 hover:text-amber-600 mb-8 transition-colors"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-amber-600 mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Ideas
           </Link>
 
-          <article className="bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden mb-8">
+          <article className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
             <div className="p-6 md:p-8">
               <div className="flex items-start gap-4 mb-6">
                 <button
@@ -171,7 +171,7 @@ export default function IdeaDetailClient({
                   className={`flex flex-col items-center justify-center w-16 h-20 rounded-xl transition-all shrink-0 ${
                     hasVoted
                       ? 'bg-amber-500 text-white'
-                      : 'bg-stone-100 text-stone-500 hover:bg-amber-100 hover:text-amber-600'
+                      : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600'
                   } ${isVoting ? 'opacity-50' : ''}`}
                 >
                   <ArrowUp className="w-6 h-6" />
@@ -179,13 +179,13 @@ export default function IdeaDetailClient({
                 </button>
 
                 <div className="flex-1">
-                  <h1 className="text-2xl md:text-3xl font-bold text-stone-900 mb-2">
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                     {idea.title}
                   </h1>
-                  <p className="text-lg text-stone-600 mb-4">
+                  <p className="text-lg text-gray-600 mb-4">
                     {idea.one_liner}
                   </p>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-stone-500">
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
                     {idea.tags && (
                       <div className="flex flex-wrap gap-1.5">
                         {idea.tags.split(',').map((tag, i) => (
@@ -213,10 +213,10 @@ export default function IdeaDetailClient({
               <div className="space-y-6">
                 {sections.map((section, i) => (
                   <div key={i}>
-                    <h2 className="text-lg font-semibold text-stone-800 mb-2">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-2">
                       {section.title}
                     </h2>
-                    <p className="text-stone-600 whitespace-pre-wrap">
+                    <p className="text-gray-600 whitespace-pre-wrap">
                       {section.content}
                     </p>
                   </div>
@@ -225,9 +225,9 @@ export default function IdeaDetailClient({
             </div>
           </article>
 
-          <div className="bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
             <div className="p-6 md:p-8">
-              <h2 className="text-xl font-bold text-stone-900 mb-6 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
                 Comments ({comments.length})
               </h2>
@@ -239,14 +239,14 @@ export default function IdeaDetailClient({
                     value={commentForm.name}
                     onChange={(e) => setCommentForm({ ...commentForm, name: e.target.value })}
                     placeholder="Your name (optional)"
-                    className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
                   />
                   <textarea
                     value={commentForm.body}
                     onChange={(e) => setCommentForm({ ...commentForm, body: e.target.value })}
                     placeholder="Share your thoughts on this idea..."
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all resize-none"
                     required
                   />
                   <button
@@ -255,7 +255,7 @@ export default function IdeaDetailClient({
                     className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
                       commentForm.body.trim() && !isSubmittingComment
                         ? 'bg-amber-500 hover:bg-amber-600 text-white'
-                        : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                   >
                     {isSubmittingComment ? (
@@ -274,26 +274,26 @@ export default function IdeaDetailClient({
               </form>
 
               {comments.length === 0 ? (
-                <div className="text-center py-8 text-stone-500">
-                  <MessageSquare className="w-10 h-10 mx-auto mb-3 text-stone-300" />
+                <div className="text-center py-8 text-gray-500">
+                  <MessageSquare className="w-10 h-10 mx-auto mb-3 text-gray-300" />
                   <p>No comments yet. Be the first to share your thoughts!</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {comments.map((comment) => (
-                    <div key={comment.id} className="bg-stone-50 rounded-xl p-4">
+                    <div key={comment.id} className="bg-gray-50 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
                           <User className="w-4 h-4 text-amber-600" />
                         </div>
-                        <span className="font-medium text-stone-800">
+                        <span className="font-medium text-gray-800">
                           {comment.author_name || 'Anonymous'}
                         </span>
-                        <span className="text-stone-400 text-sm">
+                        <span className="text-gray-400 text-sm">
                           {formatTimeAgo(comment.created_at)}
                         </span>
                       </div>
-                      <p className="text-stone-600 pl-10 whitespace-pre-wrap">
+                      <p className="text-gray-600 pl-10 whitespace-pre-wrap">
                         {comment.body}
                       </p>
                     </div>
@@ -303,8 +303,8 @@ export default function IdeaDetailClient({
             </div>
           </div>
 
-          <div className="text-center mt-8 pt-8 border-t border-stone-200">
-            <p className="text-stone-500 text-sm">
+          <div className="text-center mt-8 pt-8 border-t border-gray-200">
+            <p className="text-gray-500 text-sm">
               Part of{' '}
               <Link href="/ideas" className="text-amber-600 hover:text-amber-700 font-medium">
                 VCM Ideas Hub

@@ -89,9 +89,9 @@ export function HeroSearch() {
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto mb-8">
+    <div className="relative w-full max-w-2xl mx-auto">
       <div className="relative">
-        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
           ref={inputRef}
           type="text"
@@ -103,7 +103,7 @@ export function HeroSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search tools, products, resources..."
-          className="w-full pl-14 pr-14 py-5 text-lg bg-white border-2 border-stone-200 rounded-full shadow-lg focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 transition-all"
+          className="w-full pl-14 pr-14 py-4 text-base bg-white border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all"
         />
         <button 
           onClick={() => {
@@ -111,7 +111,7 @@ export function HeroSearch() {
               handleSelect(filteredSuggestions[0]);
             }
           }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-yellow-500 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-orange-500 hover:bg-orange-600 rounded-lg flex items-center justify-center transition-colors"
         >
           <ArrowRight className="w-5 h-5 text-white" />
         </button>
@@ -120,7 +120,7 @@ export function HeroSearch() {
       {isOpen && filteredSuggestions.length > 0 && (
         <div 
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 mt-2 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 overflow-hidden"
+          className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden"
         >
           <div className="py-2">
             {filteredSuggestions.map((suggestion, index) => (
@@ -129,18 +129,18 @@ export function HeroSearch() {
                 onClick={() => handleSelect(suggestion)}
                 className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors ${
                   index === selectedIndex 
-                    ? "bg-yellow-50 text-yellow-700" 
-                    : "hover:bg-stone-50"
+                    ? "bg-orange-50 text-orange-700" 
+                    : "hover:bg-gray-50"
                 }`}
               >
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                  index === selectedIndex ? "bg-yellow-100" : "bg-stone-100"
+                  index === selectedIndex ? "bg-orange-100" : "bg-gray-100"
                 }`}>
                   <suggestion.icon className={`w-4 h-4 ${
-                    index === selectedIndex ? "text-yellow-600" : "text-stone-500"
+                    index === selectedIndex ? "text-orange-600" : "text-gray-500"
                   }`} />
                 </div>
-                <span className="font-medium text-stone-800">{suggestion.name}</span>
+                <span className="font-medium text-gray-800">{suggestion.name}</span>
               </button>
             ))}
           </div>

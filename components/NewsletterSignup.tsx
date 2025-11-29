@@ -59,7 +59,7 @@ export function NewsletterSignup() {
       )}
       <Button
         type="submit"
-        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold tracking-wide"
+        className="w-full bg-orange-500 hover:bg-orange-600 text-black font-bold tracking-wide"
         disabled={loading || success}
       >
         {loading ? 'SUBSCRIBING...' : success ? 'SUBSCRIBED!' : 'SUBSCRIBE'}

@@ -99,7 +99,7 @@ export function EmailChangeForm({ currentEmail, onEmailChanged }: EmailChangeFor
       )}
       <Button
         type="submit"
-        className="w-full bg-yellow-500 hover:bg-yellow-600"
+        className="w-full bg-orange-500 hover:bg-orange-600"
         disabled={loading}
       >
         {loading ? 'Updating Email...' : 'Update Email Address'}

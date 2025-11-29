@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const relatedPosts = await getRelatedPosts(post.id);
   
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Featured Image */}
       {post.featured_image_url && (
         <div 
@@ -112,7 +112,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {/* Back Button */}
           <Link 
             href="/newsletter" 
-            className="inline-flex items-center gap-2 text-yellow-600 hover:text-yellow-700 mb-8 font-medium"
+            className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 mb-8 font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Blog
@@ -122,7 +122,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Main Content */}
             <article className="lg:col-span-2 bg-white rounded-lg shadow-sm p-8 md:p-12">
               <header className="mb-8">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-stone-900">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
                   {post.title}
                 </h1>
                 
@@ -151,20 +151,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               
               <div 
                 className="prose prose-lg max-w-none 
-                  prose-headings:text-stone-900 prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4
-                  prose-p:text-stone-700 prose-p:leading-relaxed prose-p:mb-6 prose-p:mt-0
-                  prose-a:text-yellow-600 hover:prose-a:text-yellow-700 
-                  prose-strong:text-stone-900 prose-strong:font-semibold
+                  prose-headings:text-gray-900 prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4
+                  prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-p:mt-0
+                  prose-a:text-orange-600 hover:prose-a:text-orange-700 
+                  prose-strong:text-gray-900 prose-strong:font-semibold
                   prose-ul:my-6 prose-ul:space-y-2
                   prose-ol:my-6 prose-ol:space-y-2
-                  prose-li:text-stone-700
+                  prose-li:text-gray-700
                   [&>p]:mb-6 [&>p]:mt-0"
                 dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
               />
               
               {/* Newsletter CTA */}
               <div className="mt-12 pt-8 border-t">
-                <Card className="bg-yellow-50 border-yellow-200">
+                <Card className="bg-orange-50 border-orange-200">
                   <CardContent className="pt-6">
                     <h3 className="text-2xl font-bold mb-2">Want more content like this?</h3>
                     <p className="text-muted-foreground mb-4">
@@ -179,7 +179,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Sidebar */}
             <aside className="lg:col-span-1 space-y-6">
               {/* Newsletter Signup */}
-              <Card className="sticky top-8 border-2 border-yellow-500">
+              <Card className="sticky top-8 border-2 border-orange-500">
                 <CardHeader>
                   <CardTitle className="text-xl">Never Miss a Post</CardTitle>
                 </CardHeader>
@@ -211,7 +211,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                               style={{ backgroundImage: `url('${relatedPost.featured_image_url}')` }}
                             />
                           )}
-                          <h4 className="font-semibold group-hover:text-yellow-600 transition-colors line-clamp-2">
+                          <h4 className="font-semibold group-hover:text-orange-600 transition-colors line-clamp-2">
                             {relatedPost.title}
                           </h4>
                           <p className="text-xs text-muted-foreground mt-1">

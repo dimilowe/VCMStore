@@ -162,29 +162,29 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="min-h-screen bg-stone-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 py-12">
           {/* Back Link */}
           <Link 
             href="/answers" 
-            className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-8 transition-colors"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Answers
           </Link>
 
           {/* Question Card */}
-          <article className="bg-white border border-stone-200 rounded-xl p-6 md:p-8 mb-8">
+          <article className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 mb-8">
             {/* Question Header */}
             <div className="flex items-start gap-4 mb-6">
               <VoteButton questionId={question.id} initialCount={question.upvote_count} />
               
               <div className="flex-1">
-                <h1 className="text-2xl md:text-3xl font-bold text-stone-900 mb-4">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                   {question.title}
                 </h1>
                 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-stone-500">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <User className="w-4 h-4" />
                     {question.author_name}
@@ -203,25 +203,25 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
 
             {/* Question Context */}
             {question.context && (
-              <div className="border-t border-stone-100 pt-6 mb-6">
-                <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">
+              <div className="border-t border-gray-100 pt-6 mb-6">
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
                   Details
                 </h2>
                 <div className="prose prose-stone max-w-none">
-                  <p className="text-stone-700 whitespace-pre-wrap">{question.context}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{question.context}</p>
                 </div>
               </div>
             )}
 
             {/* Answer Section */}
-            <div className="border-t border-stone-100 pt-6">
+            <div className="border-t border-gray-100 pt-6">
               <div className="flex items-center gap-2 mb-4">
                 {question.answer ? (
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
                 ) : (
-                  <MessageCircleQuestion className="w-5 h-5 text-yellow-500" />
+                  <MessageCircleQuestion className="w-5 h-5 text-orange-500" />
                 )}
-                <h2 className="text-lg font-bold text-stone-900">
+                <h2 className="text-lg font-bold text-gray-900">
                   {question.answer ? "Answer" : "Awaiting Answer"}
                 </h2>
               </div>
@@ -232,8 +232,8 @@ export default async function QuestionPage({ params }: { params: Promise<{ slug:
                   dangerouslySetInnerHTML={{ __html: question.answer }}
                 />
               ) : (
-                <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-5 text-center">
-                  <p className="text-stone-600">
+                <div className="bg-orange-50 border border-orange-100 rounded-lg p-5 text-center">
+                  <p className="text-gray-600">
                     This question hasn't been answered yet. Check back soon!
                   </p>
                 </div>

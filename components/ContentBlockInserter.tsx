@@ -129,7 +129,7 @@ export function ContentBlockInserter({ onInsert, onBeforeInsert }: BlockInserter
 
   const handleInsertQuote = () => {
     if (!quoteText) return;
-    const html = `<blockquote class="border-l-4 border-yellow-500 pl-4 italic my-6">
+    const html = `<blockquote class="border-l-4 border-orange-500 pl-4 italic my-6">
   <p class="text-lg">${quoteText}</p>
   ${quoteAuthor ? `<footer class="text-sm text-gray-600 mt-2">— ${quoteAuthor}</footer>` : ''}
 </blockquote>`;
@@ -149,7 +149,7 @@ export function ContentBlockInserter({ onInsert, onBeforeInsert }: BlockInserter
 
   const handleInsertLink = () => {
     if (!linkText || !linkUrl) return;
-    const html = `<a href="${linkUrl}" class="text-yellow-600 hover:text-yellow-700 underline">${linkText}</a>`;
+    const html = `<a href="${linkUrl}" class="text-orange-600 hover:text-orange-700 underline">${linkText}</a>`;
     onInsert(html);
     setActiveModal(null);
     setLinkText('');
@@ -184,7 +184,7 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
       {/* Insert Toolbar - Sticky so it follows you as you scroll */}
       {isCollapsed ? (
         <div 
-          className="lg:fixed z-20 flex flex-row lg:flex-col gap-2 p-2 bg-stone-50 border shadow-lg rounded-lg lg:cursor-move mb-4 lg:mb-0"
+          className="lg:fixed z-20 flex flex-row lg:flex-col gap-2 p-2 bg-gray-50 border shadow-lg rounded-lg lg:cursor-move mb-4 lg:mb-0"
           style={{ left: isCollapsed ? `${position.x}px` : undefined, top: isCollapsed ? `${position.y}px` : undefined }}
           onMouseDown={handleMouseDown}
         >
@@ -283,7 +283,7 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
           </Button>
         </div>
       ) : (
-        <div className="lg:sticky lg:top-[80px] z-20 flex flex-wrap gap-2 p-2 sm:p-3 lg:p-4 bg-stone-50 border-b shadow-sm">
+        <div className="lg:sticky lg:top-[80px] z-20 flex flex-wrap gap-2 p-2 sm:p-3 lg:p-4 bg-gray-50 border-b shadow-sm">
           <Button
             type="button"
             variant="ghost"
@@ -405,7 +405,7 @@ ${urls.map(url => `  <img src="${url.trim()}" alt="Gallery image" class="w-full 
                   onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="YouTube, Vimeo, or direct video URL"
                 />
-                <p className="text-xs text-stone-500 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Supports YouTube, Vimeo, and direct video files
                 </p>
               </div>

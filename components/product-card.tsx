@@ -23,10 +23,10 @@ export function ProductCard({ product }: ProductCardProps) {
   
   return (
     <Link href={`/product/${product.slug}`}>
-      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border-stone-200 group">
+      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer bg-white border-gray-200 group">
         <CardHeader className="p-0">
           {product.thumbnail_url && (
-            <div className="aspect-[4/5] bg-stone-50 overflow-hidden">
+            <div className="aspect-[4/5] bg-gray-50 overflow-hidden">
               <img
                 src={product.thumbnail_url}
                 alt={product.name}
@@ -37,20 +37,20 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardHeader>
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-2 mb-2">
-            <CardTitle className="text-base font-semibold tracking-wide text-stone-900">{product.name}</CardTitle>
-            <Badge variant="outline" className="capitalize shrink-0 text-xs border-yellow-500 text-yellow-500">
+            <CardTitle className="text-base font-semibold tracking-wide text-gray-900">{product.name}</CardTitle>
+            <Badge variant="outline" className="capitalize shrink-0 text-xs border-orange-500 text-orange-500">
               {product.type}
             </Badge>
           </div>
-          <p className="text-sm text-stone-600 line-clamp-2">
+          <p className="text-sm text-gray-600 line-clamp-2">
             {product.description}
           </p>
         </CardContent>
         <CardFooter className="p-6 pt-0 flex items-center justify-between">
-          <div className="text-lg font-bold text-stone-900">
+          <div className="text-lg font-bold text-gray-900">
             {isFree ? "Free" : `$${(product.price / 100).toFixed(2)}`}
           </div>
-          <Button variant="ghost" size="sm" className="text-yellow-500 hover:text-yellow-600">
+          <Button variant="ghost" size="sm" className="text-orange-500 hover:text-orange-600">
             View
           </Button>
         </CardFooter>

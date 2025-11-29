@@ -25,11 +25,11 @@ export default function ExploreMoreTools({ currentTool }: ExploreMoreToolsProps)
     : tools;
 
   return (
-    <section className="mt-20 bg-gray-900 rounded-2xl p-8 text-center">
-      <h2 className="text-2xl font-bold text-white mb-4">
+    <section className="mt-16 gradient-border rounded-2xl p-8 text-center bg-white">
+      <h2 className="text-2xl font-bold text-gradient mb-3">
         Explore More Free Creator Tools
       </h2>
-      <p className="text-gray-400 mb-6">
+      <p className="text-gray-500 mb-6">
         VCM Hub offers a complete ecosystem of free tools for content creators and entrepreneurs.
       </p>
       <div className="flex flex-wrap justify-center gap-3">
@@ -37,7 +37,7 @@ export default function ExploreMoreTools({ currentTool }: ExploreMoreToolsProps)
           <Link 
             key={tool.href}
             href={tool.href} 
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
           >
             {tool.name}
           </Link>
@@ -45,7 +45,7 @@ export default function ExploreMoreTools({ currentTool }: ExploreMoreToolsProps)
         <Link 
           href="https://ape.vcm.fyi" 
           target="_blank" 
-          className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-medium transition-colors"
+          className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors"
         >
           Open VCM OS →
         </Link>

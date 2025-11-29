@@ -90,7 +90,7 @@ export function ImageUploader({ onUploadComplete, onCancel, defaultUrl = '' }: I
       <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Add Image</h3>
-          <button onClick={onCancel} className="hover:bg-stone-100 p-1 rounded">
+          <button onClick={onCancel} className="hover:bg-gray-100 p-1 rounded">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -107,8 +107,8 @@ export function ImageUploader({ onUploadComplete, onCancel, defaultUrl = '' }: I
             onClick={() => setUseUrl(false)}
             className={`px-4 py-2 font-medium transition-colors ${
               !useUrl
-                ? 'border-b-2 border-yellow-500 text-yellow-600'
-                : 'text-stone-500 hover:text-stone-700'
+                ? 'border-b-2 border-orange-500 text-orange-600'
+                : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             Upload
@@ -117,8 +117,8 @@ export function ImageUploader({ onUploadComplete, onCancel, defaultUrl = '' }: I
             onClick={() => setUseUrl(true)}
             className={`px-4 py-2 font-medium transition-colors ${
               useUrl
-                ? 'border-b-2 border-yellow-500 text-yellow-600'
-                : 'text-stone-500 hover:text-stone-700'
+                ? 'border-b-2 border-orange-500 text-orange-600'
+                : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             From URL
@@ -136,22 +136,22 @@ export function ImageUploader({ onUploadComplete, onCancel, defaultUrl = '' }: I
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                   dragActive
-                    ? 'border-yellow-500 bg-yellow-50'
-                    : 'border-stone-300 hover:border-stone-400'
+                    ? 'border-orange-500 bg-orange-50'
+                    : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
                 {uploading ? (
                   <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-12 h-12 text-yellow-500 animate-spin" />
-                    <p className="text-sm text-stone-600">Uploading...</p>
+                    <Loader2 className="w-12 h-12 text-orange-500 animate-spin" />
+                    <p className="text-sm text-gray-600">Uploading...</p>
                   </div>
                 ) : (
                   <>
-                    <Upload className="w-12 h-12 text-stone-400 mx-auto mb-3" />
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                     <p className="text-sm font-medium mb-1">
                       Drag and drop an image here
                     </p>
-                    <p className="text-xs text-stone-500 mb-4">
+                    <p className="text-xs text-gray-500 mb-4">
                       or click to browse (max 50MB)
                     </p>
                     <input

@@ -22,20 +22,20 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
   
   return (
-    <div className="border-b border-stone-200 last:border-0">
+    <div className="border-b border-gray-200 last:border-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-4 flex items-center justify-between text-left hover:bg-stone-50 transition-colors"
+        className="w-full py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
       >
-        <span className="font-medium text-stone-900">{question}</span>
+        <span className="font-medium text-gray-900">{question}</span>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-stone-500 flex-shrink-0" />
+          <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-stone-500 flex-shrink-0" />
+          <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
         )}
       </button>
       {isOpen && (
-        <div className="pb-4 text-stone-600">
+        <div className="pb-4 text-gray-600">
           {answer}
         </div>
       )}
@@ -153,7 +153,7 @@ export default function ImageCompressorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-gray-50">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -218,18 +218,18 @@ export default function ImageCompressorPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Free Image Compressor
           </h1>
-          <p className="text-xl text-stone-600 mb-2">
+          <p className="text-xl text-gray-600 mb-2">
             Reduce JPG/PNG Size Online
           </p>
-          <p className="text-stone-500 max-w-2xl mx-auto">
+          <p className="text-gray-500 max-w-2xl mx-auto">
             Upload an image and instantly reduce its file size without losing visible quality.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-stone-200 p-8 mb-12">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 mb-12">
           {!result ? (
             <>
               <label
@@ -237,12 +237,12 @@ export default function ImageCompressorPage() {
                 tabIndex={0}
                 role="button"
                 aria-label="Upload image file. Drag and drop or click to browse. Accepts JPG, PNG, and WebP files up to 10MB."
-                className={`relative block w-full p-12 border-2 border-dashed rounded-xl cursor-pointer transition-all text-center focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${
+                className={`relative block w-full p-12 border-2 border-dashed rounded-xl cursor-pointer transition-all text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
                   dragActive 
-                    ? 'border-yellow-500 bg-yellow-50' 
+                    ? 'border-orange-500 bg-orange-50' 
                     : file 
                       ? 'border-green-500 bg-green-50' 
-                      : 'border-stone-300 hover:border-yellow-500 hover:bg-stone-50'
+                      : 'border-gray-300 hover:border-orange-500 hover:bg-gray-50'
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -268,7 +268,7 @@ export default function ImageCompressorPage() {
                 {file ? (
                   <div className="space-y-3">
                     {preview && (
-                      <div className="mx-auto w-32 h-32 rounded-lg overflow-hidden border border-stone-200">
+                      <div className="mx-auto w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
                         <img 
                           src={preview} 
                           alt="Preview" 
@@ -276,27 +276,27 @@ export default function ImageCompressorPage() {
                         />
                       </div>
                     )}
-                    <p className="text-lg font-medium text-stone-900">{file.name}</p>
-                    <p className="text-stone-500">
+                    <p className="text-lg font-medium text-gray-900">{file.name}</p>
+                    <p className="text-gray-500">
                       {(file.size / 1024).toFixed(1)} KB
                     </p>
                     <button 
                       onClick={(e) => { e.stopPropagation(); resetUpload(); }}
-                      className="text-sm text-stone-500 hover:text-stone-700 underline"
+                      className="text-sm text-gray-500 hover:text-gray-700 underline"
                     >
                       Choose different file
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <Upload className="w-16 h-16 mx-auto text-stone-400" />
+                    <Upload className="w-16 h-16 mx-auto text-gray-400" />
                     <div>
-                      <p className="text-lg font-medium text-stone-700">
+                      <p className="text-lg font-medium text-gray-700">
                         Drag & drop your image here
                       </p>
-                      <p className="text-stone-500">or click to browse</p>
+                      <p className="text-gray-500">or click to browse</p>
                     </div>
-                    <p id="file-constraints" className="text-sm text-stone-400">
+                    <p id="file-constraints" className="text-sm text-gray-400">
                       JPG, PNG, WebP up to 10MB
                     </p>
                   </div>
@@ -304,7 +304,7 @@ export default function ImageCompressorPage() {
               </label>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium text-stone-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Compression Level
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -318,12 +318,12 @@ export default function ImageCompressorPage() {
                       onClick={() => setLevel(option.value as CompressionLevel)}
                       className={`p-4 rounded-lg border-2 transition-all text-left ${
                         level === option.value
-                          ? 'border-yellow-500 bg-yellow-50'
-                          : 'border-stone-200 hover:border-stone-300'
+                          ? 'border-orange-500 bg-orange-50'
+                          : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <span className="font-medium text-stone-900 block">{option.label}</span>
-                      <span className="text-sm text-stone-500">{option.desc}</span>
+                      <span className="font-medium text-gray-900 block">{option.label}</span>
+                      <span className="text-sm text-gray-500">{option.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -340,8 +340,8 @@ export default function ImageCompressorPage() {
                 disabled={!file || isCompressing}
                 className={`mt-8 w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all ${
                   file && !isCompressing
-                    ? 'bg-yellow-500 hover:bg-yellow-600 text-stone-900'
-                    : 'bg-stone-200 text-stone-500 cursor-not-allowed'
+                    ? 'bg-orange-500 hover:bg-orange-600 text-gray-900'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
               >
                 {isCompressing ? (
@@ -363,28 +363,28 @@ export default function ImageCompressorPage() {
                 <Check className="w-10 h-10 text-green-600" />
               </div>
               
-              <h2 className="text-2xl font-bold text-stone-900 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Compression Complete!
               </h2>
               
               <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="bg-stone-50 rounded-lg p-4">
-                  <p className="text-sm text-stone-500 mb-1">Original Size</p>
-                  <p className="text-xl font-bold text-stone-900">{result.originalSizeFormatted}</p>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500 mb-1">Original Size</p>
+                  <p className="text-xl font-bold text-gray-900">{result.originalSizeFormatted}</p>
                 </div>
-                <div className="bg-stone-50 rounded-lg p-4">
-                  <p className="text-sm text-stone-500 mb-1">Compressed Size</p>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500 mb-1">Compressed Size</p>
                   <p className="text-xl font-bold text-green-600">{result.compressedSizeFormatted}</p>
                 </div>
-                <div className="bg-stone-50 rounded-lg p-4">
-                  <p className="text-sm text-stone-500 mb-1">Reduced By</p>
-                  <p className="text-xl font-bold text-yellow-600">{result.reduction}%</p>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500 mb-1">Reduced By</p>
+                  <p className="text-xl font-bold text-orange-600">{result.reduction}%</p>
                 </div>
               </div>
               
               <button
                 onClick={handleDownload}
-                className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-stone-900 font-semibold py-4 px-8 rounded-lg text-lg transition-all"
+                className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-gray-900 font-semibold py-4 px-8 rounded-lg text-lg transition-all"
               >
                 <Download className="w-5 h-5" />
                 Download Compressed Image
@@ -392,28 +392,28 @@ export default function ImageCompressorPage() {
               
               <button
                 onClick={resetUpload}
-                className="block mx-auto mt-4 text-stone-500 hover:text-stone-700 underline"
+                className="block mx-auto mt-4 text-gray-500 hover:text-gray-700 underline"
               >
                 Compress another image
               </button>
               
-              <p className="mt-6 text-sm text-stone-500">
+              <p className="mt-6 text-sm text-gray-500">
                 Need an even smaller file? Try running Maximum compression or resize the image before upload.
               </p>
             </div>
           )}
         </div>
 
-        <div className="bg-stone-900 rounded-2xl p-8 md:p-12 text-center mb-12">
+        <div className="bg-gray-900 rounded-2xl p-8 md:p-12 text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Turn Your Images Into Money
           </h2>
-          <p className="text-stone-300 mb-6 max-w-xl mx-auto">
+          <p className="text-gray-300 mb-6 max-w-xl mx-auto">
             Use APE (Auto Paywall Everything) to gate your best images behind tips, subscriptions, or one-time unlocks.
           </p>
           <Link
             href="/product/ape"
-            className="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-stone-900 font-semibold py-3 px-6 rounded-lg transition-all"
+            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-gray-900 font-semibold py-3 px-6 rounded-lg transition-all"
           >
             Learn About APE
             <ArrowRight className="w-5 h-5" />
@@ -421,79 +421,79 @@ export default function ImageCompressorPage() {
         </div>
 
         <article className="prose prose-stone max-w-none">
-          <h2 className="text-2xl font-bold text-stone-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             What is an Image Compressor?
           </h2>
-          <p className="text-stone-600 mb-6">
+          <p className="text-gray-600 mb-6">
             An image compressor is a tool that reduces the file size of digital images while maintaining acceptable visual quality. It works by removing unnecessary data and optimizing how the image is encoded. Modern compression algorithms can achieve significant file size reductions, often 50-80%, with minimal visible quality loss. This makes images faster to load, easier to share, and cheaper to store.
           </p>
 
-          <h2 className="text-2xl font-bold text-stone-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Why Compress an Image?
           </h2>
           <div className="grid md:grid-cols-2 gap-4 mb-8">
-            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-stone-200">
-              <Zap className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
+              <Zap className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-stone-900">Faster Loading</h3>
-                <p className="text-sm text-stone-600">Smaller images load faster, improving user experience and reducing bounce rates on websites.</p>
+                <h3 className="font-semibold text-gray-900">Faster Loading</h3>
+                <p className="text-sm text-gray-600">Smaller images load faster, improving user experience and reducing bounce rates on websites.</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-stone-200">
-              <Globe className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
+              <Globe className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-stone-900">Better SEO</h3>
-                <p className="text-sm text-stone-600">Google rewards fast-loading pages. Optimized images directly impact your search rankings.</p>
+                <h3 className="font-semibold text-gray-900">Better SEO</h3>
+                <p className="text-sm text-gray-600">Google rewards fast-loading pages. Optimized images directly impact your search rankings.</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-stone-200">
-              <Mail className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
+              <Mail className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-stone-900">Email & Uploads</h3>
-                <p className="text-sm text-stone-600">Many platforms limit file sizes. Compressed images fit within email and upload restrictions.</p>
+                <h3 className="font-semibold text-gray-900">Email & Uploads</h3>
+                <p className="text-sm text-gray-600">Many platforms limit file sizes. Compressed images fit within email and upload restrictions.</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-stone-200">
-              <HardDrive className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
+              <HardDrive className="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-stone-900">Storage Savings</h3>
-                <p className="text-sm text-stone-600">Reduce storage costs and save disk space by compressing your image library.</p>
+                <h3 className="font-semibold text-gray-900">Storage Savings</h3>
+                <p className="text-sm text-gray-600">Reduce storage costs and save disk space by compressing your image library.</p>
               </div>
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-stone-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             How to Use This Free Image Compressor
           </h2>
-          <ol className="list-decimal list-inside space-y-3 text-stone-600 mb-8">
+          <ol className="list-decimal list-inside space-y-3 text-gray-600 mb-8">
             <li><strong>Upload your image</strong> - Drag and drop or click to select a JPG, PNG, or WebP file (up to 10MB)</li>
             <li><strong>Choose compression level</strong> - Select Light for best quality, Balanced for optimal results, or Maximum for smallest file size</li>
             <li><strong>Click Compress Image</strong> - Our server processes your image in seconds</li>
             <li><strong>Download your optimized image</strong> - Save the compressed file to your device</li>
           </ol>
 
-          <h2 className="text-2xl font-bold text-stone-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Supported Image Formats
           </h2>
           <div className="flex gap-4 mb-8">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-stone-200">
-              <ImageIcon className="w-5 h-5 text-yellow-500" />
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200">
+              <ImageIcon className="w-5 h-5 text-orange-500" />
               <span className="font-medium">JPG/JPEG</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-stone-200">
-              <ImageIcon className="w-5 h-5 text-yellow-500" />
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200">
+              <ImageIcon className="w-5 h-5 text-orange-500" />
               <span className="font-medium">PNG</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-stone-200">
-              <ImageIcon className="w-5 h-5 text-yellow-500" />
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200">
+              <ImageIcon className="w-5 h-5 text-orange-500" />
               <span className="font-medium">WebP</span>
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-stone-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Frequently Asked Questions
           </h2>
-          <div className="bg-white rounded-lg border border-stone-200 divide-y divide-stone-200">
+          <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
             <FAQItem 
               question="Does this tool add a watermark?"
               answer="No. Your compressed images are completely clean with no watermarks, logos, or branding added. The output is exactly what you uploaded, just smaller."

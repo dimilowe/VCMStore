@@ -49,7 +49,7 @@ export function QuestionForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border border-stone-200 rounded-xl p-6 space-y-6">
+    <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
       {error && (
         <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
           {error}
@@ -57,7 +57,7 @@ export function QuestionForm() {
       )}
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-stone-700 mb-2">
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
           Your Question <span className="text-red-500">*</span>
         </label>
         <input
@@ -66,15 +66,15 @@ export function QuestionForm() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g., How do I monetize my newsletter?"
-          className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition-all"
+          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"
           maxLength={200}
         />
-        <p className="text-xs text-stone-500 mt-1">{title.length}/200 characters</p>
+        <p className="text-xs text-gray-500 mt-1">{title.length}/200 characters</p>
       </div>
 
       <div>
-        <label htmlFor="context" className="block text-sm font-medium text-stone-700 mb-2">
-          More Details / Context <span className="text-stone-400">(optional)</span>
+        <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-2">
+          More Details / Context <span className="text-gray-400">(optional)</span>
         </label>
         <textarea
           id="context"
@@ -82,15 +82,15 @@ export function QuestionForm() {
           onChange={(e) => setContext(e.target.value)}
           placeholder="Add any relevant details that might help get a better answer..."
           rows={5}
-          className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition-all resize-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all resize-none"
           maxLength={2000}
         />
-        <p className="text-xs text-stone-500 mt-1">{context.length}/2000 characters</p>
+        <p className="text-xs text-gray-500 mt-1">{context.length}/2000 characters</p>
       </div>
 
       <div>
-        <label htmlFor="authorName" className="block text-sm font-medium text-stone-700 mb-2">
-          Your Name <span className="text-stone-400">(optional)</span>
+        <label htmlFor="authorName" className="block text-sm font-medium text-gray-700 mb-2">
+          Your Name <span className="text-gray-400">(optional)</span>
         </label>
         <input
           type="text"
@@ -98,7 +98,7 @@ export function QuestionForm() {
           value={authorName}
           onChange={(e) => setAuthorName(e.target.value)}
           placeholder="Anonymous"
-          className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition-all"
+          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"
           maxLength={50}
         />
       </div>
@@ -106,7 +106,7 @@ export function QuestionForm() {
       <Button
         type="submit"
         disabled={isSubmitting || !title.trim()}
-        className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-6 text-base font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
+        className="w-full bg-orange-500 hover:bg-orange-600 text-white py-6 text-base font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
       >
         {isSubmitting ? (
           <>

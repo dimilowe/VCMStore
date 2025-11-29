@@ -47,24 +47,24 @@ export function RelatedQuestions({ currentSlug, title }: RelatedQuestionsProps) 
   if (loading || questions.length === 0) return null;
 
   return (
-    <div className="bg-white border border-stone-200 rounded-xl p-6">
-      <h2 className="text-lg font-bold text-stone-900 mb-4">Related Questions</h2>
+    <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <h2 className="text-lg font-bold text-gray-900 mb-4">Related Questions</h2>
       <div className="space-y-3">
         {questions.map((q) => (
           <Link
             key={q.id}
             href={`/answers/${q.slug}`}
-            className="flex items-center justify-between gap-4 p-3 rounded-lg hover:bg-stone-50 transition-colors group"
+            className="flex items-center justify-between gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
           >
-            <span className="text-stone-700 group-hover:text-yellow-600 transition-colors line-clamp-1 flex-1">
+            <span className="text-gray-700 group-hover:text-orange-600 transition-colors line-clamp-1 flex-1">
               {q.title}
             </span>
             <div className="flex items-center gap-3 shrink-0">
-              <span className="flex items-center gap-1 text-sm text-stone-500">
+              <span className="flex items-center gap-1 text-sm text-gray-500">
                 <ThumbsUp className="w-3 h-3" />
                 {q.upvote_count}
               </span>
-              <ArrowRight className="w-4 h-4 text-stone-400 group-hover:text-yellow-600 transition-colors" />
+              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition-colors" />
             </div>
           </Link>
         ))}

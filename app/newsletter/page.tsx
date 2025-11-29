@@ -103,7 +103,7 @@ export default async function NewsletterPage({
   const categories = await getCategories();
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div 
         className="relative h-[400px] flex items-center justify-center bg-cover bg-center"
@@ -145,11 +145,11 @@ export default async function NewsletterPage({
                       }
                     </p>
                     {category ? (
-                      <Link href="/newsletter" className="text-yellow-600 hover:text-yellow-700 font-medium">
+                      <Link href="/newsletter" className="text-orange-600 hover:text-orange-700 font-medium">
                         ← View All Articles
                       </Link>
                     ) : (
-                      <Link href="/" className="text-yellow-600 hover:text-yellow-700 font-medium">
+                      <Link href="/" className="text-orange-600 hover:text-orange-700 font-medium">
                         Browse Products →
                       </Link>
                     )}
@@ -184,7 +184,7 @@ export default async function NewsletterPage({
                                   </>
                                 )}
                               </div>
-                              <CardTitle className="text-2xl hover:text-yellow-600 transition-colors">
+                              <CardTitle className="text-2xl hover:text-orange-600 transition-colors">
                                 {post.title}
                               </CardTitle>
                               {post.excerpt && (
@@ -198,7 +198,7 @@ export default async function NewsletterPage({
                                     <Badge 
                                       key={cat.id} 
                                       variant="secondary"
-                                      className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                      className="bg-orange-100 text-orange-800 hover:bg-orange-200"
                                     >
                                       {cat.name}
                                     </Badge>
@@ -219,7 +219,7 @@ export default async function NewsletterPage({
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              <Card className="border-2 border-yellow-500">
+              <Card className="border-2 border-orange-500">
                 <CardHeader>
                   <CardTitle className="text-2xl">STAY IN THE LOOP</CardTitle>
                   <CardDescription>
@@ -243,8 +243,8 @@ export default async function NewsletterPage({
                         <Link 
                           key={cat.id} 
                           href={`/newsletter?category=${cat.slug}`}
-                          className={`block px-3 py-2 rounded hover:bg-stone-100 transition-colors ${
-                            category === cat.slug ? 'bg-yellow-100 text-yellow-800 font-medium' : ''
+                          className={`block px-3 py-2 rounded hover:bg-gray-100 transition-colors ${
+                            category === cat.slug ? 'bg-orange-100 text-orange-800 font-medium' : ''
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -256,7 +256,7 @@ export default async function NewsletterPage({
                       {category && (
                         <Link 
                           href="/newsletter"
-                          className="block px-3 py-2 text-sm text-yellow-600 hover:text-yellow-700 font-medium"
+                          className="block px-3 py-2 text-sm text-orange-600 hover:text-orange-700 font-medium"
                         >
                           ← View All
                         </Link>
@@ -281,7 +281,7 @@ export default async function NewsletterPage({
                           <Link 
                             key={post.id} 
                             href={`/newsletter/${post.slug}`}
-                            className="block hover:text-yellow-600 transition-colors"
+                            className="block hover:text-orange-600 transition-colors"
                           >
                             <div className="text-sm font-medium line-clamp-2">
                               {post.title}

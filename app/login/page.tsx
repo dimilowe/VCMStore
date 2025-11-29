@@ -24,7 +24,7 @@ export default async function LoginPage() {
       <div className="mt-6 text-center">
         <p className="text-sm text-muted-foreground">
           Don't have an account?{' '}
-          <a href="/dashboard" className="text-yellow-600 hover:text-yellow-700 font-medium">
+          <a href="/dashboard" className="text-orange-600 hover:text-orange-700 font-medium">
             Make a purchase to get started
           </a>
         </p>

@@ -75,11 +75,11 @@ export default async function SuccessPage({ params }: { params: Promise<{ slug: 
   const embedCode = `<iframe src="${embedUrl}" style="border:0;width:100%;max-width:420px;height:320px;overflow:hidden;border-radius:16px;" loading="lazy"></iframe>`;
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-12">
         <Link 
           href="/tools/resource-box" 
-          className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Generator
@@ -89,18 +89,18 @@ export default async function SuccessPage({ params }: { params: Promise<{ slug: 
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
             <Check className="w-8 h-8 text-green-600" />
           </div>
-          <h1 className="text-3xl font-bold text-stone-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Your Resource Box is Ready!
           </h1>
-          <p className="text-lg text-stone-600">
+          <p className="text-lg text-gray-600">
             Copy the link or embed code below to share your box.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           <div>
-            <h2 className="font-bold text-stone-900 mb-4 flex items-center gap-2">
-              <Link2 className="w-5 h-5 text-yellow-600" />
+            <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Link2 className="w-5 h-5 text-orange-600" />
               Preview
             </h2>
             <div className="flex justify-center">
@@ -109,12 +109,12 @@ export default async function SuccessPage({ params }: { params: Promise<{ slug: 
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-xl border border-stone-200 p-6">
-              <h3 className="font-bold text-stone-900 mb-3 flex items-center gap-2">
-                <Link2 className="w-5 h-5 text-yellow-600" />
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Link2 className="w-5 h-5 text-orange-600" />
                 Share Link
               </h3>
-              <p className="text-sm text-stone-600 mb-3">
+              <p className="text-sm text-gray-600 mb-3">
                 Copy this URL to share your resource box anywhere.
               </p>
               <div className="flex gap-2">
@@ -122,18 +122,18 @@ export default async function SuccessPage({ params }: { params: Promise<{ slug: 
                   type="text"
                   value={boxUrl}
                   readOnly
-                  className="flex-1 px-4 py-2 bg-stone-50 border border-stone-200 rounded-lg text-sm font-mono text-stone-700"
+                  className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono text-gray-700"
                 />
                 <CopyButton text={boxUrl} label="Copy Link" />
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-stone-200 p-6">
-              <h3 className="font-bold text-stone-900 mb-3 flex items-center gap-2">
-                <Code className="w-5 h-5 text-yellow-600" />
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Code className="w-5 h-5 text-orange-600" />
                 Embed Code
               </h3>
-              <p className="text-sm text-stone-600 mb-3">
+              <p className="text-sm text-gray-600 mb-3">
                 Paste this code into any website to embed your resource box.
               </p>
               <div className="relative">
@@ -141,7 +141,7 @@ export default async function SuccessPage({ params }: { params: Promise<{ slug: 
                   value={embedCode}
                   readOnly
                   rows={3}
-                  className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-lg text-xs font-mono text-stone-700 resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono text-gray-700 resize-none"
                 />
                 <div className="mt-2">
                   <CopyButton text={embedCode} label="Copy Embed Code" />
@@ -153,13 +153,13 @@ export default async function SuccessPage({ params }: { params: Promise<{ slug: 
               <Link 
                 href={boxUrl}
                 target="_blank"
-                className="flex-1 bg-stone-900 hover:bg-stone-800 text-white text-center py-3 rounded-lg font-medium transition-colors"
+                className="flex-1 bg-gray-900 hover:bg-gray-800 text-white text-center py-3 rounded-lg font-medium transition-colors"
               >
                 View Live Box
               </Link>
               <Link 
                 href="/tools/resource-box"
-                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white text-center py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-center py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Create Another

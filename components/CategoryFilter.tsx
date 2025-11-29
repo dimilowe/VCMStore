@@ -30,11 +30,11 @@ export function CategoryFilter({ categories, selectedCategory }: CategoryFilterP
   return (
     <div className="bg-white rounded-lg p-4 border">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-semibold text-sm text-stone-700">Filter by Category</h3>
+        <h3 className="font-semibold text-sm text-gray-700">Filter by Category</h3>
         {selectedCategory && (
           <button
             onClick={clearFilter}
-            className="text-xs text-yellow-600 hover:text-yellow-700 flex items-center gap-1"
+            className="text-xs text-orange-600 hover:text-orange-700 flex items-center gap-1"
           >
             <X className="w-3 h-3" />
             Clear
@@ -48,8 +48,8 @@ export function CategoryFilter({ categories, selectedCategory }: CategoryFilterP
             variant={selectedCategory === category.slug ? "default" : "outline"}
             className={`cursor-pointer transition-colors ${
               selectedCategory === category.slug
-                ? 'bg-yellow-500 hover:bg-yellow-600'
-                : 'hover:bg-yellow-100'
+                ? 'bg-orange-500 hover:bg-orange-600'
+                : 'hover:bg-orange-100'
             }`}
             onClick={() => handleCategoryClick(category.slug)}
           >

@@ -258,7 +258,7 @@ export default function AIThumbnailCoachPage() {
         <div className="max-w-5xl mx-auto px-4 py-12">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-yellow-600 text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-600 text-sm font-medium mb-6">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -321,7 +321,7 @@ export default function AIThumbnailCoachPage() {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-gray-900">{example.title}</h3>
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-yellow-600">{example.grade}</span>
+                        <span className="text-2xl font-bold text-orange-600">{example.grade}</span>
                         <span className="text-sm text-gray-500">({example.avgScore}/100)</span>
                       </div>
                     </div>
@@ -463,9 +463,9 @@ export default function AIThumbnailCoachPage() {
             </p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {features.map((feature, i) => (
-                <div key={i} className="bg-white rounded-xl p-5 border border-gray-200 hover:border-yellow-400 hover:shadow-md transition-all">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-3">
-                    <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={i} className="bg-white rounded-xl p-5 border border-gray-200 hover:border-orange-400 hover:shadow-md transition-all">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+                    <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
@@ -489,7 +489,7 @@ export default function AIThumbnailCoachPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="text-left px-6 py-4 font-semibold text-gray-900">Feature</th>
-                    <th className="text-center px-6 py-4 font-semibold text-yellow-600">VCM Thumbnail Coach</th>
+                    <th className="text-center px-6 py-4 font-semibold text-orange-600">VCM Thumbnail Coach</th>
                     <th className="text-center px-6 py-4 font-semibold text-gray-900">VidIQ</th>
                     <th className="text-center px-6 py-4 font-semibold text-gray-900">TubeBuddy</th>
                   </tr>
@@ -537,7 +537,7 @@ export default function AIThumbnailCoachPage() {
                     <td className="px-6 py-4 text-center text-gray-400">Generic</td>
                     <td className="px-6 py-4 text-center text-gray-400">Generic</td>
                   </tr>
-                  <tr className="bg-yellow-50">
+                  <tr className="bg-orange-50">
                     <td className="px-6 py-4 text-gray-900 font-semibold">Price</td>
                     <td className="px-6 py-4 text-center text-green-600 font-bold text-lg">$0 / Forever Free</td>
                     <td className="px-6 py-4 text-center text-gray-700">$7.50-$49/mo</td>

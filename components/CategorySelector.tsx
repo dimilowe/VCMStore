@@ -125,13 +125,13 @@ export function CategorySelector({ selectedCategories, onCategoriesChange }: Cat
 
       <div className="flex flex-wrap gap-2">
         {categories.length === 0 ? (
-          <p className="text-xs text-stone-500">No categories yet</p>
+          <p className="text-xs text-gray-500">No categories yet</p>
         ) : (
           categories.map((category) => (
             <Badge
               key={category.id}
               variant={selectedCategories.includes(category.id) ? "default" : "outline"}
-              className="cursor-pointer hover:bg-yellow-100"
+              className="cursor-pointer hover:bg-orange-100"
               onClick={() => toggleCategory(category.id)}
             >
               {category.name}
@@ -140,7 +140,7 @@ export function CategorySelector({ selectedCategories, onCategoriesChange }: Cat
         )}
       </div>
       
-      <p className="text-xs text-stone-500">
+      <p className="text-xs text-gray-500">
         Click categories to add/remove them from this post
       </p>
     </div>

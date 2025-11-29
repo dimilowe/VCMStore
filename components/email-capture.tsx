@@ -45,7 +45,7 @@ export function EmailCapture({ source, title, description, dark }: EmailCaptureP
 
   if (success) {
     return (
-      <Card className={dark ? "bg-transparent border-stone-700" : ""}>
+      <Card className={dark ? "bg-transparent border-gray-700" : ""}>
         <CardContent className="pt-6">
           <p className={`text-center font-medium ${dark ? "text-green-400" : "text-green-600"}`}>
             Thanks for subscribing! Check your email soon.
@@ -56,12 +56,12 @@ export function EmailCapture({ source, title, description, dark }: EmailCaptureP
   }
 
   return (
-    <Card className={dark ? "bg-transparent border-stone-700 shadow-none" : "border-stone-200 shadow-sm"}>
+    <Card className={dark ? "bg-transparent border-gray-700 shadow-none" : "border-gray-200 shadow-sm"}>
       <CardHeader className="text-center">
-        <CardTitle className={`text-2xl tracking-wide ${dark ? "text-white" : "text-stone-900"}`}>
+        <CardTitle className={`text-2xl font-bold ${dark ? "text-white" : "text-gray-900"}`}>
           {title || "Stay Updated"}
         </CardTitle>
-        <CardDescription className={dark ? "text-stone-400" : "text-stone-600"}>
+        <CardDescription className={dark ? "text-gray-400" : "text-gray-600"}>
           {description || "Get the latest products, tips, and exclusive deals."}
         </CardDescription>
       </CardHeader>
@@ -74,13 +74,13 @@ export function EmailCapture({ source, title, description, dark }: EmailCaptureP
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={loading}
-            className={dark ? "bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" : "border-neutral-300"}
+            className={dark ? "bg-gray-800 border-gray-700 text-white placeholder:text-gray-500" : "border-gray-300"}
           />
-          <Button type="submit" disabled={loading} className="bg-yellow-500 hover:bg-yellow-600 text-white">
+          <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
             {loading ? "..." : "Subscribe"}
           </Button>
         </form>
-        {error && <p className={`text-sm mt-2 ${dark ? "text-red-400" : "text-destructive"}`}>{error}</p>}
+        {error && <p className={`text-sm mt-2 ${dark ? "text-red-400" : "text-red-500"}`}>{error}</p>}
       </CardContent>
     </Card>
   );

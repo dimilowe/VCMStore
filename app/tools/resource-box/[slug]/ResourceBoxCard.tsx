@@ -54,14 +54,14 @@ export function ResourceBoxCard({ box, items, compact = false }: ResourceBoxCard
     >
       <div className={`${compact ? 'p-4' : 'p-6'}`}>
         <div className={`text-center ${compact ? 'mb-3' : 'mb-4'}`}>
-          <p className={`text-stone-400 ${compact ? 'text-xs' : 'text-xs'} uppercase tracking-wider mb-1`}>
+          <p className={`text-gray-400 ${compact ? 'text-xs' : 'text-xs'} uppercase tracking-wider mb-1`}>
             Creator Resource Box
           </p>
-          <h1 className={`font-bold text-stone-900 ${compact ? 'text-lg' : 'text-xl'}`}>
+          <h1 className={`font-bold text-gray-900 ${compact ? 'text-lg' : 'text-xl'}`}>
             {box.title}
           </h1>
           {box.subtitle && (
-            <p className={`text-stone-500 ${compact ? 'text-xs mt-1' : 'text-sm mt-2'}`}>
+            <p className={`text-gray-500 ${compact ? 'text-xs mt-1' : 'text-sm mt-2'}`}>
               {box.subtitle}
             </p>
           )}
@@ -81,12 +81,12 @@ export function ResourceBoxCard({ box, items, compact = false }: ResourceBoxCard
               <LinkComponent
                 key={item.id}
                 {...linkProps}
-                className={`block bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-xl ${compact ? 'p-3' : 'p-4'} transition-all hover:shadow-sm group`}
+                className={`block bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl ${compact ? 'p-3' : 'p-4'} transition-all hover:shadow-sm group`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`font-semibold text-stone-900 ${compact ? 'text-sm' : ''}`}>
+                      <span className={`font-semibold text-gray-900 ${compact ? 'text-sm' : ''}`}>
                         {item.label}
                       </span>
                       {item.resource_short_tag && (
@@ -99,13 +99,13 @@ export function ResourceBoxCard({ box, items, compact = false }: ResourceBoxCard
                       )}
                     </div>
                     {item.description && (
-                      <p className={`text-stone-500 ${compact ? 'text-xs' : 'text-sm'} mt-0.5 line-clamp-1`}>
+                      <p className={`text-gray-500 ${compact ? 'text-xs' : 'text-sm'} mt-0.5 line-clamp-1`}>
                         {item.description}
                       </p>
                     )}
                   </div>
                   {external && (
-                    <ExternalLink className={`${compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-stone-400 group-hover:text-stone-600 flex-shrink-0 mt-0.5`} />
+                    <ExternalLink className={`${compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-gray-400 group-hover:text-gray-600 flex-shrink-0 mt-0.5`} />
                   )}
                 </div>
               </LinkComponent>
@@ -113,14 +113,14 @@ export function ResourceBoxCard({ box, items, compact = false }: ResourceBoxCard
           })}
         </div>
 
-        <div className={`${compact ? 'mt-3 pt-3' : 'mt-5 pt-4'} border-t border-stone-100 text-center`}>
-          <p className={`${compact ? 'text-[10px]' : 'text-xs'} text-stone-400`}>
+        <div className={`${compact ? 'mt-3 pt-3' : 'mt-5 pt-4'} border-t border-gray-100 text-center`}>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs'} text-gray-400`}>
             Powered by{" "}
             <a 
               href="https://vcmsuite.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-stone-500 hover:text-stone-700"
+              className="text-gray-500 hover:text-gray-700"
             >
               VCM Suite
             </a>

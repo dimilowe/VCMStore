@@ -265,17 +265,17 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
       <div className="flex-1 flex flex-col min-w-0 min-h-[60vh] lg:min-h-0 lg:overflow-hidden">
         {/* Top Bar */}
         <div className="flex-shrink-0 border-b px-3 sm:px-6 py-3 flex items-center justify-between bg-white">
-          <Link href="/admin/blog" className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 text-sm sm:text-base">
+          <Link href="/admin/blog" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm sm:text-base">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden sm:flex items-center gap-2">
               {autoSaving && (
-                <span className="text-xs text-stone-500 italic">Saving...</span>
+                <span className="text-xs text-gray-500 italic">Saving...</span>
               )}
               {!autoSaving && lastSaved && (
-                <span className="text-xs text-stone-500">
+                <span className="text-xs text-gray-500">
                   Saved {formatTimeAgo(lastSaved)}
                 </span>
               )}
@@ -355,7 +355,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="Add title"
               disabled={loading}
-              className="w-full text-2xl sm:text-3xl lg:text-4xl font-bold border-none outline-none placeholder:text-stone-300"
+              className="w-full text-2xl sm:text-3xl lg:text-4xl font-bold border-none outline-none placeholder:text-gray-300"
             />
           </div>
 
@@ -385,13 +385,13 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
             <h3 className="font-semibold text-sm">Publish</h3>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-stone-600">Status:</span>
+                <span className="text-gray-600">Status:</span>
                 <span className="font-medium">
                   {post?.published_at ? 'Published' : 'Draft'}
                 </span>
               </div>
               <div className="pt-2">
-                <label className="text-xs text-stone-600 block mb-1">Schedule for:</label>
+                <label className="text-xs text-gray-600 block mb-1">Schedule for:</label>
                 <div className="flex gap-2">
                   <Input
                     type="datetime-local"
@@ -413,7 +413,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-stone-500 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   {publishedAt ? 'Click Clear to publish immediately' : 'Leave empty to publish immediately'}
                 </p>
               </div>
@@ -431,10 +431,10 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
                 disabled={loading}
                 className="text-sm font-mono"
               />
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-gray-500">
                 Preview: /newsletter/{slug || 'auto-generated-from-title'}
               </p>
-              <p className="text-xs text-yellow-700 bg-yellow-50 p-2 rounded border border-yellow-200">
+              <p className="text-xs text-orange-700 bg-orange-50 p-2 rounded border border-orange-200">
                 💡 Auto-generates from your title for SEO. Edit manually if needed.
               </p>
             </div>
@@ -475,7 +475,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
                     disabled={loading}
                     className="text-sm"
                   />
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-gray-500">
                     Optional summary shown in post listings
                   </p>
                 </div>
@@ -493,7 +493,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
               </button>
               {seoOpen && (
                 <div className="space-y-2">
-                  <label className="text-xs text-stone-600 block">Meta Description</label>
+                  <label className="text-xs text-gray-600 block">Meta Description</label>
                   <Textarea
                     value={metaDescription}
                     onChange={(e) => setMetaDescription(e.target.value)}
@@ -503,7 +503,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
                     disabled={loading}
                     className="text-sm"
                   />
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-gray-500">
                     {metaDescription.length}/160 characters
                   </p>
                 </div>

@@ -156,19 +156,19 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
           <h2 className="text-2xl font-bold">Media Library</h2>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Upload Section */}
-        <div className="p-6 border-b bg-stone-50">
+        <div className="p-6 border-b bg-gray-50">
           <div 
             className={`border-2 border-dashed rounded-lg p-6 transition-all ${
               isDragging 
                 ? 'border-blue-500 bg-blue-50' 
-                : 'border-stone-300 hover:border-stone-400'
+                : 'border-gray-300 hover:border-gray-400'
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -194,7 +194,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
                     </>
                   )}
                 </Button>
-                <span className="text-sm text-stone-600">
+                <span className="text-sm text-gray-600">
                   or drag & drop an image here
                 </span>
               </div>
@@ -226,10 +226,10 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
         <div className="flex-1 overflow-y-auto p-6">
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <Loader2 className="w-8 h-8 animate-spin text-stone-400" />
+              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
             </div>
           ) : images.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-stone-400">
+            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
               <ImageIcon className="w-16 h-16 mb-4" />
               <p className="text-lg font-medium">No images yet</p>
               <p className="text-sm">Upload your first image to get started</p>
@@ -243,7 +243,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
                   className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-4 transition-all group ${
                     selectedUrl === image.url
                       ? 'border-blue-500 shadow-lg'
-                      : 'border-transparent hover:border-stone-300'
+                      : 'border-transparent hover:border-gray-300'
                   }`}
                 >
                   <img
@@ -286,7 +286,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
 
         {/* Footer */}
         <div className="p-6 border-t flex justify-between items-center">
-          <p className="text-sm text-stone-600">
+          <p className="text-sm text-gray-600">
             {selectedUrl ? 'Click "Insert" to add the selected image' : 'Select an image to insert'}
           </p>
           <div className="flex gap-3">

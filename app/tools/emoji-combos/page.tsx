@@ -166,18 +166,18 @@ export default function EmojiCombosPage() {
       community: 'bg-cyan-100 text-cyan-700',
       cute: 'bg-pink-100 text-pink-700',
       aesthetic: 'bg-purple-100 text-purple-700',
-      funny: 'bg-yellow-100 text-yellow-700',
+      funny: 'bg-orange-100 text-orange-700',
       flirty: 'bg-red-100 text-red-700',
       meme: 'bg-orange-100 text-orange-700',
       happy: 'bg-green-100 text-green-700',
       sad: 'bg-blue-100 text-blue-700',
       angry: 'bg-red-100 text-red-700',
-      spooky: 'bg-stone-100 text-stone-700',
+      spooky: 'bg-gray-100 text-gray-700',
       celebration: 'bg-amber-100 text-amber-700',
       sass: 'bg-violet-100 text-violet-700',
       hype: 'bg-emerald-100 text-emerald-700',
     };
-    return colors[cat] || 'bg-stone-100 text-stone-700';
+    return colors[cat] || 'bg-gray-100 text-gray-700';
   };
 
   return (
@@ -211,33 +211,33 @@ export default function EmojiCombosPage() {
 
       <main className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Emoji Combos Generator
           </h1>
-          <p className="text-xl text-stone-600 mb-2">
+          <p className="text-xl text-gray-600 mb-2">
             Copy-paste aesthetic emoji combos for your captions, bios, and posts
           </p>
-          <p className="text-sm text-stone-400">
+          <p className="text-sm text-gray-400">
             Free tool for creators. No signup required.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-stone-200 p-6 mb-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search emojis or names (e.g. 'heart', 'happy')"
-                className="w-full pl-12 pr-4 py-3 border border-stone-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-stone-900"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-gray-900"
               />
             </div>
             <button
               onClick={getRandomCombo}
               disabled={filteredCombos.length === 0}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-violet-500 hover:bg-violet-600 disabled:bg-stone-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-violet-500 hover:bg-violet-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all"
             >
               <Shuffle className="w-5 h-5" />
               Random Combo
@@ -252,7 +252,7 @@ export default function EmojiCombosPage() {
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                   category === cat
                     ? 'bg-violet-500 text-white'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -264,12 +264,12 @@ export default function EmojiCombosPage() {
         <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl border border-violet-200 p-6 mb-8">
           <div className="flex items-center gap-2 mb-4">
             <Wand2 className="w-5 h-5 text-violet-600" />
-            <h2 className="text-lg font-semibold text-stone-900">Create Your Own Combo</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Create Your Own Combo</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
                 Your emoji combo
               </label>
               <input
@@ -281,7 +281,7 @@ export default function EmojiCombosPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
                 Label (optional)
               </label>
               <input
@@ -289,16 +289,16 @@ export default function EmojiCombosPage() {
                 value={customLabel}
                 onChange={(e) => setCustomLabel(e.target.value)}
                 placeholder="Give it a name..."
-                className="w-full px-4 py-3 border border-violet-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-stone-900 bg-white"
+                className="w-full px-4 py-3 border border-violet-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-gray-900 bg-white"
               />
             </div>
           </div>
 
           {customCombo && (
             <div className="bg-white rounded-xl border border-violet-200 p-4 mb-4">
-              <p className="text-xs text-stone-500 mb-2">Preview</p>
+              <p className="text-xs text-gray-500 mb-2">Preview</p>
               <div className="text-4xl mb-1">{customCombo}</div>
-              {customLabel && <p className="text-sm text-stone-500">{customLabel}</p>}
+              {customLabel && <p className="text-sm text-gray-500">{customLabel}</p>}
             </div>
           )}
 
@@ -311,7 +311,7 @@ export default function EmojiCombosPage() {
                   ? 'bg-green-500 text-white'
                   : customCombo.trim()
                     ? 'bg-violet-500 hover:bg-violet-600 text-white'
-                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
               {customCopied ? (
@@ -334,7 +334,7 @@ export default function EmojiCombosPage() {
                   ? 'bg-cyan-500 text-white'
                   : customCombo.trim() && !isSubmitting
                     ? 'bg-cyan-500 hover:bg-cyan-600 text-white'
-                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
               {isSubmitting ? (
@@ -357,18 +357,18 @@ export default function EmojiCombosPage() {
             <button
               onClick={clearCustomCombo}
               disabled={!customCombo && !customLabel}
-              className="px-4 py-3 border border-stone-300 hover:bg-stone-50 disabled:opacity-50 disabled:cursor-not-allowed text-stone-600 rounded-xl transition-all"
+              className="px-4 py-3 border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 rounded-xl transition-all"
             >
               <Trash2 className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold text-stone-900 mb-4">Browse Curated Combos</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Browse Curated Combos</h2>
 
         {filteredCombos.length === 0 ? (
-          <div className="bg-stone-50 rounded-2xl p-12 text-center">
-            <p className="text-stone-500 text-lg">No emoji combos found. Try a different search or category.</p>
+          <div className="bg-gray-50 rounded-2xl p-12 text-center">
+            <p className="text-gray-500 text-lg">No emoji combos found. Try a different search or category.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-12">
@@ -376,7 +376,7 @@ export default function EmojiCombosPage() {
               <div
                 key={combo.id}
                 ref={(el) => { cardRefs.current[combo.id] = el; }}
-                className={`bg-white rounded-xl border border-stone-200 p-5 shadow-sm hover:shadow-md transition-all relative ${
+                className={`bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all relative ${
                   highlightedId === combo.id ? 'ring-4 ring-violet-400 ring-opacity-75 animate-pulse' : ''
                 }`}
               >
@@ -388,13 +388,13 @@ export default function EmojiCombosPage() {
                   {combo.category}
                 </span>
                 <div className="text-4xl mb-3 select-all">{combo.combo}</div>
-                <p className="text-sm text-stone-500 mb-4">{combo.label}</p>
+                <p className="text-sm text-gray-500 mb-4">{combo.label}</p>
                 <button
                   onClick={() => copyToClipboard(combo)}
                   className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${
                     copiedId === combo.id
                       ? 'bg-green-100 text-green-700'
-                      : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                   }`}
                 >
                   {copiedId === combo.id ? (
@@ -414,16 +414,16 @@ export default function EmojiCombosPage() {
           </div>
         )}
 
-        <div className="bg-stone-900 rounded-2xl p-8 md:p-10 text-center mb-12">
+        <div className="bg-gray-900 rounded-2xl p-8 md:p-10 text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
             Level Up Your Content
           </h2>
-          <p className="text-stone-300 mb-5 max-w-xl mx-auto">
+          <p className="text-gray-300 mb-5 max-w-xl mx-auto">
             Great captions deserve great funnels. Turn your content into conversions with APE Funnels.
           </p>
           <Link
             href="/store"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-stone-900 font-semibold rounded-full transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-gray-900 font-semibold rounded-full transition-all"
           >
             <Sparkles className="w-5 h-5" />
             Explore APE Funnels
@@ -431,23 +431,23 @@ export default function EmojiCombosPage() {
         </div>
 
         <div className="prose prose-stone max-w-none">
-          <h2 className="text-2xl font-bold text-stone-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             What Are Emoji Combos?
           </h2>
-          <p className="text-stone-600 mb-4">
+          <p className="text-gray-600 mb-4">
             Emoji combos are creative combinations of emojis that express moods, aesthetics, or vibes better than single emojis alone. They&apos;ve become essential for social media captions, Instagram bios, TikTok posts, and text messages.
           </p>
-          <p className="text-stone-600 mb-4">
+          <p className="text-gray-600 mb-4">
             Whether you want something cute like 🥺👉👈, aesthetic like ✨💫🌙, or funny like 😭💀, the right emoji combo can make your content stand out and connect with your audience.
           </p>
-          <p className="text-stone-600 mb-8">
+          <p className="text-gray-600 mb-8">
             This free emoji combos generator gives you 100+ curated combinations across categories like cute, aesthetic, funny, flirty, meme, and more. Just find one you like and click to copy!
           </p>
 
-          <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 mt-10">
             How to Use Emoji Combos
           </h2>
-          <ul className="list-disc list-inside text-stone-600 mb-8 space-y-2">
+          <ul className="list-disc list-inside text-gray-600 mb-8 space-y-2">
             <li><strong>Instagram captions</strong> — Add personality to your posts with matching emoji combos</li>
             <li><strong>Instagram & TikTok bios</strong> — Make your profile stand out with aesthetic combinations</li>
             <li><strong>YouTube titles & descriptions</strong> — Catch attention in search results</li>
@@ -455,10 +455,10 @@ export default function EmojiCombosPage() {
             <li><strong>Discord & Twitch</strong> — Add flair to your messages and streams</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-stone-900 mb-4 mt-10">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 mt-10">
             Popular Emoji Combo Categories
           </h2>
-          <ul className="list-disc list-inside text-stone-600 mb-8 space-y-2">
+          <ul className="list-disc list-inside text-gray-600 mb-8 space-y-2">
             <li><strong>Aesthetic emojis</strong> — Dreamy, soft, and visually pleasing combinations</li>
             <li><strong>Cute emojis</strong> — Sweet, adorable combos for wholesome vibes</li>
             <li><strong>Funny emojis</strong> — Combos that express laughter and humor</li>
@@ -469,7 +469,7 @@ export default function EmojiCombosPage() {
       </main>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-stone-900 text-white px-6 py-3 rounded-full shadow-lg z-50 animate-fade-in">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-lg z-50 animate-fade-in">
           {toast}
         </div>
       )}
@@ -478,8 +478,8 @@ export default function EmojiCombosPage() {
         <ExploreMoreTools currentTool="/tools/emoji-combos" />
       </div>
 
-      <footer className="border-t border-stone-200 py-8 mt-12">
-        <div className="max-w-6xl mx-auto px-4 text-center text-sm text-stone-500">
+      <footer className="border-t border-gray-200 py-8 mt-12">
+        <div className="max-w-6xl mx-auto px-4 text-center text-sm text-gray-500">
           <p>Built for creators. Add this to your bookmarks.</p>
         </div>
       </footer>

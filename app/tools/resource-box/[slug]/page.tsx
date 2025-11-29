@@ -76,7 +76,7 @@ export default async function ResourceBoxPage({ params }: { params: Promise<{ sl
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <ResourceBoxCard box={data.box} items={data.items} />
     </div>
   );

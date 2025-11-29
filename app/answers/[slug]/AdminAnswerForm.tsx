@@ -52,10 +52,10 @@ export function AdminAnswerForm({ questionId, existingAnswer }: AdminAnswerFormP
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-stone-100 border border-stone-200 rounded-xl p-6 mt-6">
+    <form onSubmit={handleSubmit} className="bg-gray-100 border border-gray-200 rounded-xl p-6 mt-6">
       <div className="flex items-center gap-2 mb-4">
-        <Shield className="w-5 h-5 text-yellow-600" />
-        <h3 className="font-bold text-stone-900">Admin: Add/Edit Answer</h3>
+        <Shield className="w-5 h-5 text-orange-600" />
+        <h3 className="font-bold text-gray-900">Admin: Add/Edit Answer</h3>
       </div>
 
       {error && (
@@ -75,13 +75,13 @@ export function AdminAnswerForm({ questionId, existingAnswer }: AdminAnswerFormP
         onChange={(e) => setAnswer(e.target.value)}
         placeholder="Write your answer here... (HTML allowed)"
         rows={6}
-        className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition-all resize-none mb-4"
+        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all resize-none mb-4"
       />
 
       <Button
         type="submit"
         disabled={isSubmitting || !answer.trim()}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
+        className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 font-semibold rounded-lg flex items-center gap-2 disabled:opacity-50"
       >
         {isSubmitting ? (
           <>

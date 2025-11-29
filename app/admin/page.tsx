@@ -244,7 +244,7 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Admin Login</CardTitle>
@@ -258,7 +258,7 @@ export default function AdminPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600">
+              <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600">
                 Login
               </Button>
             </form>
@@ -269,7 +269,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold tracking-wide">Admin Dashboard</h1>
@@ -280,7 +280,7 @@ export default function AdminPage() {
                 Manage Blog
               </Button>
             </Link>
-            <Button onClick={() => setShowForm(true)} className="bg-yellow-500 hover:bg-yellow-600">
+            <Button onClick={() => setShowForm(true)} className="bg-orange-500 hover:bg-orange-600">
               <Plus className="mr-2 h-4 w-4" />
               Add Product
             </Button>
@@ -376,7 +376,7 @@ export default function AdminPage() {
                       value={formData.external_url}
                       onChange={(e) => setFormData({ ...formData, external_url: e.target.value })}
                     />
-                    <p className="text-xs text-stone-500">The URL where users will be redirected when they click "Check It Out"</p>
+                    <p className="text-xs text-gray-500">The URL where users will be redirected when they click "Check It Out"</p>
                   </div>
                 )}
 
@@ -397,7 +397,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" className="bg-yellow-500 hover:bg-yellow-600">
+                  <Button type="submit" className="bg-orange-500 hover:bg-orange-600">
                     {editingProduct ? "Update Product" : "Create Product"}
                   </Button>
                   <Button type="button" onClick={resetForm} variant="outline">
@@ -414,7 +414,7 @@ export default function AdminPage() {
             <Card key={product.id}>
               <CardHeader>
                 {product.thumbnail_url && (
-                  <div className="w-full h-48 bg-stone-50 rounded mb-4 relative overflow-hidden">
+                  <div className="w-full h-48 bg-gray-50 rounded mb-4 relative overflow-hidden">
                     <Image
                       src={product.thumbnail_url}
                       alt={product.name}
@@ -436,7 +436,7 @@ export default function AdminPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-stone-600 mb-4 line-clamp-3">
+                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
                   {product.description}
                 </p>
                 <div className="flex gap-2">

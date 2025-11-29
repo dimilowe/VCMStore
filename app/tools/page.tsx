@@ -9,7 +9,9 @@ import {
   Smile, 
   Star, 
   Heart,
-  ArrowRight
+  ArrowRight,
+  Youtube,
+  LayoutGrid
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -19,6 +21,27 @@ export const metadata: Metadata = {
 };
 
 const tools = [
+  { 
+    name: "AI Thumbnail Coach", 
+    description: "Analyze and optimize your YouTube thumbnails with AI.",
+    icon: Youtube, 
+    href: "/tools/ai-thumbnail-coach",
+    category: "AI"
+  },
+  { 
+    name: "Logo Generator", 
+    description: "Create AI-powered logos for your brand in seconds.",
+    icon: Palette, 
+    href: "/tools/logo-generator",
+    category: "AI"
+  },
+  { 
+    name: "Resource Box", 
+    description: "Create shareable link collections for your bio.",
+    icon: LayoutGrid, 
+    href: "/tools/resource-box",
+    category: "Social"
+  },
   { 
     name: "GIF Compressor", 
     description: "Compress GIF files to reduce size while maintaining quality.",
@@ -39,13 +62,6 @@ const tools = [
     icon: Type, 
     href: "/tools/word-counter",
     category: "Writing"
-  },
-  { 
-    name: "Logo Generator", 
-    description: "Create AI-powered logos for your brand in seconds.",
-    icon: Palette, 
-    href: "/tools/logo-generator",
-    category: "Design"
   },
   { 
     name: "Keyword Finder", 
@@ -91,21 +107,21 @@ export default function ToolsPage() {
     <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <span className="inline-block bg-yellow-100 text-yellow-700 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
+          <span className="inline-block bg-orange-100 text-orange-700 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
             100% Free
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Free Tools for Creators
           </h1>
-          <p className="text-lg text-stone-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Powerful online tools to help you create, optimize, and grow. No signup required.
           </p>
         </div>
 
         {categories.map((category) => (
           <div key={category} className="mb-12">
-            <h2 className="text-xl font-bold text-stone-800 mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
               {category}
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -113,21 +129,21 @@ export default function ToolsPage() {
                 <Link 
                   key={tool.name} 
                   href={tool.href}
-                  className="bg-white rounded-xl p-6 border border-stone-200 hover:border-yellow-400 hover:shadow-lg transition-all group"
+                  className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all group"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-stone-100 group-hover:bg-yellow-50 rounded-xl flex items-center justify-center transition-colors shrink-0">
-                      <tool.icon className="w-6 h-6 text-stone-600 group-hover:text-yellow-600" />
+                    <div className="w-12 h-12 bg-gray-100 group-hover:bg-orange-50 rounded-xl flex items-center justify-center transition-colors shrink-0">
+                      <tool.icon className="w-6 h-6 text-gray-600 group-hover:text-orange-500" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-stone-900 group-hover:text-yellow-600 transition-colors mb-1">
+                      <h3 className="font-bold text-gray-900 group-hover:text-orange-500 transition-colors mb-1">
                         {tool.name}
                       </h3>
-                      <p className="text-sm text-stone-600 line-clamp-2">{tool.description}</p>
+                      <p className="text-sm text-gray-600 line-clamp-2">{tool.description}</p>
                     </div>
                   </div>
                   <div className="mt-4 flex justify-end">
-                    <span className="text-yellow-600 text-sm font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-orange-500 text-sm font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       Use Tool <ArrowRight className="w-4 h-4" />
                     </span>
                   </div>

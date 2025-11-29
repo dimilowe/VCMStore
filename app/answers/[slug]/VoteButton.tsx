@@ -44,8 +44,8 @@ export function VoteButton({ questionId, initialCount }: VoteButtonProps) {
       disabled={hasVoted || isVoting}
       className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-all ${
         hasVoted
-          ? "bg-yellow-100 text-yellow-600"
-          : "bg-stone-100 text-stone-600 hover:bg-yellow-50 hover:text-yellow-600"
+          ? "bg-orange-100 text-orange-600"
+          : "bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-orange-600"
       }`}
     >
       <ThumbsUp className={`w-5 h-5 ${hasVoted ? "fill-current" : ""}`} />

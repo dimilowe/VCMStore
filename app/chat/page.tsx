@@ -81,21 +81,21 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-full mb-4">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-wide mb-4 text-stone-900">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-wide mb-4 text-gray-900">
             AI STRATEGY SESSIONS
           </h1>
-          <p className="text-lg text-stone-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Get personalized recommendations from our AI to discover the perfect apps, tools, and resources for your creator journey.
           </p>
         </div>
 
-        <Card className="border-2 border-stone-200 shadow-xl">
+        <Card className="border-2 border-gray-200 shadow-xl">
           <CardContent className="p-0">
             <div className="h-[500px] overflow-y-auto p-6 space-y-6">
               {messages.map((message, index) => (
@@ -108,33 +108,33 @@ export default function ChatPage() {
                   <div
                     className={`max-w-[80%] ${
                       message.role === "user"
-                        ? "bg-yellow-500 text-white"
-                        : "bg-white border-2 border-stone-200"
+                        ? "bg-orange-500 text-white"
+                        : "bg-white border-2 border-gray-200"
                     } rounded-2xl px-6 py-4`}
                   >
                     <p className="whitespace-pre-wrap">{message.content}</p>
 
                     {message.products && message.products.length > 0 && (
-                      <div className="mt-4 space-y-3 pt-4 border-t border-stone-200">
-                        <p className="text-sm font-semibold text-stone-700 mb-2">
+                      <div className="mt-4 space-y-3 pt-4 border-t border-gray-200">
+                        <p className="text-sm font-semibold text-gray-700 mb-2">
                           Recommended Products:
                         </p>
                         {message.products.map((product) => (
                           <a
                             key={product.id}
                             href={`/product/${product.slug}`}
-                            className="block bg-stone-50 hover:bg-stone-100 transition-colors rounded-lg p-3 border border-stone-200"
+                            className="block bg-gray-50 hover:bg-gray-100 transition-colors rounded-lg p-3 border border-gray-200"
                           >
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="font-semibold text-stone-900">
+                                <p className="font-semibold text-gray-900">
                                   {product.name}
                                 </p>
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge variant="outline" className="text-xs">
                                     {product.type}
                                   </Badge>
-                                  <span className="text-sm text-stone-600">
+                                  <span className="text-sm text-gray-600">
                                     {product.price_type === "free"
                                       ? "Free"
                                       : `$${(product.price / 100).toFixed(2)}`}
@@ -143,7 +143,7 @@ export default function ChatPage() {
                               </div>
                               <Button
                                 size="sm"
-                                className="bg-yellow-500 hover:bg-yellow-600"
+                                className="bg-orange-500 hover:bg-orange-600"
                               >
                                 View
                               </Button>
@@ -158,8 +158,8 @@ export default function ChatPage() {
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-white border-2 border-stone-200 rounded-2xl px-6 py-4">
-                    <Loader2 className="w-5 h-5 animate-spin text-yellow-500" />
+                  <div className="bg-white border-2 border-gray-200 rounded-2xl px-6 py-4">
+                    <Loader2 className="w-5 h-5 animate-spin text-orange-500" />
                   </div>
                 </div>
               )}
@@ -169,7 +169,7 @@ export default function ChatPage() {
 
             <form
               onSubmit={handleSubmit}
-              className="border-t-2 border-stone-200 p-4"
+              className="border-t-2 border-gray-200 p-4"
             >
               <div className="flex gap-2">
                 <Textarea
@@ -187,7 +187,7 @@ export default function ChatPage() {
                 <Button
                   type="submit"
                   disabled={isLoading || !input.trim()}
-                  className="bg-yellow-500 hover:bg-yellow-600 px-6"
+                  className="bg-orange-500 hover:bg-orange-600 px-6"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -196,7 +196,7 @@ export default function ChatPage() {
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-stone-500 mt-2">
+              <p className="text-xs text-gray-500 mt-2">
                 Press Enter to send, Shift+Enter for new line
               </p>
             </form>

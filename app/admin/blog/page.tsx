@@ -39,7 +39,7 @@ export default async function AdminBlogPage() {
           <p className="text-muted-foreground">Create and manage your blog posts</p>
         </div>
         <Link href="/admin/blog/new">
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-black font-bold">
             <Plus className="w-4 h-4 mr-2" />
             New Post
           </Button>
@@ -53,7 +53,7 @@ export default async function AdminBlogPage() {
               No blog posts yet. Create your first post!
             </p>
             <Link href="/admin/blog/new">
-              <Button className="bg-yellow-500 hover:bg-yellow-600 text-black">
+              <Button className="bg-orange-500 hover:bg-orange-600 text-black">
                 <Plus className="w-4 h-4 mr-2" />
                 Create First Post
               </Button>

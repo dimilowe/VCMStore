@@ -28,7 +28,7 @@ export function CopyButton({ text, label }: CopyButtonProps) {
       className={`flex items-center gap-2 ${
         copied 
           ? "bg-green-500 hover:bg-green-600" 
-          : "bg-yellow-500 hover:bg-yellow-600"
+          : "bg-orange-500 hover:bg-orange-600"
       } text-white`}
     >
       {copied ? (

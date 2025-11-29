@@ -79,7 +79,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <div className="grid lg:grid-cols-2 gap-12 mb-16">
         <div>
           {product.thumbnail_url && (
-            <div className="aspect-video bg-stone-50 rounded-lg overflow-hidden mb-6 flex items-center justify-center">
+            <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden mb-6 flex items-center justify-center">
               <img
                 src={product.thumbnail_url}
                 alt={product.name}
@@ -101,7 +101,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <ReactMarkdown
               components={{
                 p: ({ children }) => <p className="mb-4">{children}</p>,
-                strong: ({ children }) => <strong className="font-semibold text-stone-900">{children}</strong>,
+                strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
                 em: ({ children }) => <em className="italic">{children}</em>,
                 h1: ({ children }) => <h2 className="text-2xl font-bold mt-6 mb-3">{children}</h2>,
                 h2: ({ children }) => <h3 className="text-xl font-semibold mt-5 mb-2">{children}</h3>,

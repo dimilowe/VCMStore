@@ -128,8 +128,8 @@ export function InlineUploader({
         className={`
           relative border-2 border-dashed rounded-lg p-6 transition-all
           ${isDragging 
-            ? "border-yellow-500 bg-yellow-50" 
-            : "border-stone-300 bg-stone-50 hover:border-stone-400"
+            ? "border-orange-500 bg-orange-50" 
+            : "border-gray-300 bg-gray-50 hover:border-gray-400"
           }
           ${isUploading ? "opacity-75" : ""}
         `}
@@ -144,7 +144,7 @@ export function InlineUploader({
 
         {currentUrl && showPreview && isImage ? (
           <div className="space-y-3">
-            <div className="relative w-full h-48 rounded-lg overflow-hidden bg-stone-100">
+            <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gray-100">
               <img
                 src={currentUrl}
                 alt="Preview"
@@ -171,20 +171,20 @@ export function InlineUploader({
           </div>
         ) : currentUrl ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-stone-200">
-              <FileIcon className="h-8 w-8 text-stone-400" />
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+              <FileIcon className="h-8 w-8 text-gray-400" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-stone-900 truncate">
+                <p className="text-sm font-medium text-gray-900 truncate">
                   File uploaded
                 </p>
-                <p className="text-xs text-stone-500 truncate">{currentUrl}</p>
+                <p className="text-xs text-gray-500 truncate">{currentUrl}</p>
               </div>
               <button
                 onClick={handleRemove}
-                className="p-1.5 hover:bg-stone-100 rounded transition-colors"
+                className="p-1.5 hover:bg-gray-100 rounded transition-colors"
                 type="button"
               >
-                <X className="h-4 w-4 text-stone-500" />
+                <X className="h-4 w-4 text-gray-500" />
               </button>
             </div>
             <Button
@@ -202,32 +202,32 @@ export function InlineUploader({
           <div className="text-center">
             {isUploading ? (
               <div className="space-y-3">
-                <Loader2 className="h-8 w-8 mx-auto text-yellow-600 animate-spin" />
+                <Loader2 className="h-8 w-8 mx-auto text-orange-600 animate-spin" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-stone-700">Uploading...</p>
-                  <div className="w-full bg-stone-200 rounded-full h-2">
+                  <p className="text-sm font-medium text-gray-700">Uploading...</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-yellow-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-orange-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
-                  <p className="text-xs text-stone-500">{uploadProgress}%</p>
+                  <p className="text-xs text-gray-500">{uploadProgress}%</p>
                 </div>
               </div>
             ) : (
               <div className="space-y-3">
-                <Upload className="h-8 w-8 mx-auto text-stone-400" />
+                <Upload className="h-8 w-8 mx-auto text-gray-400" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-stone-700">
+                  <p className="text-sm font-medium text-gray-700">
                     {placeholder}
                   </p>
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-gray-500">
                     Max size: {(maxSize / 1024 / 1024).toFixed(0)}MB
                   </p>
                 </div>
                 <Button
                   onClick={handleBrowseClick}
-                  className="bg-stone-700 hover:bg-stone-800"
+                  className="bg-gray-700 hover:bg-gray-800"
                   type="button"
                 >
                   Browse Files

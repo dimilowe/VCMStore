@@ -94,8 +94,8 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
           onClick={() => setUseUrl(false)}
           className={`px-3 py-1 rounded transition-colors ${
             !useUrl
-              ? 'bg-yellow-100 text-yellow-700 font-medium'
-              : 'text-stone-500 hover:text-stone-700'
+              ? 'bg-orange-100 text-orange-700 font-medium'
+              : 'text-gray-500 hover:text-gray-700'
           }`}
           disabled={disabled}
         >
@@ -106,8 +106,8 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
           onClick={() => setUseUrl(true)}
           className={`px-3 py-1 rounded transition-colors ${
             useUrl
-              ? 'bg-yellow-100 text-yellow-700 font-medium'
-              : 'text-stone-500 hover:text-stone-700'
+              ? 'bg-orange-100 text-orange-700 font-medium'
+              : 'text-gray-500 hover:text-gray-700'
           }`}
           disabled={disabled}
         >
@@ -125,22 +125,22 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                 dragActive
-                  ? 'border-yellow-500 bg-yellow-50'
-                  : 'border-stone-300 hover:border-stone-400'
+                  ? 'border-orange-500 bg-orange-50'
+                  : 'border-gray-300 hover:border-gray-400'
               } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {uploading ? (
                 <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />
-                  <p className="text-xs text-stone-600">Uploading...</p>
+                  <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+                  <p className="text-xs text-gray-600">Uploading...</p>
                 </div>
               ) : (
                 <>
-                  <Upload className="w-8 h-8 text-stone-400 mx-auto mb-2" />
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                   <p className="text-xs font-medium mb-1">
                     Drag image here
                   </p>
-                  <p className="text-xs text-stone-500 mb-3">
+                  <p className="text-xs text-gray-500 mb-3">
                     or click to browse
                   </p>
                   <input
@@ -207,7 +207,7 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
         </>
       )}
       
-      <p className="text-xs text-stone-500">
+      <p className="text-xs text-gray-500">
         Image URL for social sharing and post listings
       </p>
     </div>

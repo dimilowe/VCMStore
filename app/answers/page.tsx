@@ -86,15 +86,15 @@ function QuestionCard({ question }: { question: Question }) {
   return (
     <Link
       href={`/answers/${question.slug}`}
-      className="block bg-white border border-stone-200 rounded-xl p-5 hover:border-yellow-400 hover:shadow-md transition-all group"
+      className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all group"
     >
-      <h3 className="text-lg font-semibold text-stone-900 group-hover:text-yellow-600 transition-colors mb-2 line-clamp-2">
+      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-orange-600 transition-colors mb-2 line-clamp-2">
         {question.title}
       </h3>
       {preview && (
-        <p className="text-stone-600 text-sm mb-3 line-clamp-2">{preview}</p>
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{preview}</p>
       )}
-      <div className="flex items-center gap-4 text-sm text-stone-500">
+      <div className="flex items-center gap-4 text-sm text-gray-500">
         <span className="flex items-center gap-1">
           <ThumbsUp className="w-4 h-4" />
           {question.upvote_count}
@@ -146,18 +146,18 @@ export default async function AnswersPage({
   ]);
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             <MessageCircleQuestion className="w-4 h-4" />
             Community Q&A
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-3">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             VCM Answers
           </h1>
-          <p className="text-stone-600 text-lg max-w-xl mx-auto">
+          <p className="text-gray-600 text-lg max-w-xl mx-auto">
             Get expert answers to your questions about creative business, marketing, monetization, and more.
           </p>
         </div>
@@ -168,7 +168,7 @@ export default async function AnswersPage({
         {/* Ask Question CTA */}
         <div className="flex justify-center mb-10">
           <Link href="/answers/new">
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-5 text-base font-semibold rounded-full flex items-center gap-2">
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-5 text-base font-semibold rounded-full flex items-center gap-2">
               <Plus className="w-5 h-5" />
               Ask a Question
             </Button>
@@ -180,12 +180,12 @@ export default async function AnswersPage({
           <div className="mb-10">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Search className="w-5 h-5 text-stone-600" />
-                <h2 className="text-xl font-bold text-stone-900">
+                <Search className="w-5 h-5 text-gray-600" />
+                <h2 className="text-xl font-bold text-gray-900">
                   Results for "{searchQuery}"
                 </h2>
               </div>
-              <Link href="/answers" className="text-yellow-600 hover:text-yellow-700 text-sm font-medium">
+              <Link href="/answers" className="text-orange-600 hover:text-orange-700 text-sm font-medium">
                 Clear search
               </Link>
             </div>
@@ -193,10 +193,10 @@ export default async function AnswersPage({
               {searchResults.length > 0 ? (
                 searchResults.map((q) => <QuestionCard key={q.id} question={q} />)
               ) : (
-                <div className="bg-white border border-stone-200 rounded-xl p-8 text-center">
-                  <Search className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-                  <p className="text-stone-500">No questions found matching "{searchQuery}"</p>
-                  <Link href="/answers/new" className="text-yellow-600 hover:text-yellow-700 font-medium mt-2 inline-flex items-center gap-1">
+                <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No questions found matching "{searchQuery}"</p>
+                  <Link href="/answers/new" className="text-orange-600 hover:text-orange-700 font-medium mt-2 inline-flex items-center gap-1">
                     Ask this question <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -211,17 +211,17 @@ export default async function AnswersPage({
             {/* Newest Questions */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-5 h-5 text-stone-600" />
-                <h2 className="text-xl font-bold text-stone-900">Newest Questions</h2>
+                <Clock className="w-5 h-5 text-gray-600" />
+                <h2 className="text-xl font-bold text-gray-900">Newest Questions</h2>
               </div>
               <div className="space-y-4">
                 {newest.length > 0 ? (
                   newest.map((q) => <QuestionCard key={q.id} question={q} />)
                 ) : (
-                  <div className="bg-white border border-stone-200 rounded-xl p-8 text-center">
-                    <MessageCircleQuestion className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-                    <p className="text-stone-500">No questions yet. Be the first to ask!</p>
-                    <Link href="/answers/new" className="text-yellow-600 hover:text-yellow-700 font-medium mt-2 inline-flex items-center gap-1">
+                  <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+                    <MessageCircleQuestion className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">No questions yet. Be the first to ask!</p>
+                    <Link href="/answers/new" className="text-orange-600 hover:text-orange-700 font-medium mt-2 inline-flex items-center gap-1">
                       Ask a Question <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -232,16 +232,16 @@ export default async function AnswersPage({
             {/* Trending Questions */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="w-5 h-5 text-stone-600" />
-                <h2 className="text-xl font-bold text-stone-900">Trending Questions</h2>
+                <TrendingUp className="w-5 h-5 text-gray-600" />
+                <h2 className="text-xl font-bold text-gray-900">Trending Questions</h2>
               </div>
               <div className="space-y-4">
                 {trending.length > 0 ? (
                   trending.map((q) => <QuestionCard key={q.id} question={q} />)
                 ) : (
-                  <div className="bg-white border border-stone-200 rounded-xl p-8 text-center">
-                    <TrendingUp className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-                    <p className="text-stone-500">Questions with the most engagement will appear here.</p>
+                  <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+                    <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">Questions with the most engagement will appear here.</p>
                   </div>
                 )}
               </div>

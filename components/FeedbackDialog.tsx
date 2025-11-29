@@ -10,9 +10,9 @@ import { MessageSquare, Bug, Lightbulb, Sparkles, Send } from 'lucide-react';
 
 const feedbackTypes = [
   { value: 'bug', label: 'Bug Report', icon: Bug, color: 'border-red-200 hover:border-red-400 hover:bg-red-50' },
-  { value: 'feature', label: 'Feature Request', icon: Sparkles, color: 'border-yellow-200 hover:border-yellow-400 hover:bg-yellow-50' },
+  { value: 'feature', label: 'Feature Request', icon: Sparkles, color: 'border-purple-200 hover:border-purple-400 hover:bg-purple-50' },
   { value: 'improvement', label: 'Improvement Suggestion', icon: Lightbulb, color: 'border-blue-200 hover:border-blue-400 hover:bg-blue-50' },
-  { value: 'general', label: 'General Feedback', icon: MessageSquare, color: 'border-stone-200 hover:border-stone-400 hover:bg-stone-50' },
+  { value: 'general', label: 'General Feedback', icon: MessageSquare, color: 'border-gray-200 hover:border-gray-400 hover:bg-gray-50' },
 ];
 
 export function FeedbackDialog() {
@@ -66,7 +66,7 @@ export function FeedbackDialog() {
       <DialogTrigger asChild>
         <Button 
           variant="outline" 
-          className="border-stone-300 hover:border-yellow-500 hover:bg-yellow-50 transition-all"
+          className="border-gray-300 hover:border-orange-400 hover:bg-orange-50 transition-all"
         >
           <MessageSquare className="w-4 h-4 mr-2" />
           Feedback
@@ -75,11 +75,11 @@ export function FeedbackDialog() {
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            <MessageSquare className="w-6 h-6 text-yellow-500" />
+            <MessageSquare className="w-6 h-6 text-orange-500" />
             Feedback Form
           </DialogTitle>
-          <DialogDescription className="text-stone-600">
-            We'd love to hear your thoughts, suggestions, or concerns.
+          <DialogDescription className="text-gray-600">
+            We&apos;d love to hear your thoughts, suggestions, or concerns.
           </DialogDescription>
         </DialogHeader>
 
@@ -91,7 +91,7 @@ export function FeedbackDialog() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold mb-2">Thank you!</h3>
-            <p className="text-stone-600">Your feedback has been submitted successfully.</p>
+            <p className="text-gray-600">Your feedback has been submitted successfully.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -107,13 +107,13 @@ export function FeedbackDialog() {
                       key={type.value}
                       type="button"
                       onClick={() => setSelectedType(type.value)}
-                      className={`p-4 border-2 rounded-lg transition-all text-left ${
+                      className={`p-4 border-2 rounded-xl transition-all text-left ${
                         selectedType === type.value
-                          ? 'border-yellow-500 bg-yellow-50'
+                          ? 'border-orange-500 bg-orange-50'
                           : type.color
                       }`}
                     >
-                      <Icon className={`w-5 h-5 mb-2 ${selectedType === type.value ? 'text-yellow-600' : 'text-stone-600'}`} />
+                      <Icon className={`w-5 h-5 mb-2 ${selectedType === type.value ? 'text-orange-600' : 'text-gray-600'}`} />
                       <span className="font-medium text-sm">{type.label}</span>
                     </button>
                   );
@@ -131,7 +131,7 @@ export function FeedbackDialog() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 required
-                className="border-stone-300 focus:border-yellow-500 focus:ring-yellow-500"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
             </div>
 
@@ -146,7 +146,7 @@ export function FeedbackDialog() {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 rows={5}
-                className="border-stone-300 focus:border-yellow-500 focus:ring-yellow-500"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
             </div>
 
@@ -160,7 +160,7 @@ export function FeedbackDialog() {
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="border-stone-300 focus:border-yellow-500 focus:ring-yellow-500"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
             </div>
 
@@ -184,7 +184,7 @@ export function FeedbackDialog() {
             <Button
               type="submit"
               disabled={!selectedType || !subject || !message || loading}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold h-12"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold h-12"
             >
               {loading ? (
                 'Submitting...'

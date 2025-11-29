@@ -139,7 +139,7 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
 
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Box Title <span className="text-red-500">*</span>
           </label>
           <input
@@ -147,12 +147,12 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="My Creator Resources"
-            className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100"
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
             maxLength={100}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Subtitle (optional)
           </label>
           <input
@@ -160,14 +160,14 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
             value={subtitle}
             onChange={(e) => setSubtitle(e.target.value)}
             placeholder="Tools I use every day"
-            className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100"
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
             maxLength={200}
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-stone-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Accent Color
         </label>
         <div className="flex items-center gap-3">
@@ -175,14 +175,14 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
             type="color"
             value={accentColor}
             onChange={(e) => setAccentColor(e.target.value)}
-            className="w-12 h-12 rounded-lg border border-stone-200 cursor-pointer"
+            className="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer"
           />
           <input
             type="text"
             value={accentColor}
             onChange={(e) => setAccentColor(e.target.value)}
             placeholder="#eab308"
-            className="w-32 px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 font-mono text-sm"
+            className="w-32 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 font-mono text-sm"
           />
           <div className="flex gap-2">
             {["#eab308", "#3b82f6", "#22c55e", "#ef4444", "#8b5cf6", "#ec4899"].map(color => (
@@ -190,7 +190,7 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
                 key={color}
                 type="button"
                 onClick={() => setAccentColor(color)}
-                className={`w-8 h-8 rounded-full border-2 transition-all ${accentColor === color ? 'border-stone-900 scale-110' : 'border-transparent'}`}
+                className={`w-8 h-8 rounded-full border-2 transition-all ${accentColor === color ? 'border-gray-900 scale-110' : 'border-transparent'}`}
                 style={{ backgroundColor: color }}
               />
             ))}
@@ -198,9 +198,9 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
         </div>
       </div>
 
-      <div className="border-t border-stone-200 pt-6">
+      <div className="border-t border-gray-200 pt-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-stone-900">Resource Links (up to 4)</h3>
+          <h3 className="font-bold text-gray-900">Resource Links (up to 4)</h3>
           {items.length < 4 && (
             <Button
               type="button"
@@ -217,14 +217,14 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
 
         <div className="space-y-4">
           {items.map((item, index) => (
-            <div key={index} className="bg-stone-50 rounded-lg p-4 border border-stone-200">
+            <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium text-stone-500">Item {index + 1}</span>
+                <span className="text-sm font-medium text-gray-500">Item {index + 1}</span>
                 {items.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
-                    className="text-stone-400 hover:text-red-500 transition-colors"
+                    className="text-gray-400 hover:text-red-500 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -233,7 +233,7 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
 
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Label <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -241,12 +241,12 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
                     value={item.label}
                     onChange={(e) => updateItem(index, "label", e.target.value)}
                     placeholder="My Favorite Tool"
-                    className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                     maxLength={100}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Description (optional)
                   </label>
                   <input
@@ -254,14 +254,14 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
                     value={item.description}
                     onChange={(e) => updateItem(index, "description", e.target.value)}
                     placeholder="Brief description"
-                    className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                     maxLength={200}
                   />
                 </div>
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-stone-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Link Type
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -270,8 +270,8 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
                     onClick={() => updateItem(index, "itemType", "external")}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
                       item.itemType === "external"
-                        ? "bg-yellow-50 border-yellow-400 text-yellow-700"
-                        : "bg-white border-stone-200 text-stone-600 hover:border-stone-300"
+                        ? "bg-orange-50 border-orange-400 text-orange-700"
+                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
                     }`}
                   >
                     <Link2 className="w-4 h-4" />
@@ -282,8 +282,8 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
                     onClick={() => updateItem(index, "itemType", "internal_tool")}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
                       item.itemType === "internal_tool"
-                        ? "bg-yellow-50 border-yellow-400 text-yellow-700"
-                        : "bg-white border-stone-200 text-stone-600 hover:border-stone-300"
+                        ? "bg-orange-50 border-orange-400 text-orange-700"
+                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
                     }`}
                   >
                     <Wrench className="w-4 h-4" />
@@ -295,8 +295,8 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
                       onClick={() => updateItem(index, "itemType", "internal_freebie")}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
                         item.itemType === "internal_freebie"
-                          ? "bg-yellow-50 border-yellow-400 text-yellow-700"
-                          : "bg-white border-stone-200 text-stone-600 hover:border-stone-300"
+                          ? "bg-orange-50 border-orange-400 text-orange-700"
+                          : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
                       }`}
                     >
                       <Gift className="w-4 h-4" />
@@ -308,7 +308,7 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
 
               {item.itemType === "external" && (
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     URL <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -316,20 +316,20 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
                     value={item.externalUrl}
                     onChange={(e) => updateItem(index, "externalUrl", e.target.value)}
                     placeholder="https://example.com"
-                    className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                   />
                 </div>
               )}
 
               {item.itemType === "internal_tool" && (
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select Tool <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={item.internalResourceId}
                     onChange={(e) => updateItem(index, "internalResourceId", e.target.value)}
-                    className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                   >
                     <option value="">Choose a tool...</option>
                     {tools.map(tool => (
@@ -343,13 +343,13 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
 
               {item.itemType === "internal_freebie" && (
                 <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Select Freebie <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={item.internalResourceId}
                     onChange={(e) => updateItem(index, "internalResourceId", e.target.value)}
-                    className="w-full px-4 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                   >
                     <option value="">Choose a freebie...</option>
                     {freebies.map(freebie => (
@@ -365,11 +365,11 @@ export function ResourceBoxForm({ tools, freebies }: ResourceBoxFormProps) {
         </div>
       </div>
 
-      <div className="border-t border-stone-200 pt-6">
+      <div className="border-t border-gray-200 pt-6">
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-4 text-lg font-semibold rounded-lg flex items-center justify-center gap-2"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 text-lg font-semibold rounded-lg flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>
