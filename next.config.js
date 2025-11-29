@@ -9,6 +9,10 @@ const nextConfig = {
       },
     ],
   },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  cleanDistDir: true,
 }
 
 module.exports = nextConfig
