@@ -211,10 +211,10 @@ export default async function HomePage() {
             ))}
           </div>
 
-          {/* What is VCM Hub Box */}
+          {/* What is VCM Suite Box */}
           <div className="max-w-2xl mx-auto gradient-border rounded-2xl p-8 bg-white">
             <h2 className="text-2xl font-bold text-gradient mb-3">
-              What is VCM Hub?
+              What is VCM Suite?
             </h2>
             <p className="text-gray-600 mb-6">
               Your unified creator marketplace. Discover tools, track your growth, and connect all your creator resources in one beautiful hub.
@@ -445,7 +445,7 @@ export default async function HomePage() {
                 <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
-                <span className="font-bold text-gray-900">VCM Hub</span>
+                <span className="font-bold text-gray-900">VCM Suite</span>
               </div>
               <p className="text-gray-500 text-sm">
                 © {new Date().getFullYear()} VCM. All rights reserved.

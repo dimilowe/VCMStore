@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Free Tools for Creators — VCM Hub",
+  title: "Free Tools for Creators — VCM Suite",
   description: "Free online tools for creators and entrepreneurs. Compress images, generate logos, find keywords, create diagrams, and more — all 100% free.",
   keywords: "free tools, image compressor, gif compressor, word counter, logo generator, keyword finder, emoji combos, horoscope generator, affirmation generator",
 };

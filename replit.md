@@ -1,7 +1,7 @@
-# VCM Hub
+# VCM Suite
 
 ## Overview
-VCM Hub is a creator-focused online campus built with Next.js 14, TypeScript, Tailwind CSS, and PostgreSQL. The platform captures attention through free utility tools and content, then converts visitors into users of paid apps and the broader ecosystem. Users can browse all content without authentication, only needing to create an account when claiming free products or purchasing paid items.
+VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, Tailwind CSS, and PostgreSQL. The platform captures attention through free utility tools and content, then converts visitors into users of paid apps and the broader ecosystem. Users can browse all content without authentication, only needing to create an account when claiming free products or purchasing paid items.
 
 ## Architecture
 
@@ -145,8 +145,8 @@ npm run dev
 - **Text**: Gray-900 for headings, gray-600 for body text
 
 ### Brand Cohesion
-VCM Hub and VCM OS share a unified brand identity:
-- VCM Hub: Light theme with orange accents on white/gray backgrounds
+VCM Suite and VCM OS share a unified brand identity:
+- VCM Suite: Light theme with orange accents on white/gray backgrounds
 - VCM OS: Dark theme with orange accents on dark backgrounds
 - Both use the same colorful app card gradient system
 
@@ -157,7 +157,7 @@ VCM Hub and VCM OS share a unified brand identity:
   - Updated all 11+ tool pages, UI components, and forms to use orange-500/600
   - Redesigned navbar, homepage, buttons, inputs, dialogs, selects
   - ExploreMoreTools component now uses white background with orange CTA
-  - Creates unified brand identity between VCM Hub and VCM OS
+  - Creates unified brand identity between VCM Suite and VCM OS
 - 2025-11-28: **Added AI Thumbnail Coach** - Free YouTube thumbnail analyzer tool
   - Upload thumbnail images (PNG, JPEG, WebP up to 5MB)
   - Uses OpenAI gpt-4o vision model for AI-powered analysis

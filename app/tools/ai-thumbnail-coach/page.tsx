@@ -579,7 +579,7 @@ export default function AIThumbnailCoachPage() {
               Powered by advanced AI vision analysis. Your thumbnails are not stored.
             </p>
             <p className="text-xs text-gray-400 mt-2">
-              © {new Date().getFullYear()} VCM Hub. Free forever for creators worldwide.
+              © {new Date().getFullYear()} VCM Suite. Free forever for creators worldwide.
             </p>
           </div>
         </div>

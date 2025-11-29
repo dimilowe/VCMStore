@@ -30,7 +30,7 @@ export default function ExploreMoreTools({ currentTool }: ExploreMoreToolsProps)
         Explore More Free Creator Tools
       </h2>
       <p className="text-gray-500 mb-6">
-        VCM Hub offers a complete ecosystem of free tools for content creators and entrepreneurs.
+        VCM Suite offers a complete ecosystem of free tools for content creators and entrepreneurs.
       </p>
       <div className="flex flex-wrap justify-center gap-3">
         {filteredTools.map((tool) => (
