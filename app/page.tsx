@@ -181,64 +181,60 @@ export default async function HomePage() {
     getLatestDrops()
   ]);
 
+  const popularTools = [
+    { name: "QR Social", icon: QrCode, href: "/product/qrsocial" },
+    { name: "C-Score", icon: Flame, href: "/product/cscorecals" },
+    { name: "APE", icon: Zap, href: "https://ape.vcm.fyi", external: true },
+    { name: "Logo Gen", icon: Palette, href: "/tools/logo-generator" },
+    { name: "Keywords", icon: Search, href: "/tools/keyword-finder" },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="py-16 md:py-20 px-4 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
-            Creator Apps
-          </h1>
-          <p className="text-gray-500 text-lg mb-12">
-            Unified tools for modern creators
+      <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-gray-500 text-lg mb-8">
+            Free tools & resources to grow, engage, and monetize your creative business.
           </p>
 
-          {/* Creator Apps Grid - VCM OS Style */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-16">
-            {creatorApps.map((app) => (
+          {/* Search Bar */}
+          <div className="mb-8">
+            <HeroSearch />
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+            <Link href="https://vcmos.io" target="_blank">
+              <Button className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-6 text-base font-semibold rounded-full shadow-lg flex items-center gap-2">
+                <Rocket className="w-5 h-5" />
+                Open VCM OS
+              </Button>
+            </Link>
+            <Link href="/tools">
+              <Button variant="outline" className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-6 text-base font-semibold rounded-full flex items-center gap-2">
+                <Wrench className="w-5 h-5" />
+                Browse Tools
+              </Button>
+            </Link>
+          </div>
+
+          {/* Popular Tools */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span className="text-sm text-gray-500">Popular:</span>
+            {popularTools.map((tool) => (
               <Link
-                key={app.name}
-                href={app.href}
-                target={app.external ? "_blank" : undefined}
-                className="group flex flex-col items-center"
+                key={tool.name}
+                href={tool.href}
+                target={tool.external ? "_blank" : undefined}
+                className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 hover:border-orange-400 hover:shadow-md transition-all text-sm font-medium text-gray-700"
               >
-                <div className={`w-24 h-24 md:w-28 md:h-28 ${app.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <app.icon className="w-10 h-10 md:w-12 md:h-12 text-white" />
-                </div>
-                <span className="text-sm font-semibold text-gray-900">{app.name}</span>
-                <span className="text-xs text-gray-500">{app.description}</span>
+                <tool.icon className="w-4 h-4 text-gray-500" />
+                {tool.name}
+                {tool.external && <ExternalLink className="w-3 h-3 text-gray-400" />}
               </Link>
             ))}
           </div>
-
-          {/* What is VCM Suite Box */}
-          <div className="max-w-2xl mx-auto gradient-border rounded-2xl p-8 bg-white">
-            <h2 className="text-2xl font-bold text-gradient mb-3">
-              What is VCM Suite?
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Your unified creator campus. Discover tools, track your growth, and connect all your creator resources in one beautiful hub.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="https://ape.vcm.fyi" target="_blank">
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-base font-semibold rounded-xl shadow-lg">
-                  Get Started Free
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button variant="outline" className="border-2 border-gray-300 hover:border-orange-400 text-gray-700 px-8 py-6 text-base font-semibold rounded-xl">
-                  Sign In
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Search Bar */}
-      <section className="py-8 px-4 border-y border-gray-100 bg-gray-50">
-        <div className="max-w-3xl mx-auto">
-          <HeroSearch />
         </div>
       </section>
 

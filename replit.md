@@ -1,7 +1,12 @@
 # VCM Suite
 
 ## Overview
-VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, Tailwind CSS, and PostgreSQL. The platform captures attention through free utility tools and content, then converts visitors into users of paid apps and the broader ecosystem. Users can browse all content without authentication, only needing to create an account when claiming free products or purchasing paid items.
+VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, Tailwind CSS, and PostgreSQL. The platform's primary goal is to **capture massive SEO traffic through free tools and content**, then **convert that traffic into joining VCM OS** (the creator ecosystem at vcmos.io). Users can browse all content without authentication, only needing to create an account when claiming free products or purchasing paid items.
+
+### Primary Conversion Goal
+- Drive SEO traffic via free tools (GIF compressor, logo generator, keyword finder, etc.)
+- Convert visitors to VCM OS ecosystem at **vcmos.io**
+- Homepage features prominent "Open VCM OS" CTA button linking to vcmos.io
 
 ## Architecture
 

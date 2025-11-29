@@ -91,7 +91,7 @@ export function HeroSearch() {
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       <div className="relative">
-        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
           ref={inputRef}
           type="text"
@@ -103,7 +103,7 @@ export function HeroSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search tools, products, resources..."
-          className="w-full pl-14 pr-14 py-4 text-base bg-white border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all"
+          className="w-full pl-14 pr-16 py-5 text-base bg-white border-2 border-gray-200 rounded-full shadow-lg focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-100 transition-all"
         />
         <button 
           onClick={() => {
@@ -111,7 +111,7 @@ export function HeroSearch() {
               handleSelect(filteredSuggestions[0]);
             }
           }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-orange-500 hover:bg-orange-600 rounded-lg flex items-center justify-center transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-orange-500 hover:bg-orange-600 rounded-full flex items-center justify-center transition-colors shadow-md"
         >
           <ArrowRight className="w-5 h-5 text-white" />
         </button>
