@@ -79,6 +79,13 @@ const tools = [
     category: "SEO"
   },
   { 
+    name: "AI Humanizer Free", 
+    description: "Detect AI-written content and humanize it to sound natural.",
+    icon: Palette, 
+    href: "/tools/ai-humanizer-free",
+    category: "AI"
+  },
+  { 
     name: "Visualization Tool", 
     description: "Turn text into flowcharts, diagrams, and visual maps.",
     icon: GitBranch, 

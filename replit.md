@@ -103,6 +103,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/resource-box/[slug]/embed` - Embeddable resource box for iframes
 - `/tools/ai-thumbnail-coach` - AI YouTube Thumbnail Coach - thumbnail analyzer with chat
 - `/tools/reach-grabber-tool` - Reach Grabber Tool - AI SEO content optimizer
+- `/tools/ai-humanizer-free` - AI Humanizer Free - detect & humanize AI-written content
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -157,6 +158,15 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-11-29: **Added AI Humanizer Free Tool** - AI text detector and humanizer
+  - Created `/tools/ai-humanizer-free` page targeting "ai humanizer free" keyword
+  - Analyze function: Detects AI probability (0-100%), shows why text sounds AI-like
+  - Humanize function: Rewrites AI text to sound more natural and human
+  - Shows annotated text with AI-sounding segments highlighted
+  - Provides specific suggestions for making text sound more human
+  - Rate limited: 15 analyses / 10 humanizations per hour per IP
+  - Full SEO: H1, meta description, FAQ section, canonical URL
+  - Added to navbar Resources dropdown, tools index, homepage, sitemap
 - 2025-11-29: **Added Reach Grabber Tool** - AI-powered SEO content optimizer
   - Created `/tools/reach-grabber-tool` page with full SEO optimization
   - Users enter target keyword phrase and paste their blog content
