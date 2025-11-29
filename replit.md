@@ -102,6 +102,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/resource-box/[slug]` - Public resource box display
 - `/tools/resource-box/[slug]/embed` - Embeddable resource box for iframes
 - `/tools/ai-thumbnail-coach` - AI YouTube Thumbnail Coach - thumbnail analyzer with chat
+- `/tools/reach-grabber-tool` - Reach Grabber Tool - AI SEO content optimizer
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -156,6 +157,22 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-11-29: **Added Reach Grabber Tool** - AI-powered SEO content optimizer
+  - Created `/tools/reach-grabber-tool` page with full SEO optimization
+  - Users enter target keyword phrase and paste their blog content
+  - AI optimizes content for better search rankings using gpt-4o-mini
+  - Shows SEO Snapshot with word count, keyword mentions, and density percentage
+  - Copy to clipboard functionality for optimized content
+  - Rate limited: 10 optimizations per hour per IP
+  - Full SEO content sections: How it works, How to use, Why use it, FAQs
+  - Added to navbar Resources dropdown, tools index, homepage, and sitemap
+- 2025-11-29: **Homepage Redesign with VCM OS CTAs**
+  - Added colorful app cards at top (APE, QR Social, Nudge, Stemly, C-Score)
+  - Pill-shaped search bar with orange arrow button
+  - "Open VCM OS" button linking to vcmos.io (primary conversion goal)
+  - "Browse Tools" button for exploring free tools
+  - Popular tool chips below search bar
+  - Rebranded from "VCM Hub" to "VCM Suite" with "Creator Campus" tagline
 - 2025-11-29: **Major Design System Overhaul** - Migrated from yellow to orange accent color
   - Updated globals.css with new orange primary color variables
   - Changed all stone-* colors to gray-* for consistency

@@ -30,7 +30,8 @@ import {
   LayoutGrid,
   Youtube,
   Bell,
-  Music
+  Music,
+  Target
 } from "lucide-react";
 
 interface BlogPost {
@@ -146,6 +147,7 @@ const freeTools = [
   { name: "Word Counter", icon: Type, href: "/tools/word-counter" },
   { name: "Logo Generator", icon: Palette, href: "/tools/logo-generator" },
   { name: "Keyword Finder", icon: Search, href: "/tools/keyword-finder" },
+  { name: "Reach Grabber", icon: Target, href: "/tools/reach-grabber-tool" },
   { name: "Visualization", icon: GitBranch, href: "/tools/visualization" },
   { name: "Emoji Combos", icon: Smile, href: "/tools/emoji-combos" },
   { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day" },

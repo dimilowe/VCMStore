@@ -11,7 +11,8 @@ import {
   Heart,
   ArrowRight,
   Youtube,
-  LayoutGrid
+  LayoutGrid,
+  Target
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -68,6 +69,13 @@ const tools = [
     description: "Find low-competition SEO keywords for your content.",
     icon: Search, 
     href: "/tools/keyword-finder",
+    category: "SEO"
+  },
+  { 
+    name: "Reach Grabber Tool", 
+    description: "AI-powered SEO optimizer for your blog posts and articles.",
+    icon: Target, 
+    href: "/tools/reach-grabber-tool",
     category: "SEO"
   },
   { 
