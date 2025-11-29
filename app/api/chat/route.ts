@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // Create the AI prompt
-    const systemPrompt = `You are a helpful AI assistant for VCM Store, a premium creator marketplace. Your role is to help visitors discover the perfect digital products, apps, tools, and resources for their creative business.
+    const systemPrompt = `You are a helpful AI assistant for VCM Store, a premium creator campus. Your role is to help visitors discover the perfect digital products, apps, tools, and resources for their creative business.
 
 AVAILABLE PRODUCTS IN THE STORE:
 ${productsContext}

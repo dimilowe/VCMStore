@@ -217,7 +217,7 @@ export default async function HomePage() {
               What is VCM Suite?
             </h2>
             <p className="text-gray-600 mb-6">
-              Your unified creator marketplace. Discover tools, track your growth, and connect all your creator resources in one beautiful hub.
+              Your unified creator campus. Discover tools, track your growth, and connect all your creator resources in one beautiful hub.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="https://ape.vcm.fyi" target="_blank">

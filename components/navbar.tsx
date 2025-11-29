@@ -109,7 +109,7 @@ export function Navbar() {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">VCM Suite</span>
-              <span className="text-xs text-gray-500 hidden sm:inline">Creator Marketplace</span>
+              <span className="text-xs text-gray-500 hidden sm:inline">Creator Campus</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">
