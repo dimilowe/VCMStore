@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, Bug, Lightbulb, Sparkles, Send } from 'lucide-react';
+import { MessageSquare, Bug, Lightbulb, Sparkles, Send, FileText } from 'lucide-react';
 
 const feedbackTypes = [
   { value: 'bug', label: 'Bug Report', icon: Bug, color: 'border-red-200 hover:border-red-400 hover:bg-red-50' },
   { value: 'feature', label: 'Feature Request', icon: Sparkles, color: 'border-purple-200 hover:border-purple-400 hover:bg-purple-50' },
   { value: 'improvement', label: 'Improvement Suggestion', icon: Lightbulb, color: 'border-blue-200 hover:border-blue-400 hover:bg-blue-50' },
   { value: 'general', label: 'General Feedback', icon: MessageSquare, color: 'border-gray-200 hover:border-gray-400 hover:bg-gray-50' },
+  { value: 'article', label: 'Submit Blog Article', icon: FileText, color: 'border-green-200 hover:border-green-400 hover:bg-green-50' },
 ];
 
 export function FeedbackDialog() {
@@ -24,6 +25,10 @@ export function FeedbackDialog() {
   const [priority, setPriority] = useState('medium');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [authorName, setAuthorName] = useState('');
+  const [authorBio, setAuthorBio] = useState('');
+
+  const isArticleSubmission = selectedType === 'article';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +43,9 @@ export function FeedbackDialog() {
           subject,
           message,
           email: email || null,
-          priority,
+          priority: isArticleSubmission ? 'medium' : priority,
+          author_name: isArticleSubmission ? authorName : null,
+          author_bio: isArticleSubmission ? authorBio : null,
         }),
       });
 
@@ -52,6 +59,8 @@ export function FeedbackDialog() {
           setMessage('');
           setEmail('');
           setPriority('medium');
+          setAuthorName('');
+          setAuthorBio('');
         }, 2000);
       }
     } catch (error) {
@@ -91,7 +100,11 @@ export function FeedbackDialog() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold mb-2">Thank you!</h3>
-            <p className="text-gray-600">Your feedback has been submitted successfully.</p>
+            <p className="text-gray-600">
+              {isArticleSubmission 
+                ? "Your article has been submitted for review. We'll be in touch soon!"
+                : "Your feedback has been submitted successfully."}
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -121,13 +134,29 @@ export function FeedbackDialog() {
               </div>
             </div>
 
+            {isArticleSubmission && (
+              <div>
+                <label htmlFor="authorName" className="text-sm font-medium mb-2 block">
+                  Author Name <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  id="authorName"
+                  placeholder="Your name as it should appear on the article"
+                  value={authorName}
+                  onChange={(e) => setAuthorName(e.target.value)}
+                  required
+                  className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                />
+              </div>
+            )}
+
             <div>
               <label htmlFor="subject" className="text-sm font-medium mb-2 block">
-                Subject <span className="text-red-500">*</span>
+                {isArticleSubmission ? 'Article Title' : 'Subject'} <span className="text-red-500">*</span>
               </label>
               <Input
                 id="subject"
-                placeholder="Brief description of your feedback"
+                placeholder={isArticleSubmission ? "Your article headline" : "Brief description of your feedback"}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 required
@@ -137,22 +166,45 @@ export function FeedbackDialog() {
 
             <div>
               <label htmlFor="message" className="text-sm font-medium mb-2 block">
-                Message <span className="text-red-500">*</span>
+                {isArticleSubmission ? 'Article Content' : 'Message'} <span className="text-red-500">*</span>
               </label>
               <Textarea
                 id="message"
-                placeholder="Please provide detailed information about your feedback..."
+                placeholder={isArticleSubmission 
+                  ? "Paste your full article content here. You can include formatting instructions in plain text..."
+                  : "Please provide detailed information about your feedback..."}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 required
-                rows={5}
+                rows={isArticleSubmission ? 12 : 5}
                 className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
+              {isArticleSubmission && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Tip: Use plain text with clear paragraph breaks. We&apos;ll handle formatting.
+                </p>
+              )}
             </div>
+
+            {isArticleSubmission && (
+              <div>
+                <label htmlFor="authorBio" className="text-sm font-medium mb-2 block">
+                  Author Bio (optional)
+                </label>
+                <Textarea
+                  id="authorBio"
+                  placeholder="A short bio about yourself (1-2 sentences for the article byline)"
+                  value={authorBio}
+                  onChange={(e) => setAuthorBio(e.target.value)}
+                  rows={2}
+                  className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                />
+              </div>
+            )}
 
             <div>
               <label htmlFor="email" className="text-sm font-medium mb-2 block">
-                Email (for follow-up)
+                Email {isArticleSubmission ? <span className="text-red-500">*</span> : '(for follow-up)'}
               </label>
               <Input
                 id="email"
@@ -160,38 +212,46 @@ export function FeedbackDialog() {
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required={isArticleSubmission}
                 className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
+              {isArticleSubmission && (
+                <p className="text-xs text-gray-500 mt-1">
+                  We&apos;ll contact you about publishing decisions and any edits.
+                </p>
+              )}
             </div>
 
-            <div>
-              <label htmlFor="priority" className="text-sm font-medium mb-2 block">
-                Priority Level
-              </label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger id="priority">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low - General feedback</SelectItem>
-                  <SelectItem value="medium">Medium - Standard feedback</SelectItem>
-                  <SelectItem value="high">High - Important issue</SelectItem>
-                  <SelectItem value="urgent">Urgent - Critical bug</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {!isArticleSubmission && (
+              <div>
+                <label htmlFor="priority" className="text-sm font-medium mb-2 block">
+                  Priority Level
+                </label>
+                <Select value={priority} onValueChange={setPriority}>
+                  <SelectTrigger id="priority">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low - General feedback</SelectItem>
+                    <SelectItem value="medium">Medium - Standard feedback</SelectItem>
+                    <SelectItem value="high">High - Important issue</SelectItem>
+                    <SelectItem value="urgent">Urgent - Critical bug</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <Button
               type="submit"
-              disabled={!selectedType || !subject || !message || loading}
+              disabled={!selectedType || !subject || !message || loading || (isArticleSubmission && (!authorName || !email))}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold h-12"
             >
               {loading ? (
                 'Submitting...'
               ) : (
                 <>
-                  <Send className="w-4 h-4 mr-2" />
-                  Submit Feedback
+                  {isArticleSubmission ? <FileText className="w-4 h-4 mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+                  {isArticleSubmission ? 'Submit Article for Review' : 'Submit Feedback'}
                 </>
               )}
             </Button>
