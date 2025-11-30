@@ -12,6 +12,7 @@ const tools = [
   { name: "Horoscope", href: "/tools/horoscope-of-the-day" },
   { name: "Ad Copy Analyzer", href: "/tools/ad-copy-analyzer" },
   { name: "Internal Link Audit", href: "/tools/internal-link-seo-audit" },
+  { name: "AI Summarizer", href: "/tools/summarizer" },
   { name: "Ideas Hub", href: "/ideas" },
   { name: "VCM Answers", href: "/answers" },
 ];

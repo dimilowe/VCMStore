@@ -45,6 +45,7 @@ const navDropdowns: NavDropdown[] = [
       { label: "Producer Tag Generator", href: "/tools/producer-tag-generator", description: "AI voice tags for beats" },
       { label: "Ad Copy Analyzer", href: "/tools/ad-copy-analyzer", description: "Analyze & improve ad copy" },
       { label: "Internal Link Audit", href: "/tools/internal-link-seo-audit", description: "Find orphan pages & weak links" },
+      { label: "AI Summarizer", href: "/tools/summarizer", description: "Summarize any text instantly" },
       { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams" },
       { label: "Emoji Combos", href: "/tools/emoji-combos", description: "Copy aesthetic emoji combos" },
       { label: "Horoscope of the Day", href: "/tools/horoscope-of-the-day", description: "AI daily zodiac readings" },

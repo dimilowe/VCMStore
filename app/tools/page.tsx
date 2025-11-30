@@ -15,7 +15,8 @@ import {
   Target,
   Music,
   Megaphone,
-  Link2
+  Link2,
+  FileText
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -108,6 +109,13 @@ const tools = [
     icon: Link2, 
     href: "/tools/internal-link-seo-audit",
     category: "SEO"
+  },
+  { 
+    name: "AI Summarizer", 
+    description: "Summarize any text and extract key takeaways instantly.",
+    icon: FileText, 
+    href: "/tools/summarizer",
+    category: "Writing"
   },
   { 
     name: "Visualization Tool", 
