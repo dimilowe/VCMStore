@@ -6,9 +6,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.SITE_URL || 
     (process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS}` : 'http://localhost:5000');
 
-  // Get all published products (excluding invisible products)
+  // Get all published products
   const productsResult = await query(
-    `SELECT slug, created_at FROM products WHERE visibility = 'public' AND type != 'invisible' ORDER BY created_at DESC`
+    `SELECT slug, created_at FROM products WHERE visibility = 'public' ORDER BY created_at DESC`
   );
 
   // Get all published blog posts
