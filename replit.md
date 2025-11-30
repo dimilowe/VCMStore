@@ -104,6 +104,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/ai-thumbnail-coach` - AI YouTube Thumbnail Coach - thumbnail analyzer with chat
 - `/tools/reach-grabber-tool` - Reach Grabber Tool - AI SEO content optimizer
 - `/tools/ai-humanizer-free` - AI Humanizer Free - detect & humanize AI-written content
+- `/tools/producer-tag-generator` - Producer Tag Generator - AI voice tags for beats
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -158,6 +159,17 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-11-30: **Added Producer Tag Generator Tool** - AI voice tags for music producers
+  - Created `/tools/producer-tag-generator` page targeting "producer tag" keyword
+  - Upload MP3/WAV files (max 30MB) and add producer tags at intervals
+  - Custom AI voice generation using OpenAI TTS (5 voice styles)
+  - Default VCM Suite tags also available
+  - Configurable tag interval (5-60 seconds) and volume adjustment
+  - FFmpeg-based audio processing with tag mixing
+  - Rate limited: 5 generations per hour per IP
+  - Files auto-cleanup after 30 minutes
+  - Full SEO: title, meta description, FAQ section, educational content
+  - Added to navbar, tools index, homepage, sitemap
 - 2025-11-29: **Added AI Humanizer Free Tool** - AI text detector and humanizer
   - Created `/tools/ai-humanizer-free` page targeting "ai humanizer free" keyword
   - Analyze function: Detects AI probability (0-100%), shows why text sounds AI-like

@@ -12,7 +12,8 @@ import {
   ArrowRight,
   Youtube,
   LayoutGrid,
-  Target
+  Target,
+  Music
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -84,6 +85,13 @@ const tools = [
     icon: Palette, 
     href: "/tools/ai-humanizer-free",
     category: "AI"
+  },
+  { 
+    name: "Producer Tag Generator", 
+    description: "Create custom AI voice tags for your beats and instrumentals.",
+    icon: Music, 
+    href: "/tools/producer-tag-generator",
+    category: "Audio"
   },
   { 
     name: "Visualization Tool", 

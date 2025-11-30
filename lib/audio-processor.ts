@@ -11,8 +11,8 @@ const openai = new OpenAI({
 });
 
 const TAGS_DIR = path.join(process.cwd(), 'public', 'tags');
-const TAG_CACHE_DIR = path.join(process.cwd(), 'public', 'tag_cache');
-const OUTPUT_DIR = path.join(process.cwd(), 'public', 'output');
+const TAG_CACHE_DIR = '/tmp/producer-tag-cache';
+const OUTPUT_DIR = '/tmp/producer-tag-output';
 
 [TAGS_DIR, TAG_CACHE_DIR, OUTPUT_DIR].forEach(dir => {
   if (!fs.existsSync(dir)) {
@@ -132,14 +132,14 @@ export async function processAudioWithTag(
   });
 }
 
-export function getDefaultTagPath(tagName: string): string {
-  const tagMap: Record<string, string> = {
-    'vcmsuite': 'vcmsuite.mp3',
-    'vcmsuite_dot_com': 'vcmsuite_dot_com.mp3'
-  };
-  
-  const filename = tagMap[tagName] || 'vcmsuite.mp3';
-  return path.join(TAGS_DIR, filename);
+const DEFAULT_TAG_PHRASES: Record<string, string> = {
+  'vcmsuite': 'VCM Suite',
+  'vcmsuite_dot_com': 'VCM Suite dot com'
+};
+
+export async function getDefaultTagPath(tagName: string): Promise<string> {
+  const phrase = DEFAULT_TAG_PHRASES[tagName] || 'VCM Suite';
+  return getOrCreateTagVoice(phrase, 'female_soft');
 }
 
 export function cleanupFile(filePath: string): void {
