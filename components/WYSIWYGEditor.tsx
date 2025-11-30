@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
 import { TextStyle } from '@tiptap/extension-text-style';
+import { Youtube } from '@/components/extensions/youtube';
 import { useEffect, useState } from 'react';
 import { 
   Bold, 
@@ -99,6 +100,7 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
       }),
       Underline,
       TextStyle,
+      Youtube,
     ],
     content: content,
     editorProps: {
@@ -138,6 +140,9 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
         // Check if this is an image tag
         const imgMatch = html.match(/<img[^>]+src="([^"]+)"/);
         
+        // Check if this is a YouTube embed
+        const youtubeMatch = html.match(/youtube\.com\/embed\/([^"?]+)/);
+        
         if (imgMatch) {
           // If we have a saved position, move cursor there first
           if (savedPosition !== null) {
@@ -150,6 +155,17 @@ export function WYSIWYGEditor({ content, onChange, onInsertImage, onEditorReady 
           editor.chain().focus().setImage({ src: imgMatch[1] }).run();
           
           // Clear saved position
+          savedPosition = null;
+        } else if (youtubeMatch) {
+          // Handle YouTube embed using the custom YouTube extension
+          if (savedPosition !== null) {
+            editor.commands.focus();
+            editor.commands.setTextSelection(savedPosition);
+          }
+          
+          const embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+          editor.chain().focus().setYoutubeVideo({ src: embedUrl }).run();
+          
           savedPosition = null;
         } else {
           // For other HTML content

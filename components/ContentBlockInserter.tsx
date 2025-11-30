@@ -102,21 +102,48 @@ export function ContentBlockInserter({ onInsert, onBeforeInsert }: BlockInserter
     handleInsertImage(url);
   };
 
+  const extractYoutubeVideoId = (url: string): string | null => {
+    if (!url) return null;
+    
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtube\.com\/watch\?.+&v=)([^&]+)/,
+      /youtu\.be\/([^?&]+)/,
+      /youtube\.com\/embed\/([^?&]+)/,
+      /youtube\.com\/v\/([^?&]+)/,
+      /youtube\.com\/shorts\/([^?&]+)/,
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  };
+
   const handleInsertVideo = () => {
     if (!videoUrl) return;
     let embedHtml = '';
     
     // YouTube
     if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-      const videoId = videoUrl.includes('youtu.be') 
-        ? videoUrl.split('youtu.be/')[1]?.split('?')[0]
-        : videoUrl.split('v=')[1]?.split('&')[0];
-      embedHtml = `<div class="video-container my-6"><iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+      const videoId = extractYoutubeVideoId(videoUrl);
+      if (!videoId) {
+        alert('Could not extract YouTube video ID. Please check the URL format.');
+        return;
+      }
+      embedHtml = `<div data-youtube-video="" class="video-container my-6" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"><iframe src="https://www.youtube.com/embed/${videoId}" width="100%" height="100%" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="true"></iframe></div>`;
     }
     // Vimeo
     else if (videoUrl.includes('vimeo.com')) {
       const videoId = videoUrl.split('vimeo.com/')[1]?.split('?')[0];
-      embedHtml = `<div class="video-container my-6"><iframe src="https://player.vimeo.com/video/${videoId}" width="100%" height="400" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
+      if (!videoId) {
+        alert('Could not extract Vimeo video ID. Please check the URL format.');
+        return;
+      }
+      embedHtml = `<div class="video-container my-6" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"><iframe src="https://player.vimeo.com/video/${videoId}" width="100%" height="100%" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
     }
     else {
       embedHtml = `<video controls class="w-full rounded-lg my-6"><source src="${videoUrl}" type="video/mp4"></video>`;
