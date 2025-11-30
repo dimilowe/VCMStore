@@ -331,6 +331,7 @@ export default function AdminPage() {
                     <option value="freebie">Freebie</option>
                     <option value="video">Video</option>
                     <option value="course">Course</option>
+                    <option value="invisible">Invisible</option>
                   </select>
 
                   <select

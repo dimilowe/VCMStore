@@ -19,7 +19,7 @@ async function getProducts(): Promise<Product[]> {
   const result = await query(
     `SELECT id, slug, name, description, thumbnail_url, type, price_type, price 
      FROM products 
-     WHERE visibility = 'public' 
+     WHERE visibility = 'public' AND type != 'invisible'
      ORDER BY created_at DESC`
   );
   return result.rows;
