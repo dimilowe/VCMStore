@@ -13,7 +13,8 @@ import {
   Youtube,
   LayoutGrid,
   Target,
-  Music
+  Music,
+  Megaphone
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -92,6 +93,13 @@ const tools = [
     icon: Music, 
     href: "/tools/producer-tag-generator",
     category: "Audio"
+  },
+  { 
+    name: "Ad Copy Analyzer", 
+    description: "Analyze any ad copy and get scores, insights, and improved versions.",
+    icon: Megaphone, 
+    href: "/tools/ad-copy-analyzer",
+    category: "Marketing"
   },
   { 
     name: "Visualization Tool", 
