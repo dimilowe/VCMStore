@@ -32,7 +32,8 @@ import {
   Bell,
   Music,
   Target,
-  Link2
+  Link2,
+  FileText
 } from "lucide-react";
 
 interface BlogPost {
@@ -153,6 +154,7 @@ const freeTools = [
   { name: "Producer Tag", icon: Music, href: "/tools/producer-tag-generator" },
   { name: "Ad Copy Analyzer", icon: Megaphone, href: "/tools/ad-copy-analyzer" },
   { name: "Internal Link Audit", icon: Link2, href: "/tools/internal-link-seo-audit" },
+  { name: "AI Summarizer", icon: FileText, href: "/tools/summarizer" },
   { name: "Visualization", icon: GitBranch, href: "/tools/visualization" },
   { name: "Emoji Combos", icon: Smile, href: "/tools/emoji-combos" },
   { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day" },
