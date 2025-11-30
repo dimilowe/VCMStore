@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, Copy, Check, ChevronDown, ChevronUp, Zap, Target, TrendingUp, AlertTriangle, Lightbulb, FileText, Sparkles } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 interface ScoreBreakdown {
   hook: number;
@@ -630,8 +631,10 @@ export default function AdCopyAnalyzerPage() {
           </div>
         </div>
 
+        <ExploreMoreTools currentTool="/tools/ad-copy-analyzer" />
+
         <div className="mt-12 text-center text-sm text-gray-500">
-          Powered by VCM Suite • Built for creators and marketers
+          Part of the VCM creator tool stack. Build, monetize, and grow with APE & VCM OS.
         </div>
       </div>
     </div>

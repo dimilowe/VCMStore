@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Search, Link2, AlertTriangle, TrendingUp, Loader2, ExternalLink, CheckCircle, XCircle, Target } from 'lucide-react';
+import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 interface PageData {
   url: string;
@@ -520,9 +521,11 @@ export default function InternalLinkSeoAuditPage() {
           </div>
         </div>
 
+        <ExploreMoreTools currentTool="/tools/internal-link-seo-audit" />
+
         <div className="text-center mt-12 py-8 border-t border-gray-200">
           <p className="text-gray-500 text-sm">
-            VCM Suite - Free tools to help creators grow their online presence
+            Part of the VCM creator tool stack. Build, monetize, and grow with APE & VCM OS.
           </p>
         </div>
       </div>
