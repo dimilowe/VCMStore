@@ -14,11 +14,12 @@ interface BlogPost {
   meta_description: string | null;
   featured_image_url: string | null;
   published_at: Date | null;
+  unlisted: boolean;
 }
 
 async function getBlogPost(id: number): Promise<BlogPost | null> {
   const result = await query(
-    `SELECT id, title, slug, content, excerpt, meta_description, featured_image_url, published_at
+    `SELECT id, title, slug, content, excerpt, meta_description, featured_image_url, published_at, unlisted
      FROM blog_posts 
      WHERE id = $1`,
     [id]

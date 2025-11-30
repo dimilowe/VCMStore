@@ -53,7 +53,7 @@ async function getBlogPosts(categorySlug?: string): Promise<BlogPost[]> {
     FROM blog_posts bp
     LEFT JOIN blog_post_categories bpc ON bp.id = bpc.blog_post_id
     LEFT JOIN categories c ON bpc.category_id = c.id
-    WHERE bp.published_at IS NOT NULL AND bp.published_at <= NOW()
+    WHERE bp.published_at IS NOT NULL AND bp.published_at <= NOW() AND (bp.unlisted IS NULL OR bp.unlisted = false)
   `;
 
   if (categorySlug) {
@@ -85,6 +85,7 @@ async function getCategories(): Promise<Category[]> {
      LEFT JOIN blog_posts bp ON bpc.blog_post_id = bp.id 
        AND bp.published_at IS NOT NULL 
        AND bp.published_at <= NOW()
+       AND (bp.unlisted IS NULL OR bp.unlisted = false)
      GROUP BY c.id
      HAVING COUNT(bpc.blog_post_id) > 0
      ORDER BY c.name ASC`,

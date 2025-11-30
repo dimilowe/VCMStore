@@ -21,6 +21,7 @@ interface BlogPost {
   meta_description: string | null;
   featured_image_url: string | null;
   published_at: Date | null;
+  unlisted?: boolean;
 }
 
 interface BlogPostEditorProps {
@@ -38,6 +39,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
     post?.published_at ? new Date(post.published_at).toISOString().slice(0, 16) : ''
   );
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [unlisted, setUnlisted] = useState(post?.unlisted || false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -88,6 +90,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
             featured_image_url: featuredImageUrl || null,
             published_at: null, // Keep as draft
             category_ids: selectedCategories,
+            unlisted,
           }),
           credentials: 'include',
         });
@@ -192,6 +195,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           featured_image_url: featuredImageUrl || null,
           published_at: null,
           category_ids: selectedCategories,
+          unlisted,
         }),
         credentials: 'include',
       });
@@ -240,6 +244,7 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
           featured_image_url: featuredImageUrl || null,
           published_at: publishedAt || new Date().toISOString(),
           category_ids: selectedCategories,
+          unlisted,
         }),
         credentials: 'include',
       });
@@ -415,6 +420,21 @@ export function BlogPostEditor({ post }: BlogPostEditorProps) {
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
                   {publishedAt ? 'Click Clear to publish immediately' : 'Leave empty to publish immediately'}
+                </p>
+              </div>
+              <div className="pt-3 border-t mt-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={unlisted}
+                    onChange={(e) => setUnlisted(e.target.checked)}
+                    disabled={loading}
+                    className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                  />
+                  <span className="text-sm font-medium">Unlisted</span>
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  Hidden from newsletter page but still ranks in Google search
                 </p>
               </div>
             </div>

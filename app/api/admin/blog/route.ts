@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const { title, slug, content, excerpt, meta_description, featured_image_url, published_at, category_ids } = await request.json();
+    const { title, slug, content, excerpt, meta_description, featured_image_url, published_at, category_ids, unlisted } = await request.json();
 
     if (!title || !slug || !content) {
       return NextResponse.json(
@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await query(
-      `INSERT INTO blog_posts (title, slug, content, excerpt, meta_description, featured_image_url, author_id, published_at) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO blog_posts (title, slug, content, excerpt, meta_description, featured_image_url, author_id, published_at, unlisted) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING id`,
-      [title, slug, content, excerpt, meta_description, featured_image_url, session.userId, published_at]
+      [title, slug, content, excerpt, meta_description, featured_image_url, session.userId, published_at, unlisted || false]
     );
 
     const postId = result.rows[0].id;
