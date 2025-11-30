@@ -14,7 +14,8 @@ import {
   LayoutGrid,
   Target,
   Music,
-  Megaphone
+  Megaphone,
+  Link2
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -100,6 +101,13 @@ const tools = [
     icon: Megaphone, 
     href: "/tools/ad-copy-analyzer",
     category: "Marketing"
+  },
+  { 
+    name: "Internal Link Audit", 
+    description: "Find orphan pages and weak internal links to improve your SEO.",
+    icon: Link2, 
+    href: "/tools/internal-link-seo-audit",
+    category: "SEO"
   },
   { 
     name: "Visualization Tool", 

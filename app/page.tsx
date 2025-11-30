@@ -31,7 +31,8 @@ import {
   Youtube,
   Bell,
   Music,
-  Target
+  Target,
+  Link2
 } from "lucide-react";
 
 interface BlogPost {
@@ -151,6 +152,7 @@ const freeTools = [
   { name: "AI Humanizer", icon: Sparkles, href: "/tools/ai-humanizer-free" },
   { name: "Producer Tag", icon: Music, href: "/tools/producer-tag-generator" },
   { name: "Ad Copy Analyzer", icon: Megaphone, href: "/tools/ad-copy-analyzer" },
+  { name: "Internal Link Audit", icon: Link2, href: "/tools/internal-link-seo-audit" },
   { name: "Visualization", icon: GitBranch, href: "/tools/visualization" },
   { name: "Emoji Combos", icon: Smile, href: "/tools/emoji-combos" },
   { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day" },
