@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, Bug, Lightbulb, Sparkles, Send, FileText } from 'lucide-react';
+import { MessageSquare, Bug, Lightbulb, Sparkles, Send, FileText, Wrench } from 'lucide-react';
 
 const feedbackTypes = [
   { value: 'bug', label: 'Bug Report', icon: Bug, color: 'border-red-200 hover:border-red-400 hover:bg-red-50' },
   { value: 'feature', label: 'Feature Request', icon: Sparkles, color: 'border-purple-200 hover:border-purple-400 hover:bg-purple-50' },
   { value: 'improvement', label: 'Improvement Suggestion', icon: Lightbulb, color: 'border-blue-200 hover:border-blue-400 hover:bg-blue-50' },
   { value: 'general', label: 'General Feedback', icon: MessageSquare, color: 'border-gray-200 hover:border-gray-400 hover:bg-gray-50' },
+  { value: 'tool_idea', label: 'Tool Idea', icon: Wrench, color: 'border-orange-200 hover:border-orange-400 hover:bg-orange-50' },
   { value: 'article', label: 'Submit Blog Article', icon: FileText, color: 'border-green-200 hover:border-green-400 hover:bg-green-50' },
 ];
 
@@ -29,6 +30,7 @@ export function FeedbackDialog() {
   const [authorBio, setAuthorBio] = useState('');
 
   const isArticleSubmission = selectedType === 'article';
+  const isToolIdea = selectedType === 'tool_idea';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,6 +105,8 @@ export function FeedbackDialog() {
             <p className="text-gray-600">
               {isArticleSubmission 
                 ? "Your article has been submitted for review. We'll be in touch soon!"
+                : isToolIdea
+                ? "Thanks for the tool idea! We'll review it and add it to our roadmap."
                 : "Your feedback has been submitted successfully."}
             </p>
           </div>
@@ -152,11 +156,11 @@ export function FeedbackDialog() {
 
             <div>
               <label htmlFor="subject" className="text-sm font-medium mb-2 block">
-                {isArticleSubmission ? 'Article Title' : 'Subject'} <span className="text-red-500">*</span>
+                {isArticleSubmission ? 'Article Title' : isToolIdea ? 'Tool Name' : 'Subject'} <span className="text-red-500">*</span>
               </label>
               <Input
                 id="subject"
-                placeholder={isArticleSubmission ? "Your article headline" : "Brief description of your feedback"}
+                placeholder={isArticleSubmission ? "Your article headline" : isToolIdea ? "e.g., Color Palette Generator, PDF Merger, etc." : "Brief description of your feedback"}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 required
@@ -166,22 +170,29 @@ export function FeedbackDialog() {
 
             <div>
               <label htmlFor="message" className="text-sm font-medium mb-2 block">
-                {isArticleSubmission ? 'Article Content' : 'Message'} <span className="text-red-500">*</span>
+                {isArticleSubmission ? 'Article Content' : isToolIdea ? 'Tool Description' : 'Message'} <span className="text-red-500">*</span>
               </label>
               <Textarea
                 id="message"
                 placeholder={isArticleSubmission 
                   ? "Paste your full article content here. You can include formatting instructions in plain text..."
+                  : isToolIdea
+                  ? "Describe what the tool should do, who would use it, and why it would be valuable for creators..."
                   : "Please provide detailed information about your feedback..."}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 required
-                rows={isArticleSubmission ? 12 : 5}
+                rows={isArticleSubmission ? 12 : isToolIdea ? 6 : 5}
                 className="border-gray-300 focus:border-orange-500 focus:ring-orange-500"
               />
               {isArticleSubmission && (
                 <p className="text-xs text-gray-500 mt-1">
                   Tip: Use plain text with clear paragraph breaks. We&apos;ll handle formatting.
+                </p>
+              )}
+              {isToolIdea && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Include example use cases and any similar tools you&apos;ve seen elsewhere.
                 </p>
               )}
             </div>
@@ -250,8 +261,8 @@ export function FeedbackDialog() {
                 'Submitting...'
               ) : (
                 <>
-                  {isArticleSubmission ? <FileText className="w-4 h-4 mr-2" /> : <Send className="w-4 h-4 mr-2" />}
-                  {isArticleSubmission ? 'Submit Article for Review' : 'Submit Feedback'}
+                  {isArticleSubmission ? <FileText className="w-4 h-4 mr-2" /> : isToolIdea ? <Wrench className="w-4 h-4 mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+                  {isArticleSubmission ? 'Submit Article for Review' : isToolIdea ? 'Submit Tool Idea' : 'Submit Feedback'}
                 </>
               )}
             </Button>
