@@ -177,56 +177,58 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </article>
             
             {/* Sidebar */}
-            <aside className="lg:col-span-1 space-y-6">
-              {/* Newsletter Signup */}
-              <Card className="sticky top-8 border-2 border-orange-500">
-                <CardHeader>
-                  <CardTitle className="text-xl">Never Miss a Post</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Get our latest articles and resources delivered weekly.
-                  </p>
-                  <NewsletterSignup />
-                </CardContent>
-              </Card>
-              
-              {/* Related Posts */}
-              {relatedPosts.length > 0 && (
-                <Card>
+            <aside className="lg:col-span-1">
+              <div className="lg:sticky lg:top-8 space-y-6">
+                {/* Newsletter Signup */}
+                <Card className="border-2 border-orange-500">
                   <CardHeader>
-                    <CardTitle className="text-xl">Related Articles</CardTitle>
+                    <CardTitle className="text-xl">Never Miss a Post</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {relatedPosts.map((relatedPost) => (
-                        <Link 
-                          key={relatedPost.id} 
-                          href={`/newsletter/${relatedPost.slug}`}
-                          className="block group"
-                        >
-                          {relatedPost.featured_image_url && (
-                            <div 
-                              className="w-full h-32 bg-cover bg-center rounded-md mb-2"
-                              style={{ backgroundImage: `url('${relatedPost.featured_image_url}')` }}
-                            />
-                          )}
-                          <h4 className="font-semibold group-hover:text-orange-600 transition-colors line-clamp-2">
-                            {relatedPost.title}
-                          </h4>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {new Date(relatedPost.published_at).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
-                          </p>
-                        </Link>
-                      ))}
-                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Get our latest articles and resources delivered weekly.
+                    </p>
+                    <NewsletterSignup />
                   </CardContent>
                 </Card>
-              )}
+                
+                {/* Related Posts */}
+                {relatedPosts.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-xl">Related Articles</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {relatedPosts.map((relatedPost) => (
+                          <Link 
+                            key={relatedPost.id} 
+                            href={`/newsletter/${relatedPost.slug}`}
+                            className="block group"
+                          >
+                            {relatedPost.featured_image_url && (
+                              <div 
+                                className="w-full h-32 bg-cover bg-center rounded-md mb-2"
+                                style={{ backgroundImage: `url('${relatedPost.featured_image_url}')` }}
+                              />
+                            )}
+                            <h4 className="font-semibold group-hover:text-orange-600 transition-colors line-clamp-2">
+                              {relatedPost.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {new Date(relatedPost.published_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </p>
+                          </Link>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </aside>
           </div>
         </div>
