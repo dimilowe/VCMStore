@@ -143,6 +143,22 @@ async function fetchChildSitemaps(sitemapUrls: string[], maxUrls: number): Promi
   return allUrls;
 }
 
+function canonicalizeUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.hash = '';
+    
+    let pathname = parsed.pathname;
+    if (pathname.length > 1 && pathname.endsWith('/')) {
+      pathname = pathname.slice(0, -1);
+    }
+    
+    return `${parsed.protocol}//${parsed.hostname}${pathname}${parsed.search}`;
+  } catch {
+    return url;
+  }
+}
+
 function normalizeUrl(href: string, baseUrl: string, hostname: string): string | null {
   if (!href) return null;
   
@@ -287,24 +303,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const canonicalizedUrls = urlsToScan.map(url => canonicalizeUrl(url));
+    
     const pageMap = new Map<string, PageData>();
     
-    for (const url of urlsToScan) {
-      pageMap.set(url, {
-        url,
-        title: null,
-        outboundInternalLinks: 0,
-        inboundInternalLinks: 0,
-        outboundUrls: []
-      });
+    for (const url of canonicalizedUrls) {
+      if (!pageMap.has(url)) {
+        pageMap.set(url, {
+          url,
+          title: null,
+          outboundInternalLinks: 0,
+          inboundInternalLinks: 0,
+          outboundUrls: []
+        });
+      }
     }
 
     let pagesScanned = 0;
     let pagesSkipped = 0;
     
+    const urlsArray = Array.from(pageMap.keys());
+    
     const BATCH_SIZE = 10;
-    for (let i = 0; i < urlsToScan.length; i += BATCH_SIZE) {
-      const batch = urlsToScan.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < urlsArray.length; i += BATCH_SIZE) {
+      const batch = urlsArray.slice(i, i + BATCH_SIZE);
       
       const results = await Promise.all(
         batch.map(async (url) => {

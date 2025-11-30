@@ -106,6 +106,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/ai-humanizer-free` - AI Humanizer Free - detect & humanize AI-written content
 - `/tools/producer-tag-generator` - Producer Tag Generator - AI voice tags for beats
 - `/tools/ad-copy-analyzer` - Ad Copy Analyzer - analyze & improve ad copy with AI
+- `/tools/internal-link-seo-audit` - Internal Link Audit - find orphan pages & weak internal links
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -160,6 +161,18 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-11-30: **Added Internal Link in SEO Audit Tool** - Website internal linking analyzer
+  - Created `/tools/internal-link-seo-audit` page targeting "internal link in seo" keyword
+  - Enter domain or sitemap URL to analyze internal linking structure
+  - Fetches sitemap automatically or uses direct sitemap URL
+  - Crawls up to 150 pages, extracts all internal links
+  - Identifies orphan pages (0 inbound links)
+  - Identifies weak pages (1-2 inbound links)
+  - Shows top linked pages (most connected content)
+  - Provides actionable suggestions for improving internal links
+  - Rate limited: 5 audits per hour per IP
+  - Full SEO: title, meta description, FAQ section, educational content
+  - Added to navbar, tools index, homepage, sitemap
 - 2025-11-30: **Added Ad Copy Analyzer Tool** - AI-powered ad copy analysis and improvement
   - Created `/tools/ad-copy-analyzer` page targeting "ad copy" keyword
   - Analyze competitor ads with 7-point scoring system (hook, clarity, benefits, proof, specificity, CTA, platform fit)
