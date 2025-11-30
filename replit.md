@@ -161,6 +161,16 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-11-30: **Added VCM Summarizer Tool** - AI text summarizer and key points extractor
+  - Created `/tools/summarizer` page targeting "summarizer", "summarizer generator", "AI summarizer", "text summarizer" keywords
+  - Paste any text (articles, essays, emails, notes) and get a clean summary + bullet-point key takeaways
+  - Options: "Simpler language" mode and "Bullet points only" mode
+  - Input validation: minimum 200 chars, max 8000 chars (truncates with notice)
+  - Real-time word/character count display
+  - Copy summary, takeaways, or all at once
+  - Rate limited: 15 summaries per hour per IP
+  - Full SEO: title, meta description, H1 with keywords, FAQ section, how-it-works explainer
+  - Added to navbar, tools index, homepage, sitemap, ExploreMoreTools
 - 2025-11-30: **Added Internal Link in SEO Audit Tool** - Website internal linking analyzer
   - Created `/tools/internal-link-seo-audit` page targeting "internal link in seo" keyword
   - Enter domain or sitemap URL to analyze internal linking structure
