@@ -52,10 +52,6 @@ localPort = 37291
 externalPort = 6000
 
 [[ports]]
-localPort = 38039
-externalPort = 4200
-
-[[ports]]
 localPort = 38253
 externalPort = 5000
 
@@ -94,7 +90,7 @@ externalPort = 8008
 [deployment]
 deploymentTarget = "autoscale"
 run = ["npm", "run", "start"]
-build = ["bash", "-c", "rm -rf .next; npm run build"]
+build = ["npm", "run", "build"]
 
 [objectStorage]
 defaultBucketID = "replit-objstore-f30af4dd-a772-4dc8-a189-f2a1bb5e1621"
