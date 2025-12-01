@@ -388,7 +388,7 @@ export default function HoroscopeOfTheDayPage() {
             <p className="text-gray-500 text-sm">
               Free tool by{' '}
               <Link href="/" className="text-orange-600 hover:text-orange-700 font-medium">
-                VCM Store
+                VCM Suite
               </Link>
             </p>
           </div>

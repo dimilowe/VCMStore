@@ -7,10 +7,10 @@ import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { CategoryFilter } from "@/components/CategoryFilter";
 
 export const metadata: Metadata = {
-  title: "Blog & Newsletter | VCM Store",
+  title: "Blog & Newsletter | VCM Suite",
   description: "Read the latest insights, tutorials, and tips for modern creators. Get exclusive tools, early access, and insider tips delivered weekly.",
   openGraph: {
-    title: "Blog & Newsletter | VCM Store",
+    title: "Blog & Newsletter | VCM Suite",
     description: "Read the latest insights, tutorials, and tips for modern creators.",
     type: "website",
   },

@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   
   return {
-    title: `${post.title} | VCM Store Blog`,
+    title: `${post.title} | VCM Suite`,
     description: post.meta_description || post.excerpt || post.title,
     openGraph: {
       title: post.title,

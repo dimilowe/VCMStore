@@ -270,7 +270,7 @@ export default function IdeasFeedPage() {
             <p className="text-gray-500 text-sm">
               Free community tool by{' '}
               <Link href="/" className="text-amber-600 hover:text-amber-700 font-medium">
-                VCM Store
+                VCM Suite
               </Link>
             </p>
           </div>

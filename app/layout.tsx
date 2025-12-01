@@ -7,8 +7,8 @@ import { Navbar } from "@/components/navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "VCM Store - Apps, Systems & Downloads for Creators",
-  description: "Browse apps, systems, and downloads to help creators & digital nomads make money online.",
+  title: "VCM Suite - Free Tools & Resources for Creators",
+  description: "Free tools and resources to help creators grow, engage, and monetize their creative business.",
   verification: {
     google: '5cb76b900fd3341c',
   },

@@ -125,7 +125,7 @@ export default function IdeaDetailClient({
     },
     publisher: {
       '@type': 'Organization',
-      name: 'VCM Store',
+      name: 'VCM Suite',
     },
     mainEntityOfPage: {
       '@type': 'WebPage',

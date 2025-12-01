@@ -433,7 +433,7 @@ export default function AffirmationAboutSelfLovePage() {
             <p className="text-gray-500 text-sm">
               Free daily tool by{' '}
               <Link href="/" className="text-rose-600 hover:text-rose-700 font-medium">
-                VCM Store
+                VCM Suite
               </Link>
             </p>
           </div>

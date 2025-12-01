@@ -24,7 +24,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Welcome to VCM Store AI Strategy Sessions! I'm here to help you discover the perfect tools and resources for your creator business. What are you working on today?",
+      content: "Welcome to VCM Suite AI Strategy Sessions! I'm here to help you discover the perfect tools and resources for your creator business. What are you working on today?",
     },
   ]);
   const [input, setInput] = useState("");
