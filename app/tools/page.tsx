@@ -62,6 +62,13 @@ const tools = [
     category: "Image"
   },
   { 
+    name: "HEIC to JPG Converter", 
+    description: "Convert iPhone HEIC photos to JPG format online. Free, private, no upload.",
+    icon: FileImage, 
+    href: "/tools/heic-to-jpg",
+    category: "Image"
+  },
+  { 
     name: "Image Compressor", 
     description: "Compress JPG, PNG, and WebP images with smart optimization.",
     icon: FileImage, 

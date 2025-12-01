@@ -6,6 +6,7 @@ const tools = [
   { name: "Image Compressor", href: "/tools/image-compressor" },
   { name: "GIF Compressor", href: "/tools/gif-compressor" },
   { name: "GIF Maker", href: "/tools/gif-maker" },
+  { name: "HEIC to JPG", href: "/tools/heic-to-jpg" },
   { name: "Emoji Combos", href: "/tools/emoji-combos" },
   { name: "Thumbnail Coach", href: "/tools/ai-thumbnail-coach" },
   { name: "Visualization", href: "/tools/visualization" },

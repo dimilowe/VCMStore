@@ -146,6 +146,7 @@ const freeTools = [
   { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach" },
   { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor" },
   { name: "GIF Maker", icon: FileImage, href: "/tools/gif-maker" },
+  { name: "HEIC to JPG", icon: FileImage, href: "/tools/heic-to-jpg" },
   { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor" },
   { name: "Word Counter", icon: Type, href: "/tools/word-counter" },
   { name: "Logo Generator", icon: Palette, href: "/tools/logo-generator" },

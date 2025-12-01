@@ -36,6 +36,7 @@ const navDropdowns: NavDropdown[] = [
       { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },
       { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards" },
       { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files" },
+      { label: "HEIC to JPG", href: "/tools/heic-to-jpg", description: "Convert iPhone HEIC to JPG" },
       { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP" },
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters" },
       { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker" },
