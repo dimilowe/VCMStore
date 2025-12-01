@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, X, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { MediaLibrary } from '@/components/MediaLibrary';
 
 interface FeaturedImageUploaderProps {
   value: string;
@@ -14,10 +15,10 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState('');
-  const [useUrl, setUseUrl] = useState(!!value);
+  const [activeTab, setActiveTab] = useState<'upload' | 'library' | 'url'>('upload');
+  const [showLibrary, setShowLibrary] = useState(false);
   
-  // Hard width limit to prevent sidebar expansion
-  const containerMaxWidth = '268px'; // 320px sidebar - 24px padding on each side
+  const containerMaxWidth = '268px';
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -77,6 +78,11 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
     }
   };
 
+  const handleLibrarySelect = (url: string) => {
+    onChange(url);
+    setShowLibrary(false);
+  };
+
   return (
     <div className="space-y-3">
       <h3 className="font-semibold text-sm">Featured Image</h3>
@@ -87,13 +93,12 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
         </div>
       )}
 
-      {/* Tab Selection */}
-      <div className="flex gap-2 text-xs">
+      <div className="flex gap-1 text-xs">
         <button
           type="button"
-          onClick={() => setUseUrl(false)}
-          className={`px-3 py-1 rounded transition-colors ${
-            !useUrl
+          onClick={() => setActiveTab('upload')}
+          className={`px-2 py-1 rounded transition-colors ${
+            activeTab === 'upload'
               ? 'bg-orange-100 text-orange-700 font-medium'
               : 'text-gray-500 hover:text-gray-700'
           }`}
@@ -103,19 +108,32 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
         </button>
         <button
           type="button"
-          onClick={() => setUseUrl(true)}
-          className={`px-3 py-1 rounded transition-colors ${
-            useUrl
+          onClick={() => setActiveTab('library')}
+          className={`px-2 py-1 rounded transition-colors flex items-center gap-1 ${
+            activeTab === 'library'
               ? 'bg-orange-100 text-orange-700 font-medium'
               : 'text-gray-500 hover:text-gray-700'
           }`}
           disabled={disabled}
         >
-          From URL
+          <ImageIcon className="w-3 h-3" />
+          Library
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('url')}
+          className={`px-2 py-1 rounded transition-colors ${
+            activeTab === 'url'
+              ? 'bg-orange-100 text-orange-700 font-medium'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+          disabled={disabled}
+        >
+          URL
         </button>
       </div>
 
-      {!useUrl ? (
+      {activeTab === 'upload' && (
         <>
           {!value ? (
             <div
@@ -184,7 +202,43 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
             </div>
           )}
         </>
-      ) : (
+      )}
+
+      {activeTab === 'library' && (
+        <>
+          {value && (
+            <div className="relative rounded-lg overflow-hidden border" style={{ maxWidth: containerMaxWidth }}>
+              <img 
+                src={value} 
+                alt="Featured" 
+                className="w-full h-32 object-cover block"
+                style={{ maxWidth: containerMaxWidth }}
+              />
+              <button
+                type="button"
+                onClick={() => onChange('')}
+                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 flex-shrink-0"
+                disabled={disabled}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowLibrary(true)}
+            className="w-full text-xs"
+            disabled={disabled}
+          >
+            <ImageIcon className="w-4 h-4 mr-2" />
+            {value ? 'Change Image' : 'Browse Media Library'}
+          </Button>
+        </>
+      )}
+
+      {activeTab === 'url' && (
         <>
           <input
             type="url"
@@ -210,6 +264,13 @@ export function FeaturedImageUploader({ value, onChange, disabled }: FeaturedIma
       <p className="text-xs text-gray-500">
         Image URL for social sharing and post listings
       </p>
+
+      {showLibrary && (
+        <MediaLibrary
+          onSelect={handleLibrarySelect}
+          onClose={() => setShowLibrary(false)}
+        />
+      )}
     </div>
   );
 }
