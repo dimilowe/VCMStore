@@ -107,6 +107,8 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/producer-tag-generator` - Producer Tag Generator - AI voice tags for beats
 - `/tools/ad-copy-analyzer` - Ad Copy Analyzer - analyze & improve ad copy with AI
 - `/tools/internal-link-seo-audit` - Internal Link Audit - find orphan pages & weak internal links
+- `/tools/gif-maker` - GIF Maker - create GIFs from videos using ffmpeg.wasm
+- `/tools/heic-to-jpg` - HEIC to JPG Converter - convert iPhone HEIC photos to JPG (targets "heic u jpg" keyword)
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -336,6 +338,22 @@ VCM Suite and VCM OS share a unified brand identity:
   - JSON-LD schema for SoftwareApplication and FAQPage
   - APE product CTA integration for monetization
   - Added to navigation dropdown and sitemap
+- 2025-12-01: **Added HEIC to JPG Converter Tool** - Free conversion tool targeting "heic u jpg" keyword
+  - Created `/tools/heic-to-jpg` page with client-side HEIC conversion
+  - Uses heic2any library for HEIC/HEIF to JPG conversion (dynamically imported for SSR compatibility)
+  - JSZip for batch downloads of multiple converted images (dynamically imported)
+  - Supports quality adjustment (1-100%) and optional resizing
+  - Batch processing up to 20 files simultaneously
+  - 100% client-side - no server uploads, complete privacy
+  - SEO-optimized with keyword targeting in meta descriptions and FAQ content
+  - JSON-LD schema for SoftwareApplication and FAQPage
+  - **IMPORTANT**: Browser-only libraries (heic2any, JSZip) must use dynamic import pattern:
+    `const heic2any = (await import('heic2any')).default;`
+- 2025-12-01: **Added GIF Maker Tool** - Create GIFs from video files
+  - Uses FFmpeg WASM for client-side video-to-GIF conversion
+  - Supports MP4, WebM, AVI, MOV, MKV video formats
+  - Configurable FPS (5-30), width (100-800px), and quality
+  - Preview of video before conversion
 - 2025-11-26: **Added GIF Compressor Tool** - Free web tool to drive SEO traffic
   - Created `/tools/gif-compressor` page with premium white/gray/gold styling
   - Three compression levels: Light (best quality), Balanced, Maximum (smallest file)
