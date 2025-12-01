@@ -55,6 +55,13 @@ const tools = [
     category: "Image"
   },
   { 
+    name: "GIF Maker", 
+    description: "Convert video or images to GIF directly in your browser.",
+    icon: FileImage, 
+    href: "/tools/gif-maker",
+    category: "Image"
+  },
+  { 
     name: "Image Compressor", 
     description: "Compress JPG, PNG, and WebP images with smart optimization.",
     icon: FileImage, 

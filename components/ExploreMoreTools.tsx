@@ -5,6 +5,7 @@ const tools = [
   { name: "Keyword Finder", href: "/tools/keyword-finder" },
   { name: "Image Compressor", href: "/tools/image-compressor" },
   { name: "GIF Compressor", href: "/tools/gif-compressor" },
+  { name: "GIF Maker", href: "/tools/gif-maker" },
   { name: "Emoji Combos", href: "/tools/emoji-combos" },
   { name: "Thumbnail Coach", href: "/tools/ai-thumbnail-coach" },
   { name: "Visualization", href: "/tools/visualization" },

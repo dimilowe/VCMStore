@@ -145,6 +145,7 @@ const freeTools = [
   { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box" },
   { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach" },
   { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor" },
+  { name: "GIF Maker", icon: FileImage, href: "/tools/gif-maker" },
   { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor" },
   { name: "Word Counter", icon: Type, href: "/tools/word-counter" },
   { name: "Logo Generator", icon: Palette, href: "/tools/logo-generator" },
