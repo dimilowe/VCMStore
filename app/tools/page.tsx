@@ -33,147 +33,168 @@ const tools = [
     description: "Snap your food + Health app screenshot to see today's calorie surplus or deficit.",
     icon: Flame, 
     href: "/tools/calorie-deficit-calculator",
-    category: "AI"
+    category: "AI",
+    iconBg: "bg-green-500"
   },
   { 
     name: "Outfit Ideas Generator", 
     description: "Upload outfit photos and find similar items to shop with AI.",
     icon: ShoppingBag, 
     href: "/tools/outfit-ideas",
-    category: "AI"
+    category: "AI",
+    iconBg: "bg-pink-500"
   },
   { 
     name: "AI Thumbnail Coach", 
     description: "Analyze and optimize your YouTube thumbnails with AI.",
     icon: Youtube, 
     href: "/tools/ai-thumbnail-coach",
-    category: "AI"
+    category: "AI",
+    iconBg: "bg-red-500"
   },
   { 
     name: "Logo Generator", 
     description: "Create AI-powered logos for your brand in seconds.",
     icon: Palette, 
     href: "/tools/logo-generator",
-    category: "AI"
+    category: "AI",
+    iconBg: "bg-pink-500"
   },
   { 
     name: "Resource Box", 
     description: "Create shareable link collections for your bio.",
     icon: LayoutGrid, 
     href: "/tools/resource-box",
-    category: "Social"
+    category: "Social",
+    iconBg: "bg-teal-500"
   },
   { 
     name: "GIF Compressor", 
     description: "Compress GIF files to reduce size while maintaining quality.",
     icon: FileImage, 
     href: "/tools/gif-compressor",
-    category: "Image"
+    category: "Image",
+    iconBg: "bg-violet-500"
   },
   { 
     name: "GIF Maker", 
     description: "Convert video or images to GIF directly in your browser.",
     icon: FileImage, 
     href: "/tools/gif-maker",
-    category: "Image"
+    category: "Image",
+    iconBg: "bg-fuchsia-500"
   },
   { 
     name: "HEIC to JPG Converter", 
     description: "Convert iPhone HEIC photos to JPG format online. Free, private, no upload.",
     icon: FileImage, 
     href: "/tools/heic-to-jpg",
-    category: "Image"
+    category: "Image",
+    iconBg: "bg-rose-500"
   },
   { 
     name: "Image Compressor", 
     description: "Compress JPG, PNG, and WebP images with smart optimization.",
     icon: FileImage, 
     href: "/tools/image-compressor",
-    category: "Image"
+    category: "Image",
+    iconBg: "bg-sky-500"
   },
   { 
     name: "Word Counter", 
     description: "Count words, characters, sentences, and reading time.",
     icon: Type, 
     href: "/tools/word-counter",
-    category: "Writing"
+    category: "Writing",
+    iconBg: "bg-gray-500"
   },
   { 
     name: "Keyword Finder", 
     description: "Find low-competition SEO keywords for your content.",
     icon: Search, 
     href: "/tools/keyword-finder",
-    category: "SEO"
+    category: "SEO",
+    iconBg: "bg-blue-500"
   },
   { 
     name: "Reach Grabber Tool", 
     description: "AI-powered SEO optimizer for your blog posts and articles.",
     icon: Target, 
     href: "/tools/reach-grabber-tool",
-    category: "SEO"
+    category: "SEO",
+    iconBg: "bg-orange-500"
   },
   { 
     name: "AI Humanizer Free", 
     description: "Detect AI-written content and humanize it to sound natural.",
     icon: Palette, 
     href: "/tools/ai-humanizer-free",
-    category: "AI"
+    category: "AI",
+    iconBg: "bg-indigo-500"
   },
   { 
     name: "Producer Tag Generator", 
     description: "Create custom AI voice tags for your beats and instrumentals.",
     icon: Music, 
     href: "/tools/producer-tag-generator",
-    category: "Audio"
+    category: "Audio",
+    iconBg: "bg-green-500"
   },
   { 
     name: "Ad Copy Analyzer", 
     description: "Analyze any ad copy and get scores, insights, and improved versions.",
     icon: Megaphone, 
     href: "/tools/ad-copy-analyzer",
-    category: "Marketing"
+    category: "Marketing",
+    iconBg: "bg-cyan-500"
   },
   { 
     name: "Internal Link Audit", 
     description: "Find orphan pages and weak internal links to improve your SEO.",
     icon: Link2, 
     href: "/tools/internal-link-seo-audit",
-    category: "SEO"
+    category: "SEO",
+    iconBg: "bg-emerald-500"
   },
   { 
     name: "AI Summarizer", 
     description: "Summarize any text and extract key takeaways instantly.",
     icon: FileText, 
     href: "/tools/summarizer",
-    category: "Writing"
+    category: "Writing",
+    iconBg: "bg-yellow-500"
   },
   { 
     name: "Visualization Tool", 
     description: "Turn text into flowcharts, diagrams, and visual maps.",
     icon: GitBranch, 
     href: "/tools/visualization",
-    category: "Design"
+    category: "Design",
+    iconBg: "bg-amber-500"
   },
   { 
     name: "Emoji Combos", 
     description: "Copy aesthetic emoji combinations for your social bios.",
     icon: Smile, 
     href: "/tools/emoji-combos",
-    category: "Social"
+    category: "Social",
+    iconBg: "bg-yellow-400"
   },
   { 
     name: "Horoscope of the Day", 
     description: "Get your personalized AI-powered daily horoscope reading.",
     icon: Star, 
     href: "/tools/horoscope-of-the-day",
-    category: "Lifestyle"
+    category: "Lifestyle",
+    iconBg: "bg-purple-400"
   },
   { 
     name: "Self-Love Affirmations", 
     description: "Daily AI-generated affirmations for self-love and confidence.",
     icon: Heart, 
     href: "/tools/affirmation-about-self-love",
-    category: "Lifestyle"
+    category: "Lifestyle",
+    iconBg: "bg-pink-400"
   },
 ];
 
@@ -209,8 +230,8 @@ export default function ToolsPage() {
                   className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all group"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gray-100 group-hover:bg-orange-50 rounded-xl flex items-center justify-center transition-colors shrink-0">
-                      <tool.icon className="w-6 h-6 text-gray-600 group-hover:text-orange-500" />
+                    <div className={`w-12 h-12 ${tool.iconBg} rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110`}>
+                      <tool.icon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-gray-900 group-hover:text-orange-500 transition-colors mb-1">
