@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, ShoppingCart, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2 } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
@@ -193,7 +193,7 @@ export function Navbar() {
                 className="text-gray-600 hover:text-orange-500 hover:bg-gray-50 rounded-lg relative"
                 onClick={() => setIsCartOpen(!isCartOpen)}
               >
-                <ShoppingCart className="h-5 w-5" />
+                <Bookmark className="h-5 w-5" />
                 {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                     {itemCount > 9 ? '9+' : itemCount}
@@ -204,15 +204,15 @@ export function Navbar() {
               {isCartOpen && (
                 <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
                   <div className="p-4 border-b border-gray-100">
-                    <h3 className="font-semibold text-gray-900">Your Cart</h3>
+                    <h3 className="font-semibold text-gray-900">Saved Items</h3>
                     <p className="text-sm text-gray-500">{itemCount} item{itemCount !== 1 ? 's' : ''}</p>
                   </div>
                   
                   {items.length === 0 ? (
                     <div className="p-6 text-center">
-                      <ShoppingCart className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 text-sm">Your cart is empty</p>
-                      <p className="text-gray-400 text-xs mt-1">Browse products and add items to get started</p>
+                      <Bookmark className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm">No saved items yet</p>
+                      <p className="text-gray-400 text-xs mt-1">Browse products and save items for later</p>
                     </div>
                   ) : (
                     <>
@@ -248,11 +248,11 @@ export function Navbar() {
                           <span className="font-semibold text-gray-900">${totalPrice.toFixed(2)}</span>
                         </div>
                         <Link
-                          href="/cart"
+                          href="/saved"
                           className="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center font-medium py-2.5 rounded-lg transition-colors"
                           onClick={() => setIsCartOpen(false)}
                         >
-                          View Cart & Checkout
+                          View All Saved Items
                         </Link>
                       </div>
                     </>

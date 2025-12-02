@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart, CartItem } from "@/contexts/CartContext";
-import { ShoppingCart, Check } from "lucide-react";
+import { Bookmark, BookmarkCheck } from "lucide-react";
 
-interface AddToCartButtonProps {
+interface SaveItemButtonProps {
   product: {
     id: string;
     name: string;
@@ -17,14 +17,14 @@ interface AddToCartButtonProps {
   className?: string;
 }
 
-export function AddToCartButton({ product, className }: AddToCartButtonProps) {
+export function SaveItemButton({ product, className }: SaveItemButtonProps) {
   const { addToCart, isInCart, removeFromCart } = useCart();
   const [justAdded, setJustAdded] = useState(false);
   
-  const inCart = isInCart(product.id);
+  const isSaved = isInCart(product.id);
 
   const handleClick = () => {
-    if (inCart) {
+    if (isSaved) {
       removeFromCart(product.id);
     } else {
       addToCart({
@@ -43,20 +43,22 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
   return (
     <Button
       onClick={handleClick}
-      variant={inCart ? "secondary" : "outline"}
-      className={`w-full ${inCart ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100" : "border-gray-300 hover:bg-gray-50"} ${className}`}
+      variant={isSaved ? "secondary" : "outline"}
+      className={`w-full ${isSaved ? "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100" : "border-gray-300 hover:bg-gray-50"} ${className}`}
     >
-      {inCart ? (
+      {isSaved ? (
         <>
-          <Check className="h-4 w-4 mr-2" />
-          {justAdded ? "Added to Cart!" : "In Cart - Remove"}
+          <BookmarkCheck className="h-4 w-4 mr-2" />
+          {justAdded ? "Saved!" : "Saved - Remove"}
         </>
       ) : (
         <>
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          Add to Cart
+          <Bookmark className="h-4 w-4 mr-2" />
+          Save for Later
         </>
       )}
     </Button>
   );
 }
+
+export { SaveItemButton as AddToCartButton };
