@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2 } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
@@ -12,47 +12,86 @@ interface DropdownItem {
   description?: string;
 }
 
+interface ResourceItem {
+  label: string;
+  href: string;
+  description: string;
+  icon: React.ElementType;
+  iconBg: string;
+}
+
+interface ResourceCategory {
+  name: string;
+  items: ResourceItem[];
+}
+
 interface NavDropdown {
   label: string;
   items: DropdownItem[];
 }
 
-const navDropdowns: NavDropdown[] = [
+const productDropdown: NavDropdown = {
+  label: "Products",
+  items: [
+    { label: "Apps", href: "/apps", description: "Premium applications for creators" },
+    { label: "Downloads", href: "/downloads", description: "Digital downloads & assets" },
+    { label: "Templates", href: "/funnels", description: "Conversion-focused templates" },
+    { label: "Videos", href: "/videos", description: "Video content & tutorials" },
+    { label: "Freebies", href: "/freebies", description: "Free products & resources" },
+  ]
+};
+
+const resourceCategories: ResourceCategory[] = [
   {
-    label: "Products",
+    name: "AI Tools",
     items: [
-      { label: "Apps", href: "/apps", description: "Premium applications for creators" },
-      { label: "Downloads", href: "/downloads", description: "Digital downloads & assets" },
-      { label: "Templates", href: "/funnels", description: "Conversion-focused templates" },
-      { label: "Videos", href: "/videos", description: "Video content & tutorials" },
-      { label: "Freebies", href: "/freebies", description: "Free products & resources" },
+      { label: "AI Chat", href: "/chat", description: "Strategy assistant for creators", icon: MessageCircle, iconBg: "bg-purple-500" },
+      { label: "Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer", icon: Camera, iconBg: "bg-red-500" },
+      { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker", icon: Palette, iconBg: "bg-pink-500" },
+      { label: "AI Humanizer", href: "/tools/ai-humanizer-free", description: "Detect & humanize AI text", icon: Bot, iconBg: "bg-indigo-500" },
+      { label: "AI Summarizer", href: "/tools/summarizer", description: "Summarize any text instantly", icon: Zap, iconBg: "bg-yellow-500" },
+      { label: "Producer Tags", href: "/tools/producer-tag-generator", description: "AI voice tags for beats", icon: Mic, iconBg: "bg-green-500" },
     ]
   },
   {
-    label: "Resources",
+    name: "SEO & Marketing",
     items: [
-      { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
-      { label: "Calorie Deficit Calculator", href: "/tools/calorie-deficit-calculator", description: "AI food calorie counter" },
-      { label: "AI Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer" },
-      { label: "VCM Answers", href: "/answers", description: "Community Q&A forum" },
-      { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },
-      { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards" },
-      { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files" },
-      { label: "HEIC to JPG", href: "/tools/heic-to-jpg", description: "Convert iPhone HEIC to JPG" },
-      { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP" },
-      { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters" },
-      { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker" },
-      { label: "Keyword Finder", href: "/tools/keyword-finder", description: "Find low-competition SEO ideas" },
-      { label: "Reach Grabber Tool", href: "/tools/reach-grabber-tool", description: "AI SEO content optimizer" },
-      { label: "AI Humanizer Free", href: "/tools/ai-humanizer-free", description: "Detect & humanize AI text" },
-      { label: "Producer Tag Generator", href: "/tools/producer-tag-generator", description: "AI voice tags for beats" },
-      { label: "Ad Copy Analyzer", href: "/tools/ad-copy-analyzer", description: "Analyze & improve ad copy" },
-      { label: "Internal Link Audit", href: "/tools/internal-link-seo-audit", description: "Find orphan pages & weak links" },
-      { label: "AI Summarizer", href: "/tools/summarizer", description: "Summarize any text instantly" },
-      { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams" },
-      { label: "Emoji Combos", href: "/tools/emoji-combos", description: "Copy aesthetic emoji combos" },
-      { label: "Horoscope of the Day", href: "/tools/horoscope-of-the-day", description: "AI daily zodiac readings" },
-      { label: "Self-Love Affirmations", href: "/tools/affirmation-about-self-love", description: "Daily affirmation generator" },
+      { label: "Keyword Finder", href: "/tools/keyword-finder", description: "Low-competition SEO ideas", icon: Search, iconBg: "bg-blue-500" },
+      { label: "Reach Grabber", href: "/tools/reach-grabber-tool", description: "AI SEO content optimizer", icon: Target, iconBg: "bg-orange-500" },
+      { label: "Ad Copy Analyzer", href: "/tools/ad-copy-analyzer", description: "Analyze & improve ad copy", icon: Wand2, iconBg: "bg-cyan-500" },
+      { label: "Internal Link Audit", href: "/tools/internal-link-seo-audit", description: "Find orphan pages & weak links", icon: Network, iconBg: "bg-emerald-500" },
+    ]
+  },
+  {
+    name: "Image Tools",
+    items: [
+      { label: "Calorie Calculator", href: "/tools/calorie-deficit-calculator", description: "AI food calorie counter", icon: Calculator, iconBg: "bg-green-500" },
+      { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP", icon: Image, iconBg: "bg-sky-500" },
+      { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files", icon: FileImage, iconBg: "bg-violet-500" },
+      { label: "HEIC to JPG", href: "/tools/heic-to-jpg", description: "Convert iPhone HEIC photos", icon: FileImage, iconBg: "bg-rose-500" },
+    ]
+  },
+  {
+    name: "Utilities",
+    items: [
+      { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters", icon: FileText, iconBg: "bg-gray-500" },
+      { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards", icon: LinkIcon, iconBg: "bg-teal-500" },
+      { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams", icon: Layout, iconBg: "bg-amber-500" },
+      { label: "Emoji Combos", href: "/tools/emoji-combos", description: "Copy aesthetic emoji combos", icon: Smile, iconBg: "bg-yellow-400" },
+    ]
+  },
+  {
+    name: "Lifestyle",
+    items: [
+      { label: "Horoscope", href: "/tools/horoscope-of-the-day", description: "AI daily zodiac readings", icon: Star, iconBg: "bg-purple-400" },
+      { label: "Self-Love Affirmations", href: "/tools/affirmation-about-self-love", description: "Daily affirmation generator", icon: Heart, iconBg: "bg-pink-400" },
+    ]
+  },
+  {
+    name: "Community",
+    items: [
+      { label: "VCM Answers", href: "/answers", description: "Community Q&A forum", icon: HelpCircle, iconBg: "bg-blue-400" },
+      { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas", icon: Lightbulb, iconBg: "bg-amber-400" },
     ]
   }
 ];
@@ -128,53 +167,144 @@ export function Navbar() {
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">
-              {navDropdowns.map((dropdown) => (
-                <div
-                  key={dropdown.label}
-                  className="relative"
-                  onMouseEnter={() => handleDropdownEnter(dropdown.label)}
-                  onMouseLeave={handleDropdownLeave}
+              {/* Products Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={() => handleDropdownEnter("Products")}
+                onMouseLeave={handleDropdownLeave}
+              >
+                <button
+                  className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    openDropdown === "Products" 
+                      ? 'text-orange-500 bg-orange-50' 
+                      : 'text-gray-700 hover:text-orange-500 hover:bg-gray-50'
+                  }`}
                 >
-                  <button
-                    className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
-                      openDropdown === dropdown.label 
-                        ? 'text-orange-500 bg-orange-50' 
-                        : 'text-gray-700 hover:text-orange-500 hover:bg-gray-50'
-                    }`}
-                  >
-                    {dropdown.label}
-                    <ChevronDown className={`h-4 w-4 transition-transform ${
-                      openDropdown === dropdown.label ? 'rotate-180' : ''
-                    }`} />
-                  </button>
-                  
-                  {openDropdown === dropdown.label && (
-                    <div className="absolute top-full left-0 pt-2 z-50">
-                      <div className="bg-white border border-gray-200 rounded-xl shadow-xl min-w-[280px] overflow-hidden">
-                        <div className="py-2">
-                          {dropdown.items.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className="block px-5 py-3 hover:bg-gray-50 transition-colors"
-                              onClick={() => setOpenDropdown(null)}
-                            >
-                              <span className="block text-sm font-medium text-gray-900">
-                                {item.label}
+                  Products
+                  <ChevronDown className={`h-4 w-4 transition-transform ${
+                    openDropdown === "Products" ? 'rotate-180' : ''
+                  }`} />
+                </button>
+                
+                {openDropdown === "Products" && (
+                  <div className="absolute top-full left-0 pt-2 z-50">
+                    <div className="bg-white border border-gray-200 rounded-xl shadow-xl min-w-[280px] overflow-hidden">
+                      <div className="py-2">
+                        {productDropdown.items.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="block px-5 py-3 hover:bg-gray-50 transition-colors"
+                            onClick={() => setOpenDropdown(null)}
+                          >
+                            <span className="block text-sm font-medium text-gray-900">
+                              {item.label}
+                            </span>
+                            {item.description && (
+                              <span className="block text-xs text-gray-500 mt-0.5">
+                                {item.description}
                               </span>
-                              {item.description && (
-                                <span className="block text-xs text-gray-500 mt-0.5">
-                                  {item.description}
-                                </span>
-                              )}
-                            </Link>
-                          ))}
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Resources Mega Menu */}
+              <div
+                className="relative"
+                onMouseEnter={() => handleDropdownEnter("Resources")}
+                onMouseLeave={handleDropdownLeave}
+              >
+                <button
+                  className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    openDropdown === "Resources" 
+                      ? 'text-orange-500 bg-orange-50' 
+                      : 'text-gray-700 hover:text-orange-500 hover:bg-gray-50'
+                  }`}
+                >
+                  Resources
+                  <ChevronDown className={`h-4 w-4 transition-transform ${
+                    openDropdown === "Resources" ? 'rotate-180' : ''
+                  }`} />
+                </button>
+                
+                {openDropdown === "Resources" && (
+                  <div className="fixed left-0 right-0 top-[73px] z-50">
+                    <div className="bg-white border-b border-gray-200 shadow-xl">
+                      <div className="max-w-7xl mx-auto px-6 py-6">
+                        <div className="flex gap-8">
+                          {/* Categories Sidebar */}
+                          <div className="w-48 flex-shrink-0 border-r border-gray-100 pr-6">
+                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Categories</h3>
+                            <div className="space-y-1">
+                              {resourceCategories.map((category) => (
+                                <button
+                                  key={category.name}
+                                  className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-gray-50 rounded-lg transition-colors"
+                                  onClick={() => {
+                                    const element = document.getElementById(`category-${category.name.replace(/\s+/g, '-')}`);
+                                    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }}
+                                >
+                                  {category.name}
+                                </button>
+                              ))}
+                            </div>
+                            <div className="mt-6 pt-4 border-t border-gray-100">
+                              <Link
+                                href="/tools"
+                                className="flex items-center gap-2 text-sm font-medium text-orange-500 hover:text-orange-600"
+                                onClick={() => setOpenDropdown(null)}
+                              >
+                                Explore All Tools
+                                <ArrowRight className="h-4 w-4" />
+                              </Link>
+                            </div>
+                          </div>
+                          
+                          {/* Tools Grid */}
+                          <div className="flex-1 max-h-[70vh] overflow-y-auto pr-2">
+                            {resourceCategories.map((category) => (
+                              <div key={category.name} id={`category-${category.name.replace(/\s+/g, '-')}`} className="mb-6 last:mb-0">
+                                <h3 className="text-sm font-semibold text-gray-900 mb-3 sticky top-0 bg-white py-1">{category.name}</h3>
+                                <div className="grid grid-cols-3 gap-3">
+                                  {category.items.map((item) => {
+                                    const IconComponent = item.icon;
+                                    return (
+                                      <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className="group flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/50 transition-all"
+                                        onClick={() => setOpenDropdown(null)}
+                                      >
+                                        <div className={`${item.iconBg} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                                          <IconComponent className="h-5 w-5 text-white" />
+                                        </div>
+                                        <div className="min-w-0">
+                                          <span className="block text-sm font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
+                                            {item.label}
+                                          </span>
+                                          <span className="block text-xs text-gray-500 mt-0.5 line-clamp-2">
+                                            {item.description}
+                                          </span>
+                                        </div>
+                                      </Link>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                )}
+              </div>
               
               <Link 
                 href="/newsletter" 
@@ -358,44 +488,107 @@ export function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white">
           <div className="px-6 py-4 space-y-1">
-            {navDropdowns.map((dropdown) => (
-              <div key={dropdown.label}>
-                <button
-                  onClick={() => setMobileOpenDropdown(
-                    mobileOpenDropdown === dropdown.label ? null : dropdown.label
-                  )}
-                  className="flex items-center justify-between w-full text-sm font-medium py-3 text-gray-700"
-                >
-                  {dropdown.label}
-                  <ChevronDown className={`h-4 w-4 transition-transform ${
-                    mobileOpenDropdown === dropdown.label ? 'rotate-180' : ''
-                  }`} />
-                </button>
-                
-                {mobileOpenDropdown === dropdown.label && (
-                  <div className="pl-4 pb-2 space-y-1">
-                    {dropdown.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="block py-2 text-sm text-gray-600 hover:text-orange-500 transition-colors"
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          setMobileOpenDropdown(null);
-                        }}
-                      >
-                        {item.label}
-                        {item.description && (
-                          <span className="block text-xs text-gray-400 mt-0.5">
-                            {item.description}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
+            {/* Products Dropdown */}
+            <div>
+              <button
+                onClick={() => setMobileOpenDropdown(
+                  mobileOpenDropdown === "Products" ? null : "Products"
                 )}
-              </div>
-            ))}
+                className="flex items-center justify-between w-full text-sm font-medium py-3 text-gray-700"
+              >
+                Products
+                <ChevronDown className={`h-4 w-4 transition-transform ${
+                  mobileOpenDropdown === "Products" ? 'rotate-180' : ''
+                }`} />
+              </button>
+              
+              {mobileOpenDropdown === "Products" && (
+                <div className="pl-4 pb-2 space-y-1">
+                  {productDropdown.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="block py-2 text-sm text-gray-600 hover:text-orange-500 transition-colors"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setMobileOpenDropdown(null);
+                      }}
+                    >
+                      {item.label}
+                      {item.description && (
+                        <span className="block text-xs text-gray-400 mt-0.5">
+                          {item.description}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Resources Dropdown */}
+            <div>
+              <button
+                onClick={() => setMobileOpenDropdown(
+                  mobileOpenDropdown === "Resources" ? null : "Resources"
+                )}
+                className="flex items-center justify-between w-full text-sm font-medium py-3 text-gray-700"
+              >
+                Resources
+                <ChevronDown className={`h-4 w-4 transition-transform ${
+                  mobileOpenDropdown === "Resources" ? 'rotate-180' : ''
+                }`} />
+              </button>
+              
+              {mobileOpenDropdown === "Resources" && (
+                <div className="pl-2 pb-2 space-y-4 max-h-[60vh] overflow-y-auto">
+                  {resourceCategories.map((category) => (
+                    <div key={category.name}>
+                      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">{category.name}</h4>
+                      <div className="space-y-1">
+                        {category.items.map((item) => {
+                          const IconComponent = item.icon;
+                          return (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setMobileOpenDropdown(null);
+                              }}
+                            >
+                              <div className={`${item.iconBg} w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                                <IconComponent className="h-4 w-4 text-white" />
+                              </div>
+                              <div>
+                                <span className="block text-sm font-medium text-gray-700">
+                                  {item.label}
+                                </span>
+                                <span className="block text-xs text-gray-400">
+                                  {item.description}
+                                </span>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                  <Link
+                    href="/tools"
+                    className="flex items-center gap-2 px-2 py-3 text-sm font-medium text-orange-500"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setMobileOpenDropdown(null);
+                    }}
+                  >
+                    Explore All Tools
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
+            </div>
             
             <Link 
               href="/newsletter" 
