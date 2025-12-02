@@ -360,7 +360,7 @@ export function Navbar() {
               </Button>
               
               {isCartOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                <div className="fixed md:absolute right-4 md:right-0 left-4 md:left-auto top-16 md:top-auto mt-2 md:w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
                   <div className="p-4 border-b border-gray-100">
                     <h3 className="font-semibold text-gray-900">Saved Items</h3>
                     <p className="text-sm text-gray-500">{itemCount} item{itemCount !== 1 ? 's' : ''}</p>

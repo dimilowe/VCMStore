@@ -116,10 +116,10 @@ export function NewsletterSearchList({
         </Card>
       ) : (
         <>
-          <div className="space-y-6">
+          <div className="space-y-8">
             {displayPosts.map((post) => (
-              <Link key={post.id} href={`/newsletter/${post.slug}`}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link key={post.id} href={`/newsletter/${post.slug}`} className="block">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer overflow-hidden">
                   <div className="md:flex">
                     {post.featured_image_url && (
                       <div 
