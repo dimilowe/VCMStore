@@ -16,7 +16,8 @@ import {
   Music,
   Megaphone,
   Link2,
-  FileText
+  FileText,
+  ShoppingBag
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -26,6 +27,13 @@ export const metadata: Metadata = {
 };
 
 const tools = [
+  { 
+    name: "Outfit Ideas Generator", 
+    description: "Upload outfit photos and find similar items to shop with AI.",
+    icon: ShoppingBag, 
+    href: "/tools/outfit-ideas",
+    category: "AI"
+  },
   { 
     name: "AI Thumbnail Coach", 
     description: "Analyze and optimize your YouTube thumbnails with AI.",

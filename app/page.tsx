@@ -33,7 +33,8 @@ import {
   Music,
   Target,
   Link2,
-  FileText
+  FileText,
+  ShoppingBag
 } from "lucide-react";
 
 interface BlogPost {
@@ -142,6 +143,7 @@ const creatorApps = [
 const freeTools = [
   { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers" },
   { name: "Ideas Hub", icon: Rocket, href: "/ideas" },
+  { name: "Outfit Ideas", icon: ShoppingBag, href: "/tools/outfit-ideas" },
   { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box" },
   { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach" },
   { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor" },

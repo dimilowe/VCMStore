@@ -109,6 +109,8 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/internal-link-seo-audit` - Internal Link Audit - find orphan pages & weak internal links
 - `/tools/gif-maker` - GIF Maker - create GIFs from videos using ffmpeg.wasm
 - `/tools/heic-to-jpg` - HEIC to JPG Converter - convert iPhone HEIC photos to JPG (targets "heic u jpg" keyword)
+- `/tools/outfit-ideas` - Outfit Ideas Generator - upload outfit photos and find similar items to shop with AI (targets "outfit ideas" keyword)
+- `/r` - Redirect route for affiliate link tracking (routes shopping clicks through for future APE integration)
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -163,6 +165,16 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-02: **Added Outfit Ideas Generator Tool** - AI-powered style finder targeting "outfit ideas" keyword
+  - Created `/tools/outfit-ideas` page for uploading outfit photos and finding similar items to shop
+  - Uses OpenAI gpt-4o-mini vision model to analyze images and detect clothing items
+  - Generates search keywords for each detected item (tops, pants, shoes, accessories, etc.)
+  - SerpAPI Google Shopping integration for product results (falls back to Google Shopping URLs if no API key)
+  - Created `/r` redirect route for affiliate link tracking (future APE integration ready)
+  - Product cards with images, prices, merchant names, and "Shop" links
+  - Rate limited: uses OpenAI Vision per request
+  - Full SEO: title, meta description, FAQ section, educational content
+  - Added to navbar, tools index, homepage, sitemap, ExploreMoreTools
 - 2025-11-30: **Added VCM Summarizer Tool** - AI text summarizer and key points extractor
   - Created `/tools/summarizer` page targeting "summarizer", "summarizer generator", "AI summarizer", "text summarizer" keywords
   - Paste any text (articles, essays, emails, notes) and get a clean summary + bullet-point key takeaways
