@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { NewsletterSearchList } from "@/components/NewsletterSearchList";
 
 const POSTS_PER_PAGE = 10;
 
@@ -140,13 +140,6 @@ export default async function NewsletterPage({
   const { posts, totalPages, totalCount } = await getBlogPosts(category, currentPage);
   const categories = await getCategories();
 
-  const buildPageUrl = (pageNum: number) => {
-    const params = new URLSearchParams();
-    if (category) params.set('category', category);
-    if (pageNum > 1) params.set('page', pageNum.toString());
-    const queryString = params.toString();
-    return `/newsletter${queryString ? `?${queryString}` : ''}`;
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -181,141 +174,13 @@ export default async function NewsletterPage({
                 }
               </h2>
               
-              {posts.length === 0 ? (
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <p className="text-lg text-muted-foreground mb-4">
-                      {category 
-                        ? 'No articles in this category yet.'
-                        : 'No blog posts yet. Check back soon for valuable insights!'
-                      }
-                    </p>
-                    {category ? (
-                      <Link href="/newsletter" className="text-orange-600 hover:text-orange-700 font-medium">
-                        ← View All Articles
-                      </Link>
-                    ) : (
-                      <Link href="/" className="text-orange-600 hover:text-orange-700 font-medium">
-                        Browse Products →
-                      </Link>
-                    )}
-                  </CardContent>
-                </Card>
-              ) : (
-                <>
-                  <div className="space-y-6">
-                    {posts.map((post) => (
-                      <Link key={post.id} href={`/newsletter/${post.slug}`}>
-                        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                          <div className="md:flex">
-                            {post.featured_image_url && (
-                              <div 
-                                className="md:w-72 h-48 bg-cover bg-center"
-                                style={{ backgroundImage: `url('${post.featured_image_url}')` }}
-                              />
-                            )}
-                            <div className="flex-1">
-                              <CardHeader>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                                  <time dateTime={new Date(post.published_at).toISOString()}>
-                                    {new Date(post.published_at).toLocaleDateString('en-US', {
-                                      month: 'long',
-                                      day: 'numeric',
-                                      year: 'numeric'
-                                    })}
-                                  </time>
-                                  {post.view_count > 0 && (
-                                    <>
-                                      <span>•</span>
-                                      <span>{post.view_count} views</span>
-                                    </>
-                                  )}
-                                </div>
-                                <CardTitle className="text-2xl hover:text-orange-600 transition-colors">
-                                  {post.title}
-                                </CardTitle>
-                                {post.excerpt && (
-                                  <CardDescription className="text-base mt-2">
-                                    {post.excerpt}
-                                  </CardDescription>
-                                )}
-                                {post.categories && post.categories.length > 0 && (
-                                  <div className="flex flex-wrap gap-2 mt-3">
-                                    {post.categories.map((cat) => (
-                                      <Badge 
-                                        key={cat.id} 
-                                        variant="secondary"
-                                        className="bg-orange-100 text-orange-800 hover:bg-orange-200"
-                                      >
-                                        {cat.name}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                )}
-                              </CardHeader>
-                            </div>
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-between pt-8 border-t mt-8">
-                      <p className="text-sm text-muted-foreground">
-                        Page {currentPage} of {totalPages} ({totalCount} articles)
-                      </p>
-                      <div className="flex items-center gap-2">
-                        {currentPage > 1 && (
-                          <Link
-                            href={buildPageUrl(currentPage - 1)}
-                            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
-                          >
-                            <ChevronLeft className="w-4 h-4 mr-1" />
-                            Previous
-                          </Link>
-                        )}
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                            let pageNum: number;
-                            if (totalPages <= 5) {
-                              pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                              pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                              pageNum = totalPages - 4 + i;
-                            } else {
-                              pageNum = currentPage - 2 + i;
-                            }
-                            return (
-                              <Link
-                                key={pageNum}
-                                href={buildPageUrl(pageNum)}
-                                className={`inline-flex items-center justify-center w-10 h-10 text-sm font-medium rounded-md transition-colors ${
-                                  currentPage === pageNum
-                                    ? 'bg-orange-500 text-white'
-                                    : 'border border-gray-300 bg-white hover:bg-gray-50'
-                                }`}
-                              >
-                                {pageNum}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                        {currentPage < totalPages && (
-                          <Link
-                            href={buildPageUrl(currentPage + 1)}
-                            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
-                          >
-                            Next
-                            <ChevronRight className="w-4 h-4 ml-1" />
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
+              <NewsletterSearchList 
+                posts={posts}
+                totalCount={totalCount}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                category={category}
+              />
             </div>
           </div>
 
