@@ -404,7 +404,7 @@ export default async function HomePage() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
             <Link
               href="https://vcmos.io"
               target="_blank"
@@ -421,6 +421,7 @@ export default async function HomePage() {
               Browse Tools
             </Link>
           </div>
+          <p className="text-gray-400 text-sm">Unified tools for modern creators</p>
         </div>
       </section>
 
