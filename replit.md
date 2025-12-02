@@ -166,6 +166,14 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-02: **Added Shopping Cart Feature** - Replace search icon with full shopping cart functionality
+  - Created CartContext in `/contexts/CartContext.tsx` with localStorage persistence
+  - Cart items persist across browser sessions
+  - Shopping cart icon in navbar with item count badge
+  - Dropdown panel shows cart contents, total price, and remove items
+  - Created `/cart` page for full cart view with checkout summary
+  - Added "Add to Cart" button to product pages alongside claim/buy button
+  - Cart syncs across all pages via React Context
 - 2025-12-02: **Added AI Calorie Deficit Calculator** - Food and health app screenshot analyzer targeting "calorie counter deficit" keyword
   - Created `/tools/calorie-deficit-calculator` page with dual image upload (food photo + optional health screenshot)
   - Uses OpenAI gpt-4o vision model for food calorie estimation and health app reading
