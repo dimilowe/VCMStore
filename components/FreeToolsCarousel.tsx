@@ -32,7 +32,7 @@ const freeTools = [
   { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day", iconBg: "bg-purple-400" },
 ];
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 24;
 
 export default function FreeToolsCarousel() {
   const [currentPage, setCurrentPage] = useState(0);
