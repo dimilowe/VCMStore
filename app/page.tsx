@@ -379,23 +379,56 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* For Creators & Entrepreneurs */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">For Creators & Entrepreneurs</h2>
-          <p className="text-gray-500 mb-8">Tools designed for your success</p>
-          <div className="flex flex-wrap gap-4">
-            {categories.map((cat) => (
-              <div 
-                key={cat.name}
-                className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer group"
+      {/* Explore VCM OS */}
+      <section className="py-16 px-4 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            Explore VCM OS
+          </h2>
+          <p className="text-gray-500 text-lg mb-12">
+            Unified tools for modern creators
+          </p>
+
+          {/* Creator Apps Grid - VCM OS Style */}
+          <div className="flex flex-wrap items-center justify-center gap-6 mb-12">
+            {creatorApps.map((app) => (
+              <Link
+                key={app.name}
+                href={app.href}
+                target={app.external ? "_blank" : undefined}
+                className="group flex flex-col items-center"
               >
-                <div className="w-10 h-10 bg-gray-100 group-hover:bg-orange-50 rounded-lg flex items-center justify-center">
-                  <cat.icon className="w-5 h-5 text-gray-600 group-hover:text-orange-500" />
+                <div className={`w-24 h-24 md:w-28 md:h-28 ${app.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <app.icon className="w-10 h-10 md:w-12 md:h-12 text-white" />
                 </div>
-                <span className="font-medium text-gray-800">{cat.name}</span>
-              </div>
+                <span className="text-sm font-semibold text-gray-900">{app.name}</span>
+                <span className="text-xs text-gray-500">{app.description}</span>
+              </Link>
             ))}
+          </div>
+
+          {/* Tagline */}
+          <p className="text-gray-500 text-base mb-8">
+            Free tools & resources to grow, engage, and monetize your creative business.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="https://vcmos.io"
+              target="_blank"
+              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium px-8 py-3 rounded-full transition-colors shadow-lg"
+            >
+              <Zap className="w-5 h-5" />
+              Open VCM OS
+            </Link>
+            <Link
+              href="/tools"
+              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium px-8 py-3 rounded-full border border-gray-200 transition-colors"
+            >
+              <Sparkles className="w-5 h-5" />
+              Browse Tools
+            </Link>
           </div>
         </div>
       </section>
