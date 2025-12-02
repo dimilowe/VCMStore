@@ -427,7 +427,7 @@ export default async function HomePage() {
 
       {/* Ecosystem Overview */}
       <section className="pt-6 pb-12 px-4 bg-gray-900">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Ecosystem Overview</h2>
           <p className="text-gray-400 mb-6">Explore the VCM universe</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
