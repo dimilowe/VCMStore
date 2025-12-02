@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import { useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote } from "lucide-react";
 
@@ -33,107 +32,86 @@ const freeTools = [
   { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day", iconBg: "bg-purple-400" },
 ];
 
-export default function FreeToolsCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: false,
-    align: "start",
-    skipSnaps: false,
-    containScroll: "trimSnaps",
-    dragFree: false,
-  });
-  
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-  
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-  
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
+const ITEMS_PER_PAGE = 12;
 
-  const onScroll = useCallback(() => {
-    if (!emblaApi) return;
-    const progress = Math.max(0, Math.min(1, emblaApi.scrollProgress()));
-    setScrollProgress(progress);
-  }, [emblaApi]);
+export default function FreeToolsCarousel() {
+  const [currentPage, setCurrentPage] = useState(0);
   
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    onScroll();
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    emblaApi.on("scroll", onScroll);
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-      emblaApi.off("scroll", onScroll);
-    };
-  }, [emblaApi, onSelect, onScroll]);
+  const totalPages = Math.ceil(freeTools.length / ITEMS_PER_PAGE);
+  const startIndex = currentPage * ITEMS_PER_PAGE;
+  const currentTools = freeTools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  
+  const goToPrev = () => {
+    if (currentPage > 0) setCurrentPage(currentPage - 1);
+  };
+  
+  const goToNext = () => {
+    if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
+  };
   
   return (
-    <div className="relative group/carousel">
-      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-gray-50 to-transparent z-10" />
-      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-gray-50 to-transparent z-10" />
-      
-      <div className="overflow-hidden -mx-4 px-4" ref={emblaRef}>
-        <div className="flex touch-pan-y gap-3 md:gap-4">
-          {freeTools.map((tool) => (
-            <Link 
-              key={tool.name} 
-              href={tool.href}
-              className="flex-[0_0_140px] sm:flex-[0_0_150px] md:flex-[0_0_160px] lg:flex-[0_0_170px] min-w-0 bg-white rounded-2xl p-4 md:p-5 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all text-center group"
-            >
-              <div className={`w-11 h-11 md:w-12 md:h-12 ${tool.iconBg} rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110`}>
-                <tool.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </div>
-              <span className="text-xs md:text-sm font-medium text-gray-800 line-clamp-2 leading-tight">{tool.name}</span>
-            </Link>
-          ))}
-        </div>
+    <div className="relative">
+      <div 
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 transition-opacity duration-300"
+      >
+        {currentTools.map((tool) => (
+          <Link 
+            key={tool.name} 
+            href={tool.href}
+            className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all text-center group"
+          >
+            <div className={`w-14 h-14 md:w-16 md:h-16 ${tool.iconBg} rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110`}>
+              <tool.icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
+            </div>
+            <span className="text-sm md:text-base font-medium text-gray-800 line-clamp-2">{tool.name}</span>
+          </Link>
+        ))}
       </div>
       
-      <button
-        onClick={scrollPrev}
-        className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100 ${
-          canScrollPrev 
-            ? 'hover:bg-orange-50 hover:border-orange-300 text-gray-600 hover:text-orange-500 cursor-pointer' 
-            : 'opacity-0 pointer-events-none'
-        }`}
-        aria-label="Scroll left"
-      >
-        <ChevronLeft className="w-5 h-5" />
-      </button>
-      
-      <button
-        onClick={scrollNext}
-        className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100 ${
-          canScrollNext 
-            ? 'hover:bg-orange-50 hover:border-orange-300 text-gray-600 hover:text-orange-500 cursor-pointer' 
-            : 'opacity-0 pointer-events-none'
-        }`}
-        aria-label="Scroll right"
-      >
-        <ChevronRight className="w-5 h-5" />
-      </button>
-      
-      <div className="mt-4 flex justify-center">
-        <div className="w-32 h-1 bg-gray-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-orange-500 rounded-full transition-all duration-150"
-            style={{ width: `${Math.max(10, scrollProgress * 100)}%` }}
-          />
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <button
+            onClick={goToPrev}
+            disabled={currentPage === 0}
+            className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
+              currentPage === 0
+                ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                : 'border-gray-300 text-gray-600 hover:border-orange-400 hover:text-orange-500 hover:bg-orange-50'
+            }`}
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index)}
+                className={`h-2.5 rounded-full transition-all ${
+                  currentPage === index 
+                    ? 'w-8 bg-orange-500' 
+                    : 'w-2.5 bg-gray-300 hover:bg-gray-400'
+                }`}
+                aria-label={`Go to page ${index + 1}`}
+              />
+            ))}
+          </div>
+          
+          <button
+            onClick={goToNext}
+            disabled={currentPage === totalPages - 1}
+            className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
+              currentPage === totalPages - 1
+                ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                : 'border-gray-300 text-gray-600 hover:border-orange-400 hover:text-orange-500 hover:bg-orange-50'
+            }`}
+            aria-label="Next page"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
