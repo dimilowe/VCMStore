@@ -247,7 +247,7 @@ export default function ToolsClient() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search tools..."
-            className="w-full pl-12 pr-10 py-3.5 rounded-full border border-gray-200 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all text-base"
+            className="w-full pl-12 pr-12 py-4 rounded-full border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:bg-white transition-all text-base shadow-sm"
           />
           {searchQuery && (
             <button
