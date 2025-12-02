@@ -68,6 +68,7 @@ const resourceCategories: ResourceCategory[] = [
       { label: "Calorie Calculator", href: "/tools/calorie-deficit-calculator", description: "AI food calorie counter", icon: Calculator, iconBg: "bg-green-500" },
       { label: "Image Compressor", href: "/tools/image-compressor", description: "Compress JPG, PNG, WebP", icon: Image, iconBg: "bg-sky-500" },
       { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files", icon: FileImage, iconBg: "bg-violet-500" },
+      { label: "GIF Maker", href: "/tools/gif-maker", description: "Convert video/images to GIF", icon: FileImage, iconBg: "bg-fuchsia-500" },
       { label: "HEIC to JPG", href: "/tools/heic-to-jpg", description: "Convert iPhone HEIC photos", icon: FileImage, iconBg: "bg-rose-500" },
     ]
   },
