@@ -154,10 +154,7 @@ export async function POST(request: NextRequest) {
     const mimeType = imageFile.type;
     const dataUrl = `data:${mimeType};base64,${base64Image}`;
     
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-      baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL || undefined,
-    });
+    const openai = new OpenAI();
     
     const visionResponse = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -231,8 +228,25 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error('Outfit analyzer error:', error);
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    if (errorMessage.includes('rate') || errorMessage.includes('limit') || errorMessage.includes('quota')) {
+      return NextResponse.json(
+        { error: 'AI service is temporarily busy. Please try again in a moment.' },
+        { status: 503 }
+      );
+    }
+    
+    if (errorMessage.includes('Invalid API Key') || errorMessage.includes('authentication')) {
+      return NextResponse.json(
+        { error: 'AI service configuration error. Please try again later.' },
+        { status: 500 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Upstream service error' },
+      { error: 'Failed to analyze image. Please try again.' },
       { status: 502 }
     );
   }
