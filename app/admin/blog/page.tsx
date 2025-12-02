@@ -1,10 +1,9 @@
 import { query } from "@/lib/db";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Eye, Trash2 } from "lucide-react";
-import { DeleteBlogPostButton } from "@/components/DeleteBlogPostButton";
+import { Plus } from "lucide-react";
+import { BlogSearchList } from "@/components/BlogSearchList";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -61,59 +60,7 @@ export default async function AdminBlogPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <Card key={post.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="py-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-bold">{post.title}</h3>
-                      {post.published_at ? (
-                        post.published_at <= new Date() ? (
-                          <Badge className="bg-green-100 text-green-800">Published</Badge>
-                        ) : (
-                          <Badge className="bg-blue-100 text-blue-800">Scheduled</Badge>
-                        )
-                      ) : (
-                        <Badge variant="secondary">Draft</Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>Slug: /{post.slug}</span>
-                      {post.published_at && (
-                        <span>
-                          Published: {new Date(post.published_at).toLocaleDateString()}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        {post.view_count} views
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {post.published_at && post.published_at <= new Date() && (
-                      <Link href={`/newsletter/${post.slug}`} target="_blank">
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                      </Link>
-                    )}
-                    <Link href={`/admin/blog/edit/${post.id}`}>
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
-                      </Button>
-                    </Link>
-                    <DeleteBlogPostButton postId={post.id} postTitle={post.title} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <BlogSearchList posts={posts} />
       )}
     </div>
   );
