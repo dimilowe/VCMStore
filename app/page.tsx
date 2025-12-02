@@ -380,7 +380,7 @@ export default async function HomePage() {
       )}
 
       {/* Explore VCM OS */}
-      <section className="py-10 px-4 bg-gray-900">
+      <section className="pt-10 pb-6 px-4 bg-gray-900">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
             Explore VCM OS
@@ -404,7 +404,7 @@ export default async function HomePage() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3">
             <Link
               href="https://vcmos.io"
               target="_blank"
@@ -426,7 +426,7 @@ export default async function HomePage() {
       </section>
 
       {/* Ecosystem Overview */}
-      <section className="pt-4 pb-12 px-4 bg-gray-900">
+      <section className="pt-6 pb-12 px-4 bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Ecosystem Overview</h2>
           <p className="text-gray-400 mb-6">Explore the VCM universe</p>
