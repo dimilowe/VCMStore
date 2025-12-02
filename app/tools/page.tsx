@@ -18,7 +18,8 @@ import {
   Link2,
   FileText,
   ShoppingBag,
-  Flame
+  Flame,
+  FilePen
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -99,6 +100,14 @@ const tools = [
     href: "/tools/image-compressor",
     category: "Image",
     iconBg: "bg-sky-500"
+  },
+  { 
+    name: "PDF Editor", 
+    description: "Upload, rearrange, rotate, delete pages, and download your edited PDF.",
+    icon: FilePen, 
+    href: "/tools/pdf-editor",
+    category: "Utilities",
+    iconBg: "bg-red-500"
   },
   { 
     name: "Word Counter", 

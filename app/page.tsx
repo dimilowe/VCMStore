@@ -34,7 +34,8 @@ import {
   Target,
   Link2,
   FileText,
-  ShoppingBag
+  ShoppingBag,
+  FilePen
 } from "lucide-react";
 
 interface BlogPost {
@@ -145,6 +146,7 @@ const freeTools = [
   { name: "Ideas Hub", icon: Rocket, href: "/ideas", iconBg: "bg-amber-400" },
   { name: "Calorie Deficit Calculator", icon: Flame, href: "/tools/calorie-deficit-calculator", iconBg: "bg-green-500" },
   { name: "Outfit Ideas", icon: ShoppingBag, href: "/tools/outfit-ideas", iconBg: "bg-pink-500" },
+  { name: "PDF Editor", icon: FilePen, href: "/tools/pdf-editor", iconBg: "bg-red-500" },
   { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box", iconBg: "bg-teal-500" },
   { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach", iconBg: "bg-red-500" },
   { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor", iconBg: "bg-violet-500" },

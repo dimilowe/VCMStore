@@ -103,6 +103,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/resource-box/[slug]/embed` - Embeddable resource box for iframes
 - `/tools/ai-thumbnail-coach` - AI YouTube Thumbnail Coach - thumbnail analyzer with chat
 - `/tools/reach-grabber-tool` - Reach Grabber Tool - AI SEO content optimizer
+- `/tools/pdf-editor` - Free online PDF editor - reorder, rotate, delete pages (client-side)
 - `/tools/ai-humanizer-free` - AI Humanizer Free - detect & humanize AI-written content
 - `/tools/producer-tag-generator` - Producer Tag Generator - AI voice tags for beats
 - `/tools/ad-copy-analyzer` - Ad Copy Analyzer - analyze & improve ad copy with AI
@@ -166,6 +167,19 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-02: **Added PDF Editor Tool** - Free online PDF editor targeting "pdf editor website" keyword
+  - Created `/tools/pdf-editor` page with client-side PDF manipulation using pdf-lib
+  - Upload PDF, view page thumbnails with page numbers
+  - Drag-and-drop page reordering with visual feedback
+  - Rotate pages left/right in 90-degree increments
+  - Delete unwanted pages with confirmation
+  - Duplicate pages for repeated content
+  - Reset all changes to original state
+  - Download edited PDF with modifications applied
+  - All processing happens in browser - files never leave user's device
+  - Privacy-focused: no server upload, no watermarks, no signup required
+  - Full SEO: title, meta, keywords, FAQ section, structured data (JSON-LD)
+  - Added to navbar Resources dropdown (Utilities), tools index, homepage, sitemap, ExploreMoreTools
 - 2025-12-02: **Added Saved Items Feature** - Bookmark icon to save products for later
   - Created CartContext in `/contexts/CartContext.tsx` with localStorage persistence
   - Saved items persist across browser sessions

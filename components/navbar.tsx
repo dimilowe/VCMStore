@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
@@ -74,6 +74,7 @@ const resourceCategories: ResourceCategory[] = [
   {
     name: "Utilities",
     items: [
+      { label: "PDF Editor", href: "/tools/pdf-editor", description: "Reorder, rotate, delete PDF pages", icon: FilePen, iconBg: "bg-red-500" },
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters", icon: FileText, iconBg: "bg-gray-500" },
       { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards", icon: LinkIcon, iconBg: "bg-teal-500" },
       { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams", icon: Layout, iconBg: "bg-amber-500" },

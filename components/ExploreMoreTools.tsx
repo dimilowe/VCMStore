@@ -4,6 +4,7 @@ const tools = [
   { name: "Calorie Deficit Calculator", href: "/tools/calorie-deficit-calculator" },
   { name: "Outfit Ideas", href: "/tools/outfit-ideas" },
   { name: "AI Logo Generator", href: "/tools/logo-generator" },
+  { name: "PDF Editor", href: "/tools/pdf-editor" },
   { name: "Keyword Finder", href: "/tools/keyword-finder" },
   { name: "Image Compressor", href: "/tools/image-compressor" },
   { name: "GIF Compressor", href: "/tools/gif-compressor" },
