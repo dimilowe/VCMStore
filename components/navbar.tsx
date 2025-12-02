@@ -109,6 +109,7 @@ export function Navbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const cartRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { items, removeFromCart, itemCount, totalPrice } = useCart();
 
   useEffect(() => {
@@ -145,12 +146,29 @@ export function Navbar() {
       });
   }, []);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleDropdownEnter = (label: string) => {
+    // Cancel any pending close
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
     setOpenDropdown(label);
   };
 
   const handleDropdownLeave = () => {
-    setOpenDropdown(null);
+    // Delay closing to allow cursor to move to dropdown
+    closeTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 150);
   };
 
   return (
