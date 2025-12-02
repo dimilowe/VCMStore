@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link";
-import { User, Search, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles } from "lucide-react";
+import { User, ShoppingCart, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2 } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 
@@ -58,6 +59,7 @@ const navDropdowns: NavDropdown[] = [
 
 export function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -66,12 +68,17 @@ export function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const cartRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
+  const { items, removeFromCart, itemCount, totalPrice } = useCart();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
+      }
+      if (cartRef.current && !cartRef.current.contains(event.target as Node)) {
+        setIsCartOpen(false);
       }
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
         setOpenDropdown(null);
@@ -179,9 +186,80 @@ export function Navbar() {
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:text-orange-500 hover:bg-gray-50 rounded-lg">
-              <Search className="h-5 w-5" />
-            </Button>
+            <div className="relative" ref={cartRef}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-gray-600 hover:text-orange-500 hover:bg-gray-50 rounded-lg relative"
+                onClick={() => setIsCartOpen(!isCartOpen)}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount > 9 ? '9+' : itemCount}
+                  </span>
+                )}
+              </Button>
+              
+              {isCartOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                  <div className="p-4 border-b border-gray-100">
+                    <h3 className="font-semibold text-gray-900">Your Cart</h3>
+                    <p className="text-sm text-gray-500">{itemCount} item{itemCount !== 1 ? 's' : ''}</p>
+                  </div>
+                  
+                  {items.length === 0 ? (
+                    <div className="p-6 text-center">
+                      <ShoppingCart className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm">Your cart is empty</p>
+                      <p className="text-gray-400 text-xs mt-1">Browse products and add items to get started</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="max-h-64 overflow-y-auto">
+                        {items.map((item) => (
+                          <div key={item.id} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50">
+                            <div className="flex-1 min-w-0">
+                              <Link 
+                                href={`/product/${item.slug}`}
+                                className="block text-sm font-medium text-gray-900 truncate hover:text-orange-500"
+                                onClick={() => setIsCartOpen(false)}
+                              >
+                                {item.name}
+                              </Link>
+                              <p className="text-xs text-gray-500">{item.type}</p>
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900">
+                              {item.price === 0 ? 'Free' : `$${item.price}`}
+                            </span>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="p-4 border-t border-gray-100 bg-gray-50">
+                        <div className="flex justify-between mb-3">
+                          <span className="text-sm text-gray-600">Total</span>
+                          <span className="font-semibold text-gray-900">${totalPrice.toFixed(2)}</span>
+                        </div>
+                        <Link
+                          href="/cart"
+                          className="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center font-medium py-2.5 rounded-lg transition-colors"
+                          onClick={() => setIsCartOpen(false)}
+                        >
+                          View Cart & Checkout
+                        </Link>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
             
             {!isCheckingSession && (
               <>
