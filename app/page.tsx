@@ -425,17 +425,17 @@ export default async function HomePage() {
       </section>
 
       {/* Ecosystem Overview */}
-      <section className="py-16 px-4 bg-gray-50">
+      <section className="py-12 px-4 bg-gray-900">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Ecosystem Overview</h2>
-          <p className="text-gray-500 mb-8">Explore the VCM universe</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Ecosystem Overview</h2>
+          <p className="text-gray-400 mb-8">Explore the VCM universe</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {ecosystemApps.map((app) => (
               <Link
                 key={app.name}
                 href={app.href}
                 target={app.href.startsWith('http') ? '_blank' : undefined}
-                className="flex items-center gap-2 text-gray-700 hover:text-orange-500 font-medium py-3 transition-colors"
+                className="flex items-center gap-2 text-gray-300 hover:text-orange-400 font-medium py-3 transition-colors"
               >
                 {app.name}
                 {app.href.startsWith('http') && <ExternalLink className="w-3 h-3" />}
