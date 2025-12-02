@@ -141,29 +141,29 @@ const creatorApps = [
 ];
 
 const freeTools = [
-  { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers" },
-  { name: "Ideas Hub", icon: Rocket, href: "/ideas" },
-  { name: "Calorie Deficit Calculator", icon: Flame, href: "/tools/calorie-deficit-calculator" },
-  { name: "Outfit Ideas", icon: ShoppingBag, href: "/tools/outfit-ideas" },
-  { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box" },
-  { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach" },
-  { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor" },
-  { name: "GIF Maker", icon: FileImage, href: "/tools/gif-maker" },
-  { name: "HEIC to JPG", icon: FileImage, href: "/tools/heic-to-jpg" },
-  { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor" },
-  { name: "Word Counter", icon: Type, href: "/tools/word-counter" },
-  { name: "Logo Generator", icon: Palette, href: "/tools/logo-generator" },
-  { name: "Keyword Finder", icon: Search, href: "/tools/keyword-finder" },
-  { name: "Reach Grabber", icon: Target, href: "/tools/reach-grabber-tool" },
-  { name: "AI Humanizer", icon: Sparkles, href: "/tools/ai-humanizer-free" },
-  { name: "Producer Tag", icon: Music, href: "/tools/producer-tag-generator" },
-  { name: "Ad Copy Analyzer", icon: Megaphone, href: "/tools/ad-copy-analyzer" },
-  { name: "Internal Link Audit", icon: Link2, href: "/tools/internal-link-seo-audit" },
-  { name: "AI Summarizer", icon: FileText, href: "/tools/summarizer" },
-  { name: "Visualization", icon: GitBranch, href: "/tools/visualization" },
-  { name: "Emoji Combos", icon: Smile, href: "/tools/emoji-combos" },
-  { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day" },
-  { name: "Self-Love Affirmations", icon: Heart, href: "/tools/affirmation-about-self-love" },
+  { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers", iconBg: "bg-blue-400" },
+  { name: "Ideas Hub", icon: Rocket, href: "/ideas", iconBg: "bg-amber-400" },
+  { name: "Calorie Deficit Calculator", icon: Flame, href: "/tools/calorie-deficit-calculator", iconBg: "bg-green-500" },
+  { name: "Outfit Ideas", icon: ShoppingBag, href: "/tools/outfit-ideas", iconBg: "bg-pink-500" },
+  { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box", iconBg: "bg-teal-500" },
+  { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach", iconBg: "bg-red-500" },
+  { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor", iconBg: "bg-violet-500" },
+  { name: "GIF Maker", icon: FileImage, href: "/tools/gif-maker", iconBg: "bg-fuchsia-500" },
+  { name: "HEIC to JPG", icon: FileImage, href: "/tools/heic-to-jpg", iconBg: "bg-rose-500" },
+  { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor", iconBg: "bg-sky-500" },
+  { name: "Word Counter", icon: Type, href: "/tools/word-counter", iconBg: "bg-gray-500" },
+  { name: "Logo Generator", icon: Palette, href: "/tools/logo-generator", iconBg: "bg-pink-500" },
+  { name: "Keyword Finder", icon: Search, href: "/tools/keyword-finder", iconBg: "bg-blue-500" },
+  { name: "Reach Grabber", icon: Target, href: "/tools/reach-grabber-tool", iconBg: "bg-orange-500" },
+  { name: "AI Humanizer", icon: Sparkles, href: "/tools/ai-humanizer-free", iconBg: "bg-indigo-500" },
+  { name: "Producer Tag", icon: Music, href: "/tools/producer-tag-generator", iconBg: "bg-green-500" },
+  { name: "Ad Copy Analyzer", icon: Megaphone, href: "/tools/ad-copy-analyzer", iconBg: "bg-cyan-500" },
+  { name: "Internal Link Audit", icon: Link2, href: "/tools/internal-link-seo-audit", iconBg: "bg-emerald-500" },
+  { name: "AI Summarizer", icon: FileText, href: "/tools/summarizer", iconBg: "bg-yellow-500" },
+  { name: "Visualization", icon: GitBranch, href: "/tools/visualization", iconBg: "bg-amber-500" },
+  { name: "Emoji Combos", icon: Smile, href: "/tools/emoji-combos", iconBg: "bg-yellow-400" },
+  { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day", iconBg: "bg-purple-400" },
+  { name: "Self-Love Affirmations", icon: Heart, href: "/tools/affirmation-about-self-love", iconBg: "bg-pink-400" },
 ];
 
 const categories = [
@@ -323,8 +323,8 @@ export default async function HomePage() {
                 href={tool.href}
                 className="bg-white rounded-2xl p-5 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all text-center group"
               >
-                <div className="w-12 h-12 bg-gray-100 group-hover:bg-orange-50 rounded-xl flex items-center justify-center mx-auto mb-3 transition-colors">
-                  <tool.icon className="w-6 h-6 text-gray-600 group-hover:text-orange-500" />
+                <div className={`w-12 h-12 ${tool.iconBg} rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110`}>
+                  <tool.icon className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-sm font-medium text-gray-800">{tool.name}</span>
               </Link>
