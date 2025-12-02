@@ -380,17 +380,14 @@ export default async function HomePage() {
       )}
 
       {/* Explore VCM OS */}
-      <section className="py-16 px-4 bg-gray-900">
+      <section className="py-10 px-4 bg-gray-900">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
             Explore VCM OS
           </h2>
-          <p className="text-gray-400 text-lg mb-12">
-            Unified tools for modern creators
-          </p>
 
           {/* Creator Apps Grid - VCM OS Style */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-12">
+          <div className="flex flex-wrap items-center justify-center gap-5 mb-8">
             {creatorApps.map((app) => (
               <Link
                 key={app.name}
@@ -398,35 +395,29 @@ export default async function HomePage() {
                 target={app.external ? "_blank" : undefined}
                 className="group flex flex-col items-center"
               >
-                <div className={`w-24 h-24 md:w-28 md:h-28 ${app.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <app.icon className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                <div className={`w-20 h-20 md:w-24 md:h-24 ${app.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <app.icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
                 </div>
-                <span className="text-sm font-semibold text-white">{app.name}</span>
-                <span className="text-xs text-gray-400">{app.description}</span>
+                <span className="text-xs font-semibold text-white">{app.name}</span>
               </Link>
             ))}
           </div>
 
-          {/* Tagline */}
-          <p className="text-gray-400 text-base mb-8">
-            Free tools & resources to grow, engage, and monetize your creative business.
-          </p>
-
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="https://vcmos.io"
               target="_blank"
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium px-8 py-3 rounded-full transition-colors shadow-lg"
+              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-2.5 rounded-full transition-colors shadow-lg text-sm"
             >
-              <Zap className="w-5 h-5" />
+              <Zap className="w-4 h-4" />
               Open VCM OS
             </Link>
             <Link
               href="/tools"
-              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-medium px-8 py-3 rounded-full border border-gray-700 transition-colors"
+              className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-medium px-6 py-2.5 rounded-full border border-gray-700 transition-colors text-sm"
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-4 h-4" />
               Browse Tools
             </Link>
           </div>
