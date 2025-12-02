@@ -231,80 +231,87 @@ export function Navbar() {
                     openDropdown === "Resources" ? 'rotate-180' : ''
                   }`} />
                 </button>
-                
-                {openDropdown === "Resources" && (
-                  <div className="fixed left-0 right-0 top-[73px] z-50">
-                    <div className="bg-white border-b border-gray-200 shadow-xl">
-                      <div className="max-w-7xl mx-auto px-6 py-6">
-                        <div className="flex gap-8">
-                          {/* Categories Sidebar */}
-                          <div className="w-48 flex-shrink-0 border-r border-gray-100 pr-6">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Categories</h3>
-                            <div className="space-y-1">
-                              {resourceCategories.map((category) => (
-                                <button
-                                  key={category.name}
-                                  className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-gray-50 rounded-lg transition-colors"
-                                  onClick={() => {
-                                    const element = document.getElementById(`category-${category.name.replace(/\s+/g, '-')}`);
-                                    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                  }}
-                                >
-                                  {category.name}
-                                </button>
-                              ))}
-                            </div>
-                            <div className="mt-6 pt-4 border-t border-gray-100">
-                              <Link
-                                href="/tools"
-                                className="flex items-center gap-2 text-sm font-medium text-orange-500 hover:text-orange-600"
-                                onClick={() => setOpenDropdown(null)}
-                              >
-                                Explore All Tools
-                                <ArrowRight className="h-4 w-4" />
-                              </Link>
-                            </div>
-                          </div>
-                          
-                          {/* Tools Grid */}
-                          <div className="flex-1 max-h-[70vh] overflow-y-auto pr-2">
+              </div>
+              
+              {/* Resources Mega Menu Panel - Separate from trigger for proper hover */}
+              {openDropdown === "Resources" && (
+                <div 
+                  className="fixed left-0 right-0 top-[73px] z-50"
+                  onMouseEnter={() => handleDropdownEnter("Resources")}
+                  onMouseLeave={handleDropdownLeave}
+                >
+                  {/* Invisible bridge to connect button to dropdown */}
+                  <div className="absolute -top-4 left-0 right-0 h-4" />
+                  <div className="bg-white border-b border-gray-200 shadow-xl">
+                    <div className="max-w-7xl mx-auto px-6 py-6">
+                      <div className="flex gap-8">
+                        {/* Categories Sidebar */}
+                        <div className="w-48 flex-shrink-0 border-r border-gray-100 pr-6">
+                          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Categories</h3>
+                          <div className="space-y-1">
                             {resourceCategories.map((category) => (
-                              <div key={category.name} id={`category-${category.name.replace(/\s+/g, '-')}`} className="mb-6 last:mb-0">
-                                <h3 className="text-sm font-semibold text-gray-900 mb-3 sticky top-0 bg-white py-1">{category.name}</h3>
-                                <div className="grid grid-cols-3 gap-3">
-                                  {category.items.map((item) => {
-                                    const IconComponent = item.icon;
-                                    return (
-                                      <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        className="group flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/50 transition-all"
-                                        onClick={() => setOpenDropdown(null)}
-                                      >
-                                        <div className={`${item.iconBg} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                                          <IconComponent className="h-5 w-5 text-white" />
-                                        </div>
-                                        <div className="min-w-0">
-                                          <span className="block text-sm font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
-                                            {item.label}
-                                          </span>
-                                          <span className="block text-xs text-gray-500 mt-0.5 line-clamp-2">
-                                            {item.description}
-                                          </span>
-                                        </div>
-                                      </Link>
-                                    );
-                                  })}
-                                </div>
-                              </div>
+                              <button
+                                key={category.name}
+                                className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-gray-50 rounded-lg transition-colors"
+                                onClick={() => {
+                                  const element = document.getElementById(`category-${category.name.replace(/\s+/g, '-')}`);
+                                  element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }}
+                              >
+                                {category.name}
+                              </button>
                             ))}
                           </div>
+                          <div className="mt-6 pt-4 border-t border-gray-100">
+                            <Link
+                              href="/tools"
+                              className="flex items-center gap-2 text-sm font-medium text-orange-500 hover:text-orange-600"
+                              onClick={() => setOpenDropdown(null)}
+                            >
+                              Explore All Tools
+                              <ArrowRight className="h-4 w-4" />
+                            </Link>
+                          </div>
+                        </div>
+                        
+                        {/* Tools Grid */}
+                        <div className="flex-1 max-h-[70vh] overflow-y-auto pr-2">
+                          {resourceCategories.map((category) => (
+                            <div key={category.name} id={`category-${category.name.replace(/\s+/g, '-')}`} className="mb-6 last:mb-0">
+                              <h3 className="text-sm font-semibold text-gray-900 mb-3 sticky top-0 bg-white py-1">{category.name}</h3>
+                              <div className="grid grid-cols-3 gap-3">
+                                {category.items.map((item) => {
+                                  const IconComponent = item.icon;
+                                  return (
+                                    <Link
+                                      key={item.href}
+                                      href={item.href}
+                                      className="group flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/50 transition-all"
+                                      onClick={() => setOpenDropdown(null)}
+                                    >
+                                      <div className={`${item.iconBg} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                                        <IconComponent className="h-5 w-5 text-white" />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <span className="block text-sm font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
+                                          {item.label}
+                                        </span>
+                                        <span className="block text-xs text-gray-500 mt-0.5 line-clamp-2">
+                                          {item.description}
+                                        </span>
+                                      </div>
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
               
               <Link 
                 href="/newsletter" 
