@@ -19,7 +19,8 @@ import {
   FileText,
   ShoppingBag,
   Flame,
-  FilePen
+  FilePen,
+  StickyNote
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -108,6 +109,14 @@ const tools = [
     href: "/tools/pdf-editor",
     category: "Utilities",
     iconBg: "bg-red-500"
+  },
+  { 
+    name: "Online Notepad", 
+    description: "Write notes online with auto-save and AI-powered writing tools.",
+    icon: StickyNote, 
+    href: "/tools/online-notepad",
+    category: "Writing",
+    iconBg: "bg-amber-500"
   },
   { 
     name: "Word Counter", 

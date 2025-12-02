@@ -75,6 +75,7 @@ const resourceCategories: ResourceCategory[] = [
   {
     name: "Utilities",
     items: [
+      { label: "Online Notepad", href: "/tools/online-notepad", description: "Write notes online with AI", icon: FileText, iconBg: "bg-amber-500" },
       { label: "PDF Editor", href: "/tools/pdf-editor", description: "Reorder, rotate, delete PDF pages", icon: FilePen, iconBg: "bg-red-500" },
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters", icon: FileText, iconBg: "bg-gray-500" },
       { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards", icon: LinkIcon, iconBg: "bg-teal-500" },

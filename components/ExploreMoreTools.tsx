@@ -18,6 +18,7 @@ const tools = [
   { name: "Ad Copy Analyzer", href: "/tools/ad-copy-analyzer" },
   { name: "Internal Link Audit", href: "/tools/internal-link-seo-audit" },
   { name: "AI Summarizer", href: "/tools/summarizer" },
+  { name: "Online Notepad", href: "/tools/online-notepad" },
   { name: "Ideas Hub", href: "/ideas" },
   { name: "VCM Answers", href: "/answers" },
 ];
