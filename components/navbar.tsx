@@ -31,6 +31,7 @@ const navDropdowns: NavDropdown[] = [
     label: "Resources",
     items: [
       { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
+      { label: "Calorie Deficit Calculator", href: "/tools/calorie-deficit-calculator", description: "AI food calorie counter" },
       { label: "AI Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer" },
       { label: "VCM Answers", href: "/answers", description: "Community Q&A forum" },
       { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas" },

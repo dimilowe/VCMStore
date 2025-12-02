@@ -143,6 +143,7 @@ const creatorApps = [
 const freeTools = [
   { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers" },
   { name: "Ideas Hub", icon: Rocket, href: "/ideas" },
+  { name: "Calorie Deficit Calculator", icon: Flame, href: "/tools/calorie-deficit-calculator" },
   { name: "Outfit Ideas", icon: ShoppingBag, href: "/tools/outfit-ideas" },
   { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box" },
   { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach" },

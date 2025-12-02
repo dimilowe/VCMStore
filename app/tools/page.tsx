@@ -17,7 +17,8 @@ import {
   Megaphone,
   Link2,
   FileText,
-  ShoppingBag
+  ShoppingBag,
+  Flame
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -27,6 +28,13 @@ export const metadata: Metadata = {
 };
 
 const tools = [
+  { 
+    name: "Calorie Deficit Calculator", 
+    description: "Snap your food + Health app screenshot to see today's calorie surplus or deficit.",
+    icon: Flame, 
+    href: "/tools/calorie-deficit-calculator",
+    category: "AI"
+  },
   { 
     name: "Outfit Ideas Generator", 
     description: "Upload outfit photos and find similar items to shop with AI.",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const tools = [
+  { name: "Calorie Deficit Calculator", href: "/tools/calorie-deficit-calculator" },
   { name: "Outfit Ideas", href: "/tools/outfit-ideas" },
   { name: "AI Logo Generator", href: "/tools/logo-generator" },
   { name: "Keyword Finder", href: "/tools/keyword-finder" },

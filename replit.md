@@ -110,6 +110,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/gif-maker` - GIF Maker - create GIFs from videos using ffmpeg.wasm
 - `/tools/heic-to-jpg` - HEIC to JPG Converter - convert iPhone HEIC photos to JPG (targets "heic u jpg" keyword)
 - `/tools/outfit-ideas` - Outfit Ideas Generator - upload outfit photos and find similar items to shop with AI (targets "outfit ideas" keyword)
+- `/tools/calorie-deficit-calculator` - AI Calorie Deficit Calculator - snap food + health app screenshot to see surplus or deficit (targets "calorie counter deficit" keyword)
 - `/r` - Redirect route for affiliate link tracking (routes shopping clicks through for future APE integration)
 
 ### Authenticated Routes
@@ -165,6 +166,16 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-02: **Added AI Calorie Deficit Calculator** - Food and health app screenshot analyzer targeting "calorie counter deficit" keyword
+  - Created `/tools/calorie-deficit-calculator` page with dual image upload (food photo + optional health screenshot)
+  - Uses OpenAI gpt-4o vision model for food calorie estimation and health app reading
+  - Analyzes food photos to estimate calories, confidence, and breakdown by items
+  - Reads Health/Fitness app screenshots to extract active and total calories burned
+  - Calculates calorie deficit or surplus with weekly projections (kg/lbs)
+  - Color-coded status badges: green for deficit, red for surplus, gray for even
+  - Rate limited: 15 calculations per hour per IP
+  - Full SEO: title, meta description, FAQ section, how-it-works, disclaimer
+  - Added to navbar Resources dropdown, tools index, homepage grid, sitemap, ExploreMoreTools
 - 2025-12-02: **Added Outfit Ideas Generator Tool** - AI-powered style finder targeting "outfit ideas" keyword
   - Created `/tools/outfit-ideas` page for uploading outfit photos and finding similar items to shop
   - Uses OpenAI gpt-4o-mini vision model to analyze images and detect clothing items
