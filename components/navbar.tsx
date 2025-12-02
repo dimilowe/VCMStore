@@ -24,12 +24,12 @@ const navDropdowns: NavDropdown[] = [
       { label: "Downloads", href: "/downloads", description: "Digital downloads & assets" },
       { label: "Templates", href: "/funnels", description: "Conversion-focused templates" },
       { label: "Videos", href: "/videos", description: "Video content & tutorials" },
+      { label: "Freebies", href: "/freebies", description: "Free products & resources" },
     ]
   },
   {
     label: "Resources",
     items: [
-      { label: "Freebies", href: "/freebies", description: "Free tools & resources" },
       { label: "AI Chat", href: "/chat", description: "Strategy assistant" },
       { label: "AI Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer" },
       { label: "VCM Answers", href: "/answers", description: "Community Q&A forum" },
