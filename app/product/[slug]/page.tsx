@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ProductRecommendations } from "@/components/product-recommendations";
 import { ClaimButton } from "@/components/claim-button";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 import ReactMarkdown from 'react-markdown';
 
 export const dynamic = 'force-dynamic';
@@ -121,7 +122,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
             
-            <ClaimButton product={product} />
+            <div className="space-y-3">
+              <ClaimButton product={product} />
+              <AddToCartButton product={product} />
+            </div>
           </Card>
 
           {product.meta?.features && (
