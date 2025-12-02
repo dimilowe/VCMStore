@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X } from "lucide-react";
 
 const freeTools = [
   { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers", iconBg: "bg-blue-400" },
@@ -36,10 +36,19 @@ const ITEMS_PER_PAGE = 24;
 
 export default function FreeToolsCarousel() {
   const [currentPage, setCurrentPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   
-  const totalPages = Math.ceil(freeTools.length / ITEMS_PER_PAGE);
+  const filteredTools = useMemo(() => {
+    if (!searchQuery.trim()) return freeTools;
+    const query = searchQuery.toLowerCase();
+    return freeTools.filter(tool => 
+      tool.name.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+  
+  const totalPages = Math.ceil(filteredTools.length / ITEMS_PER_PAGE);
   const startIndex = currentPage * ITEMS_PER_PAGE;
-  const currentTools = freeTools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const currentTools = filteredTools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   
   const goToPrev = () => {
     if (currentPage > 0) setCurrentPage(currentPage - 1);
@@ -48,27 +57,73 @@ export default function FreeToolsCarousel() {
   const goToNext = () => {
     if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
   };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setCurrentPage(0);
+  };
   
   return (
     <div className="relative">
-      <div 
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 transition-opacity duration-300"
-      >
-        {currentTools.map((tool) => (
-          <Link 
-            key={tool.name} 
-            href={tool.href}
-            className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all text-center group"
-          >
-            <div className={`w-14 h-14 md:w-16 md:h-16 ${tool.iconBg} rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110`}>
-              <tool.icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
-            </div>
-            <span className="text-sm md:text-base font-medium text-gray-800 line-clamp-2">{tool.name}</span>
-          </Link>
-        ))}
+      <div className="mb-6">
+        <div className="relative max-w-md mx-auto">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(0);
+            }}
+            placeholder="Search tools..."
+            className="w-full pl-12 pr-10 py-3 rounded-full border border-gray-200 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <p className="text-center text-sm text-gray-500 mt-2">
+            {filteredTools.length} {filteredTools.length === 1 ? 'tool' : 'tools'} found
+          </p>
+        )}
       </div>
+
+      {currentTools.length > 0 ? (
+        <div 
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 transition-opacity duration-300"
+        >
+          {currentTools.map((tool) => (
+            <Link 
+              key={tool.name} 
+              href={tool.href}
+              className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all text-center group"
+            >
+              <div className={`w-14 h-14 md:w-16 md:h-16 ${tool.iconBg} rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110`}>
+                <tool.icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
+              </div>
+              <span className="text-sm md:text-base font-medium text-gray-800 line-clamp-2">{tool.name}</span>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No tools found matching "{searchQuery}"</p>
+          <button
+            onClick={clearSearch}
+            className="mt-3 text-orange-500 hover:text-orange-600 text-sm font-medium"
+          >
+            Clear search
+          </button>
+        </div>
+      )}
       
-      {totalPages > 1 && (
+      {totalPages > 1 && !searchQuery && (
         <div className="flex items-center justify-center gap-4 mt-8">
           <button
             onClick={goToPrev}
