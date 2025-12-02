@@ -11,32 +11,36 @@ export const metadata: Metadata = {
     description: "Free online notepad with auto-save, word count, and AI-powered writing tools. Write notes online, format text, and use AI to summarize, rewrite, expand, or shorten your content instantly.",
     type: "website",
   },
-  other: {
-    "application/ld+json": JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "VCM Suite Online Notepad",
-      "applicationCategory": "Utility",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "description": "Free online notepad with auto-save, formatting, and AI-powered writing assistance.",
-      "publisher": {
-        "@type": "Organization",
-        "name": "VCM Suite"
-      }
-    })
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "VCM Suite Online Notepad",
+  "applicationCategory": "Utility",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Free online notepad with auto-save, formatting, and AI-powered writing assistance.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "VCM Suite"
   }
 };
 
 export default function OnlineNotepadPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <div className="text-center mb-10">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4 py-12">
+          <div className="text-center mb-10">
           <span className="inline-block bg-orange-100 text-orange-700 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
             100% Free
           </span>
@@ -126,7 +130,8 @@ export default function OnlineNotepadPage() {
         </section>
 
         <ExploreMoreTools currentTool="/tools/online-notepad" />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
