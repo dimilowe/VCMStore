@@ -436,7 +436,7 @@ export default async function HomePage() {
                 key={app.name}
                 href={app.href}
                 target={app.href.startsWith('http') ? '_blank' : undefined}
-                className="flex items-center gap-2 text-gray-300 hover:text-orange-400 font-medium py-3 transition-colors"
+                className="flex items-center justify-center gap-2 text-gray-300 hover:text-orange-400 font-medium py-3 transition-colors"
               >
                 {app.name}
                 {app.href.startsWith('http') && <ExternalLink className="w-3 h-3" />}
