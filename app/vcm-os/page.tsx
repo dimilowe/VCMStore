@@ -8,6 +8,7 @@ export default function VCMOSWaitlistPage() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [alreadyOnList, setAlreadyOnList] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +32,7 @@ export default function VCMOSWaitlistPage() {
       }
 
       setIsSuccess(true);
+      setAlreadyOnList(data.alreadyExists || false);
       setEmail("");
     } catch (err: any) {
       setError(err.message || "Failed to join waitlist");
@@ -108,7 +110,9 @@ export default function VCMOSWaitlistPage() {
                   <Check className="w-6 h-6" />
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold">You're on the list!</p>
+                  <p className="font-semibold">
+                    {alreadyOnList ? "You're already on the list!" : "You're on the list!"}
+                  </p>
                   <p className="text-green-400/80 text-sm">We'll notify you when VCM OS is ready.</p>
                 </div>
               </div>
