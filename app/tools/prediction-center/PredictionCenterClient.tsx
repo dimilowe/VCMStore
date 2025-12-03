@@ -17,6 +17,7 @@ import {
   BarChart3,
   X
 } from "lucide-react";
+import ExploreMoreTools from "@/components/ExploreMoreTools";
 
 interface Prediction {
   id: number;
@@ -490,6 +491,9 @@ export default function PredictionCenterClient() {
             </div>
           </section>
         </div>
+
+        {/* Explore More Tools - Internal Linking */}
+        <ExploreMoreTools currentTool="/tools/prediction-center" />
 
         <div className="mt-12 text-center">
           <Link
