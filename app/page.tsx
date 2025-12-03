@@ -105,8 +105,8 @@ async function getLatestDrops(): Promise<Product[]> {
 
 const creatorApps = [
   {
-    name: "VCM OS",
-    description: "Creator Operating System",
+    name: "APE",
+    description: "AI-Powered Engagement",
     icon: Zap,
     href: "/vcm-os",
     gradient: "app-card-pink"
@@ -149,7 +149,7 @@ const categories = [
 ];
 
 const ecosystemApps = [
-  { name: "VCM OS", href: "/vcm-os" },
+  { name: "APE", href: "/vcm-os" },
   { name: "QR Social", href: "/product/qrsocial" },
   { name: "C-Score", href: "/product/cscorecals" },
   { name: "VCM Blog", href: "/blog" },
@@ -173,7 +173,7 @@ export default async function HomePage() {
   const popularTools = [
     { name: "QR Social", icon: QrCode, href: "/product/qrsocial" },
     { name: "C-Score", icon: Flame, href: "/product/cscorecals" },
-    { name: "VCM OS", icon: Zap, href: "/vcm-os" },
+    { name: "APE", icon: Zap, href: "/vcm-os" },
     { name: "Logo Gen", icon: Palette, href: "/tools/logo-generator" },
     { name: "Keywords", icon: Search, href: "/tools/keyword-finder" },
   ];
