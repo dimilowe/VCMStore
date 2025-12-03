@@ -115,8 +115,9 @@ const creatorApps = [
     name: "QR Social",
     description: "Social QR Networking",
     icon: QrCode,
-    href: "/vcm-os",
-    gradient: "app-card-blue"
+    href: "https://qrsocial.studio",
+    gradient: "app-card-blue",
+    external: true
   },
   {
     name: "Nudge",
@@ -150,7 +151,7 @@ const categories = [
 
 const ecosystemApps = [
   { name: "APE", href: "/vcm-os" },
-  { name: "QR Social", href: "/vcm-os" },
+  { name: "QR Social", href: "https://qrsocial.studio" },
   { name: "C-Score", href: "/vcm-os" },
   { name: "VCM Blog", href: "/blog" },
   { name: "Ideas Hub", href: "/ideas" },
@@ -171,7 +172,7 @@ export default async function HomePage() {
   ]);
 
   const popularTools = [
-    { name: "QR Social", icon: QrCode, href: "/vcm-os" },
+    { name: "QR Social", icon: QrCode, href: "https://qrsocial.studio", external: true },
     { name: "C-Score", icon: Flame, href: "/vcm-os" },
     { name: "APE", icon: Zap, href: "/vcm-os" },
     { name: "Logo Gen", icon: Palette, href: "/tools/logo-generator" },
