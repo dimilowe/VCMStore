@@ -321,6 +321,176 @@ export default function PredictionCenterClient() {
           </div>
         )}
 
+        {/* SEO BOOSTER SECTIONS */}
+        <div className="mt-16 space-y-12">
+          {/* Section 1 - What Is Prediction Center? */}
+          <section className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">What Is Prediction Center?</h2>
+            <div className="prose prose-gray max-w-none">
+              <p className="text-gray-600 mb-4">
+                Prediction Center is a free, community-driven forecasting tool where anyone can submit a future prediction and vote Yes or No on open questions.
+              </p>
+              <p className="text-gray-600 mb-4">
+                It works like a lightweight prediction market — but without money, gambling, or financial risk. Instead of trading contracts, Prediction Center tracks:
+              </p>
+              <ul className="list-disc list-inside text-gray-600 space-y-1 mb-4">
+                <li>Community sentiment</li>
+                <li>Forecast accuracy</li>
+                <li>Probability shifts over time</li>
+                <li>Which predictions become true</li>
+              </ul>
+              <p className="text-gray-600 mb-4">
+                It&apos;s a fun way to see how often you&apos;re right about the future across topics like:
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {["Technology", "AI", "Business", "Crypto", "Entertainment", "World Events", "Culture", "Science", "Sports"].map(topic => (
+                  <span key={topic} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                    {topic}
+                  </span>
+                ))}
+              </div>
+              <p className="text-gray-600">
+                Prediction Center is designed to be simple, fast, and anonymous — everyone gets one vote per prediction based on cookies.
+              </p>
+            </div>
+          </section>
+
+          {/* Section 2 - How Prediction Center Works */}
+          <section className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">How Prediction Center Works</h2>
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">1</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Submit a prediction</h3>
+                  <p className="text-gray-600">Anyone can submit a question about the future. Example: &quot;Will Apple release a foldable iPhone by 2026?&quot;</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">2</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">The community votes Yes or No</h3>
+                  <p className="text-gray-600">Each visitor can vote once per prediction using anonymous cookies (no signup required).</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">3</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Percentages update instantly</h3>
+                  <p className="text-gray-600">You&apos;ll see live results showing what people believe will happen.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">4</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Predictions resolve when the outcome occurs</h3>
+                  <p className="text-gray-600">Once the future event is confirmed, it becomes either <span className="font-medium text-green-600">Resolved: YES</span> or <span className="font-medium text-red-600">Resolved: NO</span>.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">5</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Historical accuracy is tracked</h3>
+                  <p className="text-gray-600">Users can scroll through older predictions to see which ones came true.</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 p-4 bg-orange-50 rounded-xl">
+              <p className="text-sm text-orange-800">
+                <strong>Note:</strong> Prediction Center is for fun, discussion, and insight — not betting or financial speculation.
+              </p>
+            </div>
+          </section>
+
+          {/* Section 3 - Why Use Prediction Center? */}
+          <section className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Why Use Prediction Center?</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {[
+                "See how the crowd feels about upcoming events",
+                "Test your forecasting skills",
+                "Track which predictions came true",
+                "Explore trends in tech, AI, crypto, and more",
+                "Submit predictions others may not have thought about",
+                "Watch the percentages shift as news breaks"
+              ].map((benefit, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-600">{benefit}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 text-gray-600">
+              This tool is built for curious thinkers, creators, founders, and anyone who likes to see if their intuition is right.
+            </p>
+          </section>
+
+          {/* Section 4 - Popular Prediction Categories */}
+          <section className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Popular Prediction Categories</h2>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {[
+                { name: "Technology Predictions", icon: "💻" },
+                { name: "AI Predictions", icon: "🤖" },
+                { name: "Crypto Predictions", icon: "₿" },
+                { name: "Business & Startup Predictions", icon: "📈" },
+                { name: "Social Media Predictions", icon: "📱" },
+                { name: "Entertainment Predictions", icon: "🎬" },
+                { name: "Global Events", icon: "🌍" },
+                { name: "Science & Space", icon: "🚀" },
+                { name: "Sports", icon: "⚽" }
+              ].map((cat, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                  <span className="text-2xl">{cat.icon}</span>
+                  <span className="font-medium text-gray-700">{cat.name}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 text-gray-600 text-sm">
+              Each category helps users discover predictions that match their interests.
+            </p>
+          </section>
+
+          {/* Section 5 - FAQ */}
+          <section className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">What is Prediction Center?</h3>
+                <p className="text-gray-600">Prediction Center is a free forecasting tool where anyone can submit predictions and vote Yes/No on future events.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Is this gambling or betting?</h3>
+                <p className="text-gray-600">No. There is no money involved, no trading, and no payouts. It is strictly for fun, curiosity, and community forecasting.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Do I need an account to vote?</h3>
+                <p className="text-gray-600">No. Prediction Center uses anonymous cookies so each user gets one vote per prediction.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">How do predictions get resolved?</h3>
+                <p className="text-gray-600">When the outcome becomes publicly verifiable, the prediction is marked as Resolved: YES or Resolved: NO.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Can anyone submit a prediction?</h3>
+                <p className="text-gray-600">Yes — anyone can submit a future question as long as it is clear and objectively resolvable.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Does Prediction Center use AI?</h3>
+                <p className="text-gray-600">Not for voting — results are entirely based on community sentiment. AI may be used to improve moderation and insights.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Is Prediction Center accurate?</h3>
+                <p className="text-gray-600">Accuracy depends on how informed the community is. The more people vote, the more reliable the percentages become.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">Is the tool free?</h3>
+                <p className="text-gray-600">Yes. Prediction Center is completely free to use.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
         <div className="mt-12 text-center">
           <Link
             href="/tools"
