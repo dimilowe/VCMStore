@@ -115,28 +115,28 @@ const creatorApps = [
     name: "QR Social",
     description: "Social QR Networking",
     icon: QrCode,
-    href: "/product/qrsocial",
+    href: "/vcm-os",
     gradient: "app-card-blue"
   },
   {
     name: "Nudge",
     description: "Smart Notifications",
     icon: Bell,
-    href: "/product/nudge",
+    href: "/vcm-os",
     gradient: "app-card-yellow"
   },
   {
     name: "Stemly",
     description: "Music Stem Editor",
     icon: Music,
-    href: "/product/stemly",
+    href: "/vcm-os",
     gradient: "app-card-teal"
   },
   {
     name: "C-Score",
     description: "Calorie Calculator",
     icon: Flame,
-    href: "/product/cscorecals",
+    href: "/vcm-os",
     gradient: "app-card-orange"
   },
 ];
@@ -150,8 +150,8 @@ const categories = [
 
 const ecosystemApps = [
   { name: "APE", href: "/vcm-os" },
-  { name: "QR Social", href: "/product/qrsocial" },
-  { name: "C-Score", href: "/product/cscorecals" },
+  { name: "QR Social", href: "/vcm-os" },
+  { name: "C-Score", href: "/vcm-os" },
   { name: "VCM Blog", href: "/blog" },
   { name: "Ideas Hub", href: "/ideas" },
   { name: "VCM Answers", href: "/answers" },
@@ -171,8 +171,8 @@ export default async function HomePage() {
   ]);
 
   const popularTools = [
-    { name: "QR Social", icon: QrCode, href: "/product/qrsocial" },
-    { name: "C-Score", icon: Flame, href: "/product/cscorecals" },
+    { name: "QR Social", icon: QrCode, href: "/vcm-os" },
+    { name: "C-Score", icon: Flame, href: "/vcm-os" },
     { name: "APE", icon: Zap, href: "/vcm-os" },
     { name: "Logo Gen", icon: Palette, href: "/tools/logo-generator" },
     { name: "Keywords", icon: Search, href: "/tools/keyword-finder" },
