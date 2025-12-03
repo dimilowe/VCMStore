@@ -105,12 +105,11 @@ async function getLatestDrops(): Promise<Product[]> {
 
 const creatorApps = [
   {
-    name: "APE",
-    description: "AI-Powered Engagement",
+    name: "VCM OS",
+    description: "Creator Operating System",
     icon: Zap,
-    href: "https://ape.vcm.fyi",
-    gradient: "app-card-pink",
-    external: true
+    href: "/vcm-os",
+    gradient: "app-card-pink"
   },
   {
     name: "QR Social",
@@ -150,7 +149,7 @@ const categories = [
 ];
 
 const ecosystemApps = [
-  { name: "APE", href: "https://ape.vcm.fyi" },
+  { name: "VCM OS", href: "/vcm-os" },
   { name: "QR Social", href: "/product/qrsocial" },
   { name: "C-Score", href: "/product/cscorecals" },
   { name: "VCM Blog", href: "/blog" },
@@ -174,7 +173,7 @@ export default async function HomePage() {
   const popularTools = [
     { name: "QR Social", icon: QrCode, href: "/product/qrsocial" },
     { name: "C-Score", icon: Flame, href: "/product/cscorecals" },
-    { name: "APE", icon: Zap, href: "https://ape.vcm.fyi", external: true },
+    { name: "VCM OS", icon: Zap, href: "/vcm-os" },
     { name: "Logo Gen", icon: Palette, href: "/tools/logo-generator" },
     { name: "Keywords", icon: Search, href: "/tools/keyword-finder" },
   ];
@@ -197,7 +196,6 @@ export default async function HomePage() {
               <Link
                 key={app.name}
                 href={app.href}
-                target={app.external ? "_blank" : undefined}
                 className="group flex flex-col items-center"
               >
                 <div className={`w-24 h-24 md:w-28 md:h-28 ${app.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
@@ -221,10 +219,10 @@ export default async function HomePage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-            <Link href="https://vcmos.io" target="_blank">
+            <Link href="/vcm-os">
               <Button className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-6 text-base font-semibold rounded-full shadow-lg flex items-center gap-2">
                 <Rocket className="w-5 h-5" />
-                Open VCM OS
+                Join VCM OS Waitlist
               </Button>
             </Link>
             <Link href="/tools">
@@ -242,12 +240,10 @@ export default async function HomePage() {
               <Link
                 key={tool.name}
                 href={tool.href}
-                target={tool.external ? "_blank" : undefined}
                 className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 hover:border-orange-400 hover:shadow-md transition-all text-sm font-medium text-gray-700"
               >
                 <tool.icon className="w-4 h-4 text-gray-500" />
                 {tool.name}
-                {tool.external && <ExternalLink className="w-3 h-3 text-gray-400" />}
               </Link>
             ))}
           </div>
@@ -362,7 +358,6 @@ export default async function HomePage() {
               <Link
                 key={app.name}
                 href={app.href}
-                target={app.external ? "_blank" : undefined}
                 className="group flex flex-col items-center"
               >
                 <div className={`w-20 h-20 md:w-24 md:h-24 ${app.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
@@ -376,12 +371,11 @@ export default async function HomePage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3">
             <Link
-              href="https://vcmos.io"
-              target="_blank"
+              href="/vcm-os"
               className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-2.5 rounded-full transition-colors shadow-lg text-sm"
             >
               <Zap className="w-4 h-4" />
-              Open VCM OS
+              Join VCM OS Waitlist
             </Link>
             <Link
               href="/tools"

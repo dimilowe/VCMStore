@@ -52,11 +52,10 @@ export default function ExploreMoreTools({ currentTool }: ExploreMoreToolsProps)
           </Link>
         ))}
         <Link 
-          href="https://ape.vcm.fyi" 
-          target="_blank" 
+          href="/vcm-os" 
           className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors"
         >
-          Open VCM OS →
+          Join VCM OS Waitlist →
         </Link>
       </div>
     </section>
