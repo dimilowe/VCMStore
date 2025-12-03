@@ -51,6 +51,8 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `resource_boxes`: Creator resource boxes for link card generator
 - `box_items`: Links within resource boxes
 - `internal_resources`: Pre-defined VCM tools/freebies for resource boxes
+- `predictions`: Community predictions about future events (tech, crypto, etc.)
+- `prediction_votes`: Yes/No votes on predictions (anonymous voting)
 
 ## Project Structure
 
@@ -113,6 +115,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/outfit-ideas` - Outfit Ideas Generator - upload outfit photos and find similar items to shop with AI (targets "outfit ideas" keyword)
 - `/tools/calorie-deficit-calculator` - AI Calorie Deficit Calculator - snap food + health app screenshot to see surplus or deficit (targets "calorie counter deficit" keyword)
 - `/r` - Redirect route for affiliate link tracking (routes shopping clicks through for future APE integration)
+- `/tools/prediction-center` - Prediction Center - vote Yes/No on future event predictions
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -167,6 +170,16 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-03: **Added Prediction Center Tool** - Community prediction voting hub
+  - Created `/tools/prediction-center` page for voting on future event predictions
+  - Database tables: predictions (question, category, close_date, status, outcome), prediction_votes (anonymous Yes/No)
+  - Submit new predictions with question, description, category, and optional close date
+  - Vote Yes or No on any open prediction (cookie-based anonymous voting)
+  - Real-time vote percentages with color-coded progress bars
+  - Category filter and sorting (trending, newest, closing soon)
+  - SEO structured data with JSON-LD WebApplication schema
+  - Added to navbar Resources > Community, tools index, homepage carousel, sitemap
+  - Fixed Next.js 15+ async cookies() compatibility in vote API routes
 - 2025-12-02: **Added PDF Editor Tool** - Free online PDF editor targeting "pdf editor website" keyword
   - Created `/tools/pdf-editor` page with client-side PDF manipulation using pdf-lib
   - Upload PDF, view page thumbnails with page numbers
