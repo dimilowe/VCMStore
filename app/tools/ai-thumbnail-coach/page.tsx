@@ -153,7 +153,7 @@ const faqJsonLd = {
 const exampleAnalyses = [
   {
     title: "Gaming Channel Thumbnail",
-    image: "/api/placeholder/320/180",
+    image: "/api/files/thumbnail-gaming.png",
     grade: "B+",
     avgScore: 78,
     verdict: "Strong subject focus but text could be larger for mobile viewing.",
@@ -162,7 +162,7 @@ const exampleAnalyses = [
   },
   {
     title: "Tutorial Video Thumbnail",
-    image: "/api/placeholder/320/180",
+    image: "/api/files/thumbnail-tutorial.png",
     grade: "A-",
     avgScore: 85,
     verdict: "Excellent clarity and composition. Minor improvements possible.",
@@ -171,7 +171,7 @@ const exampleAnalyses = [
   },
   {
     title: "Vlog Thumbnail",
-    image: "/api/placeholder/320/180",
+    image: "/api/files/thumbnail-vlog.png",
     grade: "C+",
     avgScore: 62,
     verdict: "Background is too busy and competes with the subject.",
@@ -314,8 +314,12 @@ export default function AIThumbnailCoachPage() {
             <div className="grid md:grid-cols-3 gap-6">
               {exampleAnalyses.map((example, i) => (
                 <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                  <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">Example Thumbnail</span>
+                  <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={example.image} 
+                      alt={example.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-3">
