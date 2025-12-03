@@ -197,6 +197,7 @@ export default async function HomePage() {
               <Link
                 key={app.name}
                 href={app.href}
+                target={app.href.startsWith('http') ? '_blank' : undefined}
                 className="group flex flex-col items-center"
               >
                 <div className={`w-24 h-24 md:w-28 md:h-28 ${app.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
@@ -241,6 +242,7 @@ export default async function HomePage() {
               <Link
                 key={tool.name}
                 href={tool.href}
+                target={tool.href.startsWith('http') ? '_blank' : undefined}
                 className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 hover:border-orange-400 hover:shadow-md transition-all text-sm font-medium text-gray-700"
               >
                 <tool.icon className="w-4 h-4 text-gray-500" />
@@ -359,6 +361,7 @@ export default async function HomePage() {
               <Link
                 key={app.name}
                 href={app.href}
+                target={app.href.startsWith('http') ? '_blank' : undefined}
                 className="group flex flex-col items-center"
               >
                 <div className={`w-20 h-20 md:w-24 md:h-24 ${app.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
