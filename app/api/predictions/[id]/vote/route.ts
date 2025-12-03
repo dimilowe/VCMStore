@@ -2,8 +2,8 @@ import { query } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-function getOrCreateAnonId(): string {
-  const cookieStore = cookies();
+async function getOrCreateAnonId(): Promise<string> {
+  const cookieStore = await cookies();
   let anonId = cookieStore.get("prediction_anon_id")?.value;
   
   if (!anonId) {
@@ -44,7 +44,7 @@ export async function POST(
       return NextResponse.json({ error: "Voting is closed for this prediction" }, { status: 400 });
     }
 
-    const anonId = getOrCreateAnonId();
+    const anonId = await getOrCreateAnonId();
 
     const existingVote = await query(
       "SELECT id FROM prediction_votes WHERE prediction_id = $1 AND anon_id = $2",
@@ -106,7 +106,7 @@ export async function GET(
   try {
     const { id } = await params;
     const predictionId = parseInt(id);
-    const anonId = getOrCreateAnonId();
+    const anonId = await getOrCreateAnonId();
 
     if (isNaN(predictionId)) {
       return NextResponse.json({ error: "Invalid prediction ID" }, { status: 400 });
