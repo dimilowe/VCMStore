@@ -199,6 +199,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}/tools/prediction-center`,
+      lastModified: new Date(),
+      changeFrequency: 'hourly' as const,
+      priority: 0.9,
+    },
   ];
 
   // Product pages

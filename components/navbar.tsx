@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
@@ -93,6 +93,7 @@ const resourceCategories: ResourceCategory[] = [
   {
     name: "Community",
     items: [
+      { label: "Prediction Center", href: "/tools/prediction-center", description: "Vote on future events", icon: TrendingUp, iconBg: "bg-purple-500" },
       { label: "VCM Answers", href: "/answers", description: "Community Q&A forum", icon: HelpCircle, iconBg: "bg-blue-400" },
       { label: "Ideas Hub", href: "/ideas", description: "Browse & share startup ideas", icon: Lightbulb, iconBg: "bg-amber-400" },
     ]

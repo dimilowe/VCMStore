@@ -23,10 +23,19 @@ import {
   Flame,
   FilePen,
   StickyNote,
-  X
+  X,
+  TrendingUp
 } from "lucide-react";
 
 const tools = [
+  { 
+    name: "Prediction Center", 
+    description: "Submit predictions about future events and vote YES or NO. See what the crowd thinks.",
+    icon: TrendingUp, 
+    href: "/tools/prediction-center",
+    category: "Community",
+    iconBg: "bg-purple-500"
+  },
   { 
     name: "Calorie Deficit Calculator", 
     description: "Snap your food + Health app screenshot to see today's calorie surplus or deficit.",
