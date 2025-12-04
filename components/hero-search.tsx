@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ArrowRight, FileImage, Type, Palette, Star, Heart, Smile, GitBranch, Zap, QrCode, Flame, MessageCircleQuestion } from "lucide-react";
+import { Search, ArrowRight, FileImage, Type, Palette, Star, Heart, Smile, GitBranch, Zap, QrCode, Flame, MessageCircleQuestion, Users } from "lucide-react";
 
 const searchSuggestions = [
   { name: "VCM Answers", href: "/answers", icon: MessageCircleQuestion },
@@ -21,6 +21,7 @@ const searchSuggestions = [
   { name: "Ideas Hub", href: "/ideas", icon: Star },
   { name: "Blog", href: "/blog", icon: Type },
   { name: "Store", href: "/store", icon: Palette },
+  { name: "Name Combiner", href: "/tools/name-combiner", icon: Users },
 ];
 
 export function HeroSearch() {
