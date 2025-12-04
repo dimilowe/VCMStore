@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Upload, Download, FileImage, Zap, Shield, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 type CompressionLevel = 'light' | 'balanced' | 'max';
 
@@ -320,6 +321,8 @@ export default function GifCompressorPage() {
                 >
                   Compress Another GIF
                 </button>
+                
+                <PostResultUpsell />
               </div>
             )}
           </div>

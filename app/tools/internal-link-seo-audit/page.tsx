@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Search, Link2, AlertTriangle, TrendingUp, Loader2, ExternalLink, CheckCircle, XCircle, Target } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface PageData {
   url: string;
@@ -427,6 +428,8 @@ export default function InternalLinkSeoAuditPage() {
                 </li>
               </ul>
             </div>
+            
+            <PostResultUpsell />
           </div>
         )}
 

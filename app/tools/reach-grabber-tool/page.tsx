@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkles, Copy, Check, Loader2, AlertCircle, Target, FileText, BarChart3 } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 export default function ReachGrabberToolPage() {
   const [keyword, setKeyword] = useState('');
@@ -252,6 +253,8 @@ export default function ReachGrabberToolPage() {
                   </div>
                 </div>
               )}
+              
+              <PostResultUpsell />
             </section>
           )}
 

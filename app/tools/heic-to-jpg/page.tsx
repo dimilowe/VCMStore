@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Upload, Download, Image as ImageIcon, Settings, ChevronDown, ChevronUp, Loader2, CheckCircle2, XCircle, FileImage, Package, Sparkles, ArrowRight } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface FileItem {
   id: string;
@@ -545,16 +546,19 @@ export default function HeicToJpgPage() {
         </div>
 
         {conversionComplete && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-            <p className="text-green-800 font-medium">
-              Converted {completedCount} of {files.length} file{files.length !== 1 ? 's' : ''} successfully.
-              {errorCount > 0 && (
-                <span className="text-red-600 ml-2">
-                  {errorCount} file{errorCount !== 1 ? 's' : ''} failed.
-                </span>
-              )}
-            </p>
-          </div>
+          <>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+              <p className="text-green-800 font-medium">
+                Converted {completedCount} of {files.length} file{files.length !== 1 ? 's' : ''} successfully.
+                {errorCount > 0 && (
+                  <span className="text-red-600 ml-2">
+                    {errorCount} file{errorCount !== 1 ? 's' : ''} failed.
+                  </span>
+                )}
+              </p>
+            </div>
+            <PostResultUpsell />
+          </>
         )}
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">

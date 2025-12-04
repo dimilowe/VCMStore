@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Sparkles, Loader2, Copy, Check, Calendar } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 const AREAS = [
   { id: 'body', label: 'Body & Health', emoji: '💪', description: 'Physical self-acceptance' },
@@ -326,6 +327,10 @@ export default function AffirmationAboutSelfLovePage() {
                 </p>
               </div>
             </div>
+          )}
+
+          {affirmation && (
+            <PostResultUpsell />
           )}
 
           <div className="bg-gradient-to-r from-rose-100 to-pink-100 rounded-2xl p-6 md:p-8 mb-8 text-center">

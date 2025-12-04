@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Upload, Video, Image, Download, Loader2, RefreshCw, ChevronDown, ChevronUp, AlertCircle, Check, X } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
@@ -581,6 +582,8 @@ export default function GifMakerPage() {
                   <Download className="w-5 h-5" />
                   Download GIF
                 </button>
+                
+                <PostResultUpsell />
               </div>
             )}
 

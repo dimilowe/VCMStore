@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Upload, FileImage, Download, ArrowRight, Check, Zap, Globe, Mail, HardDrive, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 type CompressionLevel = 'light' | 'balanced' | 'max';
 
@@ -400,6 +401,8 @@ export default function ImageCompressorPage() {
               <p className="mt-6 text-sm text-gray-500">
                 Need an even smaller file? Try running Maximum compression or resize the image before upload.
               </p>
+              
+              <PostResultUpsell />
             </div>
           )}
         </div>

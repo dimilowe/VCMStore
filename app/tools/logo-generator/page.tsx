@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkles, Download, AlertCircle, Loader2, Send, User, Bot } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface Logo {
   base64: string;
@@ -179,27 +180,32 @@ export default function LogoGeneratorPage() {
                   </div>
                   
                   {message.logos && message.logos.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3 mt-4 max-w-lg">
-                      {message.logos.map((logo) => (
-                        <div
-                          key={logo.variant}
-                          className="bg-white rounded-xl border border-gray-200 p-3 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer group"
-                          onClick={() => downloadLogo(logo.base64, logo.variant)}
-                        >
-                          <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-2">
-                            <img
-                              src={`data:image/png;base64,${logo.base64}`}
-                              alt={`Logo variant ${logo.variant}`}
-                              className="w-full h-full object-contain"
-                            />
+                    <>
+                      <div className="grid grid-cols-2 gap-3 mt-4 max-w-lg">
+                        {message.logos.map((logo) => (
+                          <div
+                            key={logo.variant}
+                            className="bg-white rounded-xl border border-gray-200 p-3 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer group"
+                            onClick={() => downloadLogo(logo.base64, logo.variant)}
+                          >
+                            <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-2">
+                              <img
+                                src={`data:image/png;base64,${logo.base64}`}
+                                alt={`Logo variant ${logo.variant}`}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                            <div className="flex items-center justify-center gap-1 text-xs text-gray-500 group-hover:text-orange-600 transition-colors">
+                              <Download className="w-3 h-3" />
+                              <span>Download</span>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-center gap-1 text-xs text-gray-500 group-hover:text-orange-600 transition-colors">
-                            <Download className="w-3 h-3" />
-                            <span>Download</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      <div className="mt-4">
+                        <PostResultUpsell />
+                      </div>
+                    </>
                   )}
                 </div>
               </div>

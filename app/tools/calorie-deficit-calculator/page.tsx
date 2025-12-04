@@ -24,6 +24,7 @@ import {
   Info
 } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface FoodItem {
   name: string;
@@ -563,6 +564,8 @@ export default function CalorieDeficitCalculatorPage() {
                 )}
               </div>
             )}
+            
+            <PostResultUpsell />
           </div>
         )}
 

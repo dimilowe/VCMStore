@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 import ReactFlow, {
   Controls,
   Background,
@@ -286,6 +287,10 @@ export default function VisualizationPage() {
             </div>
           </div>
         </div>
+
+        {hasGenerated && nodes.length > 0 && (
+          <PostResultUpsell />
+        )}
 
         <div className="bg-gray-900 rounded-2xl p-8 md:p-10 text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">

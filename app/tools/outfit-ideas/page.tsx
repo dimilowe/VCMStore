@@ -19,6 +19,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface DetectedItem {
   label: string;
@@ -338,6 +339,8 @@ export default function OutfitIdeasPage() {
                 </div>
               </div>
             ))}
+            
+            <PostResultUpsell />
           </div>
         )}
 
