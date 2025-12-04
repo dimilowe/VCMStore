@@ -1,4 +1,5 @@
 import MonetizationBar from "@/components/MonetizationBar";
+import CreatorStack from "@/components/CreatorStack";
 
 export default function ToolsLayout({
   children,
@@ -9,6 +10,9 @@ export default function ToolsLayout({
     <>
       <div className="pb-14">
         {children}
+        <div className="max-w-4xl mx-auto px-4">
+          <CreatorStack />
+        </div>
       </div>
       <MonetizationBar />
     </>
