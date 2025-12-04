@@ -17,6 +17,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface AnalysisResult {
   aiProbability: number;
@@ -337,6 +338,8 @@ export default function AIHumanizerFreePage() {
               rows={12}
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 resize-y focus:outline-none"
             />
+            
+            <PostResultUpsell />
           </section>
         )}
 

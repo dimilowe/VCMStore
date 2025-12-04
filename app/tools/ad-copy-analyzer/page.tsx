@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, Copy, Check, ChevronDown, ChevronUp, Zap, Target, TrendingUp, AlertTriangle, Lightbulb, FileText, Sparkles } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface ScoreBreakdown {
   hook: number;
@@ -550,6 +551,8 @@ export default function AdCopyAnalyzerPage() {
                 <p className="text-sm text-gray-600">{result.audienceNotes}</p>
               </div>
             </div>
+            
+            <PostResultUpsell />
           </div>
         )}
 

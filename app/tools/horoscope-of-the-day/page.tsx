@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, Star, Moon, Sun, Loader2, RefreshCw } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 const ZODIAC_SIGNS = [
   { name: 'Aries', symbol: '♈', dates: 'Mar 21 - Apr 19', element: 'fire' },
@@ -281,6 +282,8 @@ export default function HoroscopeOfTheDayPage() {
                   Same sign + tone gets the same reading all day. New day, new chaos. ✨
                 </p>
               </div>
+              
+              <PostResultUpsell />
             </div>
           )}
 

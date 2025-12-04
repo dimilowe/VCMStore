@@ -17,6 +17,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 const STOP_WORDS = new Set([
   'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
@@ -358,6 +359,8 @@ export default function WordCounterPage() {
               </span>
             </div>
           </div>
+
+          {stats.words > 0 && <PostResultUpsell />}
         </div>
 
         {keywords.length > 0 && (

@@ -17,6 +17,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 type Mode = 'default' | 'custom';
 type VoiceId = 'female_soft' | 'male_hype' | 'robotic' | 'female_warm' | 'male_deep';
@@ -328,19 +329,22 @@ export default function ProducerTagGeneratorPage() {
             </button>
 
             {downloadUrl && (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
-                <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-3" />
-                <p className="font-semibold text-gray-900 mb-4">Your tagged track is ready!</p>
-                <a
-                  href={downloadUrl}
-                  download
-                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
-                >
-                  <Download className="w-5 h-5" />
-                  Download Tagged Audio
-                </a>
-                <p className="text-xs text-gray-500 mt-3">Link expires in 30 minutes</p>
-              </div>
+              <>
+                <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+                  <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-3" />
+                  <p className="font-semibold text-gray-900 mb-4">Your tagged track is ready!</p>
+                  <a
+                    href={downloadUrl}
+                    download
+                    className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+                  >
+                    <Download className="w-5 h-5" />
+                    Download Tagged Audio
+                  </a>
+                  <p className="text-xs text-gray-500 mt-3">Link expires in 30 minutes</p>
+                </div>
+                <PostResultUpsell />
+              </>
             )}
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Sparkles, Copy, Check, Loader2, Heart, Baby, Briefcase, Users, Gamepad2 } from 'lucide-react';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 type CombineStyle = 'balanced' | 'cute' | 'edgy' | 'fantasy' | 'brandable';
 
@@ -222,6 +223,10 @@ export default function NameCombinerClient() {
             No combinations found. Try shorter names or a different style.
           </p>
         </div>
+      )}
+      
+      {result && result.suggestions.length > 0 && (
+        <PostResultUpsell />
       )}
       
       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-6 md:p-8">

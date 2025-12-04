@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, Copy, Check, FileText, Zap, List, ChevronDown, ChevronUp } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface SummaryResult {
   summary: string;
@@ -272,6 +273,8 @@ export default function SummarizerPage() {
                 >
                   Summarize Another Text
                 </button>
+                
+                <PostResultUpsell />
               </div>
             )}
           </div>

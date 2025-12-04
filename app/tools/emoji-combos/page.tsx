@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Search, Shuffle, Copy, Check, Sparkles, Trash2, Wand2, Plus, Users } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface EmojiCombo {
   id: number;
@@ -371,47 +372,51 @@ export default function EmojiCombosPage() {
             <p className="text-gray-500 text-lg">No emoji combos found. Try a different search or category.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-12">
-            {filteredCombos.map((combo) => (
-              <div
-                key={combo.id}
-                ref={(el) => { cardRefs.current[combo.id] = el; }}
-                className={`bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all relative ${
-                  highlightedId === combo.id ? 'ring-4 ring-violet-400 ring-opacity-75 animate-pulse' : ''
-                }`}
-              >
-                <span
-                  className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(
-                    combo.category
-                  )}`}
-                >
-                  {combo.category}
-                </span>
-                <div className="text-4xl mb-3 select-all">{combo.combo}</div>
-                <p className="text-sm text-gray-500 mb-4">{combo.label}</p>
-                <button
-                  onClick={() => copyToClipboard(combo)}
-                  className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${
-                    copiedId === combo.id
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+              {filteredCombos.map((combo) => (
+                <div
+                  key={combo.id}
+                  ref={(el) => { cardRefs.current[combo.id] = el; }}
+                  className={`bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all relative ${
+                    highlightedId === combo.id ? 'ring-4 ring-violet-400 ring-opacity-75 animate-pulse' : ''
                   }`}
                 >
-                  {copiedId === combo.id ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      Copy
-                    </>
-                  )}
-                </button>
-              </div>
-            ))}
-          </div>
+                  <span
+                    className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(
+                      combo.category
+                    )}`}
+                  >
+                    {combo.category}
+                  </span>
+                  <div className="text-4xl mb-3 select-all">{combo.combo}</div>
+                  <p className="text-sm text-gray-500 mb-4">{combo.label}</p>
+                  <button
+                    onClick={() => copyToClipboard(combo)}
+                    className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${
+                      copiedId === combo.id
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    {copiedId === combo.id ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            {copiedId !== null && <PostResultUpsell />}
+          </>
         )}
 
         <div className="bg-gray-900 rounded-2xl p-8 md:p-10 text-center mb-12">

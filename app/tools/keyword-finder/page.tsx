@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Search, Download, Copy, ArrowUpDown, AlertCircle, Loader2, Check, Sparkles } from 'lucide-react';
 import ExploreMoreTools from '@/components/ExploreMoreTools';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface KeywordIdea {
   keyword: string;
@@ -374,6 +375,8 @@ export default function KeywordFinderPage() {
                 </tbody>
               </table>
             </div>
+            
+            <PostResultUpsell />
           </div>
         )}
 
