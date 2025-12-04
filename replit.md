@@ -116,6 +116,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/calorie-deficit-calculator` - AI Calorie Deficit Calculator - snap food + health app screenshot to see surplus or deficit (targets "calorie counter deficit" keyword)
 - `/r` - Redirect route for affiliate link tracking (routes shopping clicks through for future APE integration)
 - `/tools/prediction-center` - Prediction Center - vote Yes/No on future event predictions
+- `/tools/name-combiner` - Name Combiner - combine 2-3 names into unique mashups (targets "combiner name" keyword)
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -170,6 +171,15 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-04: **Added Name Combiner Tool** - Free name blending/mashup generator (targets "combiner name" keyword)
+  - Created `/tools/name-combiner` page for combining 2-3 names into unique mashups
+  - Features 5 combination styles: Balanced, Cute, Edgy, Fantasy, Brandable
+  - Robust algorithm with half-and-half, overlap, vowel-based, and syllable blending
+  - Reliably produces 20 suggestions for all input types including short names
+  - Use cases: couple names, baby names, brand names, usernames, team names
+  - One-click copy to clipboard functionality
+  - Full SEO booster sections and FAQ schema JSON-LD
+  - Added to ExploreMoreTools component
 - 2025-12-03: **Added Prediction Center Tool** - Community prediction voting hub
   - Created `/tools/prediction-center` page for voting on future event predictions
   - Database tables: predictions (question, category, close_date, status, outcome), prediction_votes (anonymous Yes/No)
