@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Wrench, X, Bell, QrCode, Zap, Cloud, Music, Flame, ArrowRight } from "lucide-react";
 
@@ -58,17 +58,48 @@ const creatorProducts = [
 
 export default function FloatingToolsButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > 100) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 z-40 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all group"
+        className={`fixed bottom-20 right-4 z-40 flex items-center bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 group ${
+          isCollapsed 
+            ? "w-12 h-12 justify-center rounded-full p-0" 
+            : "gap-2 px-4 py-3 rounded-full"
+        }`}
+        title="Creator Tools"
       >
-        <Wrench className="w-5 h-5" />
-        <span className="font-medium text-sm">Creator Tools</span>
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        <Wrench className="w-5 h-5 flex-shrink-0" />
+        <span className={`font-medium text-sm whitespace-nowrap transition-all duration-300 ${
+          isCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+        }`}>
+          Creator Tools
+        </span>
+        <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition-all duration-300 ${
+          isCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-4 opacity-100"
+        }`} />
       </button>
 
       {/* Backdrop */}
