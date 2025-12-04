@@ -20,6 +20,7 @@ const tools = [
   { name: "AI Summarizer", href: "/tools/summarizer" },
   { name: "Online Notepad", href: "/tools/online-notepad" },
   { name: "Prediction Center", href: "/tools/prediction-center" },
+  { name: "Name Combiner", href: "/tools/name-combiner" },
   { name: "Ideas Hub", href: "/ideas" },
   { name: "VCM Answers", href: "/answers" },
 ];
