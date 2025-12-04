@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { CartProvider } from "@/contexts/CartContext";
+import FloatingToolsButton from "@/components/FloatingToolsButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,6 +43,7 @@ export default function RootLayout({
           <main className="min-h-screen">
             {children}
           </main>
+          <FloatingToolsButton />
         </CartProvider>
       </body>
     </html>
