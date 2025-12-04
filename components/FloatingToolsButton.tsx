@@ -86,23 +86,23 @@ export default function FloatingToolsButton() {
         onClick={() => setIsOpen(true)}
         className={`fixed bottom-20 right-4 z-40 flex items-center bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 group rounded-full ${
           isCollapsed 
-            ? "w-12 hover:w-[180px] h-12 justify-center p-0 hover:px-4 hover:gap-2" 
+            ? "w-12 hover:w-[200px] h-12 justify-center p-0 hover:pl-4 hover:pr-5 hover:gap-2" 
             : "gap-2 px-4 py-3"
         }`}
         title="Creator Tools"
       >
         <Wrench className="w-5 h-5 flex-shrink-0" />
-        <span className={`font-medium text-sm whitespace-nowrap overflow-hidden transition-all duration-150 ${
+        <span className={`font-medium text-sm whitespace-nowrap transition-all duration-150 ${
           isCollapsed 
-            ? "max-w-0 opacity-0 group-hover:max-w-[120px] group-hover:opacity-100" 
-            : "max-w-[120px] opacity-100"
+            ? "w-0 opacity-0 group-hover:w-auto group-hover:opacity-100" 
+            : "opacity-100"
         }`}>
           Creator Tools
         </span>
-        <ArrowRight className={`w-4 h-4 flex-shrink-0 transition-all duration-150 ${
+        <ArrowRight className={`flex-shrink-0 transition-all duration-150 ${
           isCollapsed 
-            ? "max-w-0 opacity-0 group-hover:max-w-4 group-hover:opacity-100 group-hover:translate-x-0.5" 
-            : "max-w-4 opacity-100 group-hover:translate-x-0.5"
+            ? "w-0 opacity-0 group-hover:w-4 group-hover:h-4 group-hover:opacity-100 group-hover:translate-x-0.5" 
+            : "w-4 h-4 opacity-100 group-hover:translate-x-0.5"
         }`} />
       </button>
 
