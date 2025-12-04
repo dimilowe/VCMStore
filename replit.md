@@ -119,6 +119,12 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/prediction-center` - Prediction Center - vote Yes/No on future event predictions
 - `/tools/name-combiner` - Name Combiner - combine 2-3 names into unique mashups (targets "combiner name" keyword)
 
+### MBB Routes (Micro-Blog Business)
+MBBs are standalone SEO tools that drive traffic without appearing in main navigation. Access via Admin > Manage MBBs.
+- `/tools/calorie-counter-walking` - Walking calorie calculator (targets "calorie counter walking" keyword)
+- `/articles/steps-vs-calories-walking` - Supporting article for walking calculator
+- `/articles/walking-for-fat-loss` - Supporting article for walking calculator
+
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
 - `/apps/[slug]` - Access to purchased apps
@@ -172,6 +178,16 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-04: **Added MBB Management System** - Admin dashboard for Micro-Blog Business tools
+  - Created `/admin/mbbs` page to list all MBB tools (hidden from public navigation)
+  - Added "Manage MBBs" button to admin dashboard header
+  - MBBs are SEO-focused tools that don't clutter the main site navigation
+- 2025-12-04: **Added Calorie Counter Walking MBB** - Walking calorie calculator (targets "calorie counter walking")
+  - Created `/tools/calorie-counter-walking` main calculator page
+  - MET-based calculation formula with duration, weight, and intensity inputs
+  - Two supporting articles: `/articles/steps-vs-calories-walking` and `/articles/walking-for-fat-loss`
+  - Full SEO optimization with metadata, FAQ schema JSON-LD, calorie tables
+  - All monetization components: MonetizationBar, PostResultUpsell
 - 2025-12-04: **Added Name Combiner Tool** - Free name blending/mashup generator (targets "combiner name" keyword)
   - Created `/tools/name-combiner` page for combining 2-3 names into unique mashups
   - Features 5 combination styles: Balanced, Cute, Edgy, Fantasy, Brandable
