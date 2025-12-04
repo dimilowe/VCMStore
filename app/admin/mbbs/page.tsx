@@ -36,6 +36,19 @@ const MBB_TOOLS: MBBTool[] = [
     dateAdded: "2024-12-04",
     category: "Fitness",
   },
+  {
+    id: "calorie-counter-maintenance",
+    name: "Calorie Counter Maintenance",
+    description: "TDEE/Maintenance calorie calculator using Mifflin-St Jeor formula. Calculates BMR, maintenance calories, and deficit/surplus suggestions.",
+    targetKeyword: "calorie counter maintenance",
+    mainUrl: "/tools/calorie-counter-maintenance",
+    supportingArticles: [
+      { title: "What Are Maintenance Calories and Why Do They Matter?", url: "/articles/what-are-maintenance-calories" },
+      { title: "Maintenance vs Deficit vs Surplus: Which Is Right for Your Goal?", url: "/articles/maintenance-vs-deficit-vs-surplus" },
+    ],
+    dateAdded: "2024-12-04",
+    category: "Fitness",
+  },
 ];
 
 export default function MBBsPage() {

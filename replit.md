@@ -124,6 +124,9 @@ MBBs are standalone SEO tools that drive traffic without appearing in main navig
 - `/tools/calorie-counter-walking` - Walking calorie calculator (targets "calorie counter walking" keyword)
 - `/articles/steps-vs-calories-walking` - Supporting article for walking calculator
 - `/articles/walking-for-fat-loss` - Supporting article for walking calculator
+- `/tools/calorie-counter-maintenance` - TDEE/Maintenance calorie calculator (targets "calorie counter maintenance" keyword)
+- `/articles/what-are-maintenance-calories` - Supporting article for maintenance calculator
+- `/articles/maintenance-vs-deficit-vs-surplus` - Supporting article for maintenance calculator
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -178,6 +181,13 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-04: **Added Calorie Counter Maintenance MBB** - TDEE/Maintenance calorie calculator (targets "calorie counter maintenance")
+  - Created `/tools/calorie-counter-maintenance` main calculator page with Mifflin-St Jeor formula
+  - Calculates BMR, maintenance calories (TDEE), deficit/surplus suggestions
+  - Two supporting articles: `/articles/what-are-maintenance-calories` and `/articles/maintenance-vs-deficit-vs-surplus`
+  - Full SEO optimization with metadata, FAQ schema JSON-LD, calorie tables
+  - All monetization components: MonetizationBar, PostResultUpsell
+  - Updated admin MBB tracking page with new entry
 - 2025-12-04: **Added MBB Management System** - Admin dashboard for Micro-Blog Business tools
   - Created `/admin/mbbs` page to list all MBB tools (hidden from public navigation)
   - Added "Manage MBBs" button to admin dashboard header
