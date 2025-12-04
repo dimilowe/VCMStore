@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
@@ -81,6 +81,7 @@ const resourceCategories: ResourceCategory[] = [
       { label: "Resource Box", href: "/tools/resource-box", description: "Create shareable link cards", icon: LinkIcon, iconBg: "bg-teal-500" },
       { label: "Visualization Tool", href: "/tools/visualization", description: "Turn text into diagrams", icon: Layout, iconBg: "bg-amber-500" },
       { label: "Emoji Combos", href: "/tools/emoji-combos", description: "Copy aesthetic emoji combos", icon: Smile, iconBg: "bg-yellow-400" },
+      { label: "Name Combiner", href: "/tools/name-combiner", description: "Combine names into mashups", icon: Users, iconBg: "bg-cyan-500" },
     ]
   },
   {

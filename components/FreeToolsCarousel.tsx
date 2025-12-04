@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X, TrendingUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X, TrendingUp, Users } from "lucide-react";
 
 const freeTools = [
   { name: "Prediction Center", icon: TrendingUp, href: "/tools/prediction-center", iconBg: "bg-purple-500" },
@@ -31,6 +31,7 @@ const freeTools = [
   { name: "Visualization", icon: GitBranch, href: "/tools/visualization", iconBg: "bg-amber-500" },
   { name: "Emoji Combos", icon: Smile, href: "/tools/emoji-combos", iconBg: "bg-yellow-400" },
   { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day", iconBg: "bg-purple-400" },
+  { name: "Name Combiner", icon: Users, href: "/tools/name-combiner", iconBg: "bg-cyan-500" },
 ];
 
 const ITEMS_PER_PAGE = 24;
