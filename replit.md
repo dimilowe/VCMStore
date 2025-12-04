@@ -94,6 +94,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/emoji-combos` - Free emoji combination generator with community library
 - `/tools/horoscope-of-the-day` - Free AI-powered daily horoscope generator
 - `/tools/affirmation-about-self-love` - Free daily AI self-love affirmation generator
+- `/tools/calorie-counter-steps` - Free steps to calories calculator (SEO: "calorie counter steps")
 - `/ideas` - VCM Ideas Hub - Reddit-style feed for startup ideas
 - `/ideas/new` - Submit a new idea
 - `/ideas/[slug]` - Individual idea detail page with comments
