@@ -6,6 +6,7 @@ import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Eye } from "lucide-react";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import SidebarTools from "@/components/SidebarTools";
 
 function formatContent(content: string): string {
   // Tiptap already outputs HTML, so just return it as-is
@@ -179,18 +180,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Sidebar */}
             <aside className="lg:col-span-1">
               <div className="lg:sticky lg:top-8 space-y-6">
-                {/* Newsletter Signup */}
-                <Card className="border-2 border-orange-500">
-                  <CardHeader>
-                    <CardTitle className="text-xl">Never Miss a Post</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Get our latest articles and resources delivered weekly.
-                    </p>
-                    <NewsletterSignup />
-                  </CardContent>
-                </Card>
+                {/* Free Creator Tools */}
+                <SidebarTools />
                 
                 {/* Related Posts */}
                 {relatedPosts.length > 0 && (
