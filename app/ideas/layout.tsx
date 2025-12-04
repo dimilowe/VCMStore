@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import MonetizationBar from "@/components/MonetizationBar";
 
 export const metadata: Metadata = {
   title: 'VCM Ideas Hub — Unbuilt Opportunities & Startup Ideas',
@@ -16,5 +17,12 @@ export default function IdeasLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <div className="pb-14">
+        {children}
+      </div>
+      <MonetizationBar />
+    </>
+  );
 }
