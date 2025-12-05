@@ -166,6 +166,20 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Utilities",
     type: "tool",
   },
+  {
+    id: "401k-retirement-calculator",
+    name: "401k Retirement Estimator",
+    description: "Project 401k balance at retirement based on current savings, contributions, employer match, and expected returns. Includes year-by-year projection table.",
+    targetKeyword: "estimate 401k at retirement",
+    mainUrl: "/tools/401k-retirement-calculator",
+    supportingArticles: [
+      { title: "How 401k Compound Growth Works", url: "/mbb/how-401k-compound-growth-works" },
+      { title: "401k vs IRA: Which Is Better for Retirement?", url: "/mbb/401k-vs-ira-retirement" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Finance",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;

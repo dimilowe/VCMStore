@@ -130,6 +130,9 @@ MBBs are standalone SEO tools that drive traffic without appearing in main navig
 - `/tools/ups-shipping-cost` - UPS shipping cost estimator (targets "estimate ups shipping cost" keyword)
 - `/mbb/ups-shipping-rates-explained` - Supporting article explaining UPS rate factors
 - `/mbb/ups-ground-vs-air` - Supporting article comparing Ground vs Air services
+- `/tools/401k-retirement-calculator` - 401k retirement estimator (targets "estimate 401k at retirement" keyword)
+- `/mbb/how-401k-compound-growth-works` - Supporting article on compound interest power
+- `/mbb/401k-vs-ira-retirement` - Supporting article comparing 401k vs IRA accounts
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -184,6 +187,14 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-05: **Added 401k Retirement Estimator MBB** - 401k retirement calculator (targets "estimate 401k at retirement")
+  - Created `/tools/401k-retirement-calculator` main calculator with current age, retirement age, balance, salary, contributions, employer match, and return rate inputs
+  - Year-by-year projection table showing salary, contributions, and balance growth
+  - Employer match automatically capped at employee contribution percentage (realistic 401k matching behavior)
+  - Two supporting articles: `/mbb/how-401k-compound-growth-works` and `/mbb/401k-vs-ira-retirement`
+  - Full SEO optimization with FAQ schema, keyword prominence in H1/H2/opening paragraph
+  - All monetization components: MonetizationBar, PostResultUpsell
+  - Updated admin MBB tracking page with new entry and supporting article links
 - 2025-12-05: **Added UPS Shipping Cost Estimator MBB** - UPS shipping cost calculator (targets "estimate ups shipping cost")
   - Created `/tools/ups-shipping-cost` main calculator with weight, dimensions, ZIP codes, and service level selection
   - Uses 3-digit ZIP prefix lookup with Haversine distance formula for accurate zone calculation
