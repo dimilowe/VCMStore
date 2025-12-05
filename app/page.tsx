@@ -271,7 +271,7 @@ export default async function HomePage() {
                   >
                     <span className="text-sm text-white font-medium">{product.name}</span>
                     {product.price && product.price > 0 ? (
-                      <span className="text-xs text-orange-400 font-bold">${product.price}</span>
+                      <span className="text-xs text-orange-400 font-bold">${(product.price / 100).toFixed(2)}</span>
                     ) : (
                       <span className="text-xs text-green-400 font-bold">FREE</span>
                     )}

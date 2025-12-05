@@ -396,7 +396,7 @@ export function Navbar() {
                               <p className="text-xs text-gray-500">{item.type}</p>
                             </div>
                             <span className="text-sm font-semibold text-gray-900">
-                              {item.price === 0 ? 'Free' : `$${item.price}`}
+                              {item.price === 0 ? 'Free' : `$${(item.price / 100).toFixed(2)}`}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.id)}
@@ -411,7 +411,7 @@ export function Navbar() {
                       <div className="p-4 border-t border-gray-100 bg-gray-50">
                         <div className="flex justify-between mb-3">
                           <span className="text-sm text-gray-600">Total</span>
-                          <span className="font-semibold text-gray-900">${totalPrice.toFixed(2)}</span>
+                          <span className="font-semibold text-gray-900">${(totalPrice / 100).toFixed(2)}</span>
                         </div>
                         <Link
                           href="/saved"
