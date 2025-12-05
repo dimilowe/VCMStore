@@ -44,6 +44,20 @@ interface Product {
 
 const TOOL_MBBS: MBBItem[] = [
   {
+    id: "calorie-counter-treadmill",
+    name: "Treadmill Calorie Counter",
+    description: "MET-based treadmill calorie calculator with speed, incline, duration, and activity mode inputs. Calculates calories, distance, and pace.",
+    targetKeyword: "calorie counter for treadmill",
+    mainUrl: "/tools/calorie-counter-treadmill",
+    supportingArticles: [
+      { title: "Treadmill Calories Guide: How Many Calories Are You Really Burning?", url: "/mbb/treadmill-calories-guide" },
+      { title: "Incline vs Speed on the Treadmill: What Burns More Calories?", url: "/mbb/incline-vs-speed-treadmill" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Fitness",
+    type: "tool",
+  },
+  {
     id: "calorie-counter-free",
     name: "Free Calorie Counter",
     description: "100% free online calorie calculator. Track daily food intake with add/remove items or quick total entry. No signup required.",
