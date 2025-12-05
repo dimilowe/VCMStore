@@ -112,18 +112,15 @@ async function searchProducts(keywords: string[], label: string): Promise<Produc
   }
   
   const retailers = [
-    { name: 'Amazon', baseUrl: 'https://www.amazon.com/s?k=' },
-    { name: 'Nordstrom', baseUrl: 'https://www.nordstrom.com/sr?keyword=' },
-    { name: 'ASOS', baseUrl: 'https://www.asos.com/us/search/?q=' },
-    { name: 'Zara', baseUrl: 'https://www.zara.com/us/en/search?searchTerm=' },
+    { name: 'Amazon', baseUrl: 'https://www.amazon.com/s?k=', color: 'FF9900' },
+    { name: 'Nordstrom', baseUrl: 'https://www.nordstrom.com/sr?keyword=', color: '000000' },
+    { name: 'ASOS', baseUrl: 'https://www.asos.com/us/search/?q=', color: '2D2D2D' },
+    { name: 'Zara', baseUrl: 'https://www.zara.com/us/en/search?searchTerm=', color: '000000' },
   ];
-  
-  const simpleQuery = label.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
-  const unsplashQuery = encodeURIComponent(simpleQuery);
   
   return retailers.map((retailer, index) => ({
     title: `Shop ${label} on ${retailer.name}`,
-    imageUrl: `https://source.unsplash.com/featured/400x400/?${unsplashQuery},fashion&sig=${index}`,
+    imageUrl: `https://picsum.photos/seed/${encodeURIComponent(label + index)}/400/400`,
     source: retailer.name,
     productUrl: `${retailer.baseUrl}${encodeURIComponent(query)}`,
     externalSearchLink: false,
