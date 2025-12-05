@@ -8,7 +8,7 @@ import { ClaimButton } from "@/components/claim-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import CreatorStack from "@/components/CreatorStack";
 import MonetizationBar from "@/components/MonetizationBar";
-import FreeToolsCarousel from "@/components/FreeToolsCarousel";
+import SidebarTools from "@/components/SidebarTools";
 import ReactMarkdown from 'react-markdown';
 
 export const dynamic = 'force-dynamic';
@@ -151,11 +151,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       
       <CreatorStack />
       
-      {/* Free Tools section - placed BELOW CreatorStack to avoid cannibalizing impulse buys */}
-      <section className="mt-16 mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Free Creator Tools</h2>
-        <FreeToolsCarousel />
-      </section>
+      {/* Free Tools box - placed BELOW CreatorStack to avoid cannibalizing impulse buys */}
+      <div className="mt-12 mb-8 max-w-md mx-auto">
+        <SidebarTools />
+      </div>
       
       <MonetizationBar />
     </div>
