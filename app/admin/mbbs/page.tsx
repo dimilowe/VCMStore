@@ -44,6 +44,20 @@ interface Product {
 
 const TOOL_MBBS: MBBItem[] = [
   {
+    id: "calorie-counter-free",
+    name: "Free Calorie Counter",
+    description: "100% free online calorie calculator. Track daily food intake with add/remove items or quick total entry. No signup required.",
+    targetKeyword: "calorie counter for free",
+    mainUrl: "/tools/calorie-counter-free",
+    supportingArticles: [
+      { title: "Best Free Calorie Counters You Can Use Online", url: "/mbb/best-free-calorie-counters" },
+      { title: "How to Count Calories for Free Without Paying for Apps", url: "/mbb/how-to-count-calories-for-free" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Fitness",
+    type: "tool",
+  },
+  {
     id: "calorie-counter-walking",
     name: "Calorie Counter Walking",
     description: "Walking calorie calculator using MET-based formulas. Includes duration, weight, and intensity inputs with SEO content.",
