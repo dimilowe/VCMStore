@@ -180,6 +180,20 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Finance",
     type: "tool",
   },
+  {
+    id: "loan-estimator-home",
+    name: "Loan Estimator Home",
+    description: "Calculate monthly mortgage payments, total interest, and overall home loan costs. Includes property taxes, insurance, and HOA fees with detailed breakdown.",
+    targetKeyword: "loan estimator home",
+    mainUrl: "/tools/loan-estimator-home",
+    supportingArticles: [
+      { title: "Home Loan Basics – How Home Loans Really Work", url: "/mbb/home-loan-basics" },
+      { title: "Mortgage Types Explained – Fixed, ARM, FHA, VA", url: "/mbb/mortgage-types-explained" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Finance",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;

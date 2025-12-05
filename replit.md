@@ -133,6 +133,9 @@ MBBs are standalone SEO tools that drive traffic without appearing in main navig
 - `/tools/401k-retirement-calculator` - 401k retirement estimator (targets "estimate 401k at retirement" keyword)
 - `/mbb/how-401k-compound-growth-works` - Supporting article on compound interest power
 - `/mbb/401k-vs-ira-retirement` - Supporting article comparing 401k vs IRA accounts
+- `/tools/loan-estimator-home` - Home loan calculator (targets "loan estimator home" keyword)
+- `/mbb/home-loan-basics` - Supporting article on mortgage fundamentals
+- `/mbb/mortgage-types-explained` - Supporting article comparing Fixed, ARM, FHA, VA loans
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -187,6 +190,13 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-05: **Added Loan Estimator Home MBB** - Mortgage payment calculator (targets "loan estimator home")
+  - Created `/tools/loan-estimator-home` main calculator with home price, down payment ($/%), loan term, APR, taxes, insurance, HOA inputs
+  - Calculates monthly P&I, taxes, insurance, HOA breakdown with total cost and interest
+  - Two supporting articles: `/mbb/home-loan-basics` and `/mbb/mortgage-types-explained`
+  - Full SEO optimization with FAQ schema, keyword prominence in H1/H2/opening paragraph
+  - All monetization components: MonetizationBar, PostResultUpsell
+  - Complete cross-linking between all 3 pages
 - 2025-12-05: **Added 401k Retirement Estimator MBB** - 401k retirement calculator (targets "estimate 401k at retirement")
   - Created `/tools/401k-retirement-calculator` main calculator with current age, retirement age, balance, salary, contributions, employer match, and return rate inputs
   - Year-by-year projection table showing salary, contributions, and balance growth
