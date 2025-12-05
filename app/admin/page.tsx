@@ -400,7 +400,7 @@ export default function AdminPage() {
                       step="0.01"
                       min="0"
                       placeholder="10.00"
-                      className="pl-7"
+                      className="pl-8"
                       value={(formData.price / 100).toFixed(2)}
                       onChange={(e) => setFormData({ ...formData, price: Math.round(parseFloat(e.target.value || '0') * 100) })}
                     />
