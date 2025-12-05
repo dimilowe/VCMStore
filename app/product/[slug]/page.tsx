@@ -152,8 +152,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <CreatorStack />
       
       {/* Free Tools box - placed BELOW CreatorStack to avoid cannibalizing impulse buys */}
-      <div className="mt-12 mb-8 max-w-md mx-auto">
-        <SidebarTools />
+      <div className="mt-16 mb-12 bg-gray-50 -mx-4 px-4 py-10 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div className="max-w-sm mx-auto">
+          <SidebarTools />
+        </div>
       </div>
       
       <MonetizationBar />
