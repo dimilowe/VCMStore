@@ -127,6 +127,20 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Fitness",
     type: "tool",
   },
+  {
+    id: "weather-prediction",
+    name: "Weather Prediction",
+    description: "Instant weather forecast tool with current conditions, hourly outlook, and 7-day prediction. Supports city search and geolocation.",
+    targetKeyword: "weather prediction",
+    mainUrl: "/tools/weather-prediction",
+    supportingArticles: [
+      { title: "How Weather Prediction Works: The Science Behind Forecasting", url: "/mbb/how-weather-prediction-works" },
+      { title: "7-Day Forecast Accuracy: How Reliable Is Extended Weather Prediction?", url: "/mbb/7-day-forecast-accuracy" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Utilities",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;
