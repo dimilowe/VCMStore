@@ -237,17 +237,23 @@ export default function MBBsPage() {
     }
   };
 
-  const filteredMBBs = allMBBs.filter(mbb => {
-    const matchesType = typeFilter === 'all' || mbb.type === typeFilter;
-    const query = searchQuery.toLowerCase();
-    const matchesSearch = (
-      mbb.name.toLowerCase().includes(query) ||
-      mbb.targetKeyword.toLowerCase().includes(query) ||
-      mbb.category.toLowerCase().includes(query) ||
-      mbb.description.toLowerCase().includes(query)
-    );
-    return matchesType && matchesSearch;
-  });
+  const filteredMBBs = allMBBs
+    .filter(mbb => {
+      const matchesType = typeFilter === 'all' || mbb.type === typeFilter;
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = (
+        mbb.name.toLowerCase().includes(query) ||
+        mbb.targetKeyword.toLowerCase().includes(query) ||
+        mbb.category.toLowerCase().includes(query) ||
+        mbb.description.toLowerCase().includes(query)
+      );
+      return matchesType && matchesSearch;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.dateAdded).getTime();
+      const dateB = new Date(b.dateAdded).getTime();
+      return dateB - dateA;
+    });
 
   const totalPages = Math.ceil(filteredMBBs.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
