@@ -192,7 +192,7 @@ export default function AdminPage() {
       description: product.description,
       type: product.type,
       price_type: product.price_type,
-      price: Math.round(parseFloat(product.price as any) * 100),
+      price: Math.round(parseFloat(product.price as any)),
       thumbnail_url: product.thumbnail_url || "",
       download_url: product.download_url || "",
       external_url: product.external_url || "",
@@ -393,13 +393,17 @@ export default function AdminPage() {
                     <option value="one_time">One-time</option>
                   </select>
 
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="Price (in dollars)"
-                    value={formData.price / 100}
-                    onChange={(e) => setFormData({ ...formData, price: Math.round(parseFloat(e.target.value) * 100) || 0 })}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="pl-7"
+                      value={formData.price / 100 || ''}
+                      onChange={(e) => setFormData({ ...formData, price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
