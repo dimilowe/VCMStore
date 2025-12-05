@@ -238,6 +238,7 @@ export default function MBBsPage() {
   };
 
   const filteredMBBs = allMBBs
+    .map((mbb, index) => ({ ...mbb, _originalIndex: index }))
     .filter(mbb => {
       const matchesType = typeFilter === 'all' || mbb.type === typeFilter;
       const query = searchQuery.toLowerCase();
@@ -252,7 +253,8 @@ export default function MBBsPage() {
     .sort((a, b) => {
       const dateA = new Date(a.dateAdded).getTime();
       const dateB = new Date(b.dateAdded).getTime();
-      return dateB - dateA;
+      if (dateB !== dateA) return dateB - dateA;
+      return b._originalIndex - a._originalIndex;
     });
 
   const totalPages = Math.ceil(filteredMBBs.length / ITEMS_PER_PAGE);
