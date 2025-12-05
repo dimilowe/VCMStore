@@ -149,7 +149,7 @@ export default function MBBsPage() {
         id: `product-${p.id}`,
         name: p.name,
         description: p.description,
-        targetKeyword: p.slug.replace(/-/g, ' '),
+        targetKeyword: p.slug.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/-/g, ' ').toLowerCase(),
         mainUrl: `/product/${p.slug}`,
         dateAdded: p.created_at ? new Date(p.created_at).toISOString().split('T')[0] : 'Unknown',
         category: "Product",

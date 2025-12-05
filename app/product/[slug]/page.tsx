@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { ProductRecommendations } from "@/components/product-recommendations";
 import { ClaimButton } from "@/components/claim-button";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import CreatorStack from "@/components/CreatorStack";
+import MonetizationBar from "@/components/MonetizationBar";
 import ReactMarkdown from 'react-markdown';
 
 export const dynamic = 'force-dynamic';
@@ -145,6 +147,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </div>
 
       <ProductRecommendations currentProductId={product.id} productType={product.type} />
+      
+      <CreatorStack />
+      
+      <MonetizationBar />
     </div>
   );
 }
