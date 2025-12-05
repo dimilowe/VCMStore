@@ -398,9 +398,10 @@ export default function AdminPage() {
                     <Input
                       type="number"
                       step="0.01"
-                      placeholder="0.00"
+                      min="0"
+                      placeholder="10.00"
                       className="pl-7"
-                      value={formData.price / 100 || ''}
+                      value={(formData.price / 100).toFixed(2)}
                       onChange={(e) => setFormData({ ...formData, price: Math.round(parseFloat(e.target.value || '0') * 100) })}
                     />
                   </div>
