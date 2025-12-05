@@ -6,7 +6,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ExternalLink, Footprints, TrendingDown, FileText, Layers } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, ExternalLink, Footprints, FileText, Layers, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface MBBTool {
   id: string;
@@ -51,10 +52,14 @@ const MBB_TOOLS: MBBTool[] = [
   },
 ];
 
+const ITEMS_PER_PAGE = 5;
+
 export default function MBBsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     checkAuth();
@@ -77,6 +82,25 @@ export default function MBBsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const filteredTools = MBB_TOOLS.filter(tool => {
+    const query = searchQuery.toLowerCase();
+    return (
+      tool.name.toLowerCase().includes(query) ||
+      tool.targetKeyword.toLowerCase().includes(query) ||
+      tool.category.toLowerCase().includes(query) ||
+      tool.description.toLowerCase().includes(query)
+    );
+  });
+
+  const totalPages = Math.ceil(filteredTools.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedTools = filteredTools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
   };
 
   if (isLoading) {
@@ -125,12 +149,30 @@ export default function MBBsPage() {
           </ul>
         </div>
 
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search MBBs by name, keyword, or category..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="pl-11 py-6 text-lg bg-white"
+            />
+          </div>
+          {searchQuery && (
+            <p className="text-sm text-gray-500 mt-2">
+              Found {filteredTools.length} MBB{filteredTools.length !== 1 ? 's' : ''} matching "{searchQuery}"
+            </p>
+          )}
+        </div>
+
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">All MBB Tools ({MBB_TOOLS.length})</h2>
+          <h2 className="text-xl font-semibold">All MBB Tools ({filteredTools.length})</h2>
         </div>
 
         <div className="space-y-6">
-          {MBB_TOOLS.map((tool) => (
+          {paginatedTools.map((tool) => (
             <Card key={tool.id} className="overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b">
                 <div className="flex items-start justify-between">
@@ -198,14 +240,62 @@ export default function MBBsPage() {
           ))}
         </div>
 
-        {MBB_TOOLS.length === 0 && (
+        {filteredTools.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center">
               <Layers className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No MBB tools created yet.</p>
-              <p className="text-sm text-gray-400 mt-1">MBB tools are added through code development.</p>
+              <p className="text-gray-500">
+                {searchQuery 
+                  ? `No MBBs found matching "${searchQuery}"`
+                  : 'No MBB tools created yet.'
+                }
+              </p>
+              {!searchQuery && (
+                <p className="text-sm text-gray-400 mt-1">MBB tools are added through code development.</p>
+              )}
             </CardContent>
           </Card>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-6 mt-6 border-t">
+            <p className="text-sm text-gray-500">
+              Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredTools.length)} of {filteredTools.length} MBBs
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className={currentPage === page ? "bg-orange-500 hover:bg-orange-600" : ""}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>
