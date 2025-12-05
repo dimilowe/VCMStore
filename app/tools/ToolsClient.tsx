@@ -24,8 +24,7 @@ import {
   FilePen,
   StickyNote,
   X,
-  TrendingUp,
-  Footprints
+  TrendingUp
 } from "lucide-react";
 
 const tools = [
@@ -44,14 +43,6 @@ const tools = [
     href: "/tools/calorie-deficit-calculator",
     category: "AI",
     iconBg: "bg-green-500"
-  },
-  { 
-    name: "Calorie Counter Steps", 
-    description: "Convert your steps walked into estimated calories burned based on weight and intensity.",
-    icon: Footprints, 
-    href: "/tools/calorie-counter-steps",
-    category: "Utility",
-    iconBg: "bg-orange-500"
   },
   { 
     name: "Outfit Ideas Generator", 

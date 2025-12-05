@@ -141,6 +141,17 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Utilities",
     type: "tool",
   },
+  {
+    id: "calorie-counter-steps",
+    name: "Calorie Counter Steps",
+    description: "Convert steps walked into estimated calories burned based on weight and walking intensity. Includes conversion chart and distance estimates.",
+    targetKeyword: "calorie counter steps",
+    mainUrl: "/tools/calorie-counter-steps",
+    supportingArticles: [],
+    dateAdded: "2024-12-05",
+    category: "Fitness",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;
