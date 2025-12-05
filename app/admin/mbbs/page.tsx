@@ -44,6 +44,20 @@ interface Product {
 
 const TOOL_MBBS: MBBItem[] = [
   {
+    id: "calorie-counter-best",
+    name: "Best Calorie Counter",
+    description: "Daily intake vs target calculator with comprehensive comparison of top calorie counters. Helps users choose the best tool for their needs.",
+    targetKeyword: "calorie counter best",
+    mainUrl: "/tools/calorie-counter-best",
+    supportingArticles: [
+      { title: "How to Choose the Best Calorie Counter for Your Goals", url: "/mbb/how-to-choose-best-calorie-counter" },
+      { title: "7 Common Calorie Counter Mistakes (and How to Avoid Them)", url: "/mbb/calorie-counter-mistakes" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Fitness",
+    type: "tool",
+  },
+  {
     id: "calorie-counter-treadmill",
     name: "Treadmill Calorie Counter",
     description: "MET-based treadmill calorie calculator with speed, incline, duration, and activity mode inputs. Calculates calories, distance, and pace.",
