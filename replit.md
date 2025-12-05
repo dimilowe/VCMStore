@@ -127,6 +127,9 @@ MBBs are standalone SEO tools that drive traffic without appearing in main navig
 - `/tools/calorie-counter-maintenance` - TDEE/Maintenance calorie calculator (targets "calorie counter maintenance" keyword)
 - `/articles/what-are-maintenance-calories` - Supporting article for maintenance calculator
 - `/articles/maintenance-vs-deficit-vs-surplus` - Supporting article for maintenance calculator
+- `/tools/ups-shipping-cost` - UPS shipping cost estimator (targets "estimate ups shipping cost" keyword)
+- `/mbb/ups-shipping-rates-explained` - Supporting article explaining UPS rate factors
+- `/mbb/ups-ground-vs-air` - Supporting article comparing Ground vs Air services
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -181,6 +184,15 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-05: **Added UPS Shipping Cost Estimator MBB** - UPS shipping cost calculator (targets "estimate ups shipping cost")
+  - Created `/tools/ups-shipping-cost` main calculator with weight, dimensions, ZIP codes, and service level selection
+  - Uses 3-digit ZIP prefix lookup with Haversine distance formula for accurate zone calculation
+  - Calculates both actual weight and dimensional weight, applying the higher
+  - Supports UPS Ground, 2nd Day Air, and Next Day Air pricing estimates
+  - Two supporting articles: `/mbb/ups-shipping-rates-explained` and `/mbb/ups-ground-vs-air`
+  - Full SEO optimization with FAQ schema, keyword prominence in H1/H2/opening paragraph
+  - All monetization components: MonetizationBar, PostResultUpsell
+  - Updated admin MBB tracking page with new entry and supporting article links
 - 2025-12-04: **Added Calorie Counter Maintenance MBB** - TDEE/Maintenance calorie calculator (targets "calorie counter maintenance")
   - Created `/tools/calorie-counter-maintenance` main calculator page with Mifflin-St Jeor formula
   - Calculates BMR, maintenance calories (TDEE), deficit/surplus suggestions
