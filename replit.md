@@ -136,6 +136,9 @@ MBBs are standalone SEO tools that drive traffic without appearing in main navig
 - `/tools/loan-estimator-home` - Home loan calculator (targets "loan estimator home" keyword)
 - `/mbb/home-loan-basics` - Supporting article on mortgage fundamentals
 - `/mbb/mortgage-types-explained` - Supporting article comparing Fixed, ARM, FHA, VA loans
+- `/tools/estimator-for-car-repair` - Car repair cost calculator (targets "estimator for car repair" keyword)
+- `/mbb/common-car-repair-costs` - Supporting article with brake, engine, AC, transmission cost tables
+- `/mbb/how-car-repairs-are-priced` - Supporting article explaining labor billing, parts markup, diagnostic fees
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -190,6 +193,13 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-05: **Added Estimator for Car Repair MBB** - Car repair cost calculator (targets "estimator for car repair")
+  - Created `/tools/estimator-for-car-repair` main calculator with make, model, year, repair type, severity, labor rate, ZIP code inputs
+  - 10 repair types: Brake Pads, Check Engine, Alternator, Battery, AC, Oil Leak, Transmission, Engine Misfire, Wheel Alignment, Custom
+  - 3 severity levels (Minor/Moderate/Major) affecting labor hours
+  - Regional pricing adjustment based on ZIP code (East Coast +5%, West Coast +10%, Midwest baseline)
+  - Two supporting articles: `/mbb/common-car-repair-costs` and `/mbb/how-car-repairs-are-priced`
+  - Full SEO optimization with FAQ schema, keyword prominence in H1/H2/opening paragraph
 - 2025-12-05: **Added Loan Estimator Home MBB** - Mortgage payment calculator (targets "loan estimator home")
   - Created `/tools/loan-estimator-home` main calculator with home price, down payment ($/%), loan term, APR, taxes, insurance, HOA inputs
   - Calculates monthly P&I, taxes, insurance, HOA breakdown with total cost and interest

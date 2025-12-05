@@ -194,6 +194,20 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Finance",
     type: "tool",
   },
+  {
+    id: "estimator-for-car-repair",
+    name: "Estimator for Car Repair",
+    description: "Calculate car repair costs based on repair type, severity, labor rates, and location. Includes brake, engine, transmission, AC repairs with regional pricing adjustments.",
+    targetKeyword: "estimator for car repair",
+    mainUrl: "/tools/estimator-for-car-repair",
+    supportingArticles: [
+      { title: "Common Car Repair Costs – Full Breakdown", url: "/mbb/common-car-repair-costs" },
+      { title: "How Car Repairs Are Priced – Parts, Labor & Diagnostics", url: "/mbb/how-car-repairs-are-priced" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Auto",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;
