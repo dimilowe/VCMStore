@@ -152,6 +152,20 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Fitness",
     type: "tool",
   },
+  {
+    id: "ups-shipping-cost",
+    name: "UPS Shipping Cost Estimator",
+    description: "Calculate estimated UPS shipping costs based on weight, dimensions, distance zones, and service level. Includes dimensional weight calculation.",
+    targetKeyword: "estimate ups shipping cost",
+    mainUrl: "/tools/ups-shipping-cost",
+    supportingArticles: [
+      { title: "UPS Shipping Rates Explained: Complete Breakdown", url: "/mbb/ups-shipping-rates-explained" },
+      { title: "UPS Ground vs Air: Which Is Cheaper?", url: "/mbb/ups-ground-vs-air" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Utilities",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;
