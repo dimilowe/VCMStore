@@ -111,8 +111,8 @@ export default function GoogleTranslate() {
         disabled={isTranslating}
       >
         <Globe className="w-4 h-4" />
-        <span className="hidden lg:inline text-xs font-medium">
-          {isTranslating ? 'Translating...' : currentLanguage.flag}
+        <span className="text-xs font-semibold uppercase tracking-wide">
+          {isTranslating ? '...' : currentLanguage.code.split('-')[0].toUpperCase()}
         </span>
         <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
