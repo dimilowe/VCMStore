@@ -208,6 +208,20 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Auto",
     type: "tool",
   },
+  {
+    id: "maker-quotes-generator",
+    name: "Maker Quotes Generator",
+    description: "Generate inspiring quotes for creators, builders, and entrepreneurs. Choose themes (creativity, persistence, innovation, entrepreneurship, failure), tones (motivational, serious, funny, punchy), and formats.",
+    targetKeyword: "maker quotes generator",
+    mainUrl: "/tools/maker-quotes-generator",
+    supportingArticles: [
+      { title: "Maker Quotes Generator Tips – How to Use Quotes for Content", url: "/mbb/how-makers-use-quotes" },
+      { title: "Maker Quotes Generator – Famous Quotes for Creators & Builders", url: "/mbb/famous-quotes-for-creators" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Creator",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;

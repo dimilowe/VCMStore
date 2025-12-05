@@ -139,6 +139,9 @@ MBBs are standalone SEO tools that drive traffic without appearing in main navig
 - `/tools/estimator-for-car-repair` - Car repair cost calculator (targets "estimator for car repair" keyword)
 - `/mbb/common-car-repair-costs` - Supporting article with brake, engine, AC, transmission cost tables
 - `/mbb/how-car-repairs-are-priced` - Supporting article explaining labor billing, parts markup, diagnostic fees
+- `/tools/maker-quotes-generator` - Quote generator for creators (targets "maker quotes generator" keyword)
+- `/mbb/how-makers-use-quotes` - Supporting article on quote content strategy for makers
+- `/mbb/famous-quotes-for-creators` - Supporting article with 50+ curated quotes from famous makers
 
 ### Authenticated Routes
 - `/dashboard` - User's products and entitlements
@@ -193,6 +196,11 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-05: **Added Maker Quotes Generator MBB** - Quote generator for creators (targets "maker quotes generator")
+  - Created `/tools/maker-quotes-generator` with 75+ curated quotes, 5 themes (Creativity, Persistence, Innovation, Entrepreneurship, Failure & Learning), 4 tones (Motivational, Serious, Funny, Short & Punchy), 3 formats (Quote Only, Quote + Author, Social Caption)
+  - Copy-to-clipboard functionality for generated quotes
+  - Two supporting articles: `/mbb/how-makers-use-quotes` and `/mbb/famous-quotes-for-creators`
+  - Full SEO optimization with FAQ JSON-LD schema, keyword prominence in H1/opening paragraph
 - 2025-12-05: **Added Estimator for Car Repair MBB** - Car repair cost calculator (targets "estimator for car repair")
   - Created `/tools/estimator-for-car-repair` main calculator with make, model, year, repair type, severity, labor rate, ZIP code inputs
   - 10 repair types: Brake Pads, Check Engine, Alternator, Battery, AC, Oil Leak, Transmission, Engine Misfire, Wheel Alignment, Custom
