@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Footprints } from "lucide-react";
+import GoogleTranslate from "@/components/GoogleTranslate";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
@@ -347,6 +348,10 @@ export function Navbar() {
           </div>
           
           <div className="flex items-center space-x-3">
+            <div className="hidden sm:block">
+              <GoogleTranslate />
+            </div>
+            
             <div className="relative" ref={cartRef}>
               <Button 
                 variant="ghost" 
