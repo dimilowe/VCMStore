@@ -3,27 +3,46 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, ExternalLink, Footprints, FileText, Layers, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ExternalLink, Calculator, FileText, Layers, Search, ChevronLeft, ChevronRight, ShoppingBag, BookOpen, Filter } from "lucide-react";
 
-interface MBBTool {
+type MBBType = 'all' | 'tool' | 'product' | 'article';
+
+interface MBBItem {
   id: string;
   name: string;
   description: string;
   targetKeyword: string;
   mainUrl: string;
-  supportingArticles: {
+  supportingArticles?: {
     title: string;
     url: string;
   }[];
   dateAdded: string;
   category: string;
+  type: 'tool' | 'product' | 'article';
+  thumbnailUrl?: string;
+  price?: number;
+  priceType?: string;
 }
 
-const MBB_TOOLS: MBBTool[] = [
+interface Product {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  type: string;
+  price_type: string;
+  price: number;
+  thumbnail_url: string | null;
+  created_at: string;
+}
+
+const TOOL_MBBS: MBBItem[] = [
   {
     id: "calorie-counter-walking",
     name: "Calorie Counter Walking",
@@ -36,6 +55,7 @@ const MBB_TOOLS: MBBTool[] = [
     ],
     dateAdded: "2024-12-04",
     category: "Fitness",
+    type: "tool",
   },
   {
     id: "calorie-counter-maintenance",
@@ -49,10 +69,32 @@ const MBB_TOOLS: MBBTool[] = [
     ],
     dateAdded: "2024-12-04",
     category: "Fitness",
+    type: "tool",
   },
 ];
 
 const ITEMS_PER_PAGE = 5;
+
+const TYPE_INFO = {
+  tool: {
+    label: "Tool MBBs",
+    description: "Interactive calculators and utilities that rank for specific keywords",
+    icon: Calculator,
+    color: "bg-blue-500",
+  },
+  product: {
+    label: "Product MBBs",
+    description: "Invisible product sales pages that drive conversions from SEO traffic",
+    icon: ShoppingBag,
+    color: "bg-purple-500",
+  },
+  article: {
+    label: "Article MBBs",
+    description: "SEO-focused articles that don't appear in the Newsletter page",
+    icon: BookOpen,
+    color: "bg-green-500",
+  },
+};
 
 export default function MBBsPage() {
   const router = useRouter();
@@ -60,10 +102,18 @@ export default function MBBsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [typeFilter, setTypeFilter] = useState<MBBType>('all');
+  const [allMBBs, setAllMBBs] = useState<MBBItem[]>([]);
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadMBBs();
+    }
+  }, [isAuthenticated]);
 
   const checkAuth = async () => {
     try {
@@ -84,23 +134,77 @@ export default function MBBsPage() {
     }
   };
 
-  const filteredTools = MBB_TOOLS.filter(tool => {
+  const loadMBBs = async () => {
+    try {
+      const res = await fetch("/api/admin/products", {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      
+      const invisibleProducts: Product[] = (data.products || []).filter(
+        (p: Product) => p.type === 'invisible'
+      );
+      
+      const productMBBs: MBBItem[] = invisibleProducts.map((p: Product) => ({
+        id: `product-${p.id}`,
+        name: p.name,
+        description: p.description,
+        targetKeyword: p.slug.replace(/-/g, ' '),
+        mainUrl: `/product/${p.slug}`,
+        dateAdded: p.created_at ? new Date(p.created_at).toISOString().split('T')[0] : 'Unknown',
+        category: "Product",
+        type: 'product' as const,
+        thumbnailUrl: p.thumbnail_url || undefined,
+        price: p.price,
+        priceType: p.price_type,
+      }));
+      
+      const combined = [...TOOL_MBBS, ...productMBBs];
+      setAllMBBs(combined);
+    } catch (error) {
+      console.error("Failed to load MBBs:", error);
+      setAllMBBs([...TOOL_MBBS]);
+    }
+  };
+
+  const filteredMBBs = allMBBs.filter(mbb => {
+    const matchesType = typeFilter === 'all' || mbb.type === typeFilter;
     const query = searchQuery.toLowerCase();
-    return (
-      tool.name.toLowerCase().includes(query) ||
-      tool.targetKeyword.toLowerCase().includes(query) ||
-      tool.category.toLowerCase().includes(query) ||
-      tool.description.toLowerCase().includes(query)
+    const matchesSearch = (
+      mbb.name.toLowerCase().includes(query) ||
+      mbb.targetKeyword.toLowerCase().includes(query) ||
+      mbb.category.toLowerCase().includes(query) ||
+      mbb.description.toLowerCase().includes(query)
     );
+    return matchesType && matchesSearch;
   });
 
-  const totalPages = Math.ceil(filteredTools.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredMBBs.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedTools = filteredTools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedMBBs = filteredMBBs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
     setCurrentPage(1);
+  };
+
+  const handleTypeChange = (value: MBBType) => {
+    setTypeFilter(value);
+    setCurrentPage(1);
+  };
+
+  const getTypeIcon = (type: 'tool' | 'product' | 'article') => {
+    const Icon = TYPE_INFO[type].icon;
+    return <Icon className="w-4 h-4" />;
+  };
+
+  const getTypeBadgeColor = (type: 'tool' | 'product' | 'article') => {
+    return TYPE_INFO[type].color;
+  };
+
+  const countByType = (type: MBBType) => {
+    if (type === 'all') return allMBBs.length;
+    return allMBBs.filter(m => m.type === type).length;
   };
 
   if (isLoading) {
@@ -135,22 +239,41 @@ export default function MBBsPage() {
             <h1 className="text-3xl font-bold tracking-wide">Manage MBBs</h1>
           </div>
           <p className="text-gray-600 mt-2">
-            Micro-Blog Businesses (MBBs) are standalone SEO tools that drive traffic to VCM Suite without appearing in the main navigation or homepage.
+            Micro-Blog Businesses (MBBs) are standalone SEO pages that drive traffic to VCM Suite without appearing in the main navigation or homepage.
           </p>
         </div>
 
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-8">
-          <h3 className="font-semibold text-gray-900 mb-2">What are MBBs?</h3>
-          <ul className="text-sm text-gray-700 space-y-1">
-            <li>• <strong>Hidden from public navigation</strong> - Not in navbar Resources dropdown or homepage carousel</li>
-            <li>• <strong>SEO-focused</strong> - Each targets a specific keyword phrase for organic search traffic</li>
-            <li>• <strong>Full branding</strong> - Maintains VCM Suite look and feel with all monetization components</li>
-            <li>• <strong>Topical depth</strong> - Includes supporting articles for better SEO authority</li>
-          </ul>
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          {(['tool', 'product', 'article'] as const).map((type) => {
+            const info = TYPE_INFO[type];
+            const Icon = info.icon;
+            return (
+              <div 
+                key={type}
+                className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                  typeFilter === type 
+                    ? 'border-orange-500 bg-orange-50' 
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
+                onClick={() => handleTypeChange(type === typeFilter ? 'all' : type)}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`p-2 rounded-lg ${info.color}`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{info.label}</h3>
+                    <Badge variant="outline">{countByType(type)}</Badge>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600">{info.description}</p>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="mb-6">
-          <div className="relative flex items-center">
+        <div className="mb-6 flex gap-4">
+          <div className="relative flex items-center flex-1">
             <Search className="absolute left-4 w-5 h-5 text-gray-400 pointer-events-none z-10" />
             <Input
               type="text"
@@ -160,58 +283,109 @@ export default function MBBsPage() {
               className="pl-12 h-14 text-lg bg-white"
             />
           </div>
-          {searchQuery && (
-            <p className="text-sm text-gray-500 mt-2">
-              Found {filteredTools.length} MBB{filteredTools.length !== 1 ? 's' : ''} matching "{searchQuery}"
-            </p>
-          )}
+          <select
+            value={typeFilter}
+            onChange={(e) => handleTypeChange(e.target.value as MBBType)}
+            className="h-14 px-4 rounded-lg border border-gray-200 bg-white text-gray-700 font-medium"
+          >
+            <option value="all">All Types ({countByType('all')})</option>
+            <option value="tool">Tools ({countByType('tool')})</option>
+            <option value="product">Products ({countByType('product')})</option>
+            <option value="article">Articles ({countByType('article')})</option>
+          </select>
         </div>
 
+        {(searchQuery || typeFilter !== 'all') && (
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="w-4 h-4 text-gray-400" />
+            <p className="text-sm text-gray-500">
+              Found {filteredMBBs.length} MBB{filteredMBBs.length !== 1 ? 's' : ''}
+              {typeFilter !== 'all' && ` of type "${TYPE_INFO[typeFilter].label}"`}
+              {searchQuery && ` matching "${searchQuery}"`}
+            </p>
+            {(searchQuery || typeFilter !== 'all') && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => { setSearchQuery(''); setTypeFilter('all'); }}
+                className="text-orange-600 hover:text-orange-700"
+              >
+                Clear filters
+              </Button>
+            )}
+          </div>
+        )}
+
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">All MBB Tools ({filteredTools.length})</h2>
+          <h2 className="text-xl font-semibold">
+            {typeFilter === 'all' ? 'All MBBs' : TYPE_INFO[typeFilter].label} ({filteredMBBs.length})
+          </h2>
         </div>
 
         <div className="space-y-6">
-          {paginatedTools.map((tool) => (
-            <Card key={tool.id} className="overflow-hidden">
+          {paginatedMBBs.map((mbb) => (
+            <Card key={mbb.id} className="overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className="bg-orange-500 text-white">{tool.category}</Badge>
-                      <Badge variant="outline">Added {tool.dateAdded}</Badge>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <Badge className={`${getTypeBadgeColor(mbb.type)} text-white`}>
+                        {getTypeIcon(mbb.type)}
+                        <span className="ml-1">{mbb.type.charAt(0).toUpperCase() + mbb.type.slice(1)}</span>
+                      </Badge>
+                      <Badge variant="outline">{mbb.category}</Badge>
+                      <Badge variant="secondary">Added {mbb.dateAdded}</Badge>
+                      {mbb.type === 'product' && mbb.priceType && (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          {mbb.priceType === 'free' ? 'Free' : `$${((mbb.price || 0) / 100).toFixed(2)}`}
+                        </Badge>
+                      )}
                     </div>
-                    <CardTitle className="text-xl">{tool.name}</CardTitle>
-                    <CardDescription className="mt-1">{tool.description}</CardDescription>
+                    <CardTitle className="text-xl">{mbb.name}</CardTitle>
+                    <CardDescription className="mt-1">{mbb.description}</CardDescription>
                   </div>
+                  {mbb.type === 'product' && mbb.thumbnailUrl && (
+                    <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      <Image
+                        src={mbb.thumbnailUrl}
+                        alt={mbb.name}
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="mb-4">
                   <p className="text-sm text-gray-500 mb-1">Target Keyword:</p>
                   <code className="text-sm bg-gray-100 px-2 py-1 rounded font-mono">
-                    {tool.targetKeyword}
+                    {mbb.targetKeyword}
                   </code>
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-sm text-gray-500 mb-2">Main Tool Page:</p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {mbb.type === 'tool' ? 'Main Tool Page:' : mbb.type === 'product' ? 'Product Page:' : 'Article Page:'}
+                  </p>
                   <Link 
-                    href={tool.mainUrl}
+                    href={mbb.mainUrl}
                     target="_blank"
                     className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
                   >
-                    <Footprints className="w-4 h-4" />
-                    {tool.mainUrl}
+                    {getTypeIcon(mbb.type)}
+                    {mbb.mainUrl}
                     <ExternalLink className="w-3 h-3" />
                   </Link>
                 </div>
 
-                {tool.supportingArticles.length > 0 && (
+                {mbb.supportingArticles && mbb.supportingArticles.length > 0 && (
                   <div>
                     <p className="text-sm text-gray-500 mb-2">Supporting Articles:</p>
                     <div className="space-y-2">
-                      {tool.supportingArticles.map((article, index) => (
+                      {mbb.supportingArticles.map((article, index) => (
                         <Link 
                           key={index}
                           href={article.url}
@@ -228,30 +402,39 @@ export default function MBBsPage() {
                 )}
 
                 <div className="mt-4 pt-4 border-t flex gap-3">
-                  <Link href={tool.mainUrl} target="_blank">
+                  <Link href={mbb.mainUrl} target="_blank">
                     <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Open Tool
+                      View Live Page
                     </Button>
                   </Link>
+                  {mbb.type === 'product' && (
+                    <Link href="/admin">
+                      <Button size="sm" variant="outline">
+                        Edit in Products
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {filteredTools.length === 0 && (
+        {filteredMBBs.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center">
               <Layers className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500">
-                {searchQuery 
-                  ? `No MBBs found matching "${searchQuery}"`
-                  : 'No MBB tools created yet.'
+                {searchQuery || typeFilter !== 'all'
+                  ? `No MBBs found matching your filters`
+                  : 'No MBBs created yet.'
                 }
               </p>
-              {!searchQuery && (
-                <p className="text-sm text-gray-400 mt-1">MBB tools are added through code development.</p>
+              {!searchQuery && typeFilter === 'all' && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Create invisible products in the Products page, or add tool MBBs through code development.
+                </p>
               )}
             </CardContent>
           </Card>
@@ -260,7 +443,7 @@ export default function MBBsPage() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-6 mt-6 border-t">
             <p className="text-sm text-gray-500">
-              Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredTools.length)} of {filteredTools.length} MBBs
+              Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredMBBs.length)} of {filteredMBBs.length} MBBs
             </p>
             <div className="flex items-center gap-2">
               <Button
