@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineUploader } from "@/components/inline-uploader";
-import { Plus, Edit, Trash2, BookOpen, Layers } from "lucide-react";
+import { Plus, Edit, Trash2, BookOpen, Layers, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 interface Product {
@@ -34,6 +34,9 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
   
   // Form state
   const [formData, setFormData] = useState({
@@ -234,6 +237,25 @@ export default function AdminPage() {
     setShowForm(false);
   };
 
+  const filteredProducts = products.filter(product => {
+    const query = searchQuery.toLowerCase();
+    return (
+      product.name.toLowerCase().includes(query) ||
+      product.slug.toLowerCase().includes(query) ||
+      product.type.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query)
+    );
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -294,6 +316,28 @@ export default function AdminPage() {
               Logout
             </Button>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <div className="relative flex items-center">
+            <Search className="absolute left-4 w-5 h-5 text-gray-400 pointer-events-none z-10" />
+            <Input
+              type="text"
+              placeholder="Search products by name, slug, type, or description..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="pl-12 h-14 text-lg bg-white"
+            />
+          </div>
+          {searchQuery && (
+            <p className="text-sm text-gray-500 mt-2">
+              Found {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} matching "{searchQuery}"
+            </p>
+          )}
+        </div>
+
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">All Products ({filteredProducts.length})</h2>
         </div>
 
         {showForm && (
@@ -417,7 +461,7 @@ export default function AdminPage() {
         )}
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
+          {paginatedProducts.map((product) => (
             <Card key={product.id}>
               <CardHeader>
                 {product.thumbnail_url && (
@@ -466,6 +510,60 @@ export default function AdminPage() {
             </Card>
           ))}
         </div>
+
+        {filteredProducts.length === 0 && (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="text-gray-500">
+                {searchQuery 
+                  ? `No products found matching "${searchQuery}"`
+                  : 'No products created yet. Click "Add Product" to get started.'
+                }
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-6 mt-6 border-t">
+            <p className="text-sm text-gray-500">
+              Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length} products
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className={currentPage === page ? "bg-orange-500 hover:bg-orange-600" : ""}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
