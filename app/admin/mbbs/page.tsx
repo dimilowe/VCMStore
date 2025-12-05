@@ -113,6 +113,20 @@ const TOOL_MBBS: MBBItem[] = [
     category: "Fitness",
     type: "tool",
   },
+  {
+    id: "calorie-counter-bmi",
+    name: "Calorie Counter BMI",
+    description: "Combined BMI + daily calorie calculator using Mifflin-St Jeor. Shows BMI category, TDEE, and suggested calorie ranges for weight goals.",
+    targetKeyword: "calorie counter bmi",
+    mainUrl: "/tools/calorie-counter-bmi",
+    supportingArticles: [
+      { title: "What Is BMI? Understanding Body Mass Index", url: "/mbb/what-is-bmi" },
+      { title: "BMI vs Body Fat: What's the Difference?", url: "/mbb/bmi-vs-body-fat" },
+    ],
+    dateAdded: "2024-12-05",
+    category: "Fitness",
+    type: "tool",
+  },
 ];
 
 const ITEMS_PER_PAGE = 5;
