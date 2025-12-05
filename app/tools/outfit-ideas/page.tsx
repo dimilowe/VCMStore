@@ -34,6 +34,7 @@ interface ProductResult {
   source?: string;
   productUrl: string;
   externalSearchLink?: boolean;
+  retailerGradient?: string;
 }
 
 interface AnalyzeResponse {
@@ -297,45 +298,53 @@ export default function OutfitIdeasPage() {
                 </div>
                 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {item.products.map((product, pIndex) => (
-                    <a
-                      key={pIndex}
-                      href={`/r?u=${encodeURIComponent(product.productUrl)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group bg-gray-50 rounded-xl p-3 hover:bg-gray-100 transition-colors"
-                    >
-                      {product.imageUrl && !product.externalSearchLink ? (
-                        <div className="aspect-square bg-white rounded-lg mb-2 overflow-hidden">
-                          <img
-                            src={product.imageUrl}
-                            alt={product.title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23f3f4f6" width="100" height="100"/><text x="50" y="50" font-size="40" text-anchor="middle" dy=".35em" fill="%239ca3af">?</text></svg>';
+                  {item.products.map((product, pIndex) => {
+                    const gradientColors = product.retailerGradient?.split(',') || ['f97316', 'ea580c'];
+                    const hasRealImage = product.imageUrl && !product.externalSearchLink && !product.retailerGradient;
+                    
+                    return (
+                      <a
+                        key={pIndex}
+                        href={`/r?u=${encodeURIComponent(product.productUrl)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group bg-gray-50 rounded-xl p-3 hover:bg-gray-100 transition-all hover:scale-[1.02]"
+                      >
+                        {hasRealImage ? (
+                          <div className="aspect-square bg-white rounded-lg mb-2 overflow-hidden">
+                            <img
+                              src={product.imageUrl}
+                              alt={product.title}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div 
+                            className="aspect-square rounded-lg mb-2 flex flex-col items-center justify-center text-white relative overflow-hidden"
+                            style={{
+                              background: `linear-gradient(135deg, #${gradientColors[0]} 0%, #${gradientColors[1] || gradientColors[0]} 100%)`
                             }}
-                          />
+                          >
+                            <ShoppingBag className="w-8 h-8 mb-1 opacity-90" />
+                            <span className="text-xs font-semibold opacity-90">{product.source}</span>
+                          </div>
+                        )}
+                        <p className="text-sm font-medium text-gray-900 line-clamp-2 mb-1 group-hover:text-orange-600 transition-colors">
+                          {product.title}
+                        </p>
+                        {product.price && (
+                          <p className="text-sm font-bold text-orange-600">{product.price}</p>
+                        )}
+                        <div className="flex items-center gap-1 text-xs text-gray-400 mt-2 group-hover:text-orange-500 transition-colors">
+                          <ExternalLink className="w-3 h-3" />
+                          Shop Now
                         </div>
-                      ) : (
-                        <div className="aspect-square bg-orange-100 rounded-lg mb-2 flex items-center justify-center">
-                          <Search className="w-8 h-8 text-orange-500" />
-                        </div>
-                      )}
-                      <p className="text-sm font-medium text-gray-900 line-clamp-2 mb-1 group-hover:text-orange-600 transition-colors">
-                        {product.externalSearchLink ? 'Search Google Shopping' : product.title}
-                      </p>
-                      {product.price && (
-                        <p className="text-sm font-bold text-orange-600">{product.price}</p>
-                      )}
-                      {product.source && !product.externalSearchLink && (
-                        <p className="text-xs text-gray-500 mt-1">{product.source}</p>
-                      )}
-                      <div className="flex items-center gap-1 text-xs text-gray-400 mt-2 group-hover:text-orange-500 transition-colors">
-                        <ExternalLink className="w-3 h-3" />
-                        View
-                      </div>
-                    </a>
-                  ))}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             ))}

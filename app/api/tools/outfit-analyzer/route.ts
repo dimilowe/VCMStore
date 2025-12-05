@@ -112,18 +112,18 @@ async function searchProducts(keywords: string[], label: string): Promise<Produc
   }
   
   const retailers = [
-    { name: 'Amazon', baseUrl: 'https://www.amazon.com/s?k=', color: 'FF9900' },
-    { name: 'Nordstrom', baseUrl: 'https://www.nordstrom.com/sr?keyword=', color: '000000' },
-    { name: 'ASOS', baseUrl: 'https://www.asos.com/us/search/?q=', color: '2D2D2D' },
-    { name: 'Zara', baseUrl: 'https://www.zara.com/us/en/search?searchTerm=', color: '000000' },
+    { name: 'Amazon', baseUrl: 'https://www.amazon.com/s?k=', gradient: 'FF9900,FFB84D' },
+    { name: 'Nordstrom', baseUrl: 'https://www.nordstrom.com/sr?keyword=', gradient: '1a1a2e,16213e' },
+    { name: 'ASOS', baseUrl: 'https://www.asos.com/us/search/?q=', gradient: '2D2D2D,4a4a4a' },
+    { name: 'Google Shopping', baseUrl: 'https://www.google.com/search?tbm=shop&q=', gradient: '4285F4,34A853' },
   ];
   
-  return retailers.map((retailer, index) => ({
+  return retailers.map((retailer) => ({
     title: `Shop ${label} on ${retailer.name}`,
-    imageUrl: `https://picsum.photos/seed/${encodeURIComponent(label + index)}/400/400`,
     source: retailer.name,
     productUrl: `${retailer.baseUrl}${encodeURIComponent(query)}`,
     externalSearchLink: false,
+    retailerGradient: retailer.gradient,
   }));
 }
 
