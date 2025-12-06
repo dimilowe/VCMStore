@@ -16,6 +16,12 @@ interface ClusterHealthScore {
   status: "ready" | "needs-work" | "incomplete";
 }
 
+interface ArticleStatus {
+  slug: string;
+  isPublished: boolean;
+  title?: string;
+}
+
 interface ClusterOverview {
   id: string;
   pillarSlug: string;
@@ -30,6 +36,7 @@ interface ClusterOverview {
   healthScore: ClusterHealthScore;
   toolSlugs: string[];
   articleSlugs: string[];
+  articleStatuses: ArticleStatus[];
 }
 
 interface ToolInfo {
@@ -286,17 +293,23 @@ export default function ClusterDetailPage() {
                 })}
               </div>
               <div>
-                <div className="text-gray-700 font-medium mb-1">Articles ({cluster.articleCount})</div>
-                {cluster.articleSlugs.length === 0 ? (
+                <div className="text-gray-700 font-medium mb-1">
+                  Articles ({cluster.publishedArticleCount}/{cluster.articleCount} published)
+                </div>
+                {cluster.articleStatuses?.length === 0 ? (
                   <div className="ml-2 text-red-500 text-sm">└── (none - add supporting articles!)</div>
                 ) : (
-                  cluster.articleSlugs.map((slug, idx) => {
-                    const isLast = idx === cluster.articleSlugs.length - 1;
+                  cluster.articleStatuses?.map((article, idx) => {
+                    const isLast = idx === (cluster.articleStatuses?.length || 0) - 1;
                     return (
-                      <div key={slug} className="flex items-center gap-2 text-gray-600 ml-2">
+                      <div key={article.slug} className="flex items-center gap-2 text-gray-600 ml-2">
                         <span className="text-gray-400">{isLast ? "└──" : "├──"}</span>
-                        <span>{slug}</span>
-                        <span className="text-gray-300 text-xs">○</span>
+                        <span>{article.slug}</span>
+                        {article.isPublished ? (
+                          <span className="text-green-500 text-xs">●</span>
+                        ) : (
+                          <span className="text-gray-300 text-xs">○</span>
+                        )}
                       </div>
                     );
                   })
@@ -358,24 +371,37 @@ export default function ClusterDetailPage() {
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Supporting Articles ({cluster.articleCount})</h2>
+              <h2 className="text-lg font-semibold">
+                Supporting Articles ({cluster.publishedArticleCount}/{cluster.articleCount} published)
+              </h2>
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {cluster.articleSlugs.length === 0 ? (
+              {cluster.articleStatuses?.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <p className="mb-2">No supporting articles yet</p>
                   <p className="text-sm">Add at least 3 articles to strengthen this cluster</p>
                 </div>
               ) : (
-                cluster.articleSlugs.map((slug) => (
+                cluster.articleStatuses?.map((article) => (
                   <div
-                    key={slug}
+                    key={article.slug}
                     className="flex items-center justify-between p-2 bg-gray-50 rounded"
                   >
-                    <div className="font-medium text-sm">{slug}</div>
-                    <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                      Planned
-                    </span>
+                    <div>
+                      <div className="font-medium text-sm">
+                        {article.title || article.slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+                      </div>
+                      <div className="text-xs text-gray-500">{article.slug}</div>
+                    </div>
+                    {article.isPublished ? (
+                      <span className="px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded">
+                        Published
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+                        Planned
+                      </span>
+                    )}
                   </div>
                 ))
               )}

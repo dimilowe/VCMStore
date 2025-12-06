@@ -1,5 +1,6 @@
 import { CLUSTER_REGISTRY, TopicCluster } from "@/data/clusterRegistry";
 import { isToolIndexed } from "@/lib/toolRollout";
+import { query } from "@/lib/db";
 
 export interface ClusterHealthScore {
   total: number;
@@ -11,6 +12,12 @@ export interface ClusterHealthScore {
   };
   issues: string[];
   status: "ready" | "needs-work" | "incomplete";
+}
+
+export interface ArticleStatus {
+  slug: string;
+  isPublished: boolean;
+  title?: string;
 }
 
 export interface ClusterOverview {
@@ -27,9 +34,13 @@ export interface ClusterOverview {
   healthScore: ClusterHealthScore;
   toolSlugs: string[];
   articleSlugs: string[];
+  articleStatuses: ArticleStatus[];
 }
 
-export function calculateClusterHealth(cluster: TopicCluster): ClusterHealthScore {
+export function calculateClusterHealth(
+  cluster: TopicCluster, 
+  publishedArticleCount: number
+): ClusterHealthScore {
   const issues: string[] = [];
   
   let pillarScore = 25;
@@ -48,14 +59,18 @@ export function calculateClusterHealth(cluster: TopicCluster): ClusterHealthScor
     toolsScore = Math.min(25, Math.floor((indexedTools / toolsInCluster) * 25));
   }
   
-  const articlesInCluster = cluster.articleSlugs.length;
   let articlesScore = 0;
-  if (articlesInCluster === 0) {
-    issues.push("No supporting articles");
+  const plannedArticles = cluster.articleSlugs.length;
+  
+  if (plannedArticles === 0) {
+    issues.push("No supporting articles planned");
     articlesScore = 0;
-  } else if (articlesInCluster < 3) {
-    issues.push(`Only ${articlesInCluster} articles (minimum 3 recommended)`);
-    articlesScore = Math.floor((articlesInCluster / 3) * 25);
+  } else if (publishedArticleCount === 0) {
+    issues.push(`0/${plannedArticles} articles published`);
+    articlesScore = 0;
+  } else if (publishedArticleCount < 3) {
+    issues.push(`Only ${publishedArticleCount}/${plannedArticles} articles published (minimum 3 recommended)`);
+    articlesScore = Math.floor((publishedArticleCount / 3) * 25);
   } else {
     articlesScore = 25;
   }
@@ -65,7 +80,7 @@ export function calculateClusterHealth(cluster: TopicCluster): ClusterHealthScor
     issues.push("Insufficient tools for internal linking");
     interlinkScore = 10;
   }
-  if (articlesInCluster < 1) {
+  if (publishedArticleCount < 1) {
     interlinkScore -= 10;
   }
   
@@ -93,9 +108,81 @@ export function calculateClusterHealth(cluster: TopicCluster): ClusterHealthScor
   };
 }
 
-export function getAllClustersOverview(): ClusterOverview[] {
-  return Object.values(CLUSTER_REGISTRY).map(cluster => {
+async function getPublishedArticles(articleSlugs: string[]): Promise<ArticleStatus[]> {
+  if (articleSlugs.length === 0) {
+    return [];
+  }
+  
+  try {
+    const placeholders = articleSlugs.map((_, i) => `$${i + 1}`).join(", ");
+    const result = await query(
+      `SELECT slug, title, published_at 
+       FROM blog_posts 
+       WHERE slug IN (${placeholders})`,
+      articleSlugs
+    );
+    
+    const publishedSlugs = new Map<string, { title: string; isPublished: boolean }>();
+    for (const row of result.rows) {
+      const isPublished = row.published_at && new Date(row.published_at) <= new Date();
+      publishedSlugs.set(row.slug, { 
+        title: row.title, 
+        isPublished 
+      });
+    }
+    
+    return articleSlugs.map(slug => {
+      const found = publishedSlugs.get(slug);
+      return {
+        slug,
+        isPublished: found?.isPublished ?? false,
+        title: found?.title
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching published articles:", error);
+    return articleSlugs.map(slug => ({ slug, isPublished: false }));
+  }
+}
+
+export async function getAllClustersOverview(): Promise<ClusterOverview[]> {
+  const clusters = Object.values(CLUSTER_REGISTRY);
+  
+  const allArticleSlugs = clusters.flatMap(c => c.articleSlugs);
+  const uniqueSlugs = [...new Set(allArticleSlugs)];
+  
+  let articleStatusMap = new Map<string, ArticleStatus>();
+  
+  if (uniqueSlugs.length > 0) {
+    try {
+      const placeholders = uniqueSlugs.map((_, i) => `$${i + 1}`).join(", ");
+      const result = await query(
+        `SELECT slug, title, published_at 
+         FROM blog_posts 
+         WHERE slug IN (${placeholders})`,
+        uniqueSlugs
+      );
+      
+      for (const row of result.rows) {
+        const isPublished = row.published_at && new Date(row.published_at) <= new Date();
+        articleStatusMap.set(row.slug, {
+          slug: row.slug,
+          title: row.title,
+          isPublished
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching articles for clusters:", error);
+    }
+  }
+  
+  return clusters.map(cluster => {
     const indexedToolCount = cluster.toolSlugs.filter(slug => isToolIndexed(slug)).length;
+    
+    const articleStatuses = cluster.articleSlugs.map(slug => 
+      articleStatusMap.get(slug) || { slug, isPublished: false }
+    );
+    const publishedArticleCount = articleStatuses.filter(a => a.isPublished).length;
     
     return {
       id: cluster.id,
@@ -107,19 +194,22 @@ export function getAllClustersOverview(): ClusterOverview[] {
       toolCount: cluster.toolSlugs.length,
       indexedToolCount,
       articleCount: cluster.articleSlugs.length,
-      publishedArticleCount: 0,
-      healthScore: calculateClusterHealth(cluster),
+      publishedArticleCount,
+      healthScore: calculateClusterHealth(cluster, publishedArticleCount),
       toolSlugs: cluster.toolSlugs,
       articleSlugs: cluster.articleSlugs,
+      articleStatuses,
     };
   });
 }
 
-export function getClusterOverviewById(clusterId: string): ClusterOverview | null {
+export async function getClusterOverviewById(clusterId: string): Promise<ClusterOverview | null> {
   const cluster = CLUSTER_REGISTRY[clusterId];
   if (!cluster) return null;
   
   const indexedToolCount = cluster.toolSlugs.filter(slug => isToolIndexed(slug)).length;
+  const articleStatuses = await getPublishedArticles(cluster.articleSlugs);
+  const publishedArticleCount = articleStatuses.filter(a => a.isPublished).length;
   
   return {
     id: cluster.id,
@@ -131,9 +221,10 @@ export function getClusterOverviewById(clusterId: string): ClusterOverview | nul
     toolCount: cluster.toolSlugs.length,
     indexedToolCount,
     articleCount: cluster.articleSlugs.length,
-    publishedArticleCount: 0,
-    healthScore: calculateClusterHealth(cluster),
+    publishedArticleCount,
+    healthScore: calculateClusterHealth(cluster, publishedArticleCount),
     toolSlugs: cluster.toolSlugs,
     articleSlugs: cluster.articleSlugs,
+    articleStatuses,
   };
 }

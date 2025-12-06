@@ -15,13 +15,13 @@ export async function GET(request: Request) {
   const clusterId = searchParams.get("id");
   
   if (clusterId) {
-    const cluster = getClusterOverviewById(clusterId);
+    const cluster = await getClusterOverviewById(clusterId);
     if (!cluster) {
       return NextResponse.json({ error: "Cluster not found" }, { status: 404 });
     }
     return NextResponse.json(cluster);
   }
   
-  const clusters = getAllClustersOverview();
+  const clusters = await getAllClustersOverview();
   return NextResponse.json(clusters);
 }
