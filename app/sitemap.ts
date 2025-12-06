@@ -17,6 +17,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
      ORDER BY published_at DESC`
   );
 
+  const articlesResult = await query(
+    `SELECT slug, created_at, updated_at 
+     FROM cluster_articles 
+     WHERE is_published = true AND is_indexed = true
+     ORDER BY created_at DESC`
+  );
+
   const ideasResult = await query(
     `SELECT slug, updated_at FROM ideas ORDER BY created_at DESC`
   );
@@ -86,6 +93,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const articlePages = articlesResult.rows.map((article: any) => ({
+    url: `${baseUrl}/articles/${article.slug}`,
+    lastModified: new Date(article.updated_at || article.created_at),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
   const ideaPages = ideasResult.rows.map((idea: any) => ({
     url: `${baseUrl}/ideas/${idea.slug}`,
     lastModified: new Date(idea.updated_at),
@@ -100,5 +114,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...toolPages, ...productPages, ...blogPages, ...ideaPages, ...questionPages];
+  return [...staticPages, ...toolPages, ...productPages, ...blogPages, ...articlePages, ...ideaPages, ...questionPages];
 }

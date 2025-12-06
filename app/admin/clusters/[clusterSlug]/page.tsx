@@ -487,14 +487,14 @@ export default function ClusterDetailPage() {
                         {article.exists && (
                           <div className="flex items-center gap-2 text-xs">
                             <Link
-                              href={`/admin/blog/edit/${article.slug}`}
+                              href={`/admin/articles/edit/${article.slug}`}
                               className="text-orange-600 hover:underline"
                             >
                               Edit
                             </Link>
                             {article.isPublished && (
                               <Link
-                                href={`/newsletter/${article.slug}`}
+                                href={`/articles/${article.slug}`}
                                 target="_blank"
                                 className="text-gray-600 hover:underline"
                               >
