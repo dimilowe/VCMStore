@@ -53,6 +53,10 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `internal_resources`: Pre-defined VCM tools/freebies for resource boxes
 - `predictions`: Community predictions about future events (tech, crypto, etc.)
 - `prediction_votes`: Yes/No votes on predictions (anonymous voting)
+- `youtube_users`: YouTube OAuth users with tokens and channel info
+- `youtube_title_tests`: A/B title tests for YouTube videos
+- `youtube_title_variants`: Title variants for each test (2-5 per test)
+- `youtube_rotation_log`: Log of title rotations with activation times
 
 ## Project Structure
 
@@ -118,6 +122,8 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/r` - Redirect route for affiliate link tracking (routes shopping clicks through for future APE integration)
 - `/tools/prediction-center` - Prediction Center - vote Yes/No on future event predictions
 - `/tools/name-combiner` - Name Combiner - combine 2-3 names into unique mashups (targets "combiner name" keyword)
+- `/tools/photo-gallery-maker` - Photo Gallery Maker - create multi-photo gallery layouts (grid, masonry, horizontal strip) with PNG export
+- `/tools/youtube-title-split-test` - YouTube Title Split-Test Tool - A/B test YouTube video titles with auto-rotation and CTR tracking
 
 ### MBB Routes (Micro-Blog Business)
 MBBs are standalone SEO tools that drive traffic without appearing in main navigation. Access via Admin > Manage MBBs.
