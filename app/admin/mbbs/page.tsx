@@ -224,6 +224,129 @@ const TOOL_MBBS: MBBItem[] = [
   },
 ];
 
+const ARTICLE_MBBS: MBBItem[] = [
+  {
+    id: "youtube-thumbnail-design-tips",
+    name: "YouTube Thumbnail Design Tips",
+    description: "How to design click-worthy thumbnails that boost CTR on YouTube.",
+    targetKeyword: "youtube thumbnail design tips",
+    mainUrl: "/mbb/youtube-thumbnail-design-tips",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "youtube-thumbnail-dimensions-guide",
+    name: "YouTube Thumbnail Dimensions Guide",
+    description: "Complete guide to YouTube thumbnail sizes and specifications.",
+    targetKeyword: "youtube thumbnail dimensions guide",
+    mainUrl: "/mbb/youtube-thumbnail-dimensions-guide",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "instagram-post-design-tips",
+    name: "Instagram Post Design Tips",
+    description: "How to create stunning Instagram posts that get engagement.",
+    targetKeyword: "instagram post design tips",
+    mainUrl: "/mbb/instagram-post-design-tips",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "instagram-post-dimensions-guide",
+    name: "Instagram Post Dimensions Guide",
+    description: "Complete guide to Instagram image sizes and aspect ratios.",
+    targetKeyword: "instagram post dimensions guide",
+    mainUrl: "/mbb/instagram-post-dimensions-guide",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "instagram-story-design-tips",
+    name: "Instagram Story Design Tips",
+    description: "How to create engaging Instagram Stories that get views.",
+    targetKeyword: "instagram story design tips",
+    mainUrl: "/mbb/instagram-story-design-tips",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "instagram-story-dimensions-guide",
+    name: "Instagram Story Dimensions Guide",
+    description: "Complete guide to Instagram Story sizes and safe zones.",
+    targetKeyword: "instagram story dimensions guide",
+    mainUrl: "/mbb/instagram-story-dimensions-guide",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "tiktok-cover-design-tips",
+    name: "TikTok Cover Design Tips",
+    description: "How to create TikTok covers that get more views.",
+    targetKeyword: "tiktok cover design tips",
+    mainUrl: "/mbb/tiktok-cover-design-tips",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "tiktok-cover-dimensions-guide",
+    name: "TikTok Cover Dimensions Guide",
+    description: "Complete guide to TikTok cover sizes and profile grid cropping.",
+    targetKeyword: "tiktok cover dimensions guide",
+    mainUrl: "/mbb/tiktok-cover-dimensions-guide",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "twitter-header-design-tips",
+    name: "Twitter Header Design Tips",
+    description: "How to design Twitter/X headers that make an impact.",
+    targetKeyword: "twitter header design tips",
+    mainUrl: "/mbb/twitter-header-design-tips",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "twitter-header-dimensions-guide",
+    name: "Twitter Header Dimensions Guide",
+    description: "Complete guide to Twitter header sizes on desktop vs mobile.",
+    targetKeyword: "twitter header dimensions guide",
+    mainUrl: "/mbb/twitter-header-dimensions-guide",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "linkedin-banner-design-tips",
+    name: "LinkedIn Banner Design Tips",
+    description: "How to design professional LinkedIn banners that establish credibility.",
+    targetKeyword: "linkedin banner design tips",
+    mainUrl: "/mbb/linkedin-banner-design-tips",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+  {
+    id: "linkedin-banner-dimensions-guide",
+    name: "LinkedIn Banner Dimensions Guide",
+    description: "Complete guide to LinkedIn banner sizes for personal and company pages.",
+    targetKeyword: "linkedin banner dimensions guide",
+    mainUrl: "/mbb/linkedin-banner-dimensions-guide",
+    dateAdded: "2025-12-06",
+    category: "Social Media",
+    type: "article",
+  },
+];
+
 const ITEMS_PER_PAGE = 5;
 
 const TYPE_INFO = {
@@ -310,11 +433,11 @@ export default function MBBsPage() {
         priceType: p.price_type,
       }));
       
-      const combined = [...TOOL_MBBS, ...productMBBs];
+      const combined = [...TOOL_MBBS, ...ARTICLE_MBBS, ...productMBBs];
       setAllMBBs(combined);
     } catch (error) {
       console.error("Failed to load MBBs:", error);
-      setAllMBBs([...TOOL_MBBS]);
+      setAllMBBs([...TOOL_MBBS, ...ARTICLE_MBBS]);
     }
   };
 
