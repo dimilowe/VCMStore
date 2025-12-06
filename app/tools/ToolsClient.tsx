@@ -27,7 +27,11 @@ import {
   TrendingUp,
   Images,
   RotateCcw,
-  Users
+  Users,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Video
 } from "lucide-react";
 
 const tools = [
@@ -110,6 +114,54 @@ const tools = [
     href: "/tools/image-compressor",
     category: "Image",
     iconBg: "bg-sky-500"
+  },
+  { 
+    name: "YouTube Thumbnail Resizer", 
+    description: "Resize any image to the perfect YouTube thumbnail size (1280×720).",
+    icon: Youtube, 
+    href: "/tools/youtube-thumbnail-resizer",
+    category: "Social",
+    iconBg: "bg-red-500"
+  },
+  { 
+    name: "Instagram Post Resizer", 
+    description: "Resize images to the perfect Instagram post size (1080×1080).",
+    icon: Instagram, 
+    href: "/tools/instagram-post-resizer",
+    category: "Social",
+    iconBg: "bg-pink-500"
+  },
+  { 
+    name: "Instagram Story Resizer", 
+    description: "Resize images to the perfect Instagram Story size (1080×1920).",
+    icon: Instagram, 
+    href: "/tools/instagram-story-resizer",
+    category: "Social",
+    iconBg: "bg-gradient-to-r from-purple-500 to-pink-500"
+  },
+  { 
+    name: "TikTok Cover Resizer", 
+    description: "Resize images to the perfect TikTok video cover size (1080×1920).",
+    icon: Video, 
+    href: "/tools/tiktok-video-resizer",
+    category: "Social",
+    iconBg: "bg-black"
+  },
+  { 
+    name: "Twitter/X Header Resizer", 
+    description: "Resize images to the perfect Twitter/X header size (1500×500).",
+    icon: Twitter, 
+    href: "/tools/twitter-header-resizer",
+    category: "Social",
+    iconBg: "bg-sky-400"
+  },
+  { 
+    name: "LinkedIn Banner Resizer", 
+    description: "Resize images to the perfect LinkedIn banner size (1584×396).",
+    icon: Linkedin, 
+    href: "/tools/linkedin-banner-resizer",
+    category: "Social",
+    iconBg: "bg-blue-600"
   },
   { 
     name: "PDF Editor", 

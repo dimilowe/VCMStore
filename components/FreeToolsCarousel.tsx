@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X, TrendingUp, Users, Images, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X, TrendingUp, Users, Images, RotateCcw, Instagram, Twitter, Linkedin, Video } from "lucide-react";
 
 const freeTools = [
   { name: "Prediction Center", icon: TrendingUp, href: "/tools/prediction-center", iconBg: "bg-purple-500" },
@@ -34,6 +34,12 @@ const freeTools = [
   { name: "Name Combiner", icon: Users, href: "/tools/name-combiner", iconBg: "bg-cyan-500" },
   { name: "Photo Gallery Maker", icon: Images, href: "/tools/photo-gallery-maker", iconBg: "bg-indigo-500" },
   { name: "YouTube Title Split-Test", icon: RotateCcw, href: "/tools/youtube-title-split-test", iconBg: "bg-red-500" },
+  { name: "YouTube Thumbnail Resizer", icon: Youtube, href: "/tools/youtube-thumbnail-resizer", iconBg: "bg-red-500" },
+  { name: "Instagram Post Resizer", icon: Instagram, href: "/tools/instagram-post-resizer", iconBg: "bg-pink-500" },
+  { name: "Instagram Story Resizer", icon: Instagram, href: "/tools/instagram-story-resizer", iconBg: "bg-purple-500" },
+  { name: "TikTok Cover Resizer", icon: Video, href: "/tools/tiktok-video-resizer", iconBg: "bg-gray-900" },
+  { name: "Twitter Header Resizer", icon: Twitter, href: "/tools/twitter-header-resizer", iconBg: "bg-sky-400" },
+  { name: "LinkedIn Banner Resizer", icon: Linkedin, href: "/tools/linkedin-banner-resizer", iconBg: "bg-blue-600" },
 ];
 
 const ITEMS_PER_PAGE = 24;

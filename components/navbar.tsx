@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Images, RotateCcw } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Images, RotateCcw, Youtube, Instagram, Twitter, Linkedin, Video } from "lucide-react";
 import GoogleTranslate from "@/components/GoogleTranslate";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -73,6 +73,12 @@ const resourceCategories: ResourceCategory[] = [
       { label: "GIF Maker", href: "/tools/gif-maker", description: "Convert video/images to GIF", icon: FileImage, iconBg: "bg-fuchsia-500" },
       { label: "HEIC to JPG", href: "/tools/heic-to-jpg", description: "Convert iPhone HEIC photos", icon: FileImage, iconBg: "bg-rose-500" },
       { label: "Photo Gallery Maker", href: "/tools/photo-gallery-maker", description: "Create gallery layouts", icon: Images, iconBg: "bg-indigo-500" },
+      { label: "YouTube Thumbnail Resizer", href: "/tools/youtube-thumbnail-resizer", description: "Resize to 1280×720", icon: Youtube, iconBg: "bg-red-500" },
+      { label: "Instagram Post Resizer", href: "/tools/instagram-post-resizer", description: "Resize to 1080×1080", icon: Instagram, iconBg: "bg-pink-500" },
+      { label: "Instagram Story Resizer", href: "/tools/instagram-story-resizer", description: "Resize to 1080×1920", icon: Instagram, iconBg: "bg-purple-500" },
+      { label: "TikTok Cover Resizer", href: "/tools/tiktok-video-resizer", description: "Resize to 1080×1920", icon: Video, iconBg: "bg-gray-900" },
+      { label: "Twitter Header Resizer", href: "/tools/twitter-header-resizer", description: "Resize to 1500×500", icon: Twitter, iconBg: "bg-sky-400" },
+      { label: "LinkedIn Banner Resizer", href: "/tools/linkedin-banner-resizer", description: "Resize to 1584×396", icon: Linkedin, iconBg: "bg-blue-600" },
     ]
   },
   {
