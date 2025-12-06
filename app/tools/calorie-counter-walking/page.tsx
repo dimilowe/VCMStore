@@ -170,6 +170,14 @@ export default function CalorieCounterWalkingPage() {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
           
+          <nav className="mb-8 text-sm text-gray-500">
+            <Link href="/" className="hover:text-orange-600">Home</Link>
+            <span className="mx-2">/</span>
+            <Link href="/tools/clusters/health-fitness-calculators" className="hover:text-orange-600">Health & Fitness Calculators</Link>
+            <span className="mx-2">/</span>
+            <span className="text-gray-900">Calorie Counter Walking</span>
+          </nav>
+
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl mb-4 shadow-lg">
               <Footprints className="w-8 h-8 text-white" />

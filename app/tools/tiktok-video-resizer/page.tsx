@@ -16,6 +16,14 @@ export default function TikTokVideoResizerPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-10">
+        <nav className="mb-8 text-sm text-gray-500">
+          <Link href="/" className="hover:text-orange-600">Home</Link>
+          <span className="mx-2">/</span>
+          <Link href="/tools/clusters/social-media-image-sizes" className="hover:text-orange-600">Social Media Image Sizes</Link>
+          <span className="mx-2">/</span>
+          <span className="text-gray-900">TikTok Cover Resizer</span>
+        </nav>
+
         <PlatformImageToolClient preset={preset} />
 
         <RelatedResizers currentPresetId={preset.id} />
