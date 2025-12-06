@@ -176,7 +176,7 @@ interface ArticleTemplateProps {
 export default function ArticleTemplate({ article, clusterName, clusterPath }: ArticleTemplateProps) {
   const { content } = article;
   const HeroIcon = iconMap[content.hero.icon] || Image;
-  const CtaIcon = iconMap[content.quickCTA?.icon] || Zap;
+  const CtaIcon = content.quickCTA?.icon ? iconMap[content.quickCTA.icon] || Zap : Zap;
   
   const themeKey = content.hero.platform 
     ? getThemeFromPlatform(content.hero.platform) 
@@ -330,11 +330,11 @@ export default function ArticleTemplate({ article, clusterName, clusterPath }: A
             )}
 
             <MoreFreeTools exclude={content.quickCTA ? [`/tools/${content.quickCTA.toolSlug}`] : []} />
+            <PostResultUpsell />
           </article>
         </div>
       </div>
       <MonetizationBar />
-      <PostResultUpsell />
     </>
   );
 }

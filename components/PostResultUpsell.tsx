@@ -5,7 +5,7 @@ import { Bell, QrCode, ArrowRight, Flame } from "lucide-react";
 
 export default function PostResultUpsell() {
   return (
-    <div className="mt-8 p-6 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border border-orange-200 rounded-2xl">
+    <div className="mt-8 mb-24 p-6 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border border-orange-200 rounded-2xl">
       <div className="flex items-center gap-2 mb-4">
         <Flame className="w-5 h-5 text-orange-500" />
         <h3 className="text-lg font-bold text-gray-900">Level Up Your Channel Performance</h3>
