@@ -289,6 +289,15 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **Added Article Lifecycle System** - Complete workflow from draft to indexed
+  - Added `cluster_slug` and `is_indexed` columns to blog_posts table for cluster wiring and SEO control
+  - Created "Create Missing Drafts" button that generates empty article shells for user to fill via Replit AI
+  - Updated cluster detail UI with enhanced article status tracking (Missing/Draft/Published/Indexed)
+  - Implemented toggle controls for Published and Indexed status with visual badges
+  - Tree map shows status indicators: ✕ missing, ◐ draft, ● published, ★ indexed
+  - Sitemap now only includes posts where `is_indexed = true`
+  - Blog pages respect `is_indexed` for robots meta tag (noindex when false)
+  - Workflow: Create drafts → Fill content → Toggle Published → Toggle Indexed (for search engines)
 - 2025-12-06: **Added Cluster Control Panel** - Macro-view for managing topical authority clusters
   - Created /admin/clusters dashboard showing all clusters with health scores
   - Built lib/clusterHealth.ts with calculateClusterHealth() scoring (0-100):
