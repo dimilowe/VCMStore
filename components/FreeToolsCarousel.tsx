@@ -33,7 +33,7 @@ const freeTools = [
   { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day", iconBg: "bg-purple-400" },
   { name: "Name Combiner", icon: Users, href: "/tools/name-combiner", iconBg: "bg-cyan-500" },
   { name: "Photo Gallery Maker", icon: Images, href: "/tools/photo-gallery-maker", iconBg: "bg-indigo-500" },
-  { name: "Title Split-Test", icon: RotateCcw, href: "/tools/youtube-title-split-test", iconBg: "bg-red-500" },
+  { name: "YouTube Title Split-Test", icon: RotateCcw, href: "/tools/youtube-title-split-test", iconBg: "bg-red-500" },
 ];
 
 const ITEMS_PER_PAGE = 24;

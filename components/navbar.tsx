@@ -48,7 +48,7 @@ const resourceCategories: ResourceCategory[] = [
     items: [
       { label: "AI Chat", href: "/chat", description: "Strategy assistant for creators", icon: MessageCircle, iconBg: "bg-purple-500" },
       { label: "Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer", icon: Camera, iconBg: "bg-red-500" },
-      { label: "Title Split-Test", href: "/tools/youtube-title-split-test", description: "A/B test YouTube titles", icon: RotateCcw, iconBg: "bg-red-500" },
+      { label: "YouTube Title Split-Test", href: "/tools/youtube-title-split-test", description: "A/B test YouTube titles", icon: RotateCcw, iconBg: "bg-red-500" },
       { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker", icon: Palette, iconBg: "bg-pink-500" },
       { label: "AI Humanizer", href: "/tools/ai-humanizer-free", description: "Detect & humanize AI text", icon: Bot, iconBg: "bg-indigo-500" },
       { label: "AI Summarizer", href: "/tools/summarizer", description: "Summarize any text instantly", icon: Zap, iconBg: "bg-yellow-500" },
