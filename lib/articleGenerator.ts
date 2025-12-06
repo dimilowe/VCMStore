@@ -115,7 +115,11 @@ Return ONLY the title, nothing else.`;
     max_tokens: 100
   });
 
-  const metaDescription = metaResponse.choices[0]?.message?.content?.trim() || '';
+  let metaDescription = metaResponse.choices[0]?.message?.content?.trim() || '';
+  // Ensure meta description fits database column (max 160 chars)
+  if (metaDescription.length > 155) {
+    metaDescription = metaDescription.slice(0, 152) + '...';
+  }
 
   const excerptPrompt = `Write a 1-2 sentence excerpt (under 200 chars) summarizing an article about "${slugToTitle(articleSlug)}". Return ONLY the excerpt.`;
 
@@ -126,10 +130,14 @@ Return ONLY the title, nothing else.`;
     max_tokens: 100
   });
 
-  const excerpt = excerptResponse.choices[0]?.message?.content?.trim() || '';
+  let excerpt = excerptResponse.choices[0]?.message?.content?.trim() || '';
+  // Ensure excerpt fits reasonable length
+  if (excerpt.length > 250) {
+    excerpt = excerpt.slice(0, 247) + '...';
+  }
 
   return {
-    title,
+    title: title.slice(0, 255), // Ensure title fits
     content,
     excerpt,
     metaDescription
