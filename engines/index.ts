@@ -1,5 +1,7 @@
 import { EngineType, InputType, OutputType, toolsRegistry } from "@/data/toolsRegistry";
 
+export type { EngineType, InputType, OutputType };
+
 export interface EngineConfig {
   id: EngineType;
   name: string;

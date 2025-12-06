@@ -41,6 +41,7 @@ export type EngineType =
 
 export type InputType = "image" | "text" | "url" | "file" | "number" | "selection" | "none" | "multi";
 export type OutputType = "image" | "text" | "file" | "download" | "analysis" | "display" | "interactive";
+export type SearchIntent = "informational" | "action" | "transactional";
 
 export interface Tool {
   id: string;
@@ -60,6 +61,13 @@ export interface Tool {
   outputType: OutputType;
   relatedTools: string[];
   relatedArticles: string[];
+  primaryKeyword?: string;
+  secondaryKeywords?: string[];
+  searchIntent?: SearchIntent;
+  pillarSlug?: string;
+  clusterSlug?: string;
+  recommendedTools?: string[];
+  recommendedArticles?: string[];
 }
 
 export const CATEGORY_INFO: Record<ToolCategory, { label: string; description: string; emoji: string }> = {
@@ -179,7 +187,14 @@ export const toolsRegistry: Tool[] = [
     inputType: "image",
     outputType: "image",
     relatedTools: ["instagram-story-resizer", "youtube-thumbnail-resizer", "twitter-header-resizer"],
-    relatedArticles: ["instagram-post-size", "instagram-image-dimensions"]
+    relatedArticles: ["instagram-post-dimensions-guide", "instagram-post-design-tips"],
+    primaryKeyword: "instagram post size",
+    secondaryKeywords: ["instagram image dimensions", "instagram photo size 2024", "1080x1080 resizer", "instagram square size"],
+    searchIntent: "action",
+    pillarSlug: "social-media-image-sizes",
+    clusterSlug: "instagram-image-tools",
+    recommendedTools: ["instagram-story-resizer", "image-compressor", "heic-to-jpg"],
+    recommendedArticles: ["instagram-post-dimensions-guide", "instagram-post-design-tips"]
   },
   {
     id: "instagram-story-resizer",
@@ -195,7 +210,10 @@ export const toolsRegistry: Tool[] = [
     inputType: "image",
     outputType: "image",
     relatedTools: ["instagram-post-resizer", "tiktok-video-resizer"],
-    relatedArticles: ["instagram-story-size"]
+    relatedArticles: ["instagram-story-dimensions-guide", "instagram-story-design-tips"],
+    primaryKeyword: "instagram story dimensions",
+    searchIntent: "transactional",
+    pillarSlug: "social-media-image-sizes"
   },
   {
     id: "tiktok-video-resizer",
@@ -211,7 +229,10 @@ export const toolsRegistry: Tool[] = [
     inputType: "image",
     outputType: "image",
     relatedTools: ["instagram-story-resizer", "youtube-thumbnail-resizer"],
-    relatedArticles: ["tiktok-video-size"]
+    relatedArticles: ["tiktok-cover-dimensions-guide", "tiktok-cover-design-tips"],
+    primaryKeyword: "tiktok video cover size",
+    searchIntent: "transactional",
+    pillarSlug: "social-media-image-sizes"
   },
   {
     id: "youtube-title-split-test",
@@ -756,7 +777,10 @@ export const toolsRegistry: Tool[] = [
     inputType: "image",
     outputType: "analysis",
     relatedTools: ["calorie-counter-bmi", "calorie-counter-free"],
-    relatedArticles: []
+    relatedArticles: ["best-free-calorie-counters", "calorie-counter-mistakes"],
+    primaryKeyword: "calorie deficit calculator",
+    searchIntent: "transactional",
+    pillarSlug: "health-fitness-calculators"
   },
   {
     id: "outfit-ideas",
