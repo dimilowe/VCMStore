@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineUploader } from "@/components/inline-uploader";
-import { Plus, Edit, Trash2, BookOpen, Layers, Search, ChevronLeft, ChevronRight, Wrench } from "lucide-react";
+import { Plus, Edit, Trash2, BookOpen, Layers, Search, ChevronLeft, ChevronRight, Wrench, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 
 interface Product {
@@ -312,6 +312,12 @@ export default function AdminPage() {
               <Button variant="outline">
                 <Wrench className="mr-2 h-4 w-4" />
                 Tool Control
+              </Button>
+            </Link>
+            <Link href="/admin/clusters">
+              <Button variant="outline">
+                <LayoutGrid className="mr-2 h-4 w-4" />
+                Cluster Control
               </Button>
             </Link>
             <Button onClick={() => setShowForm(true)} className="bg-orange-500 hover:bg-orange-600">
