@@ -16,8 +16,12 @@ export interface ClusterHealthScore {
 
 export interface ArticleStatus {
   slug: string;
-  isPublished: boolean;
   title?: string;
+  exists: boolean;
+  isDraft: boolean;
+  isPublished: boolean;
+  isIndexed: boolean;
+  contentLength: number;
 }
 
 export interface ClusterOverview {
@@ -108,7 +112,7 @@ export function calculateClusterHealth(
   };
 }
 
-async function getPublishedArticles(articleSlugs: string[]): Promise<ArticleStatus[]> {
+async function getArticleStatuses(articleSlugs: string[]): Promise<ArticleStatus[]> {
   if (articleSlugs.length === 0) {
     return [];
   }
@@ -116,32 +120,61 @@ async function getPublishedArticles(articleSlugs: string[]): Promise<ArticleStat
   try {
     const placeholders = articleSlugs.map((_, i) => `$${i + 1}`).join(", ");
     const result = await query(
-      `SELECT slug, title, published_at 
+      `SELECT slug, title, content, published_at, is_indexed 
        FROM blog_posts 
        WHERE slug IN (${placeholders})`,
       articleSlugs
     );
     
-    const publishedSlugs = new Map<string, { title: string; isPublished: boolean }>();
+    const postMap = new Map<string, {
+      title: string;
+      isPublished: boolean;
+      isIndexed: boolean;
+      contentLength: number;
+    }>();
+    
     for (const row of result.rows) {
       const isPublished = row.published_at && new Date(row.published_at) <= new Date();
-      publishedSlugs.set(row.slug, { 
+      postMap.set(row.slug, { 
         title: row.title, 
-        isPublished 
+        isPublished,
+        isIndexed: row.is_indexed === true,
+        contentLength: row.content?.length || 0,
       });
     }
     
     return articleSlugs.map(slug => {
-      const found = publishedSlugs.get(slug);
+      const found = postMap.get(slug);
+      if (!found) {
+        return {
+          slug,
+          exists: false,
+          isDraft: false,
+          isPublished: false,
+          isIndexed: false,
+          contentLength: 0,
+        };
+      }
       return {
         slug,
-        isPublished: found?.isPublished ?? false,
-        title: found?.title
+        title: found.title,
+        exists: true,
+        isDraft: !found.isPublished,
+        isPublished: found.isPublished,
+        isIndexed: found.isIndexed,
+        contentLength: found.contentLength,
       };
     });
   } catch (error) {
-    console.error("Error fetching published articles:", error);
-    return articleSlugs.map(slug => ({ slug, isPublished: false }));
+    console.error("Error fetching article statuses:", error);
+    return articleSlugs.map(slug => ({ 
+      slug, 
+      exists: false,
+      isDraft: false,
+      isPublished: false, 
+      isIndexed: false,
+      contentLength: 0,
+    }));
   }
 }
 
@@ -157,7 +190,7 @@ export async function getAllClustersOverview(): Promise<ClusterOverview[]> {
     try {
       const placeholders = uniqueSlugs.map((_, i) => `$${i + 1}`).join(", ");
       const result = await query(
-        `SELECT slug, title, published_at 
+        `SELECT slug, title, content, published_at, is_indexed 
          FROM blog_posts 
          WHERE slug IN (${placeholders})`,
         uniqueSlugs
@@ -168,7 +201,11 @@ export async function getAllClustersOverview(): Promise<ClusterOverview[]> {
         articleStatusMap.set(row.slug, {
           slug: row.slug,
           title: row.title,
-          isPublished
+          exists: true,
+          isDraft: !isPublished,
+          isPublished,
+          isIndexed: row.is_indexed === true,
+          contentLength: row.content?.length || 0,
         });
       }
     } catch (error) {
@@ -180,7 +217,14 @@ export async function getAllClustersOverview(): Promise<ClusterOverview[]> {
     const indexedToolCount = cluster.toolSlugs.filter(slug => isToolIndexed(slug)).length;
     
     const articleStatuses = cluster.articleSlugs.map(slug => 
-      articleStatusMap.get(slug) || { slug, isPublished: false }
+      articleStatusMap.get(slug) || { 
+        slug, 
+        exists: false,
+        isDraft: false,
+        isPublished: false,
+        isIndexed: false,
+        contentLength: 0,
+      }
     );
     const publishedArticleCount = articleStatuses.filter(a => a.isPublished).length;
     
@@ -208,7 +252,7 @@ export async function getClusterOverviewById(clusterId: string): Promise<Cluster
   if (!cluster) return null;
   
   const indexedToolCount = cluster.toolSlugs.filter(slug => isToolIndexed(slug)).length;
-  const articleStatuses = await getPublishedArticles(cluster.articleSlugs);
+  const articleStatuses = await getArticleStatuses(cluster.articleSlugs);
   const publishedArticleCount = articleStatuses.filter(a => a.isPublished).length;
   
   return {

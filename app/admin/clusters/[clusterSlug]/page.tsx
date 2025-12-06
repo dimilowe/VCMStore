@@ -18,8 +18,12 @@ interface ClusterHealthScore {
 
 interface ArticleStatus {
   slug: string;
-  isPublished: boolean;
   title?: string;
+  exists: boolean;
+  isDraft: boolean;
+  isPublished: boolean;
+  isIndexed: boolean;
+  contentLength: number;
 }
 
 interface ClusterOverview {
@@ -55,6 +59,8 @@ export default function ClusterDetailPage() {
   const [cluster, setCluster] = useState<ClusterOverview | null>(null);
   const [tools, setTools] = useState<ToolInfo[]>([]);
   const [showToolFilter, setShowToolFilter] = useState<string>("all");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [togglingSlug, setTogglingSlug] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -116,6 +122,45 @@ export default function ClusterDetailPage() {
       }
     } catch (error) {
       console.error("Failed to load cluster data:", error);
+    }
+  };
+
+  const handleCreateDrafts = async () => {
+    if (!cluster) return;
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/admin/clusters/generate-articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clusterId: cluster.id }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        await loadClusterData();
+      }
+    } catch (error) {
+      console.error("Failed to create drafts:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleToggleArticle = async (slug: string, action: "publish" | "unpublish" | "index" | "unindex") => {
+    setTogglingSlug(slug);
+    try {
+      const res = await fetch("/api/admin/articles/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, action }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        await loadClusterData();
+      }
+    } catch (error) {
+      console.error("Failed to toggle article:", error);
+    } finally {
+      setTogglingSlug(null);
     }
   };
 
@@ -294,7 +339,7 @@ export default function ClusterDetailPage() {
               </div>
               <div>
                 <div className="text-gray-700 font-medium mb-1">
-                  Articles ({cluster.publishedArticleCount}/{cluster.articleCount} published)
+                  Articles ({cluster.articleStatuses?.filter(a => a.exists).length || 0}/{cluster.articleCount} drafts · {cluster.publishedArticleCount} published)
                 </div>
                 {cluster.articleStatuses?.length === 0 ? (
                   <div className="ml-2 text-red-500 text-sm">└── (none - add supporting articles!)</div>
@@ -305,10 +350,15 @@ export default function ClusterDetailPage() {
                       <div key={article.slug} className="flex items-center gap-2 text-gray-600 ml-2">
                         <span className="text-gray-400">{isLast ? "└──" : "├──"}</span>
                         <span>{article.slug}</span>
-                        {article.isPublished ? (
+                        {!article.exists ? (
+                          <span className="text-red-400 text-xs">✕</span>
+                        ) : article.isPublished ? (
                           <span className="text-green-500 text-xs">●</span>
                         ) : (
-                          <span className="text-gray-300 text-xs">○</span>
+                          <span className="text-yellow-500 text-xs">◐</span>
+                        )}
+                        {article.isIndexed && (
+                          <span className="text-blue-500 text-xs">★</span>
                         )}
                       </div>
                     );
@@ -371,37 +421,118 @@ export default function ClusterDetailPage() {
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">
-                Supporting Articles ({cluster.publishedArticleCount}/{cluster.articleCount} published)
-              </h2>
+              <div>
+                <h2 className="text-lg font-semibold">
+                  Supporting Articles
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {cluster.articleStatuses?.filter(a => a.exists).length || 0}/{cluster.articleCount} drafts · {cluster.publishedArticleCount}/{cluster.articleCount} published
+                </p>
+              </div>
+              {cluster.articleStatuses?.some(a => !a.exists) && (
+                <button
+                  onClick={handleCreateDrafts}
+                  disabled={isGenerating}
+                  className="px-3 py-1.5 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
+                >
+                  {isGenerating ? "Creating..." : "Create Missing Drafts"}
+                </button>
+              )}
             </div>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            <div className="space-y-3 max-h-[500px] overflow-y-auto">
               {cluster.articleStatuses?.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  <p className="mb-2">No supporting articles yet</p>
-                  <p className="text-sm">Add at least 3 articles to strengthen this cluster</p>
+                  <p className="mb-2">No supporting articles planned</p>
+                  <p className="text-sm">Add article slugs to the cluster registry</p>
                 </div>
               ) : (
                 cluster.articleStatuses?.map((article) => (
                   <div
                     key={article.slug}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                    className="p-3 bg-gray-50 rounded border"
                   >
-                    <div>
-                      <div className="font-medium text-sm">
-                        {article.title || article.slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">
+                          {article.title || article.slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+                        </div>
+                        <div className="text-xs text-gray-500">{article.slug}</div>
+                        {article.exists && (
+                          <div className="text-xs text-gray-400 mt-1">
+                            {article.contentLength > 0 ? `${Math.round(article.contentLength / 5)} words` : "Empty draft"}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-xs text-gray-500">{article.slug}</div>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex items-center gap-1">
+                          {!article.exists ? (
+                            <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded">
+                              Missing
+                            </span>
+                          ) : article.isPublished ? (
+                            <span className="px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded">
+                              Published
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded">
+                              Draft
+                            </span>
+                          )}
+                          {article.isIndexed && (
+                            <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">
+                              Indexed
+                            </span>
+                          )}
+                        </div>
+                        {article.exists && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <Link
+                              href={`/admin/blog/edit/${article.slug}`}
+                              className="text-orange-600 hover:underline"
+                            >
+                              Edit
+                            </Link>
+                            <Link
+                              href={`/blog/${article.slug}`}
+                              target="_blank"
+                              className="text-gray-600 hover:underline"
+                            >
+                              Preview
+                            </Link>
+                            <button
+                              onClick={() => handleToggleArticle(
+                                article.slug,
+                                article.isPublished ? "unpublish" : "publish"
+                              )}
+                              disabled={togglingSlug === article.slug}
+                              className={`px-2 py-0.5 rounded text-white ${
+                                article.isPublished
+                                  ? "bg-gray-500 hover:bg-gray-600"
+                                  : "bg-green-500 hover:bg-green-600"
+                              } disabled:opacity-50`}
+                            >
+                              {article.isPublished ? "Unpublish" : "Publish"}
+                            </button>
+                            {article.isPublished && (
+                              <button
+                                onClick={() => handleToggleArticle(
+                                  article.slug,
+                                  article.isIndexed ? "unindex" : "index"
+                                )}
+                                disabled={togglingSlug === article.slug}
+                                className={`px-2 py-0.5 rounded text-white ${
+                                  article.isIndexed
+                                    ? "bg-gray-500 hover:bg-gray-600"
+                                    : "bg-blue-500 hover:bg-blue-600"
+                                } disabled:opacity-50`}
+                              >
+                                {article.isIndexed ? "Unindex" : "Index"}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    {article.isPublished ? (
-                      <span className="px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded">
-                        Published
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                        Planned
-                      </span>
-                    )}
                   </div>
                 ))
               )}

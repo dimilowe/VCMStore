@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const postsResult = await query(
     `SELECT slug, published_at, created_at 
      FROM blog_posts 
-     WHERE published_at IS NOT NULL AND published_at <= NOW()
+     WHERE published_at IS NOT NULL AND published_at <= NOW() AND is_indexed = true
      ORDER BY published_at DESC`
   );
 

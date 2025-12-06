@@ -23,11 +23,12 @@ interface BlogPost {
   featured_image_url: string | null;
   published_at: Date;
   view_count: number;
+  is_indexed: boolean;
 }
 
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
   const result = await query(
-    `SELECT id, title, slug, content, excerpt, meta_description, featured_image_url, published_at, view_count
+    `SELECT id, title, slug, content, excerpt, meta_description, featured_image_url, published_at, view_count, is_indexed
      FROM blog_posts 
      WHERE slug = $1 AND published_at IS NOT NULL AND published_at <= NOW()
      LIMIT 1`,
@@ -73,6 +74,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${post.title} | VCM Suite`,
     description: post.meta_description || post.excerpt || post.title,
+    robots: post.is_indexed 
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
     openGraph: {
       title: post.title,
       description: post.meta_description || post.excerpt || post.title,
