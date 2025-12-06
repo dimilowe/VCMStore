@@ -2,9 +2,12 @@ import { query } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { getIronSession } from "iron-session";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Calendar, Eye, Wrench } from "lucide-react";
+import { ArrowLeft, Calendar, Eye, Wrench, AlertTriangle } from "lucide-react";
 import { getClusterById } from "@/data/clusterRegistry";
+import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 
 interface ClusterArticle {
   id: number;
@@ -20,11 +23,15 @@ interface ClusterArticle {
   created_at: Date;
 }
 
-async function getArticle(slug: string): Promise<ClusterArticle | null> {
+async function getArticle(slug: string, allowUnpublished: boolean = false): Promise<ClusterArticle | null> {
+  const whereClause = allowUnpublished 
+    ? 'WHERE slug = $1' 
+    : 'WHERE slug = $1 AND is_published = true';
+  
   const result = await query(
     `SELECT id, title, slug, content, excerpt, meta_description, cluster_slug, is_published, is_indexed, view_count, created_at
      FROM cluster_articles 
-     WHERE slug = $1 AND is_published = true
+     ${whereClause}
      LIMIT 1`,
     [slug]
   );
@@ -34,6 +41,16 @@ async function getArticle(slug: string): Promise<ClusterArticle | null> {
   }
   
   return result.rows[0];
+}
+
+async function isAdmin(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    const session = await getIronSession<AdminSessionData>(cookieStore, sessionOptions);
+    return session.isAdmin === true;
+  } catch {
+    return false;
+  }
 }
 
 async function incrementViewCount(articleId: number): Promise<void> {
@@ -81,19 +98,34 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const article = await getArticle(slug);
+  const adminUser = await isAdmin();
+  
+  const article = await getArticle(slug, adminUser);
   
   if (!article) {
     notFound();
   }
   
-  await incrementViewCount(article.id);
+  const isPreviewMode = !article.is_published && adminUser;
+  
+  if (!isPreviewMode) {
+    await incrementViewCount(article.id);
+  }
   
   const relatedArticles = await getRelatedArticles(article.cluster_slug, article.slug);
   const cluster = getClusterById(article.cluster_slug);
   
   return (
     <div className="min-h-screen bg-gray-50">
+      {isPreviewMode && (
+        <div className="bg-yellow-100 border-b border-yellow-300 px-4 py-3">
+          <div className="container mx-auto flex items-center gap-2 text-yellow-800">
+            <AlertTriangle className="w-5 h-5" />
+            <span className="font-medium">Preview Mode</span>
+            <span className="text-sm">— This article is not published. Only you can see this.</span>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <Link 
