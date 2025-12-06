@@ -369,6 +369,93 @@ export default function ClusterDetailPage() {
           </div>
         </div>
 
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Interlink Audit</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Verify all internal links are configured before indexing. Each tool links to up to 3 related tools + 2 articles. Each article links to 1-2 tools via CTAs.
+          </p>
+          
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-medium text-sm text-gray-700 mb-3">Tool → Tool/Article Links</h3>
+              <div className="space-y-2 max-h-64 overflow-y-auto text-xs font-mono bg-gray-50 p-3 rounded">
+                {cluster.toolSlugs.map((toolSlug) => {
+                  const relatedTools = cluster.toolSlugs.filter(s => s !== toolSlug).slice(0, 3);
+                  const relatedArticles = cluster.articleSlugs.slice(0, 2);
+                  const tool = tools.find(t => t.slug === toolSlug);
+                  return (
+                    <div key={toolSlug} className="pb-2 border-b border-gray-200 last:border-0">
+                      <div className="flex items-center gap-1 text-gray-900 font-medium">
+                        {toolSlug}
+                        {tool?.isIndexed ? (
+                          <span className="text-green-500">●</span>
+                        ) : (
+                          <span className="text-gray-300">○</span>
+                        )}
+                      </div>
+                      <div className="ml-3 text-gray-600">
+                        → Tools: {relatedTools.length > 0 ? relatedTools.join(", ") : "(none)"}
+                      </div>
+                      <div className="ml-3 text-gray-600">
+                        → Articles: {relatedArticles.length > 0 ? relatedArticles.join(", ") : "(none)"}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium text-sm text-gray-700 mb-3">Article → Tool Links (via CTAs)</h3>
+              <div className="space-y-2 max-h-64 overflow-y-auto text-xs font-mono bg-gray-50 p-3 rounded">
+                {cluster.articleStatuses?.map((article) => {
+                  const primaryTool = cluster.toolSlugs[0] || "(none)";
+                  const secondaryTool = cluster.toolSlugs[1] || "(none)";
+                  return (
+                    <div key={article.slug} className="pb-2 border-b border-gray-200 last:border-0">
+                      <div className="flex items-center gap-1 text-gray-900 font-medium">
+                        {article.slug}
+                        {!article.exists ? (
+                          <span className="text-red-400">✕</span>
+                        ) : article.isPublished ? (
+                          <span className="text-green-500">●</span>
+                        ) : (
+                          <span className="text-yellow-500">◐</span>
+                        )}
+                      </div>
+                      <div className="ml-3 text-gray-600">
+                        → quickCTA: {primaryTool}
+                      </div>
+                      <div className="ml-3 text-gray-600">
+                        → bottomCTA: {primaryTool}, {secondaryTool}
+                      </div>
+                    </div>
+                  );
+                })}
+                {(!cluster.articleStatuses || cluster.articleStatuses.length === 0) && (
+                  <div className="text-gray-400">No articles in cluster</div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <div className="flex items-center gap-4 text-sm">
+              <div>
+                <span className="font-medium text-blue-800">Total Links: </span>
+                <span className="text-blue-700">
+                  {cluster.toolSlugs.length * (Math.min(3, cluster.toolSlugs.length - 1) + Math.min(2, cluster.articleSlugs.length)) + 
+                   (cluster.articleStatuses?.filter(a => a.exists).length || 0) * 3}
+                </span>
+              </div>
+              <div className="text-blue-600">
+                ({cluster.toolSlugs.length} tools × {Math.min(3, cluster.toolSlugs.length - 1) + Math.min(2, cluster.articleSlugs.length)} links each) + 
+                ({cluster.articleStatuses?.filter(a => a.exists).length || 0} articles × 3 tool links each)
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
