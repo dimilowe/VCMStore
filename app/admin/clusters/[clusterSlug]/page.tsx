@@ -529,7 +529,14 @@ export default function ClusterDetailPage() {
                   className="flex items-center justify-between p-2 bg-gray-50 rounded"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm truncate">{tool.name || tool.slug}</div>
+                    <a
+                      href={`/tools/${tool.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-sm truncate block hover:text-orange-600 hover:underline"
+                    >
+                      {tool.name || tool.slug}
+                    </a>
                     <div className="text-xs text-gray-500 truncate">{tool.slug}</div>
                   </div>
                   <div className="flex items-center gap-2 ml-2">
