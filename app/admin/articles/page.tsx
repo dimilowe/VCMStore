@@ -311,9 +311,11 @@ export default function AdminArticlesPage() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                          {article.cluster_slug}
-                        </Badge>
+                        <Link href={`/clusters/${article.cluster_slug}`} target="_blank">
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 cursor-pointer transition-colors">
+                            {article.cluster_slug}
+                          </Badge>
+                        </Link>
                       </td>
                       <td className="p-4 text-center">
                         <button
