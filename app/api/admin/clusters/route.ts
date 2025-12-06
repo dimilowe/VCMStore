@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getIronSession } from "iron-session";
+import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 import { getAllClustersOverview, getClusterOverviewById } from "@/lib/clusterHealth";
 
 export async function GET(request: Request) {
-  const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("admin_session")?.value === "true";
+  const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
   
-  if (!isAdmin) {
+  if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   
