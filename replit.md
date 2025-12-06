@@ -289,6 +289,14 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **Built Pre-Indexing Safety System** - Tools must have complete interlinking before indexing
+  - Created dynamic pillar pages at /tools/clusters/[clusterSlug] aggregating tools by cluster
+  - Created category pages at /tools/categories/[categorySlug] filtering tools by category
+  - Built validateToolInterlinking() with 4 checks: hasPillar, hasCategory, hasSiblings (2+), hasFunnelCTA
+  - Admin shows "Link Status" column with Ready/Incomplete/Not Ready badges
+  - Added link status filter dropdown for easier cluster management
+  - API blocks isIndexed=true toggle unless all interlinking requirements pass
+  - Pattern: Upward links (→pillar, →category) + horizontal links (↔siblings) + downward funnel (→VCM OS)
 - 2025-12-06: **Wired Indexed Toggle for SEO Control** - Admin toggle now controls Google indexing
   - Created lib/toolRollout.ts with isToolIndexed(), getAllIndexedTools(), getRobotsDirective()
   - Sitemap.xml only includes tools where isIndexed=true
