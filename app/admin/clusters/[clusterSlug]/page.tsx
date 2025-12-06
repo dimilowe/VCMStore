@@ -492,13 +492,15 @@ export default function ClusterDetailPage() {
                             >
                               Edit
                             </Link>
-                            <Link
-                              href={`/blog/${article.slug}`}
-                              target="_blank"
-                              className="text-gray-600 hover:underline"
-                            >
-                              Preview
-                            </Link>
+                            {article.isPublished && (
+                              <Link
+                                href={`/newsletter/${article.slug}`}
+                                target="_blank"
+                                className="text-gray-600 hover:underline"
+                              >
+                                View
+                              </Link>
+                            )}
                             <button
                               onClick={() => handleToggleArticle(
                                 article.slug,
