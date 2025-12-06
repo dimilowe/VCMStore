@@ -290,6 +290,15 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **Engine Expansion Factory** - Cartesian product-based tool shell generation
+  - Created EngineBlueprint schema (lib/engineBlueprint.ts) with dimensions, clusterResolver, linkRules, defaults
+  - Built Engine Expansion Generator (lib/engineExpansionGenerator.ts) for idempotent Cartesian expansion
+  - All generated shells start as draft (status: "draft", isIndexed: false, inDirectory: false)
+  - 4 example blueprints: thumbnail-analyzer, content-analyzer, image-resizer-niche, calculator-niche
+  - Admin UI at /admin/engines with "Run Expansion" buttons per blueprint
+  - Shows potential shell counts per blueprint (e.g., Platform(7) × ContentType(5) = 35 shells)
+  - Link Builder (lib/linkBuilder.ts) auto-wires siblings and articles based on linkRules
+  - Storage: data/generatedShells.json (idempotent - skips existing slugs)
 - 2025-12-06: **Database-Driven Article System** - Scalable article management for 5K-10K articles
   - Created ArticleContent TypeScript schema in lib/articleTypes.ts for structured JSON content (hero, quickCTA, sections, specs, tips, FAQs, bottomCTA)
   - Built ArticleTemplate component with static Tailwind class mappings (avoids tree-shaking issues)
