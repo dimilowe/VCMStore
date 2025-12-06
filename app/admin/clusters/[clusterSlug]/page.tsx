@@ -55,6 +55,7 @@ export default function ClusterDetailPage() {
   const clusterSlug = params.clusterSlug as string;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [clusterLoading, setClusterLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [cluster, setCluster] = useState<ClusterOverview | null>(null);
   const [tools, setTools] = useState<ToolInfo[]>([]);
@@ -102,6 +103,7 @@ export default function ClusterDetailPage() {
   };
 
   const loadClusterData = async () => {
+    setClusterLoading(true);
     try {
       const clusterRes = await fetch(
         `/api/admin/clusters?id=${clusterSlug}`,
@@ -122,6 +124,8 @@ export default function ClusterDetailPage() {
       }
     } catch (error) {
       console.error("Failed to load cluster data:", error);
+    } finally {
+      setClusterLoading(false);
     }
   };
 
@@ -233,14 +237,20 @@ export default function ClusterDetailPage() {
     );
   }
 
-  if (!cluster) {
+  if (clusterLoading || !cluster) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <p className="text-gray-500 mb-4">Cluster not found</p>
-          <Link href="/admin/clusters" className="text-orange-500 hover:underline">
-            Back to Clusters
-          </Link>
+          {clusterLoading ? (
+            <p className="text-gray-500">Loading cluster...</p>
+          ) : (
+            <>
+              <p className="text-gray-500 mb-4">Cluster not found</p>
+              <Link href="/admin/clusters" className="text-orange-500 hover:underline">
+                Back to Clusters
+              </Link>
+            </>
+          )}
         </div>
       </div>
     );
