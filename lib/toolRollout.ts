@@ -120,3 +120,13 @@ export async function getToolFromDbOrRegistry(slug: string): Promise<ToolRecord 
 export async function initToolsCache(): Promise<void> {
   await ensureCacheLoaded();
 }
+
+export function getRobotsDirective(slug: string): string {
+  const indexed = isToolIndexed(slug);
+  return indexed ? 'index, follow' : 'noindex, nofollow';
+}
+
+export async function getRobotsDirectiveAsync(slug: string): Promise<string> {
+  const indexed = await isToolIndexedAsync(slug);
+  return indexed ? 'index, follow' : 'noindex, nofollow';
+}
