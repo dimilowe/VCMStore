@@ -307,6 +307,14 @@ export async function getExpansionStats(): Promise<{
   }
 }
 
+export function getGeneratedShell(slug: string): GeneratedShell | null {
+  return null;
+}
+
+export function getAllGeneratedShells(): GeneratedShell[] {
+  return [];
+}
+
 export async function previewExpansion(blueprintId: string): Promise<{
   blueprint: EngineBlueprint | null;
   wouldCreate: string[];
