@@ -410,6 +410,10 @@ function getAllSkins(): ToolSkin[] {
   return _allSkins;
 }
 
+export function getAllToolSkins(): ToolSkin[] {
+  return getAllSkins();
+}
+
 export function getToolSkinBySlug(slug: string): ToolSkin | undefined {
   return buildSkinRegistry().get(slug);
 }
