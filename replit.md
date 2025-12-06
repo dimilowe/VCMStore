@@ -298,7 +298,8 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
   - Admin UI at /admin/engines with "Run Expansion" buttons per blueprint
   - Shows potential shell counts per blueprint (e.g., Platform(7) × ContentType(5) = 35 shells)
   - Link Builder (lib/linkBuilder.ts) auto-wires siblings and articles based on linkRules
-  - Storage: data/generatedShells.json (idempotent - skips existing slugs)
+  - Database-driven storage: shells insert directly into tools table (no JSON files)
+  - Added withTransaction helper in lib/db.ts for atomic batch inserts with proper pool.connect()
 - 2025-12-06: **Database-Driven Article System** - Scalable article management for 5K-10K articles
   - Created ArticleContent TypeScript schema in lib/articleTypes.ts for structured JSON content (hero, quickCTA, sections, specs, tips, FAQs, bottomCTA)
   - Built ArticleTemplate component with static Tailwind class mappings (avoids tree-shaking issues)
