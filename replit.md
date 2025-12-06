@@ -290,6 +290,15 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **Database-Driven Article System** - Scalable article management for 5K-10K articles
+  - Created ArticleContent TypeScript schema in lib/articleTypes.ts for structured JSON content (hero, quickCTA, sections, specs, tips, FAQs, bottomCTA)
+  - Built ArticleTemplate component with static Tailwind class mappings (avoids tree-shaking issues)
+  - Theme system: instagram, youtube, linkedin, tiktok, twitter, health, social-media - auto-detected from cluster slug or platform field
+  - Updated dynamic article route app/articles/[slug]/page.tsx to render structured JSON or legacy HTML content
+  - Removed 9 static article pages - all articles now served from database
+  - Admin panel already supports filtering, search, and publish/index toggles at /admin/articles
+  - Sitemap respects is_indexed flag for SEO control
+  - Workflow: AI writes structured JSON content → save to cluster_articles → admin reviews → toggle published → toggle indexed
 - 2025-12-06: **Enhanced Article Styling** - Articles now render with tool-page aesthetics
   - Updated articleGenerator.ts to output structured HTML with semantic div classes
   - Created StyledArticleContent component for rendering articles

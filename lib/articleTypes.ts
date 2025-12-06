@@ -48,11 +48,12 @@ export interface ArticleBottomCTA {
 export interface ArticleContent {
   hero: {
     icon: string;
-    iconGradient: string;
+    iconGradient?: string;
     title: string;
     subtitle: string;
+    platform?: string;
   };
-  quickCTA: {
+  quickCTA?: {
     icon: string;
     iconColor: string;
     bgGradient: string;

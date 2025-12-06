@@ -32,7 +32,11 @@ import {
   Instagram,
   Youtube,
   Linkedin,
-  Twitter
+  Twitter,
+  Info,
+  Lightbulb,
+  Star,
+  Flame
 } from 'lucide-react';
 import { ArticleContent, ClusterTheme } from '@/lib/articleTypes';
 import MoreFreeTools from '@/components/MoreFreeTools';
@@ -43,8 +47,119 @@ const iconMap: Record<string, any> = {
   Zap, CheckCircle, AlertTriangle, Maximize, Image, Calculator, Heart, Activity,
   Scale, TrendingUp, Target, Footprints, Clock, FileImage, Video, Smartphone,
   Users, Building, Briefcase, Eye, Type, Palette, Music, Grid, Square, Crop,
-  Instagram, Youtube, Linkedin, Twitter, ArrowRight
+  Instagram, Youtube, Linkedin, Twitter, ArrowRight, Info, Lightbulb, Star, Flame
 };
+
+const themeStyles = {
+  'instagram': {
+    heroGradient: 'bg-gradient-to-br from-pink-500 via-purple-500 to-orange-500',
+    ctaBg: 'bg-gradient-to-r from-pink-50 to-purple-50',
+    ctaBorder: 'border-pink-200',
+    ctaIconColor: 'text-pink-600',
+    buttonGradient: 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600',
+    proTipBg: 'bg-pink-50',
+    proTipBorder: 'border-pink-200',
+    specBgs: ['bg-pink-100', 'bg-purple-100', 'bg-orange-100', 'bg-blue-100'],
+    specTextColors: ['text-pink-600', 'text-purple-600', 'text-orange-600', 'text-blue-600'],
+    sectionIconColor: 'text-pink-500',
+  },
+  'youtube': {
+    heroGradient: 'bg-gradient-to-br from-red-500 to-red-600',
+    ctaBg: 'bg-gradient-to-r from-red-50 to-orange-50',
+    ctaBorder: 'border-red-200',
+    ctaIconColor: 'text-red-600',
+    buttonGradient: 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700',
+    proTipBg: 'bg-red-50',
+    proTipBorder: 'border-red-200',
+    specBgs: ['bg-red-100', 'bg-orange-100', 'bg-yellow-100', 'bg-pink-100'],
+    specTextColors: ['text-red-600', 'text-orange-600', 'text-yellow-600', 'text-pink-600'],
+    sectionIconColor: 'text-red-500',
+  },
+  'linkedin': {
+    heroGradient: 'bg-gradient-to-br from-blue-600 to-blue-700',
+    ctaBg: 'bg-gradient-to-r from-blue-50 to-indigo-50',
+    ctaBorder: 'border-blue-200',
+    ctaIconColor: 'text-blue-600',
+    buttonGradient: 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800',
+    proTipBg: 'bg-blue-50',
+    proTipBorder: 'border-blue-200',
+    specBgs: ['bg-blue-100', 'bg-indigo-100', 'bg-sky-100', 'bg-cyan-100'],
+    specTextColors: ['text-blue-600', 'text-indigo-600', 'text-sky-600', 'text-cyan-600'],
+    sectionIconColor: 'text-blue-500',
+  },
+  'tiktok': {
+    heroGradient: 'bg-gradient-to-br from-gray-900 via-pink-500 to-cyan-400',
+    ctaBg: 'bg-gradient-to-r from-pink-50 to-cyan-50',
+    ctaBorder: 'border-pink-200',
+    ctaIconColor: 'text-gray-900',
+    buttonGradient: 'bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700',
+    proTipBg: 'bg-pink-50',
+    proTipBorder: 'border-pink-200',
+    specBgs: ['bg-pink-100', 'bg-cyan-100', 'bg-gray-100', 'bg-purple-100'],
+    specTextColors: ['text-pink-600', 'text-cyan-600', 'text-gray-600', 'text-purple-600'],
+    sectionIconColor: 'text-gray-900',
+  },
+  'twitter': {
+    heroGradient: 'bg-gradient-to-br from-blue-400 to-blue-500',
+    ctaBg: 'bg-gradient-to-r from-blue-50 to-sky-50',
+    ctaBorder: 'border-blue-200',
+    ctaIconColor: 'text-blue-500',
+    buttonGradient: 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600',
+    proTipBg: 'bg-blue-50',
+    proTipBorder: 'border-blue-200',
+    specBgs: ['bg-blue-100', 'bg-sky-100', 'bg-indigo-100', 'bg-cyan-100'],
+    specTextColors: ['text-blue-600', 'text-sky-600', 'text-indigo-600', 'text-cyan-600'],
+    sectionIconColor: 'text-blue-500',
+  },
+  'health': {
+    heroGradient: 'bg-gradient-to-br from-orange-500 to-orange-600',
+    ctaBg: 'bg-gradient-to-r from-orange-50 to-amber-50',
+    ctaBorder: 'border-orange-200',
+    ctaIconColor: 'text-orange-600',
+    buttonGradient: 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700',
+    proTipBg: 'bg-orange-50',
+    proTipBorder: 'border-orange-200',
+    specBgs: ['bg-orange-100', 'bg-amber-100', 'bg-yellow-100', 'bg-red-100'],
+    specTextColors: ['text-orange-600', 'text-amber-600', 'text-yellow-600', 'text-red-600'],
+    sectionIconColor: 'text-orange-500',
+  },
+  'social-media': {
+    heroGradient: 'bg-gradient-to-br from-purple-500 to-pink-500',
+    ctaBg: 'bg-gradient-to-r from-purple-50 to-pink-50',
+    ctaBorder: 'border-purple-200',
+    ctaIconColor: 'text-purple-600',
+    buttonGradient: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
+    proTipBg: 'bg-purple-50',
+    proTipBorder: 'border-purple-200',
+    specBgs: ['bg-purple-100', 'bg-pink-100', 'bg-indigo-100', 'bg-fuchsia-100'],
+    specTextColors: ['text-purple-600', 'text-pink-600', 'text-indigo-600', 'text-fuchsia-600'],
+    sectionIconColor: 'text-purple-500',
+  },
+};
+
+type ThemeKey = keyof typeof themeStyles;
+
+function getThemeFromCluster(clusterSlug: string): ThemeKey {
+  if (clusterSlug.includes('instagram')) return 'instagram';
+  if (clusterSlug.includes('youtube')) return 'youtube';
+  if (clusterSlug.includes('linkedin')) return 'linkedin';
+  if (clusterSlug.includes('tiktok')) return 'tiktok';
+  if (clusterSlug.includes('twitter')) return 'twitter';
+  if (clusterSlug.includes('health') || clusterSlug.includes('fitness') || clusterSlug.includes('calorie')) return 'health';
+  if (clusterSlug.includes('social')) return 'social-media';
+  return 'health';
+}
+
+function getThemeFromPlatform(platform?: string): ThemeKey {
+  if (!platform) return 'health';
+  const p = platform.toLowerCase();
+  if (p.includes('instagram')) return 'instagram';
+  if (p.includes('youtube')) return 'youtube';
+  if (p.includes('linkedin')) return 'linkedin';
+  if (p.includes('tiktok')) return 'tiktok';
+  if (p.includes('twitter') || p.includes('x.com')) return 'twitter';
+  return 'social-media';
+}
 
 interface ArticleTemplateProps {
   article: {
@@ -58,10 +173,15 @@ interface ArticleTemplateProps {
   theme: ClusterTheme;
 }
 
-export default function ArticleTemplate({ article, clusterName, clusterPath, theme }: ArticleTemplateProps) {
+export default function ArticleTemplate({ article, clusterName, clusterPath }: ArticleTemplateProps) {
   const { content } = article;
   const HeroIcon = iconMap[content.hero.icon] || Image;
-  const CtaIcon = iconMap[content.quickCTA.icon] || Zap;
+  const CtaIcon = iconMap[content.quickCTA?.icon] || Zap;
+  
+  const themeKey = content.hero.platform 
+    ? getThemeFromPlatform(content.hero.platform) 
+    : getThemeFromCluster(article.cluster_slug);
+  const styles = themeStyles[themeKey];
 
   return (
     <>
@@ -78,7 +198,7 @@ export default function ArticleTemplate({ article, clusterName, clusterPath, the
 
           <article className="prose prose-gray max-w-none">
             <div className="text-center mb-10">
-              <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${content.hero.iconGradient} rounded-2xl mb-4 shadow-lg`}>
+              <div className={`inline-flex items-center justify-center w-16 h-16 ${styles.heroGradient} rounded-2xl mb-4 shadow-lg`}>
                 <HeroIcon className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -89,29 +209,31 @@ export default function ArticleTemplate({ article, clusterName, clusterPath, the
               </p>
             </div>
 
-            <div className={`bg-gradient-to-r ${content.quickCTA.bgGradient} rounded-2xl p-6 ${content.quickCTA.borderColor} border mb-10`}>
-              <div className="flex items-center gap-3 mb-3">
-                <CtaIcon className={`w-6 h-6 ${content.quickCTA.iconColor}`} />
-                <span className="font-semibold text-gray-900">{content.quickCTA.title}</span>
+            {content.quickCTA && (
+              <div className={`${styles.ctaBg} rounded-2xl p-6 border ${styles.ctaBorder} mb-10`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <CtaIcon className={`w-6 h-6 ${styles.ctaIconColor}`} />
+                  <span className="font-semibold text-gray-900">{content.quickCTA.title}</span>
+                </div>
+                <p className="text-gray-700 mb-4">
+                  {content.quickCTA.description}
+                </p>
+                <Link 
+                  href={`/tools/${content.quickCTA.toolSlug}`}
+                  className={`inline-flex items-center gap-2 px-5 py-3 ${styles.buttonGradient} text-white font-medium rounded-xl transition-all group shadow-md hover:shadow-lg`}
+                >
+                  {content.quickCTA.buttonText}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
               </div>
-              <p className="text-gray-700 mb-4">
-                {content.quickCTA.description}
-              </p>
-              <Link 
-                href={`/tools/${content.quickCTA.toolSlug}`}
-                className={`inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r ${content.quickCTA.buttonGradient} hover:${content.quickCTA.buttonHoverGradient} text-white font-medium rounded-xl transition-all group shadow-md hover:shadow-lg`}
-              >
-                {content.quickCTA.buttonText}
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
+            )}
 
             {content.sections.map((section, idx) => {
               const SectionIcon = iconMap[section.icon] || CheckCircle;
               return (
                 <section key={idx} className="mb-10">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <SectionIcon className={`w-6 h-6 ${section.iconColor}`} />
+                    <SectionIcon className={`w-6 h-6 ${styles.sectionIconColor}`} />
                     {section.heading}
                   </h2>
                   
@@ -128,10 +250,12 @@ export default function ArticleTemplate({ article, clusterName, clusterPath, the
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {section.specs.map((spec, sIdx) => {
                             const SpecIcon = iconMap[spec.icon] || CheckCircle;
+                            const bgClass = styles.specBgs[sIdx % styles.specBgs.length];
+                            const textClass = styles.specTextColors[sIdx % styles.specTextColors.length];
                             return (
                               <div key={sIdx} className="flex items-center gap-3">
-                                <div className={`w-10 h-10 ${spec.iconColor} rounded-lg flex items-center justify-center`}>
-                                  <SpecIcon className="w-5 h-5" />
+                                <div className={`w-10 h-10 ${bgClass} rounded-lg flex items-center justify-center`}>
+                                  <SpecIcon className={`w-5 h-5 ${textClass}`} />
                                 </div>
                                 <div>
                                   <p className="text-sm text-gray-500">{spec.label}</p>
@@ -157,7 +281,7 @@ export default function ArticleTemplate({ article, clusterName, clusterPath, the
                   )}
 
                   {section.proTip && (
-                    <div className={`bg-${theme.accentColor}-50 rounded-xl p-5 border border-${theme.accentColor}-200`}>
+                    <div className={`${styles.proTipBg} rounded-xl p-5 border ${styles.proTipBorder}`}>
                       <p className="text-gray-700">
                         <strong>Pro tip:</strong> {section.proTip}
                       </p>
@@ -182,13 +306,13 @@ export default function ArticleTemplate({ article, clusterName, clusterPath, the
             )}
 
             {content.bottomCTA && (
-              <div className={`bg-gradient-to-r ${content.quickCTA.bgGradient} rounded-2xl p-8 ${content.quickCTA.borderColor} border text-center mb-16`}>
+              <div className={`${styles.ctaBg} rounded-2xl p-8 border ${styles.ctaBorder} text-center mb-16`}>
                 <h2 className="text-2xl font-bold text-gray-900 mb-3">{content.bottomCTA.heading}</h2>
                 <p className="text-gray-700 mb-6">{content.bottomCTA.description}</p>
                 <div className="flex flex-wrap gap-3 justify-center">
                   <Link 
                     href={`/tools/${content.bottomCTA.primaryTool.slug}`}
-                    className={`inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r ${content.quickCTA.buttonGradient} text-white font-medium rounded-xl transition-all shadow-md hover:shadow-lg`}
+                    className={`inline-flex items-center gap-2 px-5 py-3 ${styles.buttonGradient} text-white font-medium rounded-xl transition-all shadow-md hover:shadow-lg`}
                   >
                     {content.bottomCTA.primaryTool.name}
                     <ArrowRight className="w-4 h-4" />
@@ -205,7 +329,7 @@ export default function ArticleTemplate({ article, clusterName, clusterPath, the
               </div>
             )}
 
-            <MoreFreeTools exclude={[`/tools/${content.quickCTA.toolSlug}`]} />
+            <MoreFreeTools exclude={content.quickCTA ? [`/tools/${content.quickCTA.toolSlug}`] : []} />
           </article>
         </div>
       </div>
