@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import MonetizationBar from '@/components/MonetizationBar';
 import PostResultUpsell from '@/components/PostResultUpsell';
+import MoreFreeTools from '@/components/MoreFreeTools';
 
 export default function YouTubeThumbnailDimensionsGuidePage() {
   return (
@@ -292,6 +293,8 @@ export default function YouTubeThumbnailDimensionsGuidePage() {
                 </Link>
               </div>
             </div>
+
+            <MoreFreeTools exclude={['/tools/youtube-thumbnail-size']} />
           </article>
         </div>
       </div>

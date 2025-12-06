@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import MonetizationBar from '@/components/MonetizationBar';
 import PostResultUpsell from '@/components/PostResultUpsell';
+import MoreFreeTools from '@/components/MoreFreeTools';
 
 export default function InstagramPostDimensionsGuidePage() {
   return (
@@ -308,6 +309,8 @@ export default function InstagramPostDimensionsGuidePage() {
                 </Link>
               </div>
             </div>
+
+            <MoreFreeTools exclude={['/tools/instagram-post-size']} />
           </article>
         </div>
       </div>

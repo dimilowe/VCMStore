@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import MonetizationBar from '@/components/MonetizationBar';
 import PostResultUpsell from '@/components/PostResultUpsell';
+import MoreFreeTools from '@/components/MoreFreeTools';
 
 export default function TikTokCoverDimensionsGuidePage() {
   return (
@@ -314,6 +315,8 @@ export default function TikTokCoverDimensionsGuidePage() {
                 </Link>
               </div>
             </div>
+
+            <MoreFreeTools exclude={['/tools/tiktok-size']} />
           </article>
         </div>
       </div>

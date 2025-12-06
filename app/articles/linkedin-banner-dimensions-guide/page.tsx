@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import MonetizationBar from '@/components/MonetizationBar';
 import PostResultUpsell from '@/components/PostResultUpsell';
+import MoreFreeTools from '@/components/MoreFreeTools';
 
 export default function LinkedInBannerDimensionsGuidePage() {
   return (
@@ -299,6 +300,8 @@ export default function LinkedInBannerDimensionsGuidePage() {
                 </Link>
               </div>
             </div>
+
+            <MoreFreeTools exclude={['/tools/linkedin-banner-size']} />
           </article>
         </div>
       </div>
