@@ -26,7 +26,7 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const { title, slug, content, excerpt, meta_description, is_published, is_indexed } = body;
+    const { title, content, excerpt, meta_description, is_published, is_indexed } = body;
 
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -35,16 +35,15 @@ export async function PUT(
     const result = await query(
       `UPDATE cluster_articles 
        SET title = $1, 
-           slug = $2, 
-           content = $3, 
-           excerpt = $4, 
-           meta_description = $5, 
-           is_published = $6, 
-           is_indexed = $7,
+           content = $2, 
+           excerpt = $3, 
+           meta_description = $4, 
+           is_published = $5, 
+           is_indexed = $6,
            updated_at = NOW()
-       WHERE id = $8
+       WHERE id = $7
        RETURNING id`,
-      [title, slug, content, excerpt, meta_description, is_published, is_indexed, id]
+      [title, content, excerpt, meta_description, is_published, is_indexed, id]
     );
 
     if (result.rowCount === 0) {

@@ -246,11 +246,11 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
               {seoOpen && (
                 <div className="p-4 pt-0 border-t space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Slug (read-only)</label>
                     <Input
                       value={slug}
-                      onChange={(e) => setSlug(e.target.value)}
-                      className="text-sm"
+                      disabled
+                      className="text-sm bg-gray-50"
                     />
                     <p className="text-xs text-gray-400 mt-1">/articles/{slug}</p>
                   </div>
