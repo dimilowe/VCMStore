@@ -1,30 +1,95 @@
 import { Metadata } from "next";
-import ToolsClient from "./ToolsClient";
+import ToolsDirectoryClient from "./ToolsDirectoryClient";
+import { toolsRegistry, CATEGORY_INFO, CATEGORY_ORDER } from "@/data/toolsRegistry";
 
 export const metadata: Metadata = {
-  title: "Free Tools for Creators — VCM Suite",
-  description: "Free online tools for creators and entrepreneurs. Compress images, generate logos, find keywords, create diagrams, and more — all 100% free.",
-  keywords: "free tools, image compressor, gif compressor, word counter, logo generator, keyword finder, emoji combos, horoscope generator, affirmation generator",
+  title: "VCM Tools Explorer — 50+ Free Creator Tools",
+  description: "A curated library of powerful utilities for creators, businesses, and everyday workflows. Image resizers, AI tools, calculators, and more — all 100% free.",
+  keywords: "free tools, creator tools, image resizer, youtube thumbnail maker, instagram resizer, calorie calculator, AI tools, pdf editor, gif compressor",
+  openGraph: {
+    title: "VCM Tools Explorer — 50+ Free Creator Tools",
+    description: "A curated library of powerful utilities for creators, businesses, and everyday workflows.",
+    type: "website"
+  }
 };
 
-export default function ToolsPage() {
-  return (
-    <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <span className="inline-block bg-orange-100 text-orange-700 text-sm font-medium px-4 py-1.5 rounded-full mb-4">
-            100% Free
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Free Tools for Creators
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Powerful online tools to help you create, optimize, and grow. No signup required.
-          </p>
-        </div>
+function generateSchemaMarkup() {
+  const itemListElements = toolsRegistry.map((tool, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "SoftwareApplication",
+      "name": tool.name,
+      "description": tool.description,
+      "url": `https://vcmsuite.com/tools/${tool.slug}`,
+      "applicationCategory": "WebApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  }));
 
-        <ToolsClient />
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://vcmsuite.com/tools",
+        "url": "https://vcmsuite.com/tools",
+        "name": "VCM Tools Explorer — Free Creator Tools",
+        "description": "A curated library of powerful utilities for creators, businesses, and everyday workflows.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "VCM Suite",
+          "url": "https://vcmsuite.com"
+        }
+      },
+      {
+        "@type": "ItemList",
+        "name": "VCM Suite Tools Directory",
+        "description": "Complete list of free creator tools and utilities",
+        "numberOfItems": toolsRegistry.length,
+        "itemListElement": itemListElements
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "name": "Tools Directory",
+        "url": "https://vcmsuite.com/tools",
+        "description": "Browse all VCM Suite tools"
+      }
+    ]
+  };
+
+  return schema;
+}
+
+export default function ToolsPage() {
+  const schema = generateSchemaMarkup();
+  const toolCount = toolsRegistry.length;
+  
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              VCM Tools Explorer
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              A curated library of powerful utilities for creators, businesses, and everyday workflows.
+            </p>
+          </div>
+
+          <ToolsDirectoryClient />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
