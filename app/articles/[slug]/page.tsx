@@ -9,6 +9,8 @@ import { ArrowLeft, Calendar, Eye, Wrench, AlertTriangle } from "lucide-react";
 import { getClusterById } from "@/data/clusterRegistry";
 import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 import StyledArticleContent from "@/components/StyledArticleContent";
+import ArticleTemplate from "@/components/ArticleTemplate";
+import { ArticleContent, clusterThemes } from "@/lib/articleTypes";
 
 interface ClusterArticle {
   id: number;
@@ -22,6 +24,15 @@ interface ClusterArticle {
   is_indexed: boolean;
   view_count: number;
   created_at: Date;
+}
+
+function isStructuredContent(content: string): boolean {
+  try {
+    const parsed = JSON.parse(content);
+    return parsed && typeof parsed === 'object' && parsed.hero && parsed.sections;
+  } catch {
+    return false;
+  }
 }
 
 async function getArticle(slug: string, allowUnpublished: boolean = false): Promise<ClusterArticle | null> {
@@ -113,8 +124,41 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     await incrementViewCount(article.id);
   }
   
-  const relatedArticles = await getRelatedArticles(article.cluster_slug, article.slug);
   const cluster = getClusterById(article.cluster_slug);
+  
+  if (isStructuredContent(article.content)) {
+    const structuredContent: ArticleContent = JSON.parse(article.content);
+    const theme = clusterThemes[article.cluster_slug] || clusterThemes['health-fitness-calculators'];
+    const clusterName = cluster?.pillarTitle || 'Tools';
+    const clusterPath = cluster ? `/tools/clusters/${cluster.pillarSlug}` : '/tools';
+    
+    return (
+      <>
+        {isPreviewMode && (
+          <div className="bg-yellow-100 border-b border-yellow-300 px-4 py-3 fixed top-0 left-0 right-0 z-50">
+            <div className="container mx-auto flex items-center gap-2 text-yellow-800">
+              <AlertTriangle className="w-5 h-5" />
+              <span className="font-medium">Preview Mode</span>
+              <span className="text-sm">— This article is not published. Only you can see this.</span>
+            </div>
+          </div>
+        )}
+        <ArticleTemplate 
+          article={{
+            slug: article.slug,
+            title: article.title,
+            cluster_slug: article.cluster_slug,
+            content: structuredContent
+          }}
+          clusterName={clusterName}
+          clusterPath={clusterPath}
+          theme={theme}
+        />
+      </>
+    );
+  }
+  
+  const relatedArticles = await getRelatedArticles(article.cluster_slug, article.slug);
   
   return (
     <div className="min-h-screen bg-gray-50">
