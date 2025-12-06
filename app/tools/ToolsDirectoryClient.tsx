@@ -55,6 +55,22 @@ import {
   type ToolTag
 } from "@/data/toolsRegistry";
 
+const CREATOR_CATEGORIES: ToolCategory[] = [
+  "creator",
+  "image",
+  "video",
+  "writing",
+  "social",
+  "ai"
+];
+
+const MBB_CATEGORIES: ToolCategory[] = [
+  "calculators",
+  "business",
+  "file",
+  "utilities"
+];
+
 const ICON_MAP: Record<string, LucideIcon> = {
   Youtube,
   Instagram,
@@ -222,6 +238,9 @@ export default function ToolsDirectoryClient() {
           if (t.isTrending) score += 5;
           if (t.isNew) score += 3;
           
+          const isCreatorTool = CREATOR_CATEGORIES.includes(t.category);
+          if (isCreatorTool) score += 20;
+          
           return { tool: t, score };
         })
         .filter(item => item.score > 0)
@@ -324,7 +343,24 @@ export default function ToolsDirectoryClient() {
         )
       ) : (
         <>
-          {CATEGORY_ORDER.map(category => {
+          {CREATOR_CATEGORIES.map(category => {
+            const tools = getToolsByCategory(category);
+            if (tools.length === 0) return null;
+            return (
+              <CategorySection 
+                key={category} 
+                category={category} 
+                tools={tools}
+              />
+            );
+          })}
+          
+          <div className="mt-16 mb-12 border-t pt-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">More Free Tools</h2>
+            <p className="text-gray-500 text-center mb-8">Calculators, estimators, and utilities</p>
+          </div>
+          
+          {MBB_CATEGORIES.map(category => {
             const tools = getToolsByCategory(category);
             if (tools.length === 0) return null;
             return (
