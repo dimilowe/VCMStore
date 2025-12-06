@@ -207,7 +207,61 @@ VCM Suite and VCM OS share a unified brand identity:
 - VCM OS: Dark theme with orange accents on dark backgrounds
 - Both use the same colorful app card gradient system
 
+## Engine Architecture (VASE Infrastructure)
+
+### Overview
+VCM Suite uses a **Vertical Action Search Engine (VASE)** architecture. Tools are powered by reusable **engines** that can spawn multiple tools from a single codebase.
+
+### Engine Types
+| Engine | Description | Input Types | Output Types |
+|--------|-------------|-------------|--------------|
+| `platform-resizer` | Resize images for social platforms | image | image |
+| `image-compress` | Compress images to reduce size | image | download |
+| `image-convert` | Convert between image formats | image, multi | download |
+| `text-transform` | Transform and manipulate text | text | text |
+| `text-analysis` | Analyze text for metrics | text | analysis |
+| `calculator` | Numerical calculations | number, selection | analysis |
+| `ai-analysis` | AI-powered content analysis | text, image, url | analysis, text |
+| `ai-generate` | AI-powered content generation | text, selection | text, image, display, download |
+| `file-convert` | Convert between file formats | file | download |
+| `file-edit` | Edit and manipulate files | file | download |
+| `community` | User-generated content tools | selection, text | interactive, text |
+| `static` | Reference guides | none | display |
+| `standalone` | Custom one-off tools | multi, text, image | interactive, image, text |
+
+**Note**: Tool counts are computed dynamically via `getToolCountByEngine()` from the tools registry.
+
+### Tool Metadata Schema
+Every tool in `toolsRegistry.ts` includes:
+- `engineType` - which engine powers it
+- `inputType` - what it accepts (image, text, url, file, number, selection, none, multi)
+- `outputType` - what it produces (image, text, file, download, analysis, display, interactive)
+- `relatedTools` - array of related tool slugs for cross-linking
+- `relatedArticles` - array of related MBB article slugs
+
+### Adding New Tools
+1. **Engine-based tools**: Add preset to engine's config file, create thin page shell
+2. **Standalone tools**: Create custom implementation in `/app/tools/[slug]`
+3. **Register in tools registry**: Add entry to `toolsRegistry.ts` with full metadata
+
+### File Structure
+```
+/engines                    # Engine configs and shared logic
+  /platform-resizer        # Platform image resizer engine
+    config.ts              # Engine configuration
+/data
+  toolsRegistry.ts         # Master tool registry with all 47+ tools
+  platformImagePresets.ts  # Platform resizer presets
+/components
+  PlatformImageToolClient.tsx  # Shared platform resizer component
+```
+
 ## Recent Changes
+- 2025-12-06: **Formalized Engine Architecture** - VASE infrastructure for scaling to 10,000+ tools
+  - Extended Tool type with engineType, inputType, outputType, relatedTools, relatedArticles
+  - Added all new metadata fields to 47 existing tools
+  - Created `/engines` folder with engine registry and configurations
+  - Documented 13 engine types: platform-resizer, image-compress, calculator, ai-analysis, etc.
 - 2025-12-06: **Added VCM Tools Directory** - Central hub for all tools with premium design
   - Created `/tools` page "VCM Tools Explorer" with search, tag filters, and category sections
   - Implemented `toolsRegistry.ts` data file with 47+ tools organized by 10 categories

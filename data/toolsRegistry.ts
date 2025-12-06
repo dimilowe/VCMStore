@@ -24,6 +24,24 @@ export type ToolTag =
   | "utilities"
   | "ai";
 
+export type EngineType =
+  | "platform-resizer"
+  | "image-compress"
+  | "image-convert"
+  | "text-transform"
+  | "text-analysis"
+  | "calculator"
+  | "ai-analysis"
+  | "ai-generate"
+  | "file-convert"
+  | "file-edit"
+  | "community"
+  | "static"
+  | "standalone";
+
+export type InputType = "image" | "text" | "url" | "file" | "number" | "selection" | "none" | "multi";
+export type OutputType = "image" | "text" | "file" | "download" | "analysis" | "display" | "interactive";
+
 export interface Tool {
   id: string;
   name: string;
@@ -37,6 +55,11 @@ export interface Tool {
   isNew?: boolean;
   isTrending?: boolean;
   isMBB?: boolean;
+  engineType: EngineType;
+  inputType: InputType;
+  outputType: OutputType;
+  relatedTools: string[];
+  relatedArticles: string[];
 }
 
 export const CATEGORY_INFO: Record<ToolCategory, { label: string; description: string; emoji: string }> = {
@@ -118,7 +141,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Youtube",
     iconBg: "bg-red-500",
     priority: 100,
-    isTrending: true
+    isTrending: true,
+    engineType: "platform-resizer",
+    inputType: "image",
+    outputType: "image",
+    relatedTools: ["instagram-post-resizer", "tiktok-video-resizer", "ai-thumbnail-coach"],
+    relatedArticles: ["youtube-thumbnail-size", "youtube-thumbnail-dimensions"]
   },
   {
     id: "ai-thumbnail-coach",
@@ -130,7 +158,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Youtube",
     iconBg: "bg-red-500",
     priority: 95,
-    isTrending: true
+    isTrending: true,
+    engineType: "ai-analysis",
+    inputType: "image",
+    outputType: "analysis",
+    relatedTools: ["youtube-thumbnail-resizer", "logo-generator"],
+    relatedArticles: ["youtube-thumbnail-size"]
   },
   {
     id: "instagram-post-resizer",
@@ -141,7 +174,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "social", "image"],
     icon: "Instagram",
     iconBg: "bg-pink-500",
-    priority: 90
+    priority: 90,
+    engineType: "platform-resizer",
+    inputType: "image",
+    outputType: "image",
+    relatedTools: ["instagram-story-resizer", "youtube-thumbnail-resizer", "twitter-header-resizer"],
+    relatedArticles: ["instagram-post-size", "instagram-image-dimensions"]
   },
   {
     id: "instagram-story-resizer",
@@ -152,7 +190,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "social", "image"],
     icon: "Instagram",
     iconBg: "bg-gradient-to-r from-purple-500 to-pink-500",
-    priority: 89
+    priority: 89,
+    engineType: "platform-resizer",
+    inputType: "image",
+    outputType: "image",
+    relatedTools: ["instagram-post-resizer", "tiktok-video-resizer"],
+    relatedArticles: ["instagram-story-size"]
   },
   {
     id: "tiktok-video-resizer",
@@ -163,7 +206,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "social", "image"],
     icon: "Video",
     iconBg: "bg-black",
-    priority: 88
+    priority: 88,
+    engineType: "platform-resizer",
+    inputType: "image",
+    outputType: "image",
+    relatedTools: ["instagram-story-resizer", "youtube-thumbnail-resizer"],
+    relatedArticles: ["tiktok-video-size"]
   },
   {
     id: "youtube-title-split-test",
@@ -174,7 +222,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "social"],
     icon: "RotateCcw",
     iconBg: "bg-red-500",
-    priority: 85
+    priority: 85,
+    engineType: "standalone",
+    inputType: "text",
+    outputType: "interactive",
+    relatedTools: ["youtube-thumbnail-resizer", "ai-thumbnail-coach"],
+    relatedArticles: []
   },
   {
     id: "emoji-combos",
@@ -185,7 +238,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "social"],
     icon: "Smile",
     iconBg: "bg-yellow-400",
-    priority: 80
+    priority: 80,
+    engineType: "community",
+    inputType: "selection",
+    outputType: "text",
+    relatedTools: ["resource-box", "name-combiner"],
+    relatedArticles: []
   },
   {
     id: "photo-gallery-maker",
@@ -196,7 +254,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "image"],
     icon: "Images",
     iconBg: "bg-indigo-500",
-    priority: 78
+    priority: 78,
+    engineType: "standalone",
+    inputType: "image",
+    outputType: "image",
+    relatedTools: ["image-compressor", "instagram-post-resizer"],
+    relatedArticles: []
   },
   {
     id: "horoscope-of-the-day",
@@ -207,7 +270,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "ai"],
     icon: "Star",
     iconBg: "bg-purple-400",
-    priority: 75
+    priority: 75,
+    engineType: "ai-generate",
+    inputType: "selection",
+    outputType: "text",
+    relatedTools: ["affirmation-about-self-love"],
+    relatedArticles: []
   },
   {
     id: "name-combiner",
@@ -218,7 +286,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "utilities"],
     icon: "Users",
     iconBg: "bg-cyan-500",
-    priority: 70
+    priority: 70,
+    engineType: "text-transform",
+    inputType: "text",
+    outputType: "text",
+    relatedTools: ["emoji-combos"],
+    relatedArticles: []
   },
   {
     id: "social-media-image-sizes",
@@ -229,7 +302,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "social", "image"],
     icon: "Images",
     iconBg: "bg-orange-500",
-    priority: 65
+    priority: 65,
+    engineType: "static",
+    inputType: "none",
+    outputType: "display",
+    relatedTools: ["youtube-thumbnail-resizer", "instagram-post-resizer", "twitter-header-resizer"],
+    relatedArticles: []
   },
   {
     id: "resource-box",
@@ -240,7 +318,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["creator", "social"],
     icon: "LayoutGrid",
     iconBg: "bg-teal-500",
-    priority: 60
+    priority: 60,
+    engineType: "standalone",
+    inputType: "multi",
+    outputType: "interactive",
+    relatedTools: ["emoji-combos"],
+    relatedArticles: []
   },
   {
     id: "image-compressor",
@@ -252,7 +335,12 @@ export const toolsRegistry: Tool[] = [
     icon: "FileImage",
     iconBg: "bg-sky-500",
     priority: 90,
-    isTrending: true
+    isTrending: true,
+    engineType: "image-compress",
+    inputType: "image",
+    outputType: "download",
+    relatedTools: ["gif-compressor", "heic-to-jpg"],
+    relatedArticles: []
   },
   {
     id: "heic-to-jpg",
@@ -263,7 +351,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["image", "file"],
     icon: "FileImage",
     iconBg: "bg-rose-500",
-    priority: 85
+    priority: 85,
+    engineType: "image-convert",
+    inputType: "image",
+    outputType: "download",
+    relatedTools: ["image-compressor", "gif-maker"],
+    relatedArticles: []
   },
   {
     id: "gif-compressor",
@@ -274,7 +367,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["image"],
     icon: "FileImage",
     iconBg: "bg-violet-500",
-    priority: 80
+    priority: 80,
+    engineType: "image-compress",
+    inputType: "image",
+    outputType: "download",
+    relatedTools: ["image-compressor", "gif-maker"],
+    relatedArticles: []
   },
   {
     id: "gif-maker",
@@ -285,7 +383,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["image", "video"],
     icon: "FileImage",
     iconBg: "bg-fuchsia-500",
-    priority: 78
+    priority: 78,
+    engineType: "image-convert",
+    inputType: "multi",
+    outputType: "download",
+    relatedTools: ["gif-compressor", "heic-to-jpg"],
+    relatedArticles: []
   },
   {
     id: "twitter-header-resizer",
@@ -296,7 +399,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["social", "image"],
     icon: "Twitter",
     iconBg: "bg-sky-400",
-    priority: 85
+    priority: 85,
+    engineType: "platform-resizer",
+    inputType: "image",
+    outputType: "image",
+    relatedTools: ["linkedin-banner-resizer", "youtube-thumbnail-resizer"],
+    relatedArticles: ["twitter-header-size"]
   },
   {
     id: "linkedin-banner-resizer",
@@ -307,7 +415,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["social", "image"],
     icon: "Linkedin",
     iconBg: "bg-blue-600",
-    priority: 80
+    priority: 80,
+    engineType: "platform-resizer",
+    inputType: "image",
+    outputType: "image",
+    relatedTools: ["twitter-header-resizer", "instagram-post-resizer"],
+    relatedArticles: ["linkedin-banner-size"]
   },
   {
     id: "word-counter",
@@ -318,7 +431,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["writing"],
     icon: "Type",
     iconBg: "bg-gray-500",
-    priority: 85
+    priority: 85,
+    engineType: "text-analysis",
+    inputType: "text",
+    outputType: "analysis",
+    relatedTools: ["online-notepad", "summarizer"],
+    relatedArticles: []
   },
   {
     id: "online-notepad",
@@ -329,7 +447,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["writing", "ai"],
     icon: "StickyNote",
     iconBg: "bg-amber-500",
-    priority: 80
+    priority: 80,
+    engineType: "standalone",
+    inputType: "text",
+    outputType: "text",
+    relatedTools: ["word-counter", "summarizer"],
+    relatedArticles: []
   },
   {
     id: "summarizer",
@@ -340,7 +463,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["writing", "ai"],
     icon: "FileText",
     iconBg: "bg-yellow-500",
-    priority: 78
+    priority: 78,
+    engineType: "ai-analysis",
+    inputType: "text",
+    outputType: "text",
+    relatedTools: ["word-counter", "ai-humanizer-free"],
+    relatedArticles: []
   },
   {
     id: "maker-quotes-generator",
@@ -352,7 +480,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Quote",
     iconBg: "bg-orange-500",
     priority: 70,
-    isMBB: true
+    isMBB: true,
+    engineType: "ai-generate",
+    inputType: "selection",
+    outputType: "text",
+    relatedTools: ["affirmation-about-self-love", "horoscope-of-the-day"],
+    relatedArticles: ["maker-quotes-generator"]
   },
   {
     id: "pdf-editor",
@@ -363,7 +496,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["file"],
     icon: "FilePen",
     iconBg: "bg-red-500",
-    priority: 90
+    priority: 90,
+    engineType: "file-edit",
+    inputType: "file",
+    outputType: "download",
+    relatedTools: ["image-compressor"],
+    relatedArticles: []
   },
   {
     id: "calorie-counter-bmi",
@@ -376,7 +514,12 @@ export const toolsRegistry: Tool[] = [
     iconBg: "bg-green-500",
     priority: 90,
     isTrending: true,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-free", "calorie-counter-maintenance", "calorie-counter-walking"],
+    relatedArticles: ["calorie-counter-bmi"]
   },
   {
     id: "calorie-counter-free",
@@ -388,7 +531,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Calculator",
     iconBg: "bg-green-500",
     priority: 88,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-bmi", "calorie-counter-best"],
+    relatedArticles: ["calorie-counter-free"]
   },
   {
     id: "calorie-counter-walking",
@@ -400,7 +548,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Footprints",
     iconBg: "bg-green-500",
     priority: 85,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-steps", "calorie-counter-treadmill"],
+    relatedArticles: ["calorie-counter-walking"]
   },
   {
     id: "calorie-counter-treadmill",
@@ -412,7 +565,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Dumbbell",
     iconBg: "bg-green-500",
     priority: 84,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-walking", "calorie-counter-steps"],
+    relatedArticles: ["calorie-counter-treadmill"]
   },
   {
     id: "calorie-counter-steps",
@@ -424,7 +582,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Footprints",
     iconBg: "bg-green-500",
     priority: 82,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-walking", "calorie-counter-treadmill"],
+    relatedArticles: ["calorie-counter-steps"]
   },
   {
     id: "calorie-counter-maintenance",
@@ -436,7 +599,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Calculator",
     iconBg: "bg-green-500",
     priority: 80,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-bmi", "calorie-counter-free"],
+    relatedArticles: ["calorie-counter-maintenance"]
   },
   {
     id: "calorie-counter-best",
@@ -448,7 +616,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Calculator",
     iconBg: "bg-green-500",
     priority: 78,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-free", "calorie-counter-bmi"],
+    relatedArticles: ["calorie-counter-best"]
   },
   {
     id: "401k-retirement-calculator",
@@ -460,7 +633,12 @@ export const toolsRegistry: Tool[] = [
     icon: "PiggyBank",
     iconBg: "bg-blue-500",
     priority: 75,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["loan-estimator-home"],
+    relatedArticles: ["401k-retirement-calculator"]
   },
   {
     id: "loan-estimator-home",
@@ -472,7 +650,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Home",
     iconBg: "bg-blue-500",
     priority: 72,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["401k-retirement-calculator"],
+    relatedArticles: ["loan-estimator-home"]
   },
   {
     id: "ups-shipping-cost",
@@ -484,7 +667,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Package",
     iconBg: "bg-amber-600",
     priority: 70,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "number",
+    outputType: "analysis",
+    relatedTools: ["estimator-for-car-repair"],
+    relatedArticles: ["ups-shipping-cost"]
   },
   {
     id: "estimator-for-car-repair",
@@ -496,7 +684,12 @@ export const toolsRegistry: Tool[] = [
     icon: "Car",
     iconBg: "bg-gray-600",
     priority: 68,
-    isMBB: true
+    isMBB: true,
+    engineType: "calculator",
+    inputType: "selection",
+    outputType: "analysis",
+    relatedTools: ["ups-shipping-cost"],
+    relatedArticles: ["estimator-for-car-repair"]
   },
   {
     id: "visualization",
@@ -507,7 +700,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["utilities", "ai"],
     icon: "GitBranch",
     iconBg: "bg-amber-500",
-    priority: 80
+    priority: 80,
+    engineType: "ai-generate",
+    inputType: "text",
+    outputType: "display",
+    relatedTools: ["summarizer"],
+    relatedArticles: []
   },
   {
     id: "weather-prediction",
@@ -519,7 +717,12 @@ export const toolsRegistry: Tool[] = [
     icon: "CloudSun",
     iconBg: "bg-sky-400",
     priority: 75,
-    isMBB: true
+    isMBB: true,
+    engineType: "standalone",
+    inputType: "text",
+    outputType: "display",
+    relatedTools: ["prediction-center"],
+    relatedArticles: ["weather-prediction"]
   },
   {
     id: "prediction-center",
@@ -530,7 +733,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["utilities"],
     icon: "TrendingUp",
     iconBg: "bg-purple-500",
-    priority: 70
+    priority: 70,
+    engineType: "community",
+    inputType: "text",
+    outputType: "interactive",
+    relatedTools: ["weather-prediction"],
+    relatedArticles: []
   },
   {
     id: "calorie-deficit-calculator",
@@ -543,7 +751,12 @@ export const toolsRegistry: Tool[] = [
     iconBg: "bg-green-500",
     priority: 95,
     isTrending: true,
-    isNew: true
+    isNew: true,
+    engineType: "ai-analysis",
+    inputType: "image",
+    outputType: "analysis",
+    relatedTools: ["calorie-counter-bmi", "calorie-counter-free"],
+    relatedArticles: []
   },
   {
     id: "outfit-ideas",
@@ -555,7 +768,12 @@ export const toolsRegistry: Tool[] = [
     icon: "ShoppingBag",
     iconBg: "bg-pink-500",
     priority: 90,
-    isNew: true
+    isNew: true,
+    engineType: "ai-analysis",
+    inputType: "image",
+    outputType: "display",
+    relatedTools: ["logo-generator"],
+    relatedArticles: []
   },
   {
     id: "logo-generator",
@@ -566,7 +784,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai", "creator"],
     icon: "Palette",
     iconBg: "bg-pink-500",
-    priority: 88
+    priority: 88,
+    engineType: "ai-generate",
+    inputType: "text",
+    outputType: "image",
+    relatedTools: ["ai-thumbnail-coach", "producer-tag-generator"],
+    relatedArticles: []
   },
   {
     id: "ai-humanizer-free",
@@ -577,7 +800,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai", "writing"],
     icon: "Palette",
     iconBg: "bg-indigo-500",
-    priority: 85
+    priority: 85,
+    engineType: "ai-analysis",
+    inputType: "text",
+    outputType: "text",
+    relatedTools: ["summarizer", "word-counter"],
+    relatedArticles: []
   },
   {
     id: "keyword-finder",
@@ -588,7 +816,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai", "business"],
     icon: "Search",
     iconBg: "bg-blue-500",
-    priority: 82
+    priority: 82,
+    engineType: "ai-analysis",
+    inputType: "text",
+    outputType: "analysis",
+    relatedTools: ["reach-grabber-tool", "internal-link-seo-audit"],
+    relatedArticles: []
   },
   {
     id: "reach-grabber-tool",
@@ -599,7 +832,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai", "business"],
     icon: "Target",
     iconBg: "bg-orange-500",
-    priority: 80
+    priority: 80,
+    engineType: "ai-analysis",
+    inputType: "text",
+    outputType: "analysis",
+    relatedTools: ["keyword-finder", "ad-copy-analyzer"],
+    relatedArticles: []
   },
   {
     id: "ad-copy-analyzer",
@@ -610,7 +848,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai", "business"],
     icon: "Megaphone",
     iconBg: "bg-cyan-500",
-    priority: 78
+    priority: 78,
+    engineType: "ai-analysis",
+    inputType: "text",
+    outputType: "analysis",
+    relatedTools: ["reach-grabber-tool", "keyword-finder"],
+    relatedArticles: []
   },
   {
     id: "internal-link-seo-audit",
@@ -621,7 +864,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai", "business"],
     icon: "Link2",
     iconBg: "bg-emerald-500",
-    priority: 75
+    priority: 75,
+    engineType: "ai-analysis",
+    inputType: "url",
+    outputType: "analysis",
+    relatedTools: ["keyword-finder", "reach-grabber-tool"],
+    relatedArticles: []
   },
   {
     id: "producer-tag-generator",
@@ -632,7 +880,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai", "creator"],
     icon: "Music",
     iconBg: "bg-green-500",
-    priority: 70
+    priority: 70,
+    engineType: "ai-generate",
+    inputType: "text",
+    outputType: "download",
+    relatedTools: ["logo-generator"],
+    relatedArticles: []
   },
   {
     id: "affirmation-about-self-love",
@@ -643,7 +896,12 @@ export const toolsRegistry: Tool[] = [
     tags: ["ai"],
     icon: "Heart",
     iconBg: "bg-pink-400",
-    priority: 65
+    priority: 65,
+    engineType: "ai-generate",
+    inputType: "selection",
+    outputType: "text",
+    relatedTools: ["horoscope-of-the-day", "maker-quotes-generator"],
+    relatedArticles: ["affirmation-about-self-love"]
   }
 ];
 
