@@ -15,7 +15,7 @@ export default function InstagramPostDesignTipsPage() {
         <header className="mb-10">
           <p className="text-sm text-pink-600 font-medium mb-2">Instagram Growth</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            How to Create Stunning <strong>Instagram Posts</strong> That Get Engagement
+            <strong>Instagram Post Design Tips</strong>: How to Create Stunning Posts That Get Engagement
           </h1>
           <p className="text-xl text-gray-600">
             The complete guide to designing feed posts that stop the scroll and drive interaction.
@@ -38,7 +38,7 @@ export default function InstagramPostDesignTipsPage() {
         <section className="prose prose-lg max-w-none">
           <h2>Why Design Matters on Instagram</h2>
           <p>
-            <strong>Instagram</strong> is a visual-first platform. Users scroll through hundreds of posts daily, and you have less than a second to capture attention. The difference between a post that gets 50 likes and one that gets 500 often comes down to intentional design choices.
+            Mastering <strong>Instagram post design tips</strong> is essential for standing out on this visual-first platform. Users scroll through hundreds of posts daily, and you have less than a second to capture attention. The difference between a post that gets 50 likes and one that gets 500 often comes down to intentional design choices.
           </p>
 
           <h2>The 5 Pillars of High-Performing Instagram Posts</h2>

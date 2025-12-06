@@ -15,7 +15,7 @@ export default function TwitterHeaderDesignTipsPage() {
         <header className="mb-10">
           <p className="text-sm text-sky-600 font-medium mb-2">Twitter/X Growth</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            How to Design a <strong>Twitter/X Header</strong> That Makes an Impact
+            <strong>Twitter Header Design Tips</strong>: Create Headers That Make an Impact
           </h1>
           <p className="text-xl text-gray-600">
             Create a profile header that showcases your brand and makes the right first impression.
@@ -38,7 +38,7 @@ export default function TwitterHeaderDesignTipsPage() {
         <section className="prose prose-lg max-w-none">
           <h2>Why Your Twitter Header Matters</h2>
           <p>
-            Your <strong>Twitter/X header</strong> is prime real estate. It's one of the first things visitors see when they land on your profile, and it sets the tone for your entire presence. A well-designed header can communicate your expertise, showcase your work, or highlight a key message.
+            These <strong>Twitter header design tips</strong> will help you make the most of your profile's prime real estate. Your header is one of the first things visitors see when they land on your profile, and it sets the tone for your entire presence. A well-designed header can communicate your expertise, showcase your work, or highlight a key message.
           </p>
 
           <h2>5 Principles of Effective Twitter Headers</h2>

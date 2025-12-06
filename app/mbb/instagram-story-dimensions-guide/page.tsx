@@ -15,7 +15,7 @@ export default function InstagramStoryDimensionsGuidePage() {
         <header className="mb-10">
           <p className="text-sm text-purple-600 font-medium mb-2">Technical Guide</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            <strong>Instagram Story Dimensions</strong> & Safe Zones Guide
+            <strong>Instagram Story Dimensions Guide</strong>: Sizes & Safe Zones
           </h1>
           <p className="text-xl text-gray-600">
             The exact specifications for Stories, Reels covers, and where to place your content.
@@ -36,6 +36,11 @@ export default function InstagramStoryDimensionsGuidePage() {
         </div>
 
         <section className="prose prose-lg max-w-none">
+          <h2>Why Dimensions Matter</h2>
+          <p>
+            This <strong>Instagram Story dimensions guide</strong> provides the exact specifications you need for full-screen Stories that look professional. Getting the dimensions right ensures your content fills the screen without awkward cropping or letterboxing.
+          </p>
+
           <h2>Instagram Story Specifications</h2>
           
           <div className="not-prose bg-white border border-gray-200 rounded-xl p-6 my-6">

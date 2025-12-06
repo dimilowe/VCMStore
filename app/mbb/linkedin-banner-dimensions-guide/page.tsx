@@ -15,7 +15,7 @@ export default function LinkedInBannerDimensionsGuidePage() {
         <header className="mb-10">
           <p className="text-sm text-blue-700 font-medium mb-2">Technical Guide</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            <strong>LinkedIn Banner Dimensions</strong>: Personal vs Company Page
+            <strong>LinkedIn Banner Dimensions Guide</strong>: Personal vs Company Page Sizes
           </h1>
           <p className="text-xl text-gray-600">
             The exact specifications for LinkedIn banners across different page types.
@@ -36,6 +36,11 @@ export default function LinkedInBannerDimensionsGuidePage() {
         </div>
 
         <section className="prose prose-lg max-w-none">
+          <h2>Why Dimensions Matter</h2>
+          <p>
+            This <strong>LinkedIn banner dimensions guide</strong> covers the exact specifications for personal profiles and company pages. Getting the dimensions right ensures your banner looks professional across all devices and page types.
+          </p>
+
           <h2>LinkedIn Banner Size Comparison</h2>
           
           <div className="not-prose bg-white border border-gray-200 rounded-xl p-6 my-6">

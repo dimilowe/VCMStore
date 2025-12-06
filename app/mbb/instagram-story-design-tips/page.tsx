@@ -15,7 +15,7 @@ export default function InstagramStoryDesignTipsPage() {
         <header className="mb-10">
           <p className="text-sm text-purple-600 font-medium mb-2">Instagram Growth</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            How to Create Engaging <strong>Instagram Stories</strong> That Get Views
+            <strong>Instagram Story Design Tips</strong>: Create Engaging Stories That Get Views
           </h1>
           <p className="text-xl text-gray-600">
             Design Stories that keep viewers watching and drive profile visits.
@@ -38,7 +38,7 @@ export default function InstagramStoryDesignTipsPage() {
         <section className="prose prose-lg max-w-none">
           <h2>Why Stories Are Essential for Growth</h2>
           <p>
-            <strong>Instagram Stories</strong> appear at the top of the app and reach your followers directly. With over 500 million daily active Story users, this format offers unmatched visibility—but only if your Stories are designed to capture attention.
+            These <strong>Instagram Story design tips</strong> will help you maximize engagement on one of the platform's most powerful features. Stories appear at the top of the app and reach your followers directly. With over 500 million daily active users, this format offers unmatched visibility—but only if your Stories are designed to capture attention.
           </p>
 
           <h2>The 5 Rules of High-Performing Stories</h2>

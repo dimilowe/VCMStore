@@ -15,7 +15,7 @@ export default function LinkedInBannerDesignTipsPage() {
         <header className="mb-10">
           <p className="text-sm text-blue-700 font-medium mb-2">LinkedIn Growth</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            How to Design a Professional <strong>LinkedIn Banner</strong>
+            <strong>LinkedIn Banner Design Tips</strong>: Create Professional Profile Headers
           </h1>
           <p className="text-xl text-gray-600">
             Create a banner that establishes credibility and tells your professional story.
@@ -38,7 +38,7 @@ export default function LinkedInBannerDesignTipsPage() {
         <section className="prose prose-lg max-w-none">
           <h2>Why Your LinkedIn Banner Matters</h2>
           <p>
-            Your <strong>LinkedIn banner</strong> is the largest visual element on your profile. It's the first thing recruiters, clients, and connections see—and it sets the tone for your professional brand. The default gray banner signals that you haven't invested in your profile, while a thoughtful banner shows intentionality.
+            These <strong>LinkedIn banner design tips</strong> will help you maximize your profile's most prominent visual element. Your banner is the first thing recruiters, clients, and connections see—and it sets the tone for your professional brand. The default gray banner signals that you haven't invested in your profile, while a thoughtful banner shows intentionality.
           </p>
 
           <h2>5 Strategies for Effective LinkedIn Banners</h2>

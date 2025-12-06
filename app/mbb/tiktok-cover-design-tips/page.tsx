@@ -15,7 +15,7 @@ export default function TikTokCoverDesignTipsPage() {
         <header className="mb-10">
           <p className="text-sm text-gray-900 font-medium mb-2">TikTok Growth</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            How to Create <strong>TikTok Covers</strong> That Get More Views
+            <strong>TikTok Cover Design Tips</strong>: Create Covers That Get More Views
           </h1>
           <p className="text-xl text-gray-600">
             Design video covers that make viewers tap and boost your profile grid appeal.
@@ -38,7 +38,7 @@ export default function TikTokCoverDesignTipsPage() {
         <section className="prose prose-lg max-w-none">
           <h2>Why TikTok Covers Matter</h2>
           <p>
-            <strong>TikTok covers</strong> are the first thing users see when browsing your profile. A compelling cover image can mean the difference between someone scrolling past or tapping to watch. While the For You Page auto-plays videos, your profile grid relies entirely on covers to attract views.
+            These <strong>TikTok cover design tips</strong> will help you create thumbnails that drive more profile views. Your cover image is the first thing users see when browsing your profile—it can mean the difference between someone scrolling past or tapping to watch. While the For You Page auto-plays videos, your profile grid relies entirely on covers to attract views.
           </p>
 
           <h2>5 Rules for High-Performing TikTok Covers</h2>

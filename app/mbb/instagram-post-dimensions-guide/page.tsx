@@ -15,7 +15,7 @@ export default function InstagramPostDimensionsGuidePage() {
         <header className="mb-10">
           <p className="text-sm text-pink-600 font-medium mb-2">Technical Guide</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            <strong>Instagram Post Dimensions</strong>: Complete Size Guide
+            <strong>Instagram Post Dimensions Guide</strong>: Complete Size Reference
           </h1>
           <p className="text-xl text-gray-600">
             Every Instagram image size you need to know, from feed posts to profile grids.
@@ -36,6 +36,11 @@ export default function InstagramPostDimensionsGuidePage() {
         </div>
 
         <section className="prose prose-lg max-w-none">
+          <h2>Understanding Instagram Post Dimensions</h2>
+          <p>
+            This <strong>Instagram post dimensions guide</strong> covers every size specification you need for creating perfectly-sized content. Whether you're posting squares, portraits, or landscapes, knowing the correct dimensions prevents unexpected cropping and ensures maximum image quality.
+          </p>
+
           <h2>Instagram Feed Post Sizes</h2>
           
           <div className="not-prose bg-white border border-gray-200 rounded-xl p-6 my-6">

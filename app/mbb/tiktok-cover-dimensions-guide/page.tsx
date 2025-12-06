@@ -15,7 +15,7 @@ export default function TikTokCoverDimensionsGuidePage() {
         <header className="mb-10">
           <p className="text-sm text-gray-900 font-medium mb-2">Technical Guide</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            <strong>TikTok Cover Dimensions</strong> & Profile Grid Guide
+            <strong>TikTok Cover Dimensions Guide</strong>: Sizes & Profile Grid
           </h1>
           <p className="text-xl text-gray-600">
             The exact specifications for TikTok covers and how they display across the app.
@@ -36,6 +36,11 @@ export default function TikTokCoverDimensionsGuidePage() {
         </div>
 
         <section className="prose prose-lg max-w-none">
+          <h2>Why Dimensions Matter</h2>
+          <p>
+            This <strong>TikTok cover dimensions guide</strong> gives you the exact specifications for creating covers that look sharp across all views. Understanding how TikTok crops and displays your covers ensures important content stays visible.
+          </p>
+
           <h2>TikTok Video & Cover Specifications</h2>
           
           <div className="not-prose bg-white border border-gray-200 rounded-xl p-6 my-6">

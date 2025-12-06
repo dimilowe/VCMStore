@@ -15,7 +15,7 @@ export default function TwitterHeaderDimensionsGuidePage() {
         <header className="mb-10">
           <p className="text-sm text-sky-600 font-medium mb-2">Technical Guide</p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            <strong>Twitter/X Header Dimensions</strong>: Desktop vs Mobile
+            <strong>Twitter Header Dimensions Guide</strong>: Desktop vs Mobile Sizes
           </h1>
           <p className="text-xl text-gray-600">
             The exact specifications for Twitter headers and how they display across devices.
@@ -36,6 +36,11 @@ export default function TwitterHeaderDimensionsGuidePage() {
         </div>
 
         <section className="prose prose-lg max-w-none">
+          <h2>Why Dimensions Matter</h2>
+          <p>
+            This <strong>Twitter header dimensions guide</strong> covers the exact specifications and how headers display across different devices. Getting the dimensions right ensures your header looks sharp on both desktop and mobile.
+          </p>
+
           <h2>Official Twitter Header Specifications</h2>
           
           <div className="not-prose bg-white border border-gray-200 rounded-xl p-6 my-6">
