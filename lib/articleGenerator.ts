@@ -226,14 +226,39 @@ OUTPUT: Return ONLY valid JSON, no markdown, no code blocks, no explanation.`;
     throw new Error('AI generated invalid JSON. Please try again.');
   }
   
-  // Validate required fields
-  if (!articleContent.hero || !articleContent.sections || !articleContent.faqs || !articleContent.bottomCTA) {
-    throw new Error('AI response missing required fields (hero, sections, faqs, or bottomCTA)');
+  // Validate required fields with detailed checks
+  if (!articleContent.hero) {
+    throw new Error('AI response missing hero section');
+  }
+  if (typeof articleContent.hero.title !== 'string' || !articleContent.hero.title.trim()) {
+    throw new Error('AI response missing hero.title');
+  }
+  if (typeof articleContent.hero.subtitle !== 'string' || !articleContent.hero.subtitle.trim()) {
+    throw new Error('AI response missing hero.subtitle');
+  }
+  if (!Array.isArray(articleContent.sections) || articleContent.sections.length === 0) {
+    throw new Error('AI response has no sections');
+  }
+  if (!Array.isArray(articleContent.faqs) || articleContent.faqs.length === 0) {
+    throw new Error('AI response has no FAQs');
+  }
+  if (!articleContent.bottomCTA || !articleContent.bottomCTA.heading) {
+    throw new Error('AI response missing bottomCTA');
+  }
+  
+  // Graceful fallback: remove quickCTA if no tool slugs
+  if (!primaryTool && articleContent.quickCTA) {
+    delete articleContent.quickCTA;
+  }
+  
+  // Graceful fallback: remove secondary tool if not available
+  if (!secondaryTool && articleContent.bottomCTA?.secondaryTool) {
+    delete articleContent.bottomCTA.secondaryTool;
   }
 
-  const title = articleContent.hero.title;
-  const excerpt = articleContent.hero.subtitle.slice(0, 250);
-  const metaDescription = articleContent.hero.subtitle.slice(0, 155);
+  const title = articleContent.hero.title.trim();
+  const excerpt = articleContent.hero.subtitle.trim().slice(0, 250);
+  const metaDescription = articleContent.hero.subtitle.trim().slice(0, 155);
 
   return {
     title: title.slice(0, 255),
