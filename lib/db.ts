@@ -24,3 +24,27 @@ export async function query(text: string, params?: any[]) {
   console.log('executed query', { text, duration, rows: res.rowCount });
   return res;
 }
+
+export async function withTransaction<T>(
+  callback: (client: { query: typeof query }) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const clientQuery = async (text: string, params?: any[]) => {
+      const start = Date.now();
+      const res = await client.query(text, params);
+      const duration = Date.now() - start;
+      console.log('executed query (tx)', { text, duration, rows: res.rowCount });
+      return res;
+    };
+    const result = await callback({ query: clientQuery });
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}

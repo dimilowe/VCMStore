@@ -12,6 +12,7 @@ import {
 import type { EngineType } from "@/engines";
 import { toolsRegistry } from "@/data/toolsRegistry";
 import { getPreflightStatus } from "@/lib/toolInterlinking";
+import { query } from "@/lib/db";
 import fs from "fs";
 import path from "path";
 
@@ -61,6 +62,7 @@ export async function GET() {
       label: string;
       details: string[];
     };
+    status?: string;
   }> = [];
 
   const legacySlugs = new Set<string>();
@@ -118,6 +120,36 @@ export async function GET() {
         linkStatus: getPreflightStatus(skin.slug),
       });
     }
+  }
+
+  const existingSlugs = new Set(allTools.map(t => t.slug));
+  try {
+    const dbResult = await query(`SELECT * FROM tools ORDER BY created_at DESC`);
+    for (const row of dbResult.rows) {
+      if (existingSlugs.has(row.slug)) continue;
+      
+      allTools.push({
+        slug: row.slug,
+        name: row.name,
+        engineType: row.engine || "generated",
+        segment: row.segment || "secondary",
+        clusterSlug: row.cluster || "",
+        isIndexed: row.is_indexed === true,
+        isFeatured: row.featured === true,
+        inDirectory: row.in_directory === true,
+        priority: "secondary",
+        h1: row.name,
+        primaryKeyword: row.name.toLowerCase().replace(/\s+/g, " "),
+        linkStatus: {
+          status: row.link_status === "Ready" ? "ready" : row.link_status === "Warning" ? "warning" : "error",
+          label: row.link_status || "Not Ready",
+          details: [],
+        },
+        status: row.status,
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching tools from database:", error);
   }
 
   allTools.sort((a, b) => {

@@ -4,7 +4,7 @@ import {
   runExpansion,
   previewExpansion,
   getExpansionStats,
-  getAllGeneratedShells,
+  getAllToolsFromDb,
 } from "@/lib/engineExpansionGenerator";
 import { generateAllShells } from "@/lib/engineBlueprint";
 
@@ -16,17 +16,17 @@ export async function GET(request: NextRequest) {
   const blueprintId = searchParams.get("blueprintId");
   
   if (action === "stats") {
-    const stats = getExpansionStats();
+    const stats = await getExpansionStats();
     return NextResponse.json(stats);
   }
   
   if (action === "shells") {
-    const shells = getAllGeneratedShells();
+    const shells = await getAllToolsFromDb();
     return NextResponse.json({ shells, count: shells.length });
   }
   
   if (action === "preview" && blueprintId) {
-    const preview = previewExpansion(blueprintId);
+    const preview = await previewExpansion(blueprintId);
     return NextResponse.json(preview);
   }
   
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     };
   });
   
-  const stats = getExpansionStats();
+  const stats = await getExpansionStats();
   
   return NextResponse.json({
     blueprints,
@@ -65,19 +65,23 @@ export async function POST(request: NextRequest) {
     
     if (action === "expand" && blueprintId) {
       initializeBlueprints();
-      const result = runExpansion(blueprintId);
+      const result = await runExpansion(blueprintId);
       return NextResponse.json(result);
     }
     
     if (action === "expandAll") {
       initializeBlueprints();
-      const results = (blueprintIds || ALL_BLUEPRINTS.map(b => b.id)).map((id: string) => 
-        runExpansion(id)
-      );
+      const idsToExpand = blueprintIds || ALL_BLUEPRINTS.map(b => b.id);
+      const results = [];
+      
+      for (const id of idsToExpand) {
+        const result = await runExpansion(id);
+        results.push(result);
+      }
       
       const summary = {
-        totalCreated: results.reduce((sum: number, r: { createdCount: number }) => sum + r.createdCount, 0),
-        totalSkipped: results.reduce((sum: number, r: { skippedCount: number }) => sum + r.skippedCount, 0),
+        totalCreated: results.reduce((sum, r) => sum + r.createdCount, 0),
+        totalSkipped: results.reduce((sum, r) => sum + r.skippedCount, 0),
         results,
       };
       
