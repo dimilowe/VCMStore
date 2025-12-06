@@ -62,6 +62,7 @@ export default function ClusterDetailPage() {
   const [showToolFilter, setShowToolFilter] = useState<string>("all");
   const [isGenerating, setIsGenerating] = useState(false);
   const [togglingSlug, setTogglingSlug] = useState<string | null>(null);
+  const [togglingToolSlug, setTogglingToolSlug] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -165,6 +166,27 @@ export default function ClusterDetailPage() {
       console.error("Failed to toggle article:", error);
     } finally {
       setTogglingSlug(null);
+    }
+  };
+
+  const handleToggleTool = async (slug: string, isIndexed: boolean) => {
+    setTogglingToolSlug(slug);
+    try {
+      const res = await fetch("/api/admin/tools", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, isIndexed: !isIndexed }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setTools(prev => prev.map(t => 
+          t.slug === slug ? { ...t, isIndexed: !isIndexed } : t
+        ));
+      }
+    } catch (error) {
+      console.error("Failed to toggle tool:", error);
+    } finally {
+      setTogglingToolSlug(null);
     }
   };
 
@@ -469,16 +491,36 @@ export default function ClusterDetailPage() {
         <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Tools ({cluster.toolCount})</h2>
-              <select
-                className="border rounded px-2 py-1 text-sm"
-                value={showToolFilter}
-                onChange={(e) => setShowToolFilter(e.target.value)}
-              >
-                <option value="all">All</option>
-                <option value="indexed">Indexed Only</option>
-                <option value="not-indexed">Not Indexed</option>
-              </select>
+              <div>
+                <h2 className="text-lg font-semibold">Tools ({cluster.toolCount})</h2>
+                <p className="text-xs text-gray-500">
+                  {tools.filter(t => t.isIndexed).length}/{tools.length} indexed
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {tools.some(t => !t.isIndexed) && (
+                  <button
+                    onClick={async () => {
+                      const unindexedTools = tools.filter(t => !t.isIndexed);
+                      for (const tool of unindexedTools) {
+                        await handleToggleTool(tool.slug, false);
+                      }
+                    }}
+                    className="px-2 py-1 text-xs bg-orange-500 text-white rounded hover:bg-orange-600"
+                  >
+                    Index All
+                  </button>
+                )}
+                <select
+                  className="border rounded px-2 py-1 text-sm"
+                  value={showToolFilter}
+                  onChange={(e) => setShowToolFilter(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  <option value="indexed">Indexed Only</option>
+                  <option value="not-indexed">Not Indexed</option>
+                </select>
+              </div>
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {filteredTools.map((tool) => (
@@ -486,25 +528,31 @@ export default function ClusterDetailPage() {
                   key={tool.slug}
                   className="flex items-center justify-between p-2 bg-gray-50 rounded"
                 >
-                  <div>
-                    <div className="font-medium text-sm">{tool.name || tool.slug}</div>
-                    <div className="text-xs text-gray-500">{tool.slug}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{tool.name || tool.slug}</div>
+                    <div className="text-xs text-gray-500 truncate">{tool.slug}</div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {tool.isIndexed ? (
-                      <span className="px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded">
-                        Indexed
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                        Draft
-                      </span>
-                    )}
+                  <div className="flex items-center gap-2 ml-2">
                     {tool.inDirectory && (
                       <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">
                         In Dir
                       </span>
                     )}
+                    <button
+                      onClick={() => handleToggleTool(tool.slug, tool.isIndexed)}
+                      disabled={togglingToolSlug === tool.slug}
+                      className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                        tool.isIndexed
+                          ? "bg-green-100 text-green-800 hover:bg-green-200"
+                          : "bg-gray-100 text-gray-600 hover:bg-orange-100 hover:text-orange-700"
+                      } disabled:opacity-50`}
+                    >
+                      {togglingToolSlug === tool.slug
+                        ? "..."
+                        : tool.isIndexed
+                        ? "Indexed ✓"
+                        : "Draft → Index"}
+                    </button>
                   </div>
                 </div>
               ))}
