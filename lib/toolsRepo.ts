@@ -1,4 +1,5 @@
 import { query, withTransaction } from "./db";
+import { refreshToolsCache } from "./toolsCache";
 
 export interface ToolFilters {
   status?: string | string[];
@@ -289,7 +290,9 @@ export async function createTool(data: NewToolInput): Promise<ToolRecord> {
       data.source || 'manual',
     ]
   );
-  return mapRowToTool(result.rows[0]);
+  const tool = mapRowToTool(result.rows[0]);
+  await refreshToolsCache();
+  return tool;
 }
 
 export async function updateTool(
@@ -358,7 +361,9 @@ export async function updateTool(
   );
 
   if (result.rows.length === 0) return null;
-  return mapRowToTool(result.rows[0]);
+  const tool = mapRowToTool(result.rows[0]);
+  await refreshToolsCache();
+  return tool;
 }
 
 export async function upsertTool(data: NewToolInput): Promise<ToolRecord> {
