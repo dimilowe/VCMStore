@@ -199,6 +199,67 @@ export const IMAGE_RESIZER_NICHE_BLUEPRINT: EngineBlueprint = {
   outputType: "image",
 };
 
+export const YOUTUBE_METRICS_BLUEPRINT: EngineBlueprint = {
+  id: "youtube-metrics-engine",
+  engineId: "calculator",
+  name: "YouTube Metrics Engine",
+  description: "Generates YouTube metric calculators for CTR, CPM, retention, and more across longform and Shorts.",
+  segment: "creator",
+
+  slugPattern: {
+    template: "youtube-{metric}-{content_type}-calculator",
+  },
+  titlePattern: "YouTube {metric_label} {content_type_label} Calculator",
+  keywordPattern: "youtube {metric} {content_type} calculator",
+  descriptionPattern: "Calculate your YouTube {metric_label} for {content_type_label} videos and understand how your channel is performing.",
+
+  dimensions: [
+    {
+      id: "metric",
+      label: "Metric",
+      values: [
+        { id: "ctr", label: "CTR" },
+        { id: "cpm", label: "CPM" },
+        { id: "retention", label: "Retention" },
+        { id: "avg-view-duration", label: "Average View Duration" },
+        { id: "clicks-per-impression", label: "Clicks per Impression" },
+      ],
+    },
+    {
+      id: "content_type",
+      label: "Content Type",
+      values: [
+        { id: "longform", label: "Longform" },
+        { id: "shorts", label: "Shorts" },
+      ],
+    },
+  ],
+
+  clusterResolver: (combo: CartesianCombo) => {
+    return "youtube-metrics";
+  },
+
+  linkRules: {
+    siblingsPerTool: 3,
+    articlesPerTool: 2,
+    pillarSlug: "youtube-metrics",
+    defaultCTAs: {
+      quickCTA: "youtube-ctr-calculator",
+      bottomCTA: "youtube-analytics-guide",
+    },
+  },
+
+  defaults: {
+    priority: "experimental",
+    isIndexed: false,
+    inDirectory: false,
+    searchIntent: "action",
+  },
+
+  inputType: "number",
+  outputType: "display",
+};
+
 export const CALCULATOR_NICHE_BLUEPRINT: EngineBlueprint = {
   id: "calculator-niche-expansion",
   engineId: "calculator",
@@ -270,6 +331,7 @@ export function initializeBlueprints(): void {
   registerBlueprint(CONTENT_ANALYZER_BLUEPRINT);
   registerBlueprint(IMAGE_RESIZER_NICHE_BLUEPRINT);
   registerBlueprint(CALCULATOR_NICHE_BLUEPRINT);
+  registerBlueprint(YOUTUBE_METRICS_BLUEPRINT);
 }
 
 export const ALL_BLUEPRINTS = [
@@ -277,4 +339,5 @@ export const ALL_BLUEPRINTS = [
   CONTENT_ANALYZER_BLUEPRINT,
   IMAGE_RESIZER_NICHE_BLUEPRINT,
   CALCULATOR_NICHE_BLUEPRINT,
+  YOUTUBE_METRICS_BLUEPRINT,
 ];
