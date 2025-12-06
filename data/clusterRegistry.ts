@@ -170,7 +170,13 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
       "youtube-clicks-per-impression-longform-calculator",
       "youtube-clicks-per-impression-shorts-calculator"
     ],
-    articleSlugs: [],
+    articleSlugs: [
+      "what-is-a-good-youtube-ctr",
+      "how-to-improve-youtube-retention",
+      "youtube-cpm-rates-explained",
+      "youtube-shorts-vs-longform-analytics",
+      "understanding-youtube-impressions"
+    ],
     primaryKeyword: "youtube metrics calculator",
     relatedKeywords: ["youtube ctr calculator", "youtube cpm calculator", "youtube retention calculator", "youtube analytics"]
   }
