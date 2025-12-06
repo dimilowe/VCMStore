@@ -289,6 +289,13 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **Wired Indexed Toggle for SEO Control** - Admin toggle now controls Google indexing
+  - Created lib/toolRollout.ts with isToolIndexed(), getAllIndexedTools(), getRobotsDirective()
+  - Sitemap.xml only includes tools where isIndexed=true
+  - Tool layouts use generateMetadata() with getRobotsDirective(slug) for request-time robots tag
+  - Indexed=ON: robots "index, follow" + included in sitemap
+  - Indexed=OFF: robots "noindex, nofollow" + excluded from sitemap
+  - Pattern: Update tool layouts from static metadata to generateMetadata() function for dynamic control
 - 2025-12-06: **Formalized Engine Architecture** - VASE infrastructure for scaling to 10,000+ tools
   - Extended Tool type with engineType, inputType, outputType, relatedTools, relatedArticles
   - Added all new metadata fields to 47 existing tools
