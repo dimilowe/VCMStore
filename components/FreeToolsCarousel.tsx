@@ -34,6 +34,7 @@ const freeTools = [
   { name: "Name Combiner", icon: Users, href: "/tools/name-combiner", iconBg: "bg-cyan-500" },
   { name: "Photo Gallery Maker", icon: Images, href: "/tools/photo-gallery-maker", iconBg: "bg-indigo-500" },
   { name: "YouTube Title Split-Test", icon: RotateCcw, href: "/tools/youtube-title-split-test", iconBg: "bg-red-500" },
+  { name: "Image Size Guide", icon: Images, href: "/tools/social-media-image-sizes", iconBg: "bg-orange-500" },
   { name: "YouTube Thumbnail Resizer", icon: Youtube, href: "/tools/youtube-thumbnail-resizer", iconBg: "bg-red-500" },
   { name: "Instagram Post Resizer", icon: Instagram, href: "/tools/instagram-post-resizer", iconBg: "bg-pink-500" },
   { name: "Instagram Story Resizer", icon: Instagram, href: "/tools/instagram-story-resizer", iconBg: "bg-purple-500" },

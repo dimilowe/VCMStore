@@ -116,6 +116,14 @@ const tools = [
     iconBg: "bg-sky-500"
   },
   { 
+    name: "Social Media Image Sizes", 
+    description: "Complete guide to image dimensions for all social platforms with free resizer tools.",
+    icon: Images, 
+    href: "/tools/social-media-image-sizes",
+    category: "Image",
+    iconBg: "bg-orange-500"
+  },
+  { 
     name: "YouTube Thumbnail Resizer", 
     description: "Resize any image to the perfect YouTube thumbnail size (1280×720).",
     icon: Youtube, 

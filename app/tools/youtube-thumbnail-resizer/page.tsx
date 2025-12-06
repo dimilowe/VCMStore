@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import PlatformImageToolClient from "@/components/PlatformImageToolClient";
+import RelatedResizers from "@/components/RelatedResizers";
 import { getPresetBySlug } from "@/data/platformImagePresets";
 
 const preset = getPresetBySlug("youtube-thumbnail-resizer")!;
@@ -14,6 +15,8 @@ export default function YouTubeThumbnailResizerPage() {
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-10">
         <PlatformImageToolClient preset={preset} />
+
+        <RelatedResizers currentPresetId={preset.id} />
 
         <section className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
