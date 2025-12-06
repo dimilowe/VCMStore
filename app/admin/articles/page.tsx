@@ -363,17 +363,11 @@ export default function AdminArticlesPage() {
                             href={`/articles/${article.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            View
-                          </a>
-                          <Link
-                            href={`/admin/articles/edit/${article.slug}`}
                             className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-100 hover:bg-orange-200 rounded text-sm text-orange-700 transition-colors"
                           >
-                            Edit
-                          </Link>
+                            <ExternalLink className="w-3 h-3" />
+                            Preview
+                          </a>
                         </div>
                       </td>
                     </tr>

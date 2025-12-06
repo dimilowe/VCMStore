@@ -487,20 +487,12 @@ export default function ClusterDetailPage() {
                         {article.exists && (
                           <div className="flex items-center gap-2 text-xs">
                             <Link
-                              href={`/admin/articles/edit/${article.slug}`}
-                              className="text-orange-600 hover:underline"
+                              href={`/articles/${article.slug}`}
+                              target="_blank"
+                              className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                             >
-                              Edit
+                              Preview
                             </Link>
-                            {article.isPublished && (
-                              <Link
-                                href={`/articles/${article.slug}`}
-                                target="_blank"
-                                className="text-gray-600 hover:underline"
-                              >
-                                View
-                              </Link>
-                            )}
                             <button
                               onClick={() => handleToggleArticle(
                                 article.slug,
