@@ -124,6 +124,12 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `/tools/name-combiner` - Name Combiner - combine 2-3 names into unique mashups (targets "combiner name" keyword)
 - `/tools/photo-gallery-maker` - Photo Gallery Maker - create multi-photo gallery layouts (grid, masonry, horizontal strip) with PNG export
 - `/tools/youtube-title-split-test` - YouTube Title Split-Test Tool - A/B test YouTube video titles with auto-rotation and CTR tracking
+- `/tools/youtube-thumbnail-resizer` - YouTube Thumbnail Resizer - resize images to 1280×720 (shared engine)
+- `/tools/instagram-post-resizer` - Instagram Post Resizer - resize images to 1080×1080 (shared engine)
+- `/tools/instagram-story-resizer` - Instagram Story Resizer - resize images to 1080×1920 (shared engine)
+- `/tools/tiktok-video-resizer` - TikTok Cover Resizer - resize images to 1080×1920 (shared engine)
+- `/tools/twitter-header-resizer` - Twitter/X Header Resizer - resize images to 1500×500 (shared engine)
+- `/tools/linkedin-banner-resizer` - LinkedIn Banner Resizer - resize images to 1584×396 (shared engine)
 
 ### MBB Routes (Micro-Blog Business)
 MBBs are standalone SEO tools that drive traffic without appearing in main navigation. Access via Admin > Manage MBBs.
@@ -202,6 +208,13 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-06: **Added Platform Image Resizer Suite** - Shared engine architecture for platform-specific image resizers
+  - Created shared `PlatformImageToolClient` component with upload, preview, resize, download
+  - Created `platformImagePresets.ts` registry with TypeScript types and preset configurations
+  - Created API route `/api/platform-image/resize` using sharp for server-side processing
+  - 6 platform-specific tools: YouTube Thumbnail (1280×720), Instagram Post (1080×1080), Instagram Story (1080×1920), TikTok Cover (1080×1920), Twitter Header (1500×500), LinkedIn Banner (1584×396)
+  - Each tool has unique SEO metadata, FAQ section with JSON-LD schema, and platform-specific tips
+  - Architecture designed for easy expansion - adding new platforms requires only preset config + thin page shell
 - 2025-12-05: **Added Maker Quotes Generator MBB** - Quote generator for creators (targets "maker quotes generator")
   - Created `/tools/maker-quotes-generator` with 75+ curated quotes, 5 themes (Creativity, Persistence, Innovation, Entrepreneurship, Failure & Learning), 4 tones (Motivational, Serious, Funny, Short & Punchy), 3 formats (Quote Only, Quote + Author, Social Caption)
   - Copy-to-clipboard functionality for generated quotes
