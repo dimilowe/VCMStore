@@ -140,3 +140,8 @@ export function clearRolloutCache(): void {
   cachedConfig = null;
   cacheTime = 0;
 }
+
+export function getRobotsDirective(slug: string): { index: boolean; follow: boolean } {
+  const indexed = isToolIndexed(slug);
+  return { index: indexed, follow: indexed };
+}
