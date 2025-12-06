@@ -1,6 +1,9 @@
 import type { EngineType } from "@/engines";
 import type { SearchIntent } from "./toolsRegistry";
 
+export type ToolSegment = "creator" | "social" | "utility" | "finance" | "health" | "mbb";
+export type ToolPriority = "primary" | "secondary" | "experimental";
+
 export interface KeywordModifier {
   id: string;
   label: string;
@@ -9,6 +12,7 @@ export interface KeywordModifier {
 
 export interface EngineKeywordMatrix {
   engineId: EngineType;
+  segment: ToolSegment;
   baseKeywords: string[];
   platformModifiers: KeywordModifier[];
   dimensionModifiers: KeywordModifier[];
@@ -20,6 +24,10 @@ export interface EngineKeywordMatrix {
 export interface ToolSkin {
   slug: string;
   name: string;
+  engineType: EngineType;
+  segment: ToolSegment;
+  priority: ToolPriority;
+  isIndexed: boolean;
   primaryKeyword: string;
   secondaryKeywords: string[];
   searchIntent: SearchIntent;
@@ -28,10 +36,14 @@ export interface ToolSkin {
   introCopy: string;
   dimensions?: { width: number; height: number };
   aspectRatio?: string;
+  clusterSlug?: string;
 }
+
+const PRIMARY_PLATFORMS = ["instagram", "instagram-story", "tiktok", "youtube", "twitter", "linkedin"];
 
 export const PLATFORM_RESIZER_MATRIX: EngineKeywordMatrix = {
   engineId: "platform-resizer",
+  segment: "social",
   baseKeywords: ["resize image", "image resizer", "photo resizer", "crop image", "resize photo"],
   
   platformModifiers: [
@@ -114,9 +126,16 @@ export const PLATFORM_RESIZER_MATRIX: EngineKeywordMatrix = {
       const baseName = `${platform.label} Image Resizer`;
       const basePrimaryKeyword = `${platform.variations[0]} image size`;
       
+      const isPrimary = PRIMARY_PLATFORMS.includes(platform.id);
+      
       skins.push({
         slug: baseSlug,
         name: baseName,
+        engineType: "platform-resizer",
+        segment: "social",
+        priority: isPrimary ? "primary" : "secondary",
+        isIndexed: isPrimary,
+        clusterSlug: "social-media-image-sizes",
         primaryKeyword: basePrimaryKeyword,
         secondaryKeywords: [
           `resize image for ${platform.variations[0]}`,
@@ -142,6 +161,11 @@ export const PLATFORM_RESIZER_MATRIX: EngineKeywordMatrix = {
         skins.push({
           slug: intentSlug,
           name: intentName,
+          engineType: "platform-resizer",
+          segment: "social",
+          priority: "experimental",
+          isIndexed: false,
+          clusterSlug: "social-media-image-sizes",
           primaryKeyword: `${intent.variations[0]} image for ${platform.variations[0]}`,
           secondaryKeywords: [
             `${platform.variations[0]} ${intent.id}`,
@@ -166,6 +190,11 @@ export const PLATFORM_RESIZER_MATRIX: EngineKeywordMatrix = {
         skins.push({
           slug: formatSlug,
           name: formatName,
+          engineType: "platform-resizer",
+          segment: "social",
+          priority: "experimental",
+          isIndexed: false,
+          clusterSlug: "social-media-image-sizes",
           primaryKeyword: `${platform.variations[0]} ${format.variations[0]} image`,
           secondaryKeywords: [
             `${format.label.toLowerCase()} ${platform.variations[0]}`,
@@ -188,6 +217,10 @@ export const PLATFORM_RESIZER_MATRIX: EngineKeywordMatrix = {
       skins.push({
         slug: dimensionSlug,
         name: `${dimension.label} Image Resizer`,
+        engineType: "platform-resizer",
+        segment: "utility",
+        priority: "secondary",
+        isIndexed: false,
         primaryKeyword: `resize image to ${dimension.id}`,
         secondaryKeywords: [
           `${dimension.id} image resizer`,
@@ -207,12 +240,15 @@ export const PLATFORM_RESIZER_MATRIX: EngineKeywordMatrix = {
   }
 };
 
+const HEALTH_CALCULATORS = ["calorie-deficit", "bmi", "tdee", "macro", "sleep"];
+const FINANCE_CALCULATORS = ["401k-retirement", "mortgage", "compound-interest", "loan", "car-payment", "rent-vs-buy", "paycheck", "inflation", "retirement"];
+
 export const CALCULATOR_MATRIX: EngineKeywordMatrix = {
   engineId: "calculator",
+  segment: "mbb",
   baseKeywords: ["calculator", "estimator", "calculate", "estimate"],
   
   platformModifiers: [],
-  
   dimensionModifiers: [],
   
   intentModifiers: [
@@ -223,32 +259,37 @@ export const CALCULATOR_MATRIX: EngineKeywordMatrix = {
   formatModifiers: [],
   
   generateCombinations(): ToolSkin[] {
-    const calculatorTypes = [
-      { id: "calorie-deficit", name: "Calorie Deficit", keyword: "calorie deficit calculator", desc: "Calculate your daily calorie deficit for weight loss" },
-      { id: "401k-retirement", name: "401k Retirement", keyword: "401k calculator", desc: "Project your 401k growth until retirement" },
-      { id: "mortgage", name: "Mortgage", keyword: "mortgage calculator", desc: "Calculate monthly mortgage payments" },
-      { id: "bmi", name: "BMI", keyword: "bmi calculator", desc: "Calculate your body mass index" },
-      { id: "tdee", name: "TDEE", keyword: "tdee calculator", desc: "Calculate total daily energy expenditure" },
-      { id: "macro", name: "Macro", keyword: "macro calculator", desc: "Calculate daily macronutrient targets" },
-      { id: "compound-interest", name: "Compound Interest", keyword: "compound interest calculator", desc: "Calculate compound interest growth" },
-      { id: "loan", name: "Loan", keyword: "loan calculator", desc: "Calculate loan payments and total interest" },
-      { id: "tip", name: "Tip", keyword: "tip calculator", desc: "Calculate tip amounts and split bills" },
-      { id: "percentage", name: "Percentage", keyword: "percentage calculator", desc: "Calculate percentages and percent changes" },
-      { id: "age", name: "Age", keyword: "age calculator", desc: "Calculate age from birthdate" },
-      { id: "gpa", name: "GPA", keyword: "gpa calculator", desc: "Calculate grade point average" },
-      { id: "pregnancy", name: "Pregnancy Due Date", keyword: "pregnancy calculator", desc: "Calculate due date and pregnancy milestones" },
-      { id: "ovulation", name: "Ovulation", keyword: "ovulation calculator", desc: "Calculate ovulation and fertility windows" },
-      { id: "sleep", name: "Sleep", keyword: "sleep calculator", desc: "Calculate optimal bedtime and wake time" },
-      { id: "car-payment", name: "Car Payment", keyword: "car payment calculator", desc: "Calculate monthly car loan payments" },
-      { id: "rent-vs-buy", name: "Rent vs Buy", keyword: "rent vs buy calculator", desc: "Compare renting vs buying a home" },
-      { id: "paycheck", name: "Paycheck", keyword: "paycheck calculator", desc: "Calculate net pay after taxes" },
-      { id: "inflation", name: "Inflation", keyword: "inflation calculator", desc: "Calculate purchasing power over time" },
-      { id: "retirement", name: "Retirement", keyword: "retirement calculator", desc: "Calculate retirement savings needs" },
+    const calculatorTypes: { id: string; name: string; keyword: string; desc: string; segment: ToolSegment; cluster: string; isIndexed: boolean }[] = [
+      { id: "calorie-deficit", name: "Calorie Deficit", keyword: "calorie deficit calculator", desc: "Calculate your daily calorie deficit for weight loss", segment: "health", cluster: "health-fitness-calculators", isIndexed: true },
+      { id: "401k-retirement", name: "401k Retirement", keyword: "401k calculator", desc: "Project your 401k growth until retirement", segment: "finance", cluster: "financial-calculators", isIndexed: true },
+      { id: "mortgage", name: "Mortgage", keyword: "mortgage calculator", desc: "Calculate monthly mortgage payments", segment: "finance", cluster: "financial-calculators", isIndexed: false },
+      { id: "bmi", name: "BMI", keyword: "bmi calculator", desc: "Calculate your body mass index", segment: "health", cluster: "health-fitness-calculators", isIndexed: false },
+      { id: "tdee", name: "TDEE", keyword: "tdee calculator", desc: "Calculate total daily energy expenditure", segment: "health", cluster: "health-fitness-calculators", isIndexed: false },
+      { id: "macro", name: "Macro", keyword: "macro calculator", desc: "Calculate daily macronutrient targets", segment: "health", cluster: "health-fitness-calculators", isIndexed: false },
+      { id: "compound-interest", name: "Compound Interest", keyword: "compound interest calculator", desc: "Calculate compound interest growth", segment: "finance", cluster: "financial-calculators", isIndexed: false },
+      { id: "loan", name: "Loan", keyword: "loan calculator", desc: "Calculate loan payments and total interest", segment: "finance", cluster: "financial-calculators", isIndexed: false },
+      { id: "tip", name: "Tip", keyword: "tip calculator", desc: "Calculate tip amounts and split bills", segment: "utility", cluster: "", isIndexed: false },
+      { id: "percentage", name: "Percentage", keyword: "percentage calculator", desc: "Calculate percentages and percent changes", segment: "utility", cluster: "", isIndexed: false },
+      { id: "age", name: "Age", keyword: "age calculator", desc: "Calculate age from birthdate", segment: "utility", cluster: "", isIndexed: false },
+      { id: "gpa", name: "GPA", keyword: "gpa calculator", desc: "Calculate grade point average", segment: "utility", cluster: "", isIndexed: false },
+      { id: "pregnancy", name: "Pregnancy Due Date", keyword: "pregnancy calculator", desc: "Calculate due date and pregnancy milestones", segment: "health", cluster: "health-fitness-calculators", isIndexed: false },
+      { id: "ovulation", name: "Ovulation", keyword: "ovulation calculator", desc: "Calculate ovulation and fertility windows", segment: "health", cluster: "health-fitness-calculators", isIndexed: false },
+      { id: "sleep", name: "Sleep", keyword: "sleep calculator", desc: "Calculate optimal bedtime and wake time", segment: "health", cluster: "health-fitness-calculators", isIndexed: false },
+      { id: "car-payment", name: "Car Payment", keyword: "car payment calculator", desc: "Calculate monthly car loan payments", segment: "finance", cluster: "financial-calculators", isIndexed: false },
+      { id: "rent-vs-buy", name: "Rent vs Buy", keyword: "rent vs buy calculator", desc: "Compare renting vs buying a home", segment: "finance", cluster: "financial-calculators", isIndexed: false },
+      { id: "paycheck", name: "Paycheck", keyword: "paycheck calculator", desc: "Calculate net pay after taxes", segment: "finance", cluster: "financial-calculators", isIndexed: false },
+      { id: "inflation", name: "Inflation", keyword: "inflation calculator", desc: "Calculate purchasing power over time", segment: "finance", cluster: "financial-calculators", isIndexed: false },
+      { id: "retirement", name: "Retirement", keyword: "retirement calculator", desc: "Calculate retirement savings needs", segment: "finance", cluster: "financial-calculators", isIndexed: false },
     ];
     
     return calculatorTypes.map(calc => ({
       slug: `${calc.id}-calculator`,
       name: `${calc.name} Calculator`,
+      engineType: "calculator" as const,
+      segment: calc.segment,
+      priority: calc.isIndexed ? "primary" as const : "secondary" as const,
+      isIndexed: calc.isIndexed,
+      clusterSlug: calc.cluster || undefined,
       primaryKeyword: calc.keyword,
       secondaryKeywords: [
         `${calc.keyword} free`,
@@ -266,6 +307,7 @@ export const CALCULATOR_MATRIX: EngineKeywordMatrix = {
 
 export const AI_ANALYSIS_MATRIX: EngineKeywordMatrix = {
   engineId: "ai-analysis",
+  segment: "creator",
   baseKeywords: ["analyzer", "analysis", "check", "audit", "review"],
   
   platformModifiers: [],
@@ -278,22 +320,27 @@ export const AI_ANALYSIS_MATRIX: EngineKeywordMatrix = {
   ],
   
   generateCombinations(): ToolSkin[] {
-    const analyzerTypes = [
-      { id: "thumbnail", name: "YouTube Thumbnail", keyword: "youtube thumbnail analyzer", desc: "Analyze YouTube thumbnails for CTR optimization" },
-      { id: "ad-copy", name: "Ad Copy", keyword: "ad copy analyzer", desc: "Analyze advertising copy effectiveness" },
-      { id: "headline", name: "Headline", keyword: "headline analyzer", desc: "Analyze headline strength and emotional impact" },
-      { id: "seo", name: "SEO", keyword: "seo analyzer", desc: "Analyze on-page SEO factors" },
-      { id: "readability", name: "Readability", keyword: "readability analyzer", desc: "Analyze text readability and grade level" },
-      { id: "sentiment", name: "Sentiment", keyword: "sentiment analyzer", desc: "Analyze text sentiment and emotion" },
-      { id: "grammar", name: "Grammar", keyword: "grammar checker", desc: "Check grammar and spelling errors" },
-      { id: "plagiarism", name: "Plagiarism", keyword: "plagiarism checker", desc: "Check content for plagiarism" },
-      { id: "email", name: "Email", keyword: "email analyzer", desc: "Analyze email subject lines and content" },
-      { id: "resume", name: "Resume", keyword: "resume analyzer", desc: "Analyze resume strength and ATS compatibility" },
+    const analyzerTypes: { id: string; name: string; keyword: string; desc: string; isIndexed: boolean }[] = [
+      { id: "thumbnail", name: "YouTube Thumbnail", keyword: "youtube thumbnail analyzer", desc: "Analyze YouTube thumbnails for CTR optimization", isIndexed: true },
+      { id: "ad-copy", name: "Ad Copy", keyword: "ad copy analyzer", desc: "Analyze advertising copy effectiveness", isIndexed: true },
+      { id: "headline", name: "Headline", keyword: "headline analyzer", desc: "Analyze headline strength and emotional impact", isIndexed: false },
+      { id: "seo", name: "SEO", keyword: "seo analyzer", desc: "Analyze on-page SEO factors", isIndexed: false },
+      { id: "readability", name: "Readability", keyword: "readability analyzer", desc: "Analyze text readability and grade level", isIndexed: false },
+      { id: "sentiment", name: "Sentiment", keyword: "sentiment analyzer", desc: "Analyze text sentiment and emotion", isIndexed: false },
+      { id: "grammar", name: "Grammar", keyword: "grammar checker", desc: "Check grammar and spelling errors", isIndexed: false },
+      { id: "plagiarism", name: "Plagiarism", keyword: "plagiarism checker", desc: "Check content for plagiarism", isIndexed: false },
+      { id: "email", name: "Email", keyword: "email analyzer", desc: "Analyze email subject lines and content", isIndexed: false },
+      { id: "resume", name: "Resume", keyword: "resume analyzer", desc: "Analyze resume strength and ATS compatibility", isIndexed: false },
     ];
     
     return analyzerTypes.map(analyzer => ({
       slug: `${analyzer.id}-analyzer`,
       name: `${analyzer.name} Analyzer`,
+      engineType: "ai-analysis" as const,
+      segment: "creator" as const,
+      priority: analyzer.isIndexed ? "primary" as const : "secondary" as const,
+      isIndexed: analyzer.isIndexed,
+      clusterSlug: "ai-content-tools",
       primaryKeyword: analyzer.keyword,
       secondaryKeywords: [
         `${analyzer.keyword} free`,
@@ -334,4 +381,68 @@ export function getTotalPotentialTools(): number {
   return Object.values(ENGINE_KEYWORD_MATRICES)
     .filter(m => m !== null)
     .reduce((total, matrix) => total + matrix!.generateCombinations().length, 0);
+}
+
+let _skinRegistry: Map<string, ToolSkin> | null = null;
+let _allSkins: ToolSkin[] | null = null;
+
+function buildSkinRegistry(): Map<string, ToolSkin> {
+  if (_skinRegistry) return _skinRegistry;
+  
+  _skinRegistry = new Map();
+  for (const matrix of Object.values(ENGINE_KEYWORD_MATRICES)) {
+    if (!matrix) continue;
+    for (const skin of matrix.generateCombinations()) {
+      _skinRegistry.set(skin.slug, skin);
+    }
+  }
+  return _skinRegistry;
+}
+
+function getAllSkins(): ToolSkin[] {
+  if (_allSkins) return _allSkins;
+  
+  _allSkins = [];
+  for (const matrix of Object.values(ENGINE_KEYWORD_MATRICES)) {
+    if (!matrix) continue;
+    _allSkins.push(...matrix.generateCombinations());
+  }
+  return _allSkins;
+}
+
+export function getToolSkinBySlug(slug: string): ToolSkin | undefined {
+  return buildSkinRegistry().get(slug);
+}
+
+export function getAllIndexedSkins(): ToolSkin[] {
+  return getAllSkins().filter(skin => skin.isIndexed);
+}
+
+export function getSkinsBySegment(segment: ToolSegment): ToolSkin[] {
+  return getAllSkins().filter(skin => skin.segment === segment);
+}
+
+export function getSkinsByCluster(clusterSlug: string): ToolSkin[] {
+  return getAllSkins().filter(skin => skin.clusterSlug === clusterSlug);
+}
+
+export function getCreatorSkins(): ToolSkin[] {
+  return getAllSkins().filter(skin => 
+    skin.segment === "creator" || skin.segment === "social"
+  );
+}
+
+export function getMBBSkins(): ToolSkin[] {
+  return getAllSkins().filter(skin => 
+    skin.segment === "mbb" || skin.segment === "health" || skin.segment === "finance" || skin.segment === "utility"
+  );
+}
+
+export function searchSkins(query: string): ToolSkin[] {
+  const q = query.toLowerCase();
+  return getAllSkins().filter(skin => 
+    skin.primaryKeyword.toLowerCase().includes(q) ||
+    skin.secondaryKeywords.some(kw => kw.toLowerCase().includes(q)) ||
+    skin.name.toLowerCase().includes(q)
+  );
 }
