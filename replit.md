@@ -231,13 +231,45 @@ VCM Suite uses a **Vertical Action Search Engine (VASE)** architecture. Tools ar
 
 **Note**: Tool counts are computed dynamically via `getToolCountByEngine()` from the tools registry.
 
-### Tool Metadata Schema
-Every tool in `toolsRegistry.ts` includes:
+### Tool Metadata Schema (Semantic Layer)
+Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automated SEO manufacturing:
+
+**Core Fields:**
 - `engineType` - which engine powers it
 - `inputType` - what it accepts (image, text, url, file, number, selection, none, multi)
 - `outputType` - what it produces (image, text, file, download, analysis, display, interactive)
-- `relatedTools` - array of related tool slugs for cross-linking
-- `relatedArticles` - array of related MBB article slugs
+- `relatedTools` - array of related tool slugs for legacy cross-linking
+- `relatedArticles` - array of related MBB article slugs for legacy linking
+
+**SEO Manufacturing Fields (Phase 2):**
+- `primaryKeyword` - main target keyword for the tool
+- `secondaryKeywords[]` - array of secondary keyword variations for content optimization
+- `searchIntent` - "informational" | "action" | "transactional"
+- `pillarSlug` - the pillar topic this tool belongs to (e.g., "social-media-image-sizes")
+- `clusterSlug` - specific cluster within pillar (e.g., "instagram-image-tools")
+- `recommendedTools[]` - tools to link to (automated linking)
+- `recommendedArticles[]` - articles to link to (automated linking)
+
+**This semantic layer enables:**
+- Automated internal linking
+- Automated breadcrumbs generation
+- Automated CTA selection
+- Automated schema.org injection
+- Automated sitemap grouping
+- Automated cluster performance reporting
+
+### Keyword & Cluster Registries
+- `data/keywordsRegistry.ts` - Keyword metadata (volume, difficulty, intent, SERP features, content briefs)
+- `data/clusterRegistry.ts` - Topic cluster structure (pillarSlug, toolSlugs[], articleSlugs[], keywords)
+
+### Phase 2: Tool Manufacturing Strategy
+**Step 1** - Build 10 Engines (platform-resizer, calculator, ai-analysis, etc.)
+**Step 2** - Create Keyword Matrix for each engine (modifiers × platforms = 200+ skins)
+**Step 3** - Auto-generate tool pages from the matrix (unique SEO copy, CTAs, related blocks)
+**Step 4** - Build clusters (Engine page = pillar, Articles = support, Tools = spokes)
+**Step 5** - Deploy internal linking automation (3 tools + 2 articles + 1 revenue CTA per page)
+**Step 6** - Add schema at engine, cluster, and page levels
+**Step 7** - Add monetization overlays (QR Social, Nudge, APE, etc.)
 
 ### Adding New Tools
 1. **Engine-based tools**: Add preset to engine's config file, create thin page shell
