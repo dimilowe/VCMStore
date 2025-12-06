@@ -45,7 +45,7 @@ export async function generateArticleContent(
     .map(slug => `- [${slugToTitle(slug)}](/tools/${slug})`)
     .join('\n');
 
-  const prompt = `You are an SEO content writer for VCM Suite, a creator tools platform. Write a comprehensive, actionable blog article.
+  const prompt = `You are an SEO content writer for VCM Suite, a creator tools platform. Write a comprehensive, actionable blog article with rich formatting.
 
 ARTICLE TOPIC: "${slugToTitle(articleSlug)}"
 CLUSTER THEME: "${cluster.pillarTitle}"
@@ -53,28 +53,89 @@ PRIMARY KEYWORD: "${cluster.primaryKeyword}"
 RELATED KEYWORDS: ${cluster.relatedKeywords.join(', ')}
 
 REQUIREMENTS:
-1. Write 800-1200 words of high-quality, actionable content
-2. Use proper HTML formatting with <h2>, <h3>, <p>, <ul>, <li>, <strong> tags
-3. Include the primary keyword naturally in the first paragraph
-4. Structure with 3-4 main sections using <h2> headings
-5. Include practical tips, examples, or step-by-step guidance
-6. End with a call-to-action mentioning our free tools
-7. Write in a friendly, expert tone - not salesy
-8. Include internal links to these related tools:
-${toolLinks}
+1. Write 1000-1500 words of high-quality, actionable content
+2. Use PROPER HTML with semantic structure
+3. Include the primary keyword naturally in the first 100 words
+4. Write in a friendly, expert tone - not salesy
 
-FORMAT YOUR RESPONSE AS HTML (no markdown). Start directly with the content, no title tag (title is separate).
+REQUIRED STRUCTURE - Follow this EXACT format:
 
-Example structure:
-<p>Opening paragraph with keyword...</p>
-<h2>First Main Section</h2>
-<p>Content...</p>
-<h2>Second Section</h2>
-<p>Content with <a href="/tools/tool-slug">Tool Name</a> link...</p>
-<h2>Third Section</h2>
-<ul><li>Tip 1</li><li>Tip 2</li></ul>
-<h2>Start Taking Action</h2>
-<p>CTA paragraph mentioning our free calculators/tools...</p>`;
+<div class="article-intro">
+<p>Engaging opening paragraph (2-3 sentences) with primary keyword naturally included...</p>
+</div>
+
+<div class="article-section">
+<h2>First Main Topic</h2>
+<p>Detailed content with actionable information...</p>
+<p>More content as needed...</p>
+</div>
+
+<div class="article-section">
+<h2>Second Main Topic</h2>
+<p>Include practical examples and specific numbers when possible...</p>
+<ul>
+<li><strong>Key Point:</strong> Explanation...</li>
+<li><strong>Key Point:</strong> Explanation...</li>
+<li><strong>Key Point:</strong> Explanation...</li>
+</ul>
+</div>
+
+<div class="article-steps">
+<h2>How to [Action Related to Topic]</h2>
+<div class="step" data-step="1">
+<h3>Step Title</h3>
+<p>Step description...</p>
+</div>
+<div class="step" data-step="2">
+<h3>Step Title</h3>
+<p>Step description...</p>
+</div>
+<div class="step" data-step="3">
+<h3>Step Title</h3>
+<p>Step description...</p>
+</div>
+</div>
+
+<div class="article-section">
+<h2>Tips and Best Practices</h2>
+<ul>
+<li>Tip with explanation...</li>
+<li>Tip with explanation...</li>
+<li>Tip with explanation...</li>
+</ul>
+</div>
+
+<div class="article-faq">
+<h2>Frequently Asked Questions</h2>
+<div class="faq-item">
+<h3>Question about the topic?</h3>
+<p>Detailed answer...</p>
+</div>
+<div class="faq-item">
+<h3>Another common question?</h3>
+<p>Detailed answer...</p>
+</div>
+<div class="faq-item">
+<h3>Third question?</h3>
+<p>Detailed answer...</p>
+</div>
+</div>
+
+<div class="article-cta">
+<h2>Get Started with Our Free Tools</h2>
+<p>Ready to [take action]? Try our free tools to make it easy:</p>
+<ul class="tool-links">
+${toolLinks.split('\n').map(link => `<li>${link.replace(/^- /, '')}</li>`).join('\n')}
+</ul>
+</div>
+
+CRITICAL RULES:
+- Use EXACTLY the div classes shown above (article-intro, article-section, article-steps, article-faq, article-cta)
+- Include data-step attributes on step divs
+- Include 3-5 FAQ items
+- Include 3-4 steps in the how-to section
+- Links should use <a href="/tools/slug">Tool Name</a> format
+- Output clean HTML only, no markdown`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o',

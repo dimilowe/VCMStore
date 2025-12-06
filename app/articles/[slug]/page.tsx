@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Eye, Wrench, AlertTriangle } from "lucide-react";
 import { getClusterById } from "@/data/clusterRegistry";
 import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
+import StyledArticleContent from "@/components/StyledArticleContent";
 
 interface ClusterArticle {
   id: number;
@@ -163,10 +164,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 </p>
               )}
               
-              <div 
-                className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-orange-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg"
-                dangerouslySetInnerHTML={{ __html: article.content }}
-              />
+              <StyledArticleContent content={article.content} />
             </div>
           </article>
           
