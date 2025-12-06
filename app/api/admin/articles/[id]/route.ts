@@ -1,24 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getIronSession } from "iron-session";
 import { query } from "@/lib/db";
-
-async function isAdmin(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("vcm_admin_session");
-  if (!sessionCookie?.value) return false;
-  try {
-    const session = JSON.parse(sessionCookie.value);
-    return session.isAdmin === true;
-  } catch {
-    return false;
-  }
-}
+import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await isAdmin())) {
+  const cookieStore = await cookies();
+  const session = await getIronSession<AdminSessionData>(cookieStore, sessionOptions);
+  
+  if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -61,7 +54,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await isAdmin())) {
+  const cookieStore = await cookies();
+  const session = await getIronSession<AdminSessionData>(cookieStore, sessionOptions);
+  
+  if (!session.isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
