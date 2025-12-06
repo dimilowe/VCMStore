@@ -57,6 +57,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `youtube_title_tests`: A/B title tests for YouTube videos
 - `youtube_title_variants`: Title variants for each test (2-5 per test)
 - `youtube_rotation_log`: Log of title rotations with activation times
+- `cluster_articles`: AI-generated SEO articles linked to clusters (separate from manual blog posts)
 
 ## Project Structure
 
