@@ -24,7 +24,10 @@ import {
   FilePen,
   StickyNote,
   X,
-  TrendingUp
+  TrendingUp,
+  Images,
+  RotateCcw,
+  Users
 } from "lucide-react";
 
 const tools = [
@@ -219,6 +222,30 @@ const tools = [
     href: "/tools/affirmation-about-self-love",
     category: "Lifestyle",
     iconBg: "bg-pink-400"
+  },
+  { 
+    name: "Photo Gallery Maker", 
+    description: "Create multi-photo gallery layouts with grid, masonry, or horizontal strip options.",
+    icon: Images, 
+    href: "/tools/photo-gallery-maker",
+    category: "Image",
+    iconBg: "bg-indigo-500"
+  },
+  { 
+    name: "YouTube Title Split-Test", 
+    description: "A/B test your YouTube video titles with auto-rotation and CTR tracking.",
+    icon: RotateCcw, 
+    href: "/tools/youtube-title-split-test",
+    category: "Social",
+    iconBg: "bg-red-500"
+  },
+  { 
+    name: "Name Combiner", 
+    description: "Combine 2-3 names into creative mashups for couples or groups.",
+    icon: Users, 
+    href: "/tools/name-combiner",
+    category: "Social",
+    iconBg: "bg-cyan-500"
   },
 ];
 

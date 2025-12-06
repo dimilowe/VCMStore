@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Images, RotateCcw } from "lucide-react";
 import GoogleTranslate from "@/components/GoogleTranslate";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,7 @@ const resourceCategories: ResourceCategory[] = [
     items: [
       { label: "AI Chat", href: "/chat", description: "Strategy assistant for creators", icon: MessageCircle, iconBg: "bg-purple-500" },
       { label: "Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer", icon: Camera, iconBg: "bg-red-500" },
+      { label: "Title Split-Test", href: "/tools/youtube-title-split-test", description: "A/B test YouTube titles", icon: RotateCcw, iconBg: "bg-red-500" },
       { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker", icon: Palette, iconBg: "bg-pink-500" },
       { label: "AI Humanizer", href: "/tools/ai-humanizer-free", description: "Detect & humanize AI text", icon: Bot, iconBg: "bg-indigo-500" },
       { label: "AI Summarizer", href: "/tools/summarizer", description: "Summarize any text instantly", icon: Zap, iconBg: "bg-yellow-500" },
@@ -71,6 +72,7 @@ const resourceCategories: ResourceCategory[] = [
       { label: "GIF Compressor", href: "/tools/gif-compressor", description: "Compress GIF files", icon: FileImage, iconBg: "bg-violet-500" },
       { label: "GIF Maker", href: "/tools/gif-maker", description: "Convert video/images to GIF", icon: FileImage, iconBg: "bg-fuchsia-500" },
       { label: "HEIC to JPG", href: "/tools/heic-to-jpg", description: "Convert iPhone HEIC photos", icon: FileImage, iconBg: "bg-rose-500" },
+      { label: "Photo Gallery Maker", href: "/tools/photo-gallery-maker", description: "Create gallery layouts", icon: Images, iconBg: "bg-indigo-500" },
     ]
   },
   {
