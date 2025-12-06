@@ -122,7 +122,14 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
       "heic-to-jpg",
       "gif-maker"
     ],
-    articleSlugs: [],
+    articleSlugs: [
+      "how-to-compress-images-without-losing-quality",
+      "best-image-formats-for-web",
+      "heic-vs-jpg-complete-guide",
+      "gif-compression-optimization-guide",
+      "reduce-image-file-size-guide",
+      "image-optimization-for-seo"
+    ],
     primaryKeyword: "image compressor",
     relatedKeywords: ["compress image online", "reduce image size", "HEIC converter", "GIF maker"]
   },
