@@ -208,6 +208,15 @@ VCM Suite and VCM OS share a unified brand identity:
 - Both use the same colorful app card gradient system
 
 ## Recent Changes
+- 2025-12-06: **Added VCM Tools Directory** - Central hub for all tools with premium design
+  - Created `/tools` page "VCM Tools Explorer" with search, tag filters, and category sections
+  - Implemented `toolsRegistry.ts` data file with 47+ tools organized by 10 categories
+  - Added weighted search ranking (name matches > tag matches > description matches)
+  - Created `/tools/all` page with alphabetical listing and letter navigation
+  - Added ItemList, SiteNavigationElement, and WebPage JSON-LD schema for SEO
+  - Added "Tools Directory" footer link on homepage
+  - Categories: Creator, Image, Video, Writing, Social, Business, File, Calculators, Utilities, AI
+  - MBB tools included in categories but not highlighted as MBB (maintains luxury brand)
 - 2025-12-06: **Added Platform Image Resizer Suite** - Shared engine architecture for platform-specific image resizers
   - Created shared `PlatformImageToolClient` component with upload, preview, resize, download
   - Created `platformImagePresets.ts` registry with TypeScript types and preset configurations

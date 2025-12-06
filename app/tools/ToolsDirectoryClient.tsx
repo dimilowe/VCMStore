@@ -194,11 +194,44 @@ export default function ToolsDirectoryClient() {
     
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      tools = tools.filter(t => 
-        t.name.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.tags.some(tag => tag.includes(q))
-      );
+      
+      const scoredTools = tools
+        .map(t => {
+          let score = 0;
+          const nameLower = t.name.toLowerCase();
+          const descLower = t.description.toLowerCase();
+          
+          if (nameLower === q) {
+            score += 100;
+          } else if (nameLower.startsWith(q)) {
+            score += 80;
+          } else if (nameLower.includes(q)) {
+            score += 50;
+          }
+          
+          if (t.tags.some(tag => tag === q)) {
+            score += 30;
+          } else if (t.tags.some(tag => tag.includes(q))) {
+            score += 15;
+          }
+          
+          if (descLower.includes(q)) {
+            score += 10;
+          }
+          
+          if (t.isTrending) score += 5;
+          if (t.isNew) score += 3;
+          
+          return { tool: t, score };
+        })
+        .filter(item => item.score > 0)
+        .sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return b.tool.priority - a.tool.priority;
+        })
+        .map(item => item.tool);
+      
+      return scoredTools;
     }
     
     return tools.sort((a, b) => b.priority - a.priority);
