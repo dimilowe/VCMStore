@@ -100,7 +100,7 @@ export default function ClusterDetailPage() {
 
         const toolsRes = await fetch("/api/admin/tools", { credentials: "include" });
         if (toolsRes.ok) {
-          const allTools = await toolsRes.json();
+          const { tools: allTools } = await toolsRes.json();
           const clusterTools = allTools.filter((t: ToolInfo) =>
             clusterData.toolSlugs.includes(t.slug)
           );
