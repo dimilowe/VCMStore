@@ -289,6 +289,18 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **Added Cluster Control Panel** - Macro-view for managing topical authority clusters
+  - Created /admin/clusters dashboard showing all clusters with health scores
+  - Built lib/clusterHealth.ts with calculateClusterHealth() scoring (0-100):
+    - pillarScore (25pts) + toolsScore (25pts) + articlesScore (25pts) + interlinkScore (25pts)
+    - Status: ready (80+), needs-work (50-79), incomplete (<50)
+  - Cluster detail page /admin/clusters/[clusterSlug] with:
+    - Visual cluster map (tree structure: Pillar → Tools + Articles)
+    - Tools table with indexed/draft status
+    - Supporting articles list
+    - Health score breakdown by category
+  - Filter by status (Ready/Needs Work/Incomplete) and engine type
+  - Issues displayed as red tags showing what's missing
 - 2025-12-06: **Built Pre-Indexing Safety System** - Tools must have complete interlinking before indexing
   - Created dynamic pillar pages at /tools/clusters/[clusterSlug] aggregating tools by cluster
   - Created category pages at /tools/categories/[categorySlug] filtering tools by category
