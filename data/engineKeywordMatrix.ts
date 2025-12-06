@@ -86,53 +86,120 @@ export const PLATFORM_RESIZER_MATRIX: EngineKeywordMatrix = {
   generateCombinations(): ToolSkin[] {
     const skins: ToolSkin[] = [];
     
-    const platformConfigs: Record<string, { width: number; height: number; aspectRatio: string }> = {
-      "instagram": { width: 1080, height: 1080, aspectRatio: "1:1" },
-      "instagram-story": { width: 1080, height: 1920, aspectRatio: "9:16" },
-      "instagram-reel": { width: 1080, height: 1920, aspectRatio: "9:16" },
-      "tiktok": { width: 1080, height: 1920, aspectRatio: "9:16" },
-      "youtube": { width: 1280, height: 720, aspectRatio: "16:9" },
-      "youtube-shorts": { width: 1080, height: 1920, aspectRatio: "9:16" },
-      "twitter": { width: 1500, height: 500, aspectRatio: "3:1" },
-      "linkedin": { width: 1584, height: 396, aspectRatio: "4:1" },
-      "linkedin-company": { width: 1128, height: 191, aspectRatio: "6:1" },
-      "facebook": { width: 1200, height: 630, aspectRatio: "1.91:1" },
-      "facebook-cover": { width: 820, height: 312, aspectRatio: "2.63:1" },
-      "pinterest": { width: 1000, height: 1500, aspectRatio: "2:3" },
-      "snapchat": { width: 1080, height: 1920, aspectRatio: "9:16" },
-      "discord": { width: 680, height: 240, aspectRatio: "17:6" },
-      "twitch": { width: 1200, height: 480, aspectRatio: "2.5:1" },
-      "blog": { width: 1200, height: 630, aspectRatio: "1.91:1" },
-      "email": { width: 600, height: 400, aspectRatio: "3:2" },
+    const platformConfigs: Record<string, { width: number; height: number; aspectRatio: string; compatibleDimensions: string[] }> = {
+      "instagram": { width: 1080, height: 1080, aspectRatio: "1:1", compatibleDimensions: ["1080x1080"] },
+      "instagram-story": { width: 1080, height: 1920, aspectRatio: "9:16", compatibleDimensions: ["1080x1920"] },
+      "instagram-reel": { width: 1080, height: 1920, aspectRatio: "9:16", compatibleDimensions: ["1080x1920"] },
+      "tiktok": { width: 1080, height: 1920, aspectRatio: "9:16", compatibleDimensions: ["1080x1920"] },
+      "youtube": { width: 1280, height: 720, aspectRatio: "16:9", compatibleDimensions: ["1280x720", "1920x1080"] },
+      "youtube-shorts": { width: 1080, height: 1920, aspectRatio: "9:16", compatibleDimensions: ["1080x1920"] },
+      "twitter": { width: 1500, height: 500, aspectRatio: "3:1", compatibleDimensions: ["1500x500"] },
+      "linkedin": { width: 1584, height: 396, aspectRatio: "4:1", compatibleDimensions: ["1584x396"] },
+      "linkedin-company": { width: 1128, height: 191, aspectRatio: "6:1", compatibleDimensions: [] },
+      "facebook": { width: 1200, height: 630, aspectRatio: "1.91:1", compatibleDimensions: [] },
+      "facebook-cover": { width: 820, height: 312, aspectRatio: "2.63:1", compatibleDimensions: ["820x312"] },
+      "pinterest": { width: 1000, height: 1500, aspectRatio: "2:3", compatibleDimensions: ["1000x1500"] },
+      "snapchat": { width: 1080, height: 1920, aspectRatio: "9:16", compatibleDimensions: ["1080x1920"] },
+      "discord": { width: 680, height: 240, aspectRatio: "17:6", compatibleDimensions: [] },
+      "twitch": { width: 1200, height: 480, aspectRatio: "2.5:1", compatibleDimensions: [] },
+      "blog": { width: 1200, height: 630, aspectRatio: "1.91:1", compatibleDimensions: [] },
+      "email": { width: 600, height: 400, aspectRatio: "3:2", compatibleDimensions: [] },
     };
     
     for (const platform of this.platformModifiers) {
       const config = platformConfigs[platform.id];
       if (!config) continue;
       
-      const slug = `${platform.id}-resizer`;
-      const name = `${platform.label} Image Resizer`;
-      const primaryKeyword = `${platform.variations[0]} image size`;
-      
-      const secondaryKeywords = [
-        `resize image for ${platform.variations[0]}`,
-        `${platform.variations[0]} photo size`,
-        `${platform.variations[0]} dimensions`,
-        `${config.width}x${config.height} resizer`,
-        `${platform.label.toLowerCase()} image resizer free`,
-      ];
+      const baseSlug = `${platform.id}-resizer`;
+      const baseName = `${platform.label} Image Resizer`;
+      const basePrimaryKeyword = `${platform.variations[0]} image size`;
       
       skins.push({
-        slug,
-        name,
-        primaryKeyword,
-        secondaryKeywords,
+        slug: baseSlug,
+        name: baseName,
+        primaryKeyword: basePrimaryKeyword,
+        secondaryKeywords: [
+          `resize image for ${platform.variations[0]}`,
+          `${platform.variations[0]} photo size`,
+          `${platform.variations[0]} dimensions`,
+          `${config.width}x${config.height} resizer`,
+          `${platform.label.toLowerCase()} image resizer free`,
+        ],
         searchIntent: "action",
         h1: `${platform.label} Image Resizer`,
         metaDescription: `Resize images to ${config.width}×${config.height} pixels for ${platform.label}. Free online tool, no signup required.`,
         introCopy: `Upload any image and resize it to the perfect ${platform.label} dimensions (${config.width}×${config.height}) instantly.`,
         dimensions: { width: config.width, height: config.height },
         aspectRatio: config.aspectRatio,
+      });
+      
+      for (const intent of this.intentModifiers) {
+        if (intent.id === "resize") continue;
+        
+        const intentSlug = `${platform.id}-${intent.id}`;
+        const intentName = `${platform.label} Image ${intent.label}`;
+        
+        skins.push({
+          slug: intentSlug,
+          name: intentName,
+          primaryKeyword: `${intent.variations[0]} image for ${platform.variations[0]}`,
+          secondaryKeywords: [
+            `${platform.variations[0]} ${intent.id}`,
+            `${intent.id} ${platform.variations[0]} image`,
+            `${intent.variations[1] || intent.variations[0]} ${platform.label.toLowerCase()}`,
+          ],
+          searchIntent: "action",
+          h1: `${intent.label} Images for ${platform.label}`,
+          metaDescription: `${intent.label} your images for ${platform.label} (${config.width}×${config.height}). Free online tool.`,
+          introCopy: `${intent.label} any image to the perfect ${platform.label} dimensions instantly.`,
+          dimensions: { width: config.width, height: config.height },
+          aspectRatio: config.aspectRatio,
+        });
+      }
+      
+      for (const format of this.formatModifiers) {
+        if (format.id === config.aspectRatio) continue;
+        
+        const formatSlug = `${platform.id}-${format.id.replace(":", "-")}-resizer`;
+        const formatName = `${platform.label} ${format.label} Resizer`;
+        
+        skins.push({
+          slug: formatSlug,
+          name: formatName,
+          primaryKeyword: `${platform.variations[0]} ${format.variations[0]} image`,
+          secondaryKeywords: [
+            `${format.label.toLowerCase()} ${platform.variations[0]}`,
+            `${platform.label.toLowerCase()} ${format.variations[0]} size`,
+            `resize ${format.variations[0]} for ${platform.variations[0]}`,
+          ],
+          searchIntent: "action",
+          h1: `${platform.label} ${format.label} Image Resizer`,
+          metaDescription: `Resize images to ${format.label} (${format.variations[0]}) for ${platform.label}. Free online tool.`,
+          introCopy: `Create ${format.label.toLowerCase()} images optimized for ${platform.label}.`,
+          aspectRatio: format.id,
+        });
+      }
+    }
+    
+    for (const dimension of this.dimensionModifiers) {
+      const [w, h] = dimension.id.split("x").map(Number);
+      const dimensionSlug = `image-resizer-${dimension.id}`;
+      
+      skins.push({
+        slug: dimensionSlug,
+        name: `${dimension.label} Image Resizer`,
+        primaryKeyword: `resize image to ${dimension.id}`,
+        secondaryKeywords: [
+          `${dimension.id} image resizer`,
+          `${dimension.label.toLowerCase()} resizer`,
+          `make image ${dimension.id}`,
+          ...dimension.variations,
+        ],
+        searchIntent: "action",
+        h1: `Resize Images to ${dimension.label}`,
+        metaDescription: `Resize any image to ${dimension.label} pixels. Free online ${dimension.id} resizer, no signup required.`,
+        introCopy: `Upload any image and resize it to exactly ${w}×${h} pixels instantly.`,
+        dimensions: { width: w, height: h },
       });
     }
     

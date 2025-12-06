@@ -22,7 +22,7 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
     toolSlugs: [
       "instagram-post-resizer",
       "instagram-story-resizer",
-      "tiktok-cover-resizer",
+      "tiktok-video-resizer",
       "youtube-thumbnail-resizer",
       "twitter-header-resizer",
       "linkedin-banner-resizer"
@@ -33,13 +33,7 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
       "youtube-thumbnail-dimensions-guide",
       "twitter-header-dimensions-guide",
       "linkedin-banner-dimensions-guide",
-      "tiktok-cover-dimensions-guide",
-      "instagram-post-design-tips",
-      "instagram-story-design-tips",
-      "youtube-thumbnail-design-tips",
-      "twitter-header-design-tips",
-      "linkedin-banner-design-tips",
-      "tiktok-cover-design-tips"
+      "tiktok-cover-dimensions-guide"
     ],
     primaryKeyword: "social media image sizes",
     relatedKeywords: ["image dimensions", "aspect ratio", "resize for social media", "photo dimensions"]
@@ -52,20 +46,19 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
     engineId: "calculator",
     toolSlugs: [
       "calorie-deficit-calculator",
-      "bmi-calculator",
-      "treadmill-calorie-calculator",
+      "calorie-counter-bmi",
+      "calorie-counter-treadmill",
       "calorie-counter-walking",
-      "calorie-counter-steps"
+      "calorie-counter-steps",
+      "calorie-counter-maintenance",
+      "calorie-counter-free",
+      "calorie-counter-best"
     ],
     articleSlugs: [
-      "best-free-calorie-counters",
-      "calorie-counter-mistakes",
-      "how-to-count-calories-for-free",
-      "how-to-choose-best-calorie-counter",
-      "bmi-vs-body-fat",
-      "what-is-bmi",
-      "treadmill-calories-guide",
-      "incline-vs-speed-treadmill"
+      "steps-vs-calories-walking",
+      "walking-for-fat-loss",
+      "what-are-maintenance-calories",
+      "maintenance-vs-deficit-vs-surplus"
     ],
     primaryKeyword: "calorie calculator",
     relatedKeywords: ["weight loss calculator", "TDEE calculator", "calorie deficit", "BMI calculator"]
@@ -78,9 +71,9 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
     engineId: "calculator",
     toolSlugs: [
       "401k-retirement-calculator",
-      "mortgage-calculator",
+      "loan-estimator-home",
       "ups-shipping-cost",
-      "car-repair-estimator"
+      "estimator-for-car-repair"
     ],
     articleSlugs: [
       "401k-vs-ira-retirement",
