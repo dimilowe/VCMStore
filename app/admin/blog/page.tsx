@@ -2,7 +2,7 @@ import { query } from "@/lib/db";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 import { BlogSearchList } from "@/components/BlogSearchList";
 
 export const dynamic = 'force-dynamic';
@@ -32,6 +32,15 @@ export default async function AdminBlogPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Link href="/admin">
+          <Button variant="outline" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Admin
+          </Button>
+        </Link>
+      </div>
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-4xl font-bold mb-2">Blog Management</h1>
