@@ -293,7 +293,7 @@ export default function TikTokCoverDimensionsGuidePage() {
               </div>
             </section>
 
-            <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-cyan-100 rounded-2xl p-8 border border-pink-200 text-center">
+            <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-cyan-100 rounded-2xl p-8 border border-pink-200 text-center mb-16">
               <h2 className="text-2xl font-bold text-gray-900 mb-3">Create Perfect TikTok Content</h2>
               <p className="text-gray-700 mb-6">
                 Use our free tools to resize images and videos for TikTok.
