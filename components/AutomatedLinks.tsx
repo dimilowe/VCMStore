@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { ArrowRight, FileText, Wrench } from "lucide-react";
 import { toolsRegistry, Tool } from "@/data/toolsRegistry";
-import { getClusterByToolSlug, getRelatedToolsFromCluster, getRelatedArticlesFromCluster } from "@/data/clusterRegistry";
+import { getClusterByToolSlug, getRelatedToolsFromCluster, getRelatedArticlesFromCluster, getClusterById } from "@/data/clusterRegistry";
+import { getToolSkinBySlug, getSkinsByCluster, ToolSkin } from "@/data/engineKeywordMatrix";
 
 interface AutomatedLinksProps {
   currentToolSlug: string;
@@ -14,22 +15,52 @@ function getToolBySlug(slug: string): Tool | undefined {
   return toolsRegistry.find(t => t.slug === slug);
 }
 
+function getSkinRelatedTools(skin: ToolSkin, limit: number = 3): ToolSkin[] {
+  if (!skin.clusterSlug) return [];
+  return getSkinsByCluster(skin.clusterSlug)
+    .filter(s => s.slug !== skin.slug && s.isIndexed)
+    .slice(0, limit);
+}
+
+function getSkinRelatedArticles(skin: ToolSkin, limit: number = 2): string[] {
+  if (!skin.clusterSlug) return [];
+  const cluster = getClusterById(skin.clusterSlug);
+  return cluster?.articleSlugs.slice(0, limit) || [];
+}
+
 export function AutomatedToolLinks({ currentToolSlug, showRevenueCTA = true }: AutomatedLinksProps) {
   const currentTool = getToolBySlug(currentToolSlug);
-  if (!currentTool) return null;
-
-  const recommendedToolSlugs = currentTool.recommendedTools?.length 
-    ? currentTool.recommendedTools 
-    : getRelatedToolsFromCluster(currentToolSlug, 3);
+  const currentSkin = getToolSkinBySlug(currentToolSlug);
   
-  const recommendedArticleSlugs = currentTool.recommendedArticles?.length
-    ? currentTool.recommendedArticles
-    : getRelatedArticlesFromCluster(currentToolSlug, 2);
+  if (!currentTool && !currentSkin) return null;
 
-  const relatedTools = recommendedToolSlugs
-    .map(slug => getToolBySlug(slug))
-    .filter((t): t is Tool => t !== undefined)
-    .slice(0, 3);
+  let relatedTools: { slug: string; name: string; description: string }[] = [];
+  let recommendedArticleSlugs: string[] = [];
+
+  if (currentTool) {
+    const recommendedToolSlugs = currentTool.recommendedTools?.length 
+      ? currentTool.recommendedTools 
+      : getRelatedToolsFromCluster(currentToolSlug, 3);
+    
+    recommendedArticleSlugs = currentTool.recommendedArticles?.length
+      ? currentTool.recommendedArticles
+      : getRelatedArticlesFromCluster(currentToolSlug, 2);
+
+    relatedTools = recommendedToolSlugs
+      .map(slug => {
+        const tool = getToolBySlug(slug);
+        if (tool) return { slug: tool.slug, name: tool.name, description: tool.description };
+        const skin = getToolSkinBySlug(slug);
+        if (skin) return { slug: skin.slug, name: skin.name, description: skin.introCopy };
+        return null;
+      })
+      .filter((t): t is { slug: string; name: string; description: string } => t !== null)
+      .slice(0, 3);
+  } else if (currentSkin) {
+    const skinRelated = getSkinRelatedTools(currentSkin, 3);
+    relatedTools = skinRelated.map(s => ({ slug: s.slug, name: s.name, description: s.introCopy }));
+    recommendedArticleSlugs = getSkinRelatedArticles(currentSkin, 2);
+  }
 
   if (relatedTools.length === 0 && recommendedArticleSlugs.length === 0) return null;
 
@@ -42,17 +73,17 @@ export function AutomatedToolLinks({ currentToolSlug, showRevenueCTA = true }: A
             Related Tools
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {relatedTools.map(tool => (
+            {relatedTools.map(t => (
               <Link
-                key={tool.slug}
-                href={`/tools/${tool.slug}`}
+                key={t.slug}
+                href={`/tools/${t.slug}`}
                 className="group p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:shadow-md transition-all"
               >
                 <div className="font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
-                  {tool.name}
+                  {t.name}
                 </div>
                 <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                  {tool.description}
+                  {t.description}
                 </p>
               </Link>
             ))}
@@ -115,9 +146,13 @@ interface BreadcrumbsProps {
 
 export function AutomatedBreadcrumbs({ currentToolSlug }: BreadcrumbsProps) {
   const currentTool = getToolBySlug(currentToolSlug);
-  if (!currentTool) return null;
+  const currentSkin = getToolSkinBySlug(currentToolSlug);
+  
+  if (!currentTool && !currentSkin) return null;
 
-  const cluster = getClusterByToolSlug(currentToolSlug);
+  const toolName = currentTool?.name || currentSkin?.name || currentToolSlug;
+  const clusterSlug = currentTool?.clusterSlug || currentSkin?.clusterSlug;
+  const cluster = clusterSlug ? getClusterById(clusterSlug) : getClusterByToolSlug(currentToolSlug);
   
   return (
     <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
@@ -140,7 +175,7 @@ export function AutomatedBreadcrumbs({ currentToolSlug }: BreadcrumbsProps) {
         </>
       )}
       <span>/</span>
-      <span className="text-gray-900 font-medium">{currentTool.name}</span>
+      <span className="text-gray-900 font-medium">{toolName}</span>
     </nav>
   );
 }
@@ -151,16 +186,23 @@ interface SchemaInjectorProps {
 
 export function generateToolSchema(currentToolSlug: string) {
   const currentTool = getToolBySlug(currentToolSlug);
-  if (!currentTool) return null;
+  const currentSkin = getToolSkinBySlug(currentToolSlug);
+  
+  if (!currentTool && !currentSkin) return null;
 
-  const cluster = getClusterByToolSlug(currentToolSlug);
+  const name = currentTool?.name || currentSkin?.name || currentToolSlug;
+  const description = currentTool?.description || currentSkin?.introCopy || "";
+  const clusterSlug = currentTool?.clusterSlug || currentSkin?.clusterSlug;
+  const cluster = clusterSlug ? getClusterById(clusterSlug) : getClusterByToolSlug(currentToolSlug);
+  const primaryKeyword = currentTool?.primaryKeyword || currentSkin?.primaryKeyword;
+  const secondaryKeywords = currentTool?.secondaryKeywords || currentSkin?.secondaryKeywords || [];
 
   return {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": currentTool.name,
-    "description": currentTool.description,
-    "url": `https://vcmsuite.com/tools/${currentTool.slug}`,
+    "name": name,
+    "description": description,
+    "url": `https://vcmsuite.com/tools/${currentToolSlug}`,
     "applicationCategory": "UtilityApplication",
     "operatingSystem": "Web",
     "offers": {
@@ -175,11 +217,8 @@ export function generateToolSchema(currentToolSlug: string) {
         "url": `https://vcmsuite.com/tools?cluster=${cluster.id}`
       }
     }),
-    ...(currentTool.primaryKeyword && {
-      "keywords": [
-        currentTool.primaryKeyword,
-        ...(currentTool.secondaryKeywords || [])
-      ].join(", ")
+    ...(primaryKeyword && {
+      "keywords": [primaryKeyword, ...secondaryKeywords].join(", ")
     })
   };
 }

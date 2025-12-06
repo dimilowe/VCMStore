@@ -3,17 +3,57 @@
 import { ToolSkin } from "@/data/engineKeywordMatrix";
 import { AutomatedToolLinks, AutomatedBreadcrumbs, ToolSchemaScript } from "@/components/AutomatedLinks";
 import PlatformImageToolClient from "@/components/PlatformImageToolClient";
-import { getPresetBySlug } from "@/data/platformImagePresets";
+import { getPresetBySlug, PlatformImagePreset } from "@/data/platformImagePresets";
 
 interface DynamicToolRendererProps {
   skin: ToolSkin;
+}
+
+function createPresetFromSkin(skin: ToolSkin): PlatformImagePreset | undefined {
+  if (!skin.dimensions) return undefined;
+  
+  return {
+    id: skin.slug,
+    slug: skin.slug,
+    name: skin.name,
+    width: skin.dimensions.width,
+    height: skin.dimensions.height,
+    aspectRatioLabel: skin.aspectRatio || `${skin.dimensions.width}:${skin.dimensions.height}`,
+    maxFileSizeMB: 10,
+    outputFormats: ["jpg", "png"],
+    seo: {
+      title: `${skin.h1} - Free Online Tool | VCM Suite`,
+      description: skin.metaDescription,
+      h1: skin.h1,
+      faq: [
+        {
+          question: `What size does this tool resize to?`,
+          answer: `This tool resizes images to ${skin.dimensions.width}×${skin.dimensions.height} pixels.`
+        },
+        {
+          question: "Is this tool free?",
+          answer: "Yes, this tool is completely free to use with no signup required."
+        }
+      ]
+    },
+    ui: {
+      notes: [
+        `Upload any image to resize it to ${skin.dimensions.width}×${skin.dimensions.height} pixels.`,
+        "Supports JPG and PNG formats.",
+        "Download the resized image instantly."
+      ]
+    }
+  };
 }
 
 export default function DynamicToolRenderer({ skin }: DynamicToolRendererProps) {
   const renderEngine = () => {
     switch (skin.engineType) {
       case "platform-resizer":
-        const preset = getPresetBySlug(skin.slug);
+        let preset = getPresetBySlug(skin.slug);
+        if (!preset && skin.dimensions) {
+          preset = createPresetFromSkin(skin);
+        }
         if (preset) {
           return <PlatformImageToolClient preset={preset} />;
         }
