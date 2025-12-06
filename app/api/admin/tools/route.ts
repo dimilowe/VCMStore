@@ -11,6 +11,7 @@ import {
 } from "@/data/engineKeywordMatrix";
 import type { EngineType } from "@/engines";
 import { toolsRegistry } from "@/data/toolsRegistry";
+import { getPreflightStatus } from "@/lib/toolInterlinking";
 import fs from "fs";
 import path from "path";
 
@@ -55,6 +56,11 @@ export async function GET() {
     dimensions?: { width: number; height: number };
     h1: string;
     primaryKeyword: string;
+    linkStatus: {
+      status: "ready" | "warning" | "error";
+      label: string;
+      details: string[];
+    };
   }> = [];
 
   const legacySlugs = new Set<string>();
@@ -85,6 +91,7 @@ export async function GET() {
       priority: String(tool.priority) || "primary",
       h1: tool.name,
       primaryKeyword: tool.primaryKeyword || "",
+      linkStatus: getPreflightStatus(tool.slug),
     });
   }
 
@@ -108,6 +115,7 @@ export async function GET() {
         dimensions: skin.dimensions,
         h1: skin.h1,
         primaryKeyword: skin.primaryKeyword,
+        linkStatus: getPreflightStatus(skin.slug),
       });
     }
   }

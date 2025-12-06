@@ -19,7 +19,16 @@ import {
   EyeOff,
   Star,
   StarOff,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
 } from "lucide-react";
+
+interface LinkStatus {
+  status: "ready" | "warning" | "error";
+  label: string;
+  details: string[];
+}
 
 interface ToolSkin {
   slug: string;
@@ -34,6 +43,7 @@ interface ToolSkin {
   dimensions?: { width: number; height: number };
   h1: string;
   primaryKeyword: string;
+  linkStatus: LinkStatus;
 }
 
 interface ClusterSummary {
@@ -64,6 +74,7 @@ export default function AdminToolsPage() {
   const [filterCluster, setFilterCluster] = useState<string>("all");
   const [filterSegment, setFilterSegment] = useState<string>("all");
   const [filterIndexed, setFilterIndexed] = useState<string>("all");
+  const [filterLinkStatus, setFilterLinkStatus] = useState<string>("all");
 
   useEffect(() => {
     checkAuth();
@@ -144,6 +155,11 @@ export default function AdminToolsPage() {
           prev.map((t) => (t.slug === slug ? { ...t, isIndexed: !currentValue } : t))
         );
         loadClusters();
+      } else {
+        const data = await res.json();
+        if (data.blocked) {
+          alert(data.error || "Cannot index this tool yet. Check link status.");
+        }
       }
     } catch (error) {
       console.error("Failed to update tool:", error);
@@ -203,7 +219,10 @@ export default function AdminToolsPage() {
       filterIndexed === "all" ||
       (filterIndexed === "indexed" && tool.isIndexed) ||
       (filterIndexed === "not-indexed" && !tool.isIndexed);
-    return matchesSearch && matchesEngine && matchesCluster && matchesSegment && matchesIndexed;
+    const matchesLinkStatus =
+      filterLinkStatus === "all" ||
+      tool.linkStatus?.status === filterLinkStatus;
+    return matchesSearch && matchesEngine && matchesCluster && matchesSegment && matchesIndexed && matchesLinkStatus;
   });
 
   const totalPages = Math.ceil(filteredTools.length / ITEMS_PER_PAGE);
@@ -395,6 +414,20 @@ export default function AdminToolsPage() {
                   <option value="not-indexed">Not Indexed</option>
                 </select>
 
+                <select
+                  className="border rounded px-3 py-2 bg-white text-sm"
+                  value={filterLinkStatus}
+                  onChange={(e) => {
+                    setFilterLinkStatus(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="all">All Link Status</option>
+                  <option value="ready">Ready to Index</option>
+                  <option value="warning">Incomplete</option>
+                  <option value="error">Not Ready</option>
+                </select>
+
                 <span className="text-sm text-gray-500 ml-auto">
                   Showing {filteredTools.length} of {tools.length} tools
                 </span>
@@ -410,7 +443,7 @@ export default function AdminToolsPage() {
                         <th className="text-left p-4 font-medium text-gray-600">Name</th>
                         <th className="text-left p-4 font-medium text-gray-600">Engine</th>
                         <th className="text-left p-4 font-medium text-gray-600">Cluster</th>
-                        <th className="text-left p-4 font-medium text-gray-600">Segment</th>
+                        <th className="text-center p-4 font-medium text-gray-600">Link Status</th>
                         <th className="text-center p-4 font-medium text-gray-600">Indexed</th>
                         <th className="text-center p-4 font-medium text-gray-600">Featured</th>
                         <th className="text-center p-4 font-medium text-gray-600">In Directory</th>
@@ -439,8 +472,28 @@ export default function AdminToolsPage() {
                           <td className="p-4">
                             <span className="text-sm text-gray-600">{tool.clusterSlug || "-"}</span>
                           </td>
-                          <td className="p-4">
-                            <Badge className={getSegmentColor(tool.segment)}>{tool.segment}</Badge>
+                          <td className="p-4 text-center">
+                            <div 
+                              className="group relative inline-block"
+                              title={tool.linkStatus?.details?.join("\n") || ""}
+                            >
+                              {tool.linkStatus?.status === "ready" ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Ready
+                                </span>
+                              ) : tool.linkStatus?.status === "error" ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                                  <XCircle className="w-3 h-3" />
+                                  Not Ready
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                                  <AlertTriangle className="w-3 h-3" />
+                                  Incomplete
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="p-4 text-center">
                             <button

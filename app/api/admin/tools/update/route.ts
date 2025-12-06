@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
 import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
+import { canIndexTool } from "@/lib/toolInterlinking";
 import fs from "fs";
 import path from "path";
 
@@ -48,6 +49,16 @@ export async function POST(request: NextRequest) {
     const allowedFields = ["isIndexed", "isFeatured", "inDirectory", "segment"];
     if (!allowedFields.includes(field)) {
       return NextResponse.json({ error: "Invalid field" }, { status: 400 });
+    }
+
+    if (field === "isIndexed" && value === true) {
+      const canIndex = canIndexTool(slug);
+      if (!canIndex.allowed) {
+        return NextResponse.json({ 
+          error: canIndex.reason || "Cannot index this tool yet",
+          blocked: true 
+        }, { status: 400 });
+      }
     }
 
     const config = loadRolloutConfig();
