@@ -97,6 +97,8 @@ export interface ExpansionResult {
   created: string[];
   skipped: string[];
   errors: string[];
+  warnings: string[];
+  missingClusters: string[];
 }
 
 function interpolate(template: string, values: Record<string, string>): string {

@@ -7,6 +7,7 @@ import {
   getBlueprint,
   getAllBlueprints,
 } from "./engineBlueprint";
+import { getClusterById } from "@/data/clusterRegistry";
 
 export async function runExpansion(blueprintId: string): Promise<ExpansionResult> {
   const blueprint = getBlueprint(blueprintId);
@@ -19,6 +20,8 @@ export async function runExpansion(blueprintId: string): Promise<ExpansionResult
       created: [],
       skipped: [],
       errors: [`Blueprint not found: ${blueprintId}`],
+      warnings: [],
+      missingClusters: [],
     };
   }
   
@@ -35,10 +38,27 @@ export async function expandBlueprint(blueprint: EngineBlueprint): Promise<Expan
     created: [],
     skipped: [],
     errors: [],
+    warnings: [],
+    missingClusters: [],
   };
   
   if (shells.length === 0) {
     return result;
+  }
+  
+  const referencedClusters = new Set<string>();
+  for (const shell of shells) {
+    if (shell.clusterSlug) {
+      referencedClusters.add(shell.clusterSlug);
+    }
+  }
+  
+  for (const clusterSlug of referencedClusters) {
+    const cluster = getClusterById(clusterSlug);
+    if (!cluster) {
+      result.missingClusters.push(clusterSlug);
+      result.warnings.push(`Cluster "${clusterSlug}" is referenced but not defined in clusterRegistry.ts`);
+    }
   }
   
   try {

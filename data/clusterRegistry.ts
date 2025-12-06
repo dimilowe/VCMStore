@@ -151,6 +151,28 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
     ],
     primaryKeyword: "daily affirmations",
     relatedKeywords: ["motivation for creators", "positive affirmations", "creator mindset"]
+  },
+  "youtube-metrics": {
+    id: "youtube-metrics",
+    pillarSlug: "youtube-metrics",
+    pillarTitle: "Free YouTube Analytics Calculators",
+    pillarDescription: "Calculate CTR, CPM, retention, and other key YouTube metrics for longform videos and Shorts.",
+    engineId: "calculator",
+    toolSlugs: [
+      "youtube-ctr-longform-calculator",
+      "youtube-ctr-shorts-calculator",
+      "youtube-cpm-longform-calculator",
+      "youtube-cpm-shorts-calculator",
+      "youtube-retention-longform-calculator",
+      "youtube-retention-shorts-calculator",
+      "youtube-avg-view-duration-longform-calculator",
+      "youtube-avg-view-duration-shorts-calculator",
+      "youtube-clicks-per-impression-longform-calculator",
+      "youtube-clicks-per-impression-shorts-calculator"
+    ],
+    articleSlugs: [],
+    primaryKeyword: "youtube metrics calculator",
+    relatedKeywords: ["youtube ctr calculator", "youtube cpm calculator", "youtube retention calculator", "youtube analytics"]
   }
 };
 
