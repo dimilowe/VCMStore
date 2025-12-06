@@ -53,7 +53,7 @@ export default function TikTokCoverDimensionsGuidePage() {
               </p>
               <Link 
                 href="/tools/tiktok-size"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-pink-500 to-cyan-500 hover:from-pink-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all group shadow-md hover:shadow-lg"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-all group shadow-md hover:shadow-lg"
               >
                 Create TikTok Cover
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -301,7 +301,7 @@ export default function TikTokCoverDimensionsGuidePage() {
               <div className="flex flex-wrap gap-3 justify-center">
                 <Link 
                   href="/tools/tiktok-size"
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-pink-500 to-cyan-500 hover:from-pink-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all shadow-md hover:shadow-lg"
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-all shadow-md hover:shadow-lg"
                 >
                   TikTok Image Resizer
                   <ArrowRight className="w-4 h-4" />
