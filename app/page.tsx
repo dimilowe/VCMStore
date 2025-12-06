@@ -481,9 +481,17 @@ export default async function HomePage() {
               </p>
             </div>
             
-            <div className="flex items-center gap-4">
-              <p className="text-gray-500 text-sm hidden md:block">Have feedback or suggestions?</p>
-              <FeedbackDialog />
+            <div className="flex items-center gap-6">
+              <Link 
+                href="/tools" 
+                className="text-gray-600 hover:text-orange-500 text-sm font-medium transition-colors"
+              >
+                Tools Directory
+              </Link>
+              <div className="flex items-center gap-4">
+                <p className="text-gray-500 text-sm hidden md:block">Feedback?</p>
+                <FeedbackDialog />
+              </div>
             </div>
           </div>
         </div>
