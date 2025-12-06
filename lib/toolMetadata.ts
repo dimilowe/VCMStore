@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { getToolSkinBySlug, ToolSkin } from "@/data/engineKeywordMatrix";
 import { toolsRegistry } from "@/data/toolsRegistry";
+import { isToolIndexed } from "@/lib/toolRollout";
 
 export function generateToolMetadata(slug: string): Metadata {
   const skin = getToolSkinBySlug(slug);
+  const indexed = isToolIndexed(slug);
   
   if (skin) {
     return {
@@ -16,7 +18,9 @@ export function generateToolMetadata(slug: string): Metadata {
         type: "website",
         siteName: "VCM Suite",
       },
-      robots: skin.isIndexed ? "index, follow" : "noindex, follow",
+      robots: indexed 
+        ? { index: true, follow: true }
+        : { index: false, follow: false },
     };
   }
   
@@ -31,12 +35,16 @@ export function generateToolMetadata(slug: string): Metadata {
         type: "website",
         siteName: "VCM Suite",
       },
+      robots: indexed 
+        ? { index: true, follow: true }
+        : { index: false, follow: false },
     };
   }
   
   return {
     title: "Free Online Tool | VCM Suite",
     description: "Free online tools for creators and entrepreneurs.",
+    robots: { index: false, follow: false },
   };
 }
 
@@ -45,6 +53,5 @@ export function getToolSkin(slug: string): ToolSkin | undefined {
 }
 
 export function shouldIndexTool(slug: string): boolean {
-  const skin = getToolSkinBySlug(slug);
-  return skin?.isIndexed ?? true;
+  return isToolIndexed(slug);
 }
