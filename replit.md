@@ -290,6 +290,15 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **ToolsRepo Single Source of Truth** - Database-driven tool management
+  - Created ToolsRepo abstraction (lib/toolsRepo.ts): getToolBySlug, listTools, createTool, updateTool, upsertTool
+  - Extended tools table with 19 new columns: category, tags, icon, priority, input_type, output_type, etc.
+  - Migrated 47 legacy tools from toolsRegistry.ts into database (source='legacy', status='published')
+  - Total: 79 tools in database (47 legacy + 32 expansion shells)
+  - Tool Control Panel now reads exclusively from database via ToolsRepo
+  - Created toolsCache.ts for sync access with auto-initialization on module load
+  - Updated toolRollout.ts to use cache-first pattern (no registry fallback)
+  - JSON configs and toolsRegistry.ts are no longer source of truth - database is authoritative
 - 2025-12-06: **Engine Expansion Factory** - Cartesian product-based tool shell generation
   - Created EngineBlueprint schema (lib/engineBlueprint.ts) with dimensions, clusterResolver, linkRules, defaults
   - Built Engine Expansion Generator (lib/engineExpansionGenerator.ts) for idempotent Cartesian expansion

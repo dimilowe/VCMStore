@@ -1,87 +1,57 @@
-import fs from "fs";
-import path from "path";
-import { toolsRegistry } from "@/data/toolsRegistry";
+import { getToolBySlug, listTools, ToolRecord } from "@/lib/toolsRepo";
 import { 
-  getToolSkinBySlug, 
-  getAllToolSkinsForEngine,
-  ENGINE_KEYWORD_MATRICES,
-  ToolSkin 
-} from "@/data/engineKeywordMatrix";
-import type { EngineType } from "@/engines";
+  getCachedToolBySlug, 
+  getCachedIndexedTools, 
+  getCachedDirectoryTools,
+  getCachedFeaturedTools,
+  ensureCacheLoaded 
+} from "@/lib/toolsCache";
 
-interface ToolOverride {
-  isIndexed?: boolean;
-  isFeatured?: boolean;
-  inDirectory?: boolean;
-  segment?: string;
-}
-
-interface RolloutConfig {
-  tools: Record<string, ToolOverride>;
-}
-
-let cachedConfig: RolloutConfig | null = null;
-let cacheTime: number = 0;
-const CACHE_TTL = 5000;
-
-function loadRolloutConfig(): RolloutConfig {
-  const now = Date.now();
-  if (cachedConfig && (now - cacheTime) < CACHE_TTL) {
-    return cachedConfig;
+export async function isToolIndexedAsync(slug: string): Promise<boolean> {
+  const dbTool = await getToolBySlug(slug);
+  if (dbTool) {
+    return dbTool.isIndexed;
   }
-  
-  try {
-    const configPath = path.join(process.cwd(), "data/toolRolloutConfig.json");
-    const data = fs.readFileSync(configPath, "utf-8");
-    cachedConfig = JSON.parse(data);
-    cacheTime = now;
-    return cachedConfig!;
-  } catch {
-    cachedConfig = { tools: {} };
-    cacheTime = now;
-    return cachedConfig;
-  }
+  return false;
 }
 
 export function isToolIndexed(slug: string): boolean {
-  const config = loadRolloutConfig();
-  const override = config.tools[slug];
-  
-  if (override?.isIndexed !== undefined) {
-    return override.isIndexed;
+  const cached = getCachedToolBySlug(slug);
+  if (cached) {
+    return cached.isIndexed;
   }
-  
-  const legacyTool = toolsRegistry.find(t => t.slug === slug);
-  if (legacyTool) {
-    return true;
+  return false;
+}
+
+export async function isToolFeaturedAsync(slug: string): Promise<boolean> {
+  const dbTool = await getToolBySlug(slug);
+  if (dbTool) {
+    return dbTool.featured;
   }
-  
-  const skin = getToolSkinBySlug(slug);
-  if (skin) {
-    return skin.isIndexed ?? false;
-  }
-  
   return false;
 }
 
 export function isToolFeatured(slug: string): boolean {
-  const config = loadRolloutConfig();
-  return config.tools[slug]?.isFeatured ?? false;
+  const cached = getCachedToolBySlug(slug);
+  if (cached) {
+    return cached.featured;
+  }
+  return false;
+}
+
+export async function isToolInDirectoryAsync(slug: string): Promise<boolean> {
+  const dbTool = await getToolBySlug(slug);
+  if (dbTool) {
+    return dbTool.inDirectory;
+  }
+  return false;
 }
 
 export function isToolInDirectory(slug: string): boolean {
-  const config = loadRolloutConfig();
-  const override = config.tools[slug];
-  
-  if (override?.inDirectory !== undefined) {
-    return override.inDirectory;
+  const cached = getCachedToolBySlug(slug);
+  if (cached) {
+    return cached.inDirectory;
   }
-  
-  const legacyTool = toolsRegistry.find(t => t.slug === slug);
-  if (legacyTool) {
-    return true;
-  }
-  
   return false;
 }
 
@@ -92,56 +62,61 @@ export interface IndexedToolInfo {
   priority: number;
 }
 
+export async function getAllIndexedToolsAsync(): Promise<IndexedToolInfo[]> {
+  const dbTools = await listTools({ isIndexed: true });
+  return dbTools.map(tool => ({
+    slug: tool.slug,
+    name: tool.name,
+    engineType: tool.engine || "legacy",
+    priority: tool.priority,
+  }));
+}
+
 export function getAllIndexedTools(): IndexedToolInfo[] {
-  const config = loadRolloutConfig();
-  const indexedTools: IndexedToolInfo[] = [];
-  const seenSlugs = new Set<string>();
-  
-  for (const tool of toolsRegistry) {
-    const override = config.tools[tool.slug];
-    const isIndexed = override?.isIndexed ?? true;
-    
-    if (isIndexed && !seenSlugs.has(tool.slug)) {
-      seenSlugs.add(tool.slug);
-      indexedTools.push({
-        slug: tool.slug,
-        name: tool.name,
-        engineType: tool.engineType || "legacy",
-        priority: 0.8,
-      });
-    }
-  }
-  
-  const engineTypes = Object.keys(ENGINE_KEYWORD_MATRICES) as EngineType[];
-  for (const engineType of engineTypes) {
-    const skins = getAllToolSkinsForEngine(engineType);
-    for (const skin of skins) {
-      if (seenSlugs.has(skin.slug)) continue;
-      
-      const override = config.tools[skin.slug];
-      const isIndexed = override?.isIndexed ?? skin.isIndexed ?? false;
-      
-      if (isIndexed) {
-        seenSlugs.add(skin.slug);
-        indexedTools.push({
-          slug: skin.slug,
-          name: skin.name,
-          engineType: skin.engineType,
-          priority: skin.priority === "primary" ? 0.9 : 0.7,
-        });
-      }
-    }
-  }
-  
-  return indexedTools;
+  const cached = getCachedIndexedTools();
+  return cached.map(tool => ({
+    slug: tool.slug,
+    name: tool.name,
+    engineType: tool.engine || "legacy",
+    priority: tool.priority,
+  }));
 }
 
-export function clearRolloutCache(): void {
-  cachedConfig = null;
-  cacheTime = 0;
+export async function getAllDirectoryToolsAsync(): Promise<IndexedToolInfo[]> {
+  const dbTools = await listTools({ inDirectory: true });
+  return dbTools.map(tool => ({
+    slug: tool.slug,
+    name: tool.name,
+    engineType: tool.engine || "legacy",
+    priority: tool.priority,
+  }));
 }
 
-export function getRobotsDirective(slug: string): { index: boolean; follow: boolean } {
-  const indexed = isToolIndexed(slug);
-  return { index: indexed, follow: indexed };
+export function getAllDirectoryTools(): IndexedToolInfo[] {
+  const cached = getCachedDirectoryTools();
+  return cached.map(tool => ({
+    slug: tool.slug,
+    name: tool.name,
+    engineType: tool.engine || "legacy",
+    priority: tool.priority,
+  }));
+}
+
+export function getAllFeaturedTools(): IndexedToolInfo[] {
+  const cached = getCachedFeaturedTools();
+  return cached.map(tool => ({
+    slug: tool.slug,
+    name: tool.name,
+    engineType: tool.engine || "legacy",
+    priority: tool.priority,
+  }));
+}
+
+export async function getToolFromDbOrRegistry(slug: string): Promise<ToolRecord | null> {
+  const dbTool = await getToolBySlug(slug);
+  return dbTool;
+}
+
+export async function initToolsCache(): Promise<void> {
+  await ensureCacheLoaded();
 }
