@@ -6,6 +6,7 @@ import {
   generateAllShells,
   getBlueprint,
   getAllBlueprints,
+  generateArticleSlugsFromPatterns,
 } from "./engineBlueprint";
 import { getClusterById } from "@/data/clusterRegistry";
 
@@ -22,6 +23,7 @@ export async function runExpansion(blueprintId: string): Promise<ExpansionResult
       errors: [`Blueprint not found: ${blueprintId}`],
       warnings: [],
       missingClusters: [],
+      generatedArticleSlugs: [],
     };
   }
   
@@ -30,6 +32,14 @@ export async function runExpansion(blueprintId: string): Promise<ExpansionResult
 
 export async function expandBlueprint(blueprint: EngineBlueprint): Promise<ExpansionResult> {
   const shells = generateAllShells(blueprint);
+  
+  let generatedArticleSlugs: string[] = [];
+  let clusterSlug: string | undefined;
+  
+  if (blueprint.clusterConfig) {
+    generatedArticleSlugs = generateArticleSlugsFromPatterns(blueprint.clusterConfig);
+    clusterSlug = blueprint.clusterConfig.clusterSlug;
+  }
   
   const result: ExpansionResult = {
     engineId: blueprint.id,
@@ -40,6 +50,8 @@ export async function expandBlueprint(blueprint: EngineBlueprint): Promise<Expan
     errors: [],
     warnings: [],
     missingClusters: [],
+    generatedArticleSlugs,
+    clusterSlug,
   };
   
   if (shells.length === 0) {
@@ -79,37 +91,69 @@ export async function expandBlueprint(blueprint: EngineBlueprint): Promise<Expan
       }
     }
     
-    if (toInsert.length === 0) {
-      return result;
-    }
-    
     await withTransaction(async (tx) => {
-      for (const shell of toInsert) {
-        await tx.query(
-          `INSERT INTO tools (
-            slug, name, description, engine, cluster, segment, status, 
-            link_status, is_indexed, in_directory, featured, 
-            blueprint_id, dimensions, link_rules
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-          [
-            shell.slug,
-            shell.name,
-            shell.metaDescription || '',
-            shell.engineType,
-            shell.clusterSlug || null,
-            shell.segment || 'secondary',
-            'draft',
-            'Not Ready',
-            false,
-            false,
-            false,
-            blueprint.id,
-            JSON.stringify(shell.dimensions || {}),
-            JSON.stringify(shell.linkRules || {}),
-          ]
+      if (toInsert.length > 0) {
+        for (const shell of toInsert) {
+          await tx.query(
+            `INSERT INTO tools (
+              slug, name, description, engine, cluster, segment, status, 
+              link_status, is_indexed, in_directory, featured, 
+              blueprint_id, dimensions, link_rules
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+            [
+              shell.slug,
+              shell.name,
+              shell.metaDescription || '',
+              shell.engineType,
+              shell.clusterSlug || null,
+              shell.segment || 'secondary',
+              'draft',
+              'Not Ready',
+              false,
+              false,
+              false,
+              blueprint.id,
+              JSON.stringify(shell.dimensions || {}),
+              JSON.stringify(shell.linkRules || {}),
+            ]
+          );
+          result.createdCount++;
+          result.created.push(shell.slug);
+        }
+      }
+      
+      if (blueprint.clusterConfig && generatedArticleSlugs.length > 0) {
+        const existingArticles = await tx.query(
+          `SELECT slug FROM cluster_articles WHERE slug = ANY($1)`,
+          [generatedArticleSlugs]
         );
-        result.createdCount++;
-        result.created.push(shell.slug);
+        const existingArticleSlugs = new Set(existingArticles.rows.map((r: { slug: string }) => r.slug));
+        
+        for (const articleSlug of generatedArticleSlugs) {
+          if (!existingArticleSlugs.has(articleSlug)) {
+            const title = articleSlug
+              .split("-")
+              .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ");
+            
+            await tx.query(
+              `INSERT INTO cluster_articles (
+                slug, title, content, excerpt, meta_description, 
+                cluster_slug, is_indexed, is_published, created_at, updated_at
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())`,
+              [
+                articleSlug,
+                title,
+                '',
+                '',
+                '',
+                blueprint.clusterConfig!.clusterSlug,
+                false,
+                false,
+              ]
+            );
+          }
+        }
       }
     });
     

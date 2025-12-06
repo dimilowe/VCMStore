@@ -238,6 +238,21 @@ export const YOUTUBE_METRICS_BLUEPRINT: EngineBlueprint = {
   clusterResolver: (combo: CartesianCombo) => {
     return "youtube-metrics";
   },
+  
+  clusterConfig: {
+    clusterSlug: "youtube-metrics",
+    pillarTitle: "Free YouTube Analytics Calculators",
+    pillarDescription: "Calculate CTR, CPM, retention, and other key YouTube metrics for longform videos and Shorts.",
+    primaryKeyword: "youtube metrics",
+    relatedKeywords: ["youtube ctr calculator", "youtube cpm calculator", "youtube retention calculator", "youtube analytics"],
+    articlePatterns: [
+      { template: "what-is-a-good-youtube-ctr" },
+      { template: "how-to-improve-youtube-retention" },
+      { template: "youtube-cpm-rates-explained" },
+      { template: "youtube-shorts-vs-longform-analytics" },
+      { template: "understanding-youtube-impressions" },
+    ],
+  },
 
   linkRules: {
     siblingsPerTool: 3,

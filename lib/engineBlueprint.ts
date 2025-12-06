@@ -12,6 +12,20 @@ export interface LinkRules {
   };
 }
 
+export interface ArticlePattern {
+  template: string;
+  title?: string;
+}
+
+export interface ClusterConfig {
+  clusterSlug: string;
+  pillarTitle: string;
+  pillarDescription: string;
+  primaryKeyword: string;
+  relatedKeywords: string[];
+  articlePatterns: ArticlePattern[];
+}
+
 export interface DimensionArray {
   id: string;
   label: string;
@@ -45,6 +59,8 @@ export interface EngineBlueprint {
   dimensions: DimensionArray[];
   
   clusterResolver: (combo: CartesianCombo) => string | undefined;
+  
+  clusterConfig?: ClusterConfig;
   
   linkRules: LinkRules;
   
@@ -99,6 +115,8 @@ export interface ExpansionResult {
   errors: string[];
   warnings: string[];
   missingClusters: string[];
+  generatedArticleSlugs: string[];
+  clusterSlug?: string;
 }
 
 function interpolate(template: string, values: Record<string, string>): string {
@@ -218,4 +236,27 @@ export function getAllBlueprints(): EngineBlueprint[] {
 
 export function getBlueprintsByEngine(engineId: EngineType): EngineBlueprint[] {
   return getAllBlueprints().filter(b => b.engineId === engineId);
+}
+
+export function generateArticleSlugsFromPatterns(clusterConfig: ClusterConfig): string[] {
+  const { articlePatterns, primaryKeyword, clusterSlug } = clusterConfig;
+  
+  return articlePatterns.map(pattern => {
+    let slug = pattern.template
+      .replace(/\{keyword\}/g, primaryKeyword)
+      .replace(/\{cluster\}/g, clusterSlug)
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    return slug;
+  });
+}
+
+export interface ClusterExpansionResult {
+  clusterSlug: string;
+  pillarTitle: string;
+  toolSlugs: string[];
+  articleSlugs: string[];
+  primaryKeyword: string;
+  relatedKeywords: string[];
 }
