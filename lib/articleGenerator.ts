@@ -150,21 +150,21 @@ export async function getArticleStatusesForCluster(clusterSlug: string): Promise
     return [];
   }
 
-  const existingPosts = await query(
-    `SELECT slug, title, content, published_at, is_indexed 
-     FROM blog_posts 
+  const existingArticles = await query(
+    `SELECT slug, title, content, is_published, is_indexed 
+     FROM cluster_articles 
      WHERE slug = ANY($1)`,
     [cluster.articleSlugs]
   );
 
-  const postMap = new Map<string, typeof existingPosts.rows[0]>();
-  for (const row of existingPosts.rows) {
-    postMap.set(row.slug, row);
+  const articleMap = new Map<string, typeof existingArticles.rows[0]>();
+  for (const row of existingArticles.rows) {
+    articleMap.set(row.slug, row);
   }
 
   return cluster.articleSlugs.map(slug => {
-    const post = postMap.get(slug);
-    if (!post) {
+    const article = articleMap.get(slug);
+    if (!article) {
       return {
         slug,
         title: slugToTitle(slug),
@@ -176,16 +176,14 @@ export async function getArticleStatusesForCluster(clusterSlug: string): Promise
       };
     }
 
-    const isPublished = post.published_at !== null && new Date(post.published_at) <= new Date();
-
     return {
       slug,
-      title: post.title || slugToTitle(slug),
+      title: article.title || slugToTitle(slug),
       exists: true,
-      isDraft: !isPublished,
-      isPublished,
-      isIndexed: post.is_indexed === true,
-      contentLength: post.content?.length || 0,
+      isDraft: !article.is_published,
+      isPublished: article.is_published === true,
+      isIndexed: article.is_indexed === true,
+      contentLength: article.content?.length || 0,
     };
   });
 }
@@ -200,12 +198,12 @@ export async function createMissingDraftsWithContent(clusterSlug: string): Promi
     throw new Error(`Cluster not found: ${clusterSlug}`);
   }
 
-  const existingPosts = await query(
-    `SELECT slug FROM blog_posts WHERE slug = ANY($1)`,
+  const existingArticles = await query(
+    `SELECT slug FROM cluster_articles WHERE slug = ANY($1)`,
     [cluster.articleSlugs]
   );
 
-  const existingSlugs = new Set(existingPosts.rows.map(r => r.slug));
+  const existingSlugs = new Set(existingArticles.rows.map(r => r.slug));
 
   const created: string[] = [];
   const skipped: string[] = [];
@@ -222,9 +220,9 @@ export async function createMissingDraftsWithContent(clusterSlug: string): Promi
       const generated = await generateArticleContent(articleSlug, clusterSlug);
       
       await query(`
-        INSERT INTO blog_posts (slug, title, content, excerpt, meta_description, cluster_slug, is_indexed, published_at, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NULL, NOW(), NOW())
-      `, [articleSlug, generated.title, generated.content, generated.excerpt, generated.metaDescription, clusterSlug, false]);
+        INSERT INTO cluster_articles (slug, title, content, excerpt, meta_description, cluster_slug, is_indexed, is_published, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+      `, [articleSlug, generated.title, generated.content, generated.excerpt, generated.metaDescription, clusterSlug, false, false]);
 
       created.push(articleSlug);
       console.log(`Created article: ${articleSlug}`);
@@ -248,9 +246,9 @@ export async function createMissingDrafts(clusterSlug: string): Promise<{
 
 export async function publishArticle(slug: string): Promise<boolean> {
   const result = await query(
-    `UPDATE blog_posts 
-     SET published_at = NOW(), updated_at = NOW() 
-     WHERE slug = $1 AND published_at IS NULL
+    `UPDATE cluster_articles 
+     SET is_published = true, updated_at = NOW() 
+     WHERE slug = $1 AND is_published = false
      RETURNING id`,
     [slug]
   );
@@ -259,8 +257,8 @@ export async function publishArticle(slug: string): Promise<boolean> {
 
 export async function unpublishArticle(slug: string): Promise<boolean> {
   const result = await query(
-    `UPDATE blog_posts 
-     SET published_at = NULL, updated_at = NOW() 
+    `UPDATE cluster_articles 
+     SET is_published = false, updated_at = NOW() 
      WHERE slug = $1
      RETURNING id`,
     [slug]
@@ -270,7 +268,7 @@ export async function unpublishArticle(slug: string): Promise<boolean> {
 
 export async function setArticleIndexed(slug: string, indexed: boolean): Promise<boolean> {
   const result = await query(
-    `UPDATE blog_posts 
+    `UPDATE cluster_articles 
      SET is_indexed = $1, updated_at = NOW() 
      WHERE slug = $2
      RETURNING id`,

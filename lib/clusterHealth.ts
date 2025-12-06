@@ -120,13 +120,13 @@ async function getArticleStatuses(articleSlugs: string[]): Promise<ArticleStatus
   try {
     const placeholders = articleSlugs.map((_, i) => `$${i + 1}`).join(", ");
     const result = await query(
-      `SELECT slug, title, content, published_at, is_indexed 
-       FROM blog_posts 
+      `SELECT slug, title, content, is_published, is_indexed 
+       FROM cluster_articles 
        WHERE slug IN (${placeholders})`,
       articleSlugs
     );
     
-    const postMap = new Map<string, {
+    const articleMap = new Map<string, {
       title: string;
       isPublished: boolean;
       isIndexed: boolean;
@@ -134,17 +134,16 @@ async function getArticleStatuses(articleSlugs: string[]): Promise<ArticleStatus
     }>();
     
     for (const row of result.rows) {
-      const isPublished = row.published_at && new Date(row.published_at) <= new Date();
-      postMap.set(row.slug, { 
+      articleMap.set(row.slug, { 
         title: row.title, 
-        isPublished,
+        isPublished: row.is_published === true,
         isIndexed: row.is_indexed === true,
         contentLength: row.content?.length || 0,
       });
     }
     
     return articleSlugs.map(slug => {
-      const found = postMap.get(slug);
+      const found = articleMap.get(slug);
       if (!found) {
         return {
           slug,
@@ -190,20 +189,19 @@ export async function getAllClustersOverview(): Promise<ClusterOverview[]> {
     try {
       const placeholders = uniqueSlugs.map((_, i) => `$${i + 1}`).join(", ");
       const result = await query(
-        `SELECT slug, title, content, published_at, is_indexed 
-         FROM blog_posts 
+        `SELECT slug, title, content, is_published, is_indexed 
+         FROM cluster_articles 
          WHERE slug IN (${placeholders})`,
         uniqueSlugs
       );
       
       for (const row of result.rows) {
-        const isPublished = row.published_at && new Date(row.published_at) <= new Date();
         articleStatusMap.set(row.slug, {
           slug: row.slug,
           title: row.title,
           exists: true,
-          isDraft: !isPublished,
-          isPublished,
+          isDraft: !row.is_published,
+          isPublished: row.is_published === true,
           isIndexed: row.is_indexed === true,
           contentLength: row.content?.length || 0,
         });
