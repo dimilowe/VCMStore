@@ -42,7 +42,7 @@ export async function generateArticleContent(
 
   const toolLinks = cluster.toolSlugs
     .slice(0, 3)
-    .map(slug => `- [${slugToTitle(slug)}](/tools/${slug})`)
+    .map(slug => `<li><a href="/tools/${slug}">${slugToTitle(slug)}</a></li>`)
     .join('\n');
 
   const prompt = `You are an SEO content writer for VCM Suite, a creator tools platform. Write a comprehensive, actionable blog article with rich formatting.
@@ -125,7 +125,7 @@ REQUIRED STRUCTURE - Follow this EXACT format:
 <h2>Get Started with Our Free Tools</h2>
 <p>Ready to [take action]? Try our free tools to make it easy:</p>
 <ul class="tool-links">
-${toolLinks.split('\n').map(link => `<li>${link.replace(/^- /, '')}</li>`).join('\n')}
+${toolLinks}
 </ul>
 </div>
 

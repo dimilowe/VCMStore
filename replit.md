@@ -290,6 +290,14 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-06: **Enhanced Article Styling** - Articles now render with tool-page aesthetics
+  - Updated articleGenerator.ts to output structured HTML with semantic div classes
+  - Created StyledArticleContent component for rendering articles
+  - Added comprehensive CSS styling for: article-intro, article-section, article-steps (numbered cards), article-faq (card-based FAQs), article-cta (tool button links)
+  - Steps section displays as 3-column grid on desktop with numbered badges
+  - FAQ section uses white cards with gray borders matching tool page design
+  - CTA section features gradient background with styled tool link buttons
+  - Newly generated articles get full visual treatment; existing articles retain basic styling
 - 2025-12-06: **Added Article Lifecycle System** - Complete workflow from draft to indexed
   - Added `cluster_slug` and `is_indexed` columns to blog_posts table for cluster wiring and SEO control
   - Created "Create Missing Drafts" button that generates empty article shells for user to fill via Replit AI
