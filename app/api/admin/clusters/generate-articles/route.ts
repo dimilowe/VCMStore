@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getIronSession } from 'iron-session';
 import { AdminSessionData, sessionOptions } from '@/lib/admin-session';
-import { createMissingDrafts } from '@/lib/articleGenerator';
+import { createMissingDraftsWithContent } from '@/lib/articleGenerator';
 import { getClusterById } from '@/data/clusterRegistry';
 
 export async function POST(request: NextRequest) {
@@ -37,13 +37,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const results = await createMissingDrafts(clusterId);
+    const results = await createMissingDraftsWithContent(clusterId);
 
     return NextResponse.json({
       success: true,
       clusterId,
       created: results.created,
       skipped: results.skipped,
+      errors: results.errors,
       total: cluster.articleSlugs.length,
     });
 

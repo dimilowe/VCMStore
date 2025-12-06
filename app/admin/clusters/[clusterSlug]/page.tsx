@@ -435,7 +435,7 @@ export default function ClusterDetailPage() {
                   disabled={isGenerating}
                   className="px-3 py-1.5 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
                 >
-                  {isGenerating ? "Creating..." : "Create Missing Drafts"}
+                  {isGenerating ? "Generating with AI..." : "Generate Articles with AI"}
                 </button>
               )}
             </div>
