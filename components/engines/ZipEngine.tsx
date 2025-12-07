@@ -12,6 +12,7 @@ import {
 import { ToolRecord } from '@/lib/toolsRepo';
 import { ZipEngineConfig, getZipPresetBySlug } from '@/engines/zip/config';
 import PostResultUpsell from '@/components/PostResultUpsell';
+import CreatorStack from '@/components/CreatorStack';
 
 interface ZipEngineProps {
   tool: ToolRecord;
@@ -417,6 +418,22 @@ export default function ZipEngine({ tool }: ZipEngineProps) {
             </ul>
           </div>
         )}
+
+        {config.ui.notes && config.ui.notes.length > 0 && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+            <h3 className="font-medium text-orange-800 mb-2">Pro Tips:</h3>
+            <ul className="space-y-1">
+              {config.ui.notes.map((note, index) => (
+                <li key={index} className="text-sm text-orange-700 flex items-start gap-2">
+                  <span className="text-orange-500 mt-0.5">•</span>
+                  {note}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <CreatorStack />
 
         {config.seo.contentGuide && (
           <ContentGuide content={config.seo.contentGuide} />

@@ -44,6 +44,11 @@ export const zipPresets: Record<string, ZipEngineConfig> = {
         'Up to 50 files, 100MB total',
         'No signup required',
         'Files stay on your device'
+      ],
+      notes: [
+        'Organize files into folders before zipping for better structure',
+        'Use clear, descriptive names for your ZIP files',
+        'Check file sizes before adding - some files compress better than others'
       ]
     },
     seo: {
