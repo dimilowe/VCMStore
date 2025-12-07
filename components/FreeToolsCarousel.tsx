@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X, TrendingUp, Users, Images, RotateCcw, Instagram, Twitter, Linkedin, Video } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X, TrendingUp, Users, Images, RotateCcw, Instagram, Twitter, Linkedin, Video, FileArchive } from "lucide-react";
 
 const freeTools = [
+  { name: "ZIP File Creator", icon: FileArchive, href: "/tools/zip-file-creator", iconBg: "bg-orange-500" },
   { name: "Prediction Center", icon: TrendingUp, href: "/tools/prediction-center", iconBg: "bg-purple-500" },
   { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers", iconBg: "bg-blue-400" },
   { name: "Ideas Hub", icon: Rocket, href: "/ideas", iconBg: "bg-amber-400" },

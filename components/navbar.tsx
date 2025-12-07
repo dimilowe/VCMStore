@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Images, RotateCcw, Youtube, Instagram, Twitter, Linkedin, Video } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Images, RotateCcw, Youtube, Instagram, Twitter, Linkedin, Video, FileArchive } from "lucide-react";
 import GoogleTranslate from "@/components/GoogleTranslate";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -85,6 +85,7 @@ const resourceCategories: ResourceCategory[] = [
   {
     name: "Utilities",
     items: [
+      { label: "ZIP File Creator", href: "/tools/zip-file-creator", description: "Create ZIP archives instantly", icon: FileArchive, iconBg: "bg-orange-500" },
       { label: "Online Notepad", href: "/tools/online-notepad", description: "Write notes online with AI", icon: FileText, iconBg: "bg-amber-500" },
       { label: "PDF Editor", href: "/tools/pdf-editor", description: "Reorder, rotate, delete PDF pages", icon: FilePen, iconBg: "bg-red-500" },
       { label: "Word Counter", href: "/tools/word-counter", description: "Count words & characters", icon: FileText, iconBg: "bg-gray-500" },
