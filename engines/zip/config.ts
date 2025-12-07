@@ -13,6 +13,7 @@ export type ZipEngineConfig = {
     primaryCtaLabel: string;
     dropzoneLabel: string;
     secondaryNotes?: string[];
+    notes?: string[];
   };
   seo: {
     title: string;
