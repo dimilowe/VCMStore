@@ -58,6 +58,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `youtube_title_variants`: Title variants for each test (2-5 per test)
 - `youtube_rotation_log`: Log of title rotations with activation times
 - `cluster_articles`: AI-generated SEO articles linked to clusters (separate from manual blog posts)
+- `global_urls`: URL registry for domain-wide indexing control (URL, type, is_indexed, canonical, notes)
 
 ## Project Structure
 
@@ -290,6 +291,13 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-07: **Global URL Registry** - Centralized indexing control system for SEO
+  - Created global_urls database table to track all URLs with indexing status
+  - Built auto-discovery API at /api/global-urls/discover to scan app folder
+  - Created admin panel at /admin/indexing with search, filters, bulk toggle/delete
+  - Sitemap.ts now integrates with registry - only indexed URLs included
+  - Uses iron-session for secure admin authentication
+  - Removed legacy /ai-chat page and navigation links (orphan page cleanup)
 - 2025-12-06: **ToolsRepo Single Source of Truth** - Database-driven tool management
   - Created ToolsRepo abstraction (lib/toolsRepo.ts): getToolBySlug, listTools, createTool, updateTool, upsertTool
   - Extended tools table with 19 new columns: category, tags, icon, priority, input_type, output_type, etc.
