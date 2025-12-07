@@ -24,6 +24,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <Script id="internal-user-flag" strategy="beforeInteractive">
+          {`
+            if (localStorage.getItem('vcm_internal_user') === 'true') {
+              window.dataLayer = window.dataLayer || [];
+              window.dataLayer.push({
+                user_properties: { internal_user: 'true' }
+              });
+            }
+          `}
+        </Script>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-0SGBDR0QMG"
           strategy="afterInteractive"
