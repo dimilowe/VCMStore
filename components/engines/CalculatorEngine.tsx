@@ -23,6 +23,7 @@ interface MetricPreset {
   resultLabel: string;
   resultSuffix: string;
   goodRange?: string;
+  contentGuide: string;
   faqs: FAQ[];
 }
 
@@ -39,6 +40,47 @@ const YOUTUBE_METRIC_PRESETS: Record<string, MetricPreset> = {
     resultLabel: 'CTR',
     resultSuffix: '%',
     goodRange: 'A good YouTube CTR is typically 4-10%. Top performers often see 10%+.',
+    contentGuide: `## Understanding YouTube Click-Through Rate (CTR) in 2025
+
+### What Is CTR and Why It Matters
+Click-Through Rate measures the percentage of viewers who click on your video after seeing the thumbnail in their feed. It's calculated by dividing clicks by impressions and multiplying by 100. CTR is one of the most critical metrics for YouTube success because it directly influences how often YouTube recommends your content.
+
+### 2025 CTR Benchmarks by Niche
+
+**High CTR Niches (8-15%+):**
+- Entertainment and reaction videos
+- Drama and commentary content
+- Trending topic coverage
+- Celebrity and pop culture
+
+**Average CTR Niches (4-8%):**
+- Gaming and Let's Plays
+- Vlogs and lifestyle
+- Product reviews
+- How-to tutorials
+
+**Lower CTR Niches (2-5%):**
+- Educational deep-dives
+- Documentary-style content
+- Niche technical topics
+- Long-form analysis
+
+### Factors That Influence CTR
+
+**Thumbnail Design:**
+Thumbnails account for roughly 80% of CTR performance. Key elements include: high-contrast colors, expressive faces (especially eyes), readable text (3-5 words max), and clear visual hierarchy. Avoid cluttered designs.
+
+**Title Optimization:**
+Titles should create curiosity without clickbait. Use numbers, power words, and emotional triggers. Front-load important keywords. Aim for 50-60 characters.
+
+**Audience Match:**
+CTR depends heavily on who sees your video. If YouTube shows your content to the wrong audience, CTR drops—even with great thumbnails.
+
+### CTR vs. Total Views Trade-off
+Higher CTR doesn't always mean more views. As YouTube expands your audience reach, CTR naturally decreases. A video with 5% CTR and 1 million impressions outperforms one with 15% CTR and 50,000 impressions. Focus on the balance.
+
+### Tools to Improve CTR
+Use A/B testing tools to compare thumbnail variations. YouTube's built-in thumbnail test feature (available in Studio) lets you test up to 3 versions. External tools like Nudge can add interactive elements that boost engagement.`,
     faqs: [
       {
         question: 'What is a good YouTube CTR?',
@@ -70,6 +112,51 @@ const YOUTUBE_METRIC_PRESETS: Record<string, MetricPreset> = {
     resultLabel: 'CPM',
     resultSuffix: ' USD',
     goodRange: 'Average YouTube CPM ranges from $1-5. Finance, tech, and B2B niches can see $10-50+.',
+    contentGuide: `## YouTube CPM Deep Dive: Maximizing Ad Revenue in 2025
+
+### How YouTube CPM Works
+CPM (Cost Per Mille) represents what advertisers pay per 1,000 ad impressions on your videos. Your actual earnings are approximately 55% of the CPM after YouTube's 45% cut. A $10 CPM means you earn roughly $5.50 per 1,000 monetized views.
+
+### 2025 CPM Rates by Niche
+
+**Premium CPM ($15-50+):**
+- Finance and investing
+- Business and B2B
+- Legal and insurance
+- Real estate
+- Enterprise software
+
+**Mid-Tier CPM ($5-15):**
+- Technology reviews
+- Health and wellness
+- Education and courses
+- Marketing and entrepreneurship
+
+**Lower CPM ($1-5):**
+- Gaming and entertainment
+- Vlogs and lifestyle
+- Comedy and pranks
+- Music and covers
+
+### Factors That Affect Your CPM
+
+**Audience Geography:**
+US, UK, Canada, and Australia viewers command 3-10x higher CPMs than viewers from developing nations. A channel with 80% US audience will earn dramatically more than one with 80% India audience.
+
+**Seasonality:**
+Q4 (October-December) sees CPMs spike 30-100% as advertisers increase holiday spending. January typically sees the lowest CPMs of the year.
+
+**Video Length:**
+Videos over 8 minutes can include mid-roll ads, often doubling or tripling effective CPM. Longer watch sessions = more ad opportunities.
+
+**Content Category:**
+Brand-safe, advertiser-friendly content earns higher CPMs. Videos with sensitive topics may get limited or no ads.
+
+### CPM vs RPM: Understanding the Difference
+CPM is what advertisers pay. RPM (Revenue Per Mille) is what you actually earn per 1,000 total views (not just monetized views). RPM is typically 40-70% of CPM because not all views are monetized.
+
+### Strategies to Increase CPM
+Create content targeting high-value demographics. Focus on US/UK audiences. Make longer videos (8+ min) for mid-roll eligibility. Stay brand-safe. Post during Q4 for maximum rates. Target keywords advertisers bid highly on.`,
     faqs: [
       {
         question: 'What affects YouTube CPM rates?',
@@ -101,6 +188,49 @@ const YOUTUBE_METRIC_PRESETS: Record<string, MetricPreset> = {
     resultLabel: 'Avg Duration',
     resultSuffix: ' min',
     goodRange: 'Aim for 50%+ of your video length. For a 10-min video, 5+ minutes is solid.',
+    contentGuide: `## Average View Duration: The Metric That Drives YouTube Growth
+
+### What Average View Duration Tells You
+Average View Duration (AVD) measures how many minutes viewers watch your video on average. Unlike retention percentage, AVD gives you an absolute number. A 10-minute video with 5 minutes AVD and a 20-minute video with 5 minutes AVD have the same AVD but very different retention rates.
+
+### Why AVD Matters for the Algorithm
+YouTube's goal is to maximize time spent on platform. Videos with high AVD contribute more to this goal, earning more algorithmic favor. A video that holds viewers for 8 minutes generates more ad revenue potential than one that holds for 2 minutes.
+
+### AVD Benchmarks by Content Type
+
+**High AVD Content (60%+ of length):**
+- Tutorial walkthroughs
+- Documentary-style content
+- Storytelling videos
+- Compelling narratives
+
+**Average AVD (40-60%):**
+- Product reviews
+- Commentary videos
+- Gaming content
+- Vlogs
+
+**Lower AVD (20-40%):**
+- Music videos (viewers replay specific sections)
+- Quick tips compilations
+- News and updates
+
+### The Hook-Retain-Payoff Framework
+
+**First 30 Seconds (Hook):**
+Your most critical window. Preview the value, create curiosity, and prove the video is worth watching. Avoid long intros, logos, or unnecessary context.
+
+**Middle Sections (Retain):**
+Use pattern interrupts every 30-60 seconds: visual changes, tone shifts, B-roll, graphics, or new talking points. Each section should promise and deliver micro-value.
+
+**Final Section (Payoff):**
+Deliver your main promise. End strong with a call-to-action. Consider end screens to keep viewers on your channel.
+
+### Common AVD Killers
+Long intros, off-topic tangents, repetitive content, low energy sections, technical issues (audio/video quality), and unfulfilled promises in thumbnails/titles.
+
+### Improving AVD Over Time
+Study your retention graphs in YouTube Analytics. Identify exact timestamps where viewers drop off. Create content that addresses those weak points. Test different video structures. Short-form creators transitioning to long-form often need to relearn pacing.`,
     faqs: [
       {
         question: 'What is a good average view duration on YouTube?',
@@ -132,6 +262,52 @@ const YOUTUBE_METRIC_PRESETS: Record<string, MetricPreset> = {
     resultLabel: 'Retention',
     resultSuffix: '%',
     goodRange: 'Aim for 40-60% retention. Top videos often achieve 70%+.',
+    contentGuide: `## Audience Retention: YouTube's Most Important Algorithm Signal
+
+### What Is Audience Retention?
+Audience Retention measures the percentage of your video that viewers watch on average. If your 10-minute video has 50% retention, viewers watch an average of 5 minutes. YouTube Studio provides both absolute retention (percentage) and relative retention (compared to similar videos).
+
+### Why Retention Trumps All Other Metrics
+YouTube has stated that watch time and retention are the primary signals for recommendations. High retention tells YouTube: "This content delivers on its promise and keeps people engaged." Videos with strong retention get pushed to more viewers through suggested videos and browse features.
+
+### 2025 Retention Benchmarks
+
+**Exceptional (60-80%+):**
+- Short, highly focused tutorials
+- Compelling storytelling
+- Viral entertainment
+
+**Good (40-60%):**
+- Standard YouTube content
+- Educational videos
+- Reviews and commentary
+
+**Below Average (20-40%):**
+- Overly long content
+- Mismatched expectations
+- Poor pacing
+
+### Reading Your Retention Graph
+
+**The First 30-Second Drop:**
+Nearly all videos see a significant drop in the first 30 seconds. This is normal. The goal is to minimize this drop with a strong hook.
+
+**Mid-Video Valleys:**
+Identify specific timestamps where viewers leave. These reveal pacing issues, boring sections, or unmet expectations.
+
+**End Retention:**
+If retention increases near the end, viewers may be seeking a specific answer. Consider restructuring content.
+
+### The Retention-CTR Connection
+High CTR with low retention signals clickbait—YouTube will reduce impressions. High CTR with high retention signals quality content worth promoting. The combination matters more than either metric alone.
+
+### Strategies for Better Retention
+
+**Structure:** Promise early, deliver throughout, payoff at the end.
+**Pacing:** Change visuals/energy every 30-60 seconds.
+**Editing:** Cut ruthlessly. Every second must earn its place.
+**Hooks:** Start with the most compelling part of your content.
+**Chapters:** Help viewers navigate to what they need.`,
     faqs: [
       {
         question: 'What is a good retention rate on YouTube?',
@@ -163,6 +339,47 @@ const YOUTUBE_METRIC_PRESETS: Record<string, MetricPreset> = {
     resultLabel: 'Ratio',
     resultSuffix: '',
     goodRange: 'A ratio of 0.04-0.10 (4-10%) is typical. Higher is better.',
+    contentGuide: `## Clicks Per Impression: Raw Performance Data for Your Thumbnails
+
+### Understanding Clicks vs Impressions
+Every time YouTube shows your thumbnail to a potential viewer, that's an impression. When someone clicks on your video, that's a click. The ratio between these two numbers reveals how effective your thumbnail and title combination is at converting browsers into viewers.
+
+### Why Track Raw Ratios?
+While CTR (percentage) is the standard metric, tracking raw click-to-impression ratios helps you understand absolute performance. A 0.05 ratio means 1 in 20 people who see your thumbnail click on it. This framing can help you visualize real human behavior.
+
+### Where Impressions Come From
+
+**Home/Browse (40-60% of impressions):**
+YouTube's algorithm decides to show your video on the homepage or browse features. This audience is often unfamiliar with your content.
+
+**Suggested Videos (20-40%):**
+Your video appears next to related content. These viewers are primed for your topic but may not know you.
+
+**Search (5-20%):**
+Viewers actively searching for your keywords. High intent, but competitive placement.
+
+**Subscriptions/Notifications (5-15%):**
+Your existing audience. Usually highest conversion rate.
+
+### Analyzing Your Ratio by Source
+Different traffic sources have different expected ratios. Subscriber impressions should convert at 2-3x the rate of browse impressions. If your subscription ratio is low, your core audience may be losing interest.
+
+### The Impression Threshold Effect
+YouTube tests your content with small impression batches first. If early click ratios are strong, you get more impressions. If weak, the test stops. First-hour performance often determines a video's trajectory.
+
+### Improving Your Ratio
+
+**Thumbnail Clarity:**
+Can viewers understand what your video is about in 0.5 seconds? If not, simplify.
+
+**Title Synergy:**
+Title and thumbnail should work together but not repeat information. Each should add context the other doesn't provide.
+
+**Niche Targeting:**
+The more specific your audience targeting, the higher your ratio potential. Broad content gets lower ratios because it's shown to less relevant viewers.
+
+### When Low Ratios Are Acceptable
+Viral content often has lower ratios because YouTube shows it to massive audiences. A 2% ratio with 10 million impressions dramatically outperforms a 15% ratio with 10,000 impressions.`,
     faqs: [
       {
         question: 'How is clicks per impression different from CTR?',
@@ -257,6 +474,115 @@ function FAQSection({ faqs, metric }: { faqs: FAQ[]; metric: string }) {
           }),
         }}
       />
+    </section>
+  );
+}
+
+function ContentGuide({ content }: { content: string }) {
+  const renderMarkdown = (text: string) => {
+    const lines = text.trim().split('\n');
+    const elements: React.ReactNode[] = [];
+    let currentList: string[] = [];
+    let inBoldSection = false;
+    let boldSectionTitle = '';
+    let boldSectionItems: string[] = [];
+
+    const flushList = () => {
+      if (currentList.length > 0) {
+        elements.push(
+          <ul key={`list-${elements.length}`} className="space-y-1 mb-4 ml-4">
+            {currentList.map((item, i) => (
+              <li key={i} className="text-gray-600 text-sm flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">•</span>
+                <span dangerouslySetInnerHTML={{ __html: formatBold(item) }} />
+              </li>
+            ))}
+          </ul>
+        );
+        currentList = [];
+      }
+    };
+
+    const flushBoldSection = () => {
+      if (boldSectionTitle && boldSectionItems.length > 0) {
+        elements.push(
+          <div key={`bold-section-${elements.length}`} className="mb-4">
+            <p className="font-semibold text-gray-800 mb-2">{boldSectionTitle}</p>
+            <ul className="space-y-1 ml-4">
+              {boldSectionItems.map((item, i) => (
+                <li key={i} className="text-gray-600 text-sm flex items-start gap-2">
+                  <span className="text-orange-500 mt-0.5">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+        boldSectionTitle = '';
+        boldSectionItems = [];
+        inBoldSection = false;
+      }
+    };
+
+    const formatBold = (text: string) => {
+      return text.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-gray-800">$1</strong>');
+    };
+
+    lines.forEach((line, index) => {
+      const trimmedLine = line.trim();
+      
+      if (trimmedLine.startsWith('## ')) {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <h2 key={`h2-${index}`} className="text-xl font-bold text-gray-900 mb-4 mt-6 first:mt-0">
+            {trimmedLine.replace('## ', '')}
+          </h2>
+        );
+      } else if (trimmedLine.startsWith('### ')) {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <h3 key={`h3-${index}`} className="text-lg font-semibold text-gray-800 mb-3 mt-5">
+            {trimmedLine.replace('### ', '')}
+          </h3>
+        );
+      } else if (trimmedLine.match(/^\*\*[^*]+:\*\*$/)) {
+        flushList();
+        flushBoldSection();
+        boldSectionTitle = trimmedLine.replace(/\*\*/g, '');
+        inBoldSection = true;
+      } else if (trimmedLine.startsWith('- ') && inBoldSection) {
+        boldSectionItems.push(trimmedLine.replace('- ', ''));
+      } else if (trimmedLine.startsWith('- ')) {
+        flushBoldSection();
+        currentList.push(trimmedLine.replace('- ', ''));
+      } else if (trimmedLine === '') {
+        flushList();
+        if (!inBoldSection) flushBoldSection();
+      } else {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <p 
+            key={`p-${index}`} 
+            className="text-gray-600 text-sm leading-relaxed mb-3"
+            dangerouslySetInnerHTML={{ __html: formatBold(trimmedLine) }}
+          />
+        );
+      }
+    });
+
+    flushList();
+    flushBoldSection();
+    return elements;
+  };
+
+  return (
+    <section className="mt-10 bg-white rounded-xl border p-6 md:p-8">
+      <div className="prose prose-sm max-w-none">
+        {renderMarkdown(content)}
+      </div>
     </section>
   );
 }
@@ -590,6 +916,8 @@ export default function CalculatorEngine({ tool }: CalculatorEngineProps) {
               </p>
             </div>
           )}
+
+          <ContentGuide content={preset.contentGuide} />
 
           <PostResultUpsell />
 
