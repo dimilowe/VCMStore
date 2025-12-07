@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineUploader } from "@/components/inline-uploader";
-import { Plus, Edit, Trash2, BookOpen, Layers, Search, ChevronLeft, ChevronRight, Wrench, LayoutGrid, FileText, Zap } from "lucide-react";
+import { Plus, Edit, Trash2, BookOpen, Layers, Search, ChevronLeft, ChevronRight, Wrench, LayoutGrid, FileText, Zap, Globe } from "lucide-react";
 import Link from "next/link";
 
 interface Product {
@@ -293,9 +293,9 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col gap-4 mb-8">
           <h1 className="text-3xl font-bold tracking-wide">Admin Dashboard</h1>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-2">
             <Link href="/admin/blog">
               <Button variant="outline">
                 <BookOpen className="mr-2 h-4 w-4" />
@@ -330,6 +330,12 @@ export default function AdminPage() {
               <Button variant="outline">
                 <Zap className="mr-2 h-4 w-4" />
                 Engine Factory
+              </Button>
+            </Link>
+            <Link href="/admin/indexing">
+              <Button variant="outline">
+                <Globe className="mr-2 h-4 w-4" />
+                URL Registry
               </Button>
             </Link>
             <Button onClick={() => setShowForm(true)} className="bg-orange-500 hover:bg-orange-600">
