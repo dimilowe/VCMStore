@@ -8,6 +8,7 @@ export interface EngineComponentProps {
 export const ENGINE_COMPONENTS: Record<string, () => Promise<{ default: ComponentType<EngineComponentProps> }>> = {
   'calculator': () => import('@/components/engines/CalculatorEngine'),
   'youtube-metrics-calculator': () => import('@/components/engines/CalculatorEngine'),
+  'platform-resizer': () => import('@/components/engines/PlatformResizerEngine'),
 };
 
 export function getEngineLoader(engine: string | null): (() => Promise<{ default: ComponentType<EngineComponentProps> }>) | null {
