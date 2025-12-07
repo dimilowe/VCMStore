@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { ToolRecord } from '@/lib/toolsRepo';
 import { ZipEngineConfig, getZipPresetBySlug } from '@/engines/zip/config';
+import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface ZipEngineProps {
   tool: ToolRecord;
@@ -419,6 +420,8 @@ export default function ZipEngine({ tool }: ZipEngineProps) {
         {config.seo.contentGuide && (
           <ContentGuide content={config.seo.contentGuide} />
         )}
+
+        <PostResultUpsell />
 
         {config.seo.faq && config.seo.faq.length > 0 && (
           <FAQSection faqs={config.seo.faq} />
