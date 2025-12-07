@@ -12,7 +12,6 @@ import {
 import { ToolRecord } from '@/lib/toolsRepo';
 import { ZipEngineConfig, getZipPresetBySlug } from '@/engines/zip/config';
 import PostResultUpsell from '@/components/PostResultUpsell';
-import CreatorStack from '@/components/CreatorStack';
 
 interface ZipEngineProps {
   tool: ToolRecord;
@@ -432,8 +431,6 @@ export default function ZipEngine({ tool }: ZipEngineProps) {
             </ul>
           </div>
         )}
-
-        <CreatorStack />
 
         {config.seo.contentGuide && (
           <ContentGuide content={config.seo.contentGuide} />
