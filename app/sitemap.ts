@@ -32,6 +32,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     `SELECT slug, updated_at FROM questions ORDER BY created_at DESC`
   );
 
+  const registryResult = await query(
+    `SELECT url, canonical, updated_at 
+     FROM global_urls 
+     WHERE is_indexed = true 
+     ORDER BY url ASC`
+  );
+
+  const knownPaths = new Set<string>([
+    '/',
+    '/newsletter',
+    '/ideas',
+    '/answers',
+    '/tools',
+    ...productsResult.rows.map((p: any) => `/product/${p.slug}`),
+    ...postsResult.rows.map((p: any) => `/newsletter/${p.slug}`),
+    ...articlesResult.rows.map((a: any) => `/articles/${a.slug}`),
+    ...ideasResult.rows.map((i: any) => `/ideas/${i.slug}`),
+    ...questionsResult.rows.map((q: any) => `/answers/${q.slug}`),
+    ...getAllIndexedTools().map(t => `/tools/${t.slug}`),
+  ]);
+
   const staticPages = [
     {
       url: baseUrl,
@@ -108,5 +129,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...toolPages, ...productPages, ...blogPages, ...articlePages, ...ideaPages, ...questionPages];
+  const registryPages = registryResult.rows
+    .filter((entry: any) => !knownPaths.has(entry.url))
+    .map((entry: any) => ({
+      url: entry.canonical ? `${baseUrl}${entry.canonical}` : `${baseUrl}${entry.url}`,
+      lastModified: new Date(entry.updated_at),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }));
+
+  return [...staticPages, ...toolPages, ...productPages, ...blogPages, ...articlePages, ...ideaPages, ...questionPages, ...registryPages];
 }
