@@ -416,10 +416,122 @@ export default function ZipEngine({ tool }: ZipEngineProps) {
           </div>
         )}
 
+        {config.seo.contentGuide && (
+          <ContentGuide content={config.seo.contentGuide} />
+        )}
+
         {config.seo.faq && config.seo.faq.length > 0 && (
           <FAQSection faqs={config.seo.faq} />
         )}
       </div>
     </main>
+  );
+}
+
+function ContentGuide({ content }: { content: string }) {
+  const renderMarkdown = (text: string) => {
+    const lines = text.trim().split('\n');
+    const elements: React.ReactNode[] = [];
+    let currentList: string[] = [];
+    let inBoldSection = false;
+    let boldSectionTitle = '';
+    let boldSectionItems: string[] = [];
+
+    const flushList = () => {
+      if (currentList.length > 0) {
+        elements.push(
+          <ul key={`list-${elements.length}`} className="space-y-1 mb-4 ml-4">
+            {currentList.map((item, i) => (
+              <li key={i} className="text-gray-600 text-sm flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">•</span>
+                <span dangerouslySetInnerHTML={{ __html: formatBold(item) }} />
+              </li>
+            ))}
+          </ul>
+        );
+        currentList = [];
+      }
+    };
+
+    const flushBoldSection = () => {
+      if (boldSectionTitle && boldSectionItems.length > 0) {
+        elements.push(
+          <div key={`bold-section-${elements.length}`} className="mb-4">
+            <p className="font-semibold text-gray-800 mb-2">{boldSectionTitle}</p>
+            <ul className="space-y-1 ml-4">
+              {boldSectionItems.map((item, i) => (
+                <li key={i} className="text-gray-600 text-sm flex items-start gap-2">
+                  <span className="text-orange-500 mt-0.5">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+        boldSectionTitle = '';
+        boldSectionItems = [];
+        inBoldSection = false;
+      }
+    };
+
+    const formatBold = (text: string) => {
+      return text.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-gray-800">$1</strong>');
+    };
+
+    lines.forEach((line, index) => {
+      const trimmedLine = line.trim();
+      
+      if (trimmedLine.startsWith('## ')) {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <h2 key={`h2-${index}`} className="text-xl font-bold text-gray-900 mb-4 mt-6 first:mt-0">
+            {trimmedLine.replace('## ', '')}
+          </h2>
+        );
+      } else if (trimmedLine.startsWith('### ')) {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <h3 key={`h3-${index}`} className="text-lg font-semibold text-gray-800 mb-3 mt-5">
+            {trimmedLine.replace('### ', '')}
+          </h3>
+        );
+      } else if (trimmedLine.match(/^\*\*[^*]+:\*\*$/)) {
+        flushList();
+        flushBoldSection();
+        boldSectionTitle = trimmedLine.replace(/\*\*/g, '').replace(':', '');
+        inBoldSection = true;
+      } else if (trimmedLine.startsWith('- ')) {
+        if (inBoldSection) {
+          boldSectionItems.push(trimmedLine.replace('- ', ''));
+        } else {
+          currentList.push(trimmedLine.replace('- ', ''));
+        }
+      } else if (trimmedLine === '') {
+        flushList();
+        if (!inBoldSection) {
+          flushBoldSection();
+        }
+      } else if (trimmedLine) {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <p key={`p-${index}`} className="text-gray-600 text-sm mb-4" dangerouslySetInnerHTML={{ __html: formatBold(trimmedLine) }} />
+        );
+      }
+    });
+
+    flushList();
+    flushBoldSection();
+    return elements;
+  };
+
+  return (
+    <section className="mt-10 bg-white rounded-xl border p-6 md:p-8">
+      <div className="prose prose-sm max-w-none">
+        {renderMarkdown(content)}
+      </div>
+    </section>
   );
 }
