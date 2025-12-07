@@ -16,6 +16,7 @@ export type PlatformImagePreset = {
     description: string;
     h1: string;
     intro: string;
+    platformGuide: string;
     faq: { question: string; answer: string }[];
   };
   ui: {
@@ -45,6 +46,38 @@ export const platformImagePresets: PlatformImagePreset[] = [
       description: "Instantly resize any image to the perfect YouTube thumbnail size (1280x720). Free online tool with no signup required. Get perfectly sized thumbnails in seconds.",
       h1: "YouTube Thumbnail Resizer",
       intro: "Create perfectly sized YouTube thumbnails that grab attention and boost your CTR. Upload any image and instantly resize it to YouTube's recommended 1280×720 pixel dimensions.",
+      platformGuide: `## YouTube Thumbnail Best Practices for 2025
+
+### Official Size Requirements
+YouTube's recommended thumbnail dimensions are **1280×720 pixels** with a **16:9 aspect ratio**. The minimum width is 640 pixels, and file size must stay under 2MB. Accepted formats include JPG, PNG, and GIF (non-animated). These specifications ensure your thumbnail displays crisp on all devices—from 4K monitors to mobile phones.
+
+### The Safe Zone Rule
+YouTube crops thumbnails slightly depending on where they appear (search results, suggested videos, homepage). Keep critical elements like faces and text at least **10% away from all edges**. The bottom-right corner often shows video duration overlays, so avoid placing important content there.
+
+### Design Do's & Don'ts
+
+**Do:**
+- Use bold, high-contrast colors that pop against YouTube's white/dark backgrounds
+- Include expressive human faces—eyes create emotional connection
+- Add 3-5 words of large, readable text (minimum 24pt equivalent)
+- Create visual consistency across your channel for brand recognition
+- Test how your thumbnail looks at small sizes (mobile thumbnail preview)
+
+**Don't:**
+- Overcrowd with too many elements or excessive text
+- Use low-resolution or blurry images
+- Mislead viewers with clickbait that doesn't match content
+- Rely on thin fonts or colors that blend into the background
+- Ignore mobile users (60%+ of YouTube views are on phones)
+
+### CTR Optimization Tips
+Thumbnails with faces get **38% higher CTR** on average. Bright colors (yellow, orange, red) outperform muted tones. Contrast is king—your thumbnail competes against dozens of others. Consider A/B testing different designs using YouTube Studio's test feature.
+
+### File Format Recommendations
+Use **JPG** for photographs (smaller file size, faster loading). Choose **PNG** for graphics with text, logos, or flat colors (sharper edges). Always export at maximum quality—YouTube will compress it further.
+
+### Mobile vs Desktop Considerations
+On mobile, thumbnails appear smaller, so text must be significantly larger than you'd think. What looks readable on your desktop monitor may become illegible on a phone screen. Always preview at 100×56 pixels to simulate mobile appearance.`,
       faq: [
         {
           question: "What size should a YouTube thumbnail be?",
@@ -106,6 +139,43 @@ export const platformImagePresets: PlatformImagePreset[] = [
       description: "Resize any image to the perfect Instagram square post size (1080x1080). Free online tool, no signup required. Create perfectly sized Instagram posts instantly.",
       h1: "Instagram Post Resizer",
       intro: "Create perfectly square Instagram posts that display beautifully in the grid. Upload any image and instantly resize it to Instagram's ideal 1080×1080 pixel dimensions.",
+      platformGuide: `## Instagram Post Image Guide for 2025
+
+### Current Size Standards
+Instagram's classic square post format is **1080×1080 pixels** with a perfect **1:1 aspect ratio**. While Instagram now supports multiple formats, square posts still dominate the grid and display at the largest size in profile view. For 2025, Instagram continues to favor high-resolution images—always upload at 1080px width minimum.
+
+### Understanding Instagram's Compression
+Instagram compresses all uploaded images. To minimize quality loss: upload at exactly 1080px width, use JPG format for photos (PNG for graphics with text), and keep file sizes under 8MB. Images with lots of fine detail or gradients suffer most from compression—consider slightly over-sharpening before upload.
+
+### Square vs Portrait vs Carousel
+
+**Square (1:1):** The classic format. Displays largest in your profile grid and works best for standalone product shots, quotes, and centered compositions.
+
+**Portrait (4:5):** Takes up more screen real estate in the feed. Ideal for fashion, portraits, and content where vertical space adds impact. Size: 1080×1350 pixels.
+
+**Carousel:** Use 1080×1080 for consistency across slides, or 1080×1350 for maximum engagement. Keep aspect ratio consistent within a single carousel post.
+
+### Color and Filter Best Practices
+Instagram's algorithm favors bright, well-lit images with consistent color palettes. Over-filtering is outdated—subtle enhancements outperform heavy filters. Stick to your brand colors for a cohesive grid aesthetic. Test how your colors display on different phones; some screens oversaturate.
+
+### Design Do's & Don'ts
+
+**Do:**
+- Center your main subject for square crops
+- Use white space strategically
+- Maintain a consistent visual style across posts
+- Include your brand colors subtly
+- Consider how single posts look in your overall grid
+
+**Don't:**
+- Place important elements near edges (cropping happens)
+- Use text smaller than 24pt (illegible on mobile)
+- Rely solely on stock photos (authenticity wins)
+- Post low-resolution or pixelated images
+- Ignore the preview before posting
+
+### Engagement Optimization
+Posts with faces receive 38% more likes. Carousel posts get 1.4x more reach than single images. The first image matters most—make it count. Consistency in posting time and aesthetic builds algorithmic favor.`,
       faq: [
         {
           question: "What is the best size for Instagram posts?",
@@ -160,6 +230,45 @@ export const platformImagePresets: PlatformImagePreset[] = [
       description: "Resize any image to the perfect Instagram Story size (1080x1920). Free online tool for creating full-screen stories. No signup required.",
       h1: "Instagram Story Resizer",
       intro: "Create full-screen Instagram Stories that captivate your audience. Upload any image and instantly resize it to the perfect 1080×1920 vertical dimensions.",
+      platformGuide: `## Instagram Story Dimensions & Best Practices 2025
+
+### Official Size Specifications
+Instagram Stories require **1080×1920 pixels** with a **9:16 vertical aspect ratio**. This full-screen format fills modern smartphone displays edge-to-edge. Stories support both images and videos up to 15 seconds per slide. Maximum file size is 30MB for video, 8MB for images.
+
+### Critical Safe Zones
+Instagram overlays UI elements on Stories that can hide your content:
+
+**Top 14% (approximately 250-270 pixels):** Your username, profile picture, and "X" close button appear here. Keep critical text and faces below this zone.
+
+**Bottom 14% (approximately 250-270 pixels):** Reply bar, stickers, and swipe-up/link buttons occupy this space. Never place call-to-actions or important text at the bottom.
+
+**Center 72%:** This is your safe zone for all important visual content.
+
+### Design Best Practices
+
+**Do:**
+- Use vertical compositions designed specifically for Stories
+- Create visual hierarchy with your main message in the center
+- Add movement or stickers to increase engagement
+- Include clear calls-to-action (swipe, tap, reply)
+- Maintain brand colors for instant recognition
+- Use large, bold text (minimum 32pt equivalent)
+
+**Don't:**
+- Repurpose horizontal content without proper cropping
+- Place text near edges where it might be cut off
+- Use busy backgrounds that compete with your message
+- Forget about the link sticker zone at the bottom
+- Post Stories without previewing on mobile
+
+### Text and Typography
+Text on Stories must be readable in 2 seconds or less. Use high-contrast colors—white text with black outline works universally. Avoid placing text over complex backgrounds. Instagram's native fonts are optimized for readability, but custom text as images should be at least 48px.
+
+### Mobile-First Considerations
+100% of Story views happen on mobile devices. Always preview your Stories on an actual phone before posting. What looks perfect on desktop may have readability issues on smaller screens. Consider notched and dynamic island iPhone displays when designing.
+
+### Engagement Optimization
+Interactive stickers (polls, quizzes, sliders) increase engagement by 15-25%. Story sequences of 4-7 slides have the highest completion rates. Post during peak hours (11am-1pm, 7pm-9pm local time) for maximum visibility.`,
       faq: [
         {
           question: "What size should Instagram Stories be?",
@@ -215,6 +324,43 @@ export const platformImagePresets: PlatformImagePreset[] = [
       description: "Resize any image to the perfect TikTok video cover size (1080x1920). Free online tool for creating eye-catching TikTok thumbnails. No signup required.",
       h1: "TikTok Video Cover Resizer",
       intro: "Create eye-catching TikTok cover images that stop scrollers in their tracks. Upload any image and instantly resize it to TikTok's optimal 1080×1920 dimensions.",
+      platformGuide: `## TikTok Cover Image Guide for 2025
+
+### Official Dimensions
+TikTok video covers use **1080×1920 pixels** with a **9:16 vertical aspect ratio**—identical to the video format itself. Your cover image is extracted from your video or can be uploaded as a custom frame. For maximum impact, create dedicated cover images rather than relying on random video frames.
+
+### Understanding the Profile Grid
+When viewers visit your profile, they see a grid of your video covers. TikTok displays only the **center square portion** of each cover in this grid view. This means approximately **420 pixels on each side** are cropped in grid view, even though the full 9:16 ratio shows when viewing a video directly.
+
+### Safe Zone Strategy
+
+**Grid-Safe Center Zone:** Keep your main subject, text, and key visuals in the center 1080×1080 square (the middle portion of your 1080×1920 canvas). This ensures visibility in both grid and full views.
+
+**Video Title Placement:** Position text in the center-top area. Avoid the bottom 200 pixels where TikTok overlays the caption and interaction buttons.
+
+**Avoid Edge Content:** The top and bottom areas may be cropped or obscured by UI elements depending on the device.
+
+### Design Best Practices
+
+**Do:**
+- Use bold, legible text (minimum 48pt equivalent)
+- Include expressive human faces or reactions
+- Create visual consistency across your covers for brand recognition
+- Use bright, saturated colors that pop on mobile screens
+- Design specifically for the center square that shows in grid view
+
+**Don't:**
+- Rely on video auto-generated thumbnails
+- Place important text at the very bottom (caption overlay zone)
+- Use thin fonts or low-contrast color combinations
+- Overcrowd with too many elements
+- Forget that most viewing happens on small phone screens
+
+### Color and Contrast Tips
+TikTok's dark-mode interface is popular among users. Design covers that stand out against both light and dark backgrounds. High saturation and strong contrast perform best. Yellow, red, and cyan tend to grab attention in the busy For You feed.
+
+### Cover Selection Strategy
+You can select any frame from your video or upload a custom cover image. Custom covers consistently outperform random frames for engagement. Consider creating a cover template with your branding that you can customize for each video.`,
       faq: [
         {
           question: "What size should TikTok covers be?",
@@ -270,6 +416,50 @@ export const platformImagePresets: PlatformImagePreset[] = [
       description: "Resize any image to the perfect Twitter/X header banner size (1500x500). Free online tool for creating professional profile headers. No signup required.",
       h1: "Twitter/X Header Resizer",
       intro: "Create a professional Twitter/X header that makes a strong first impression. Upload any image and instantly resize it to Twitter's recommended 1500×500 dimensions.",
+      platformGuide: `## Twitter/X Header Banner Guide for 2025
+
+### Official Size Requirements
+Twitter/X recommends header images at **1500×500 pixels** with a **3:1 aspect ratio**. Maximum file size is 5MB. Accepted formats include JPG, PNG, and GIF (static only for headers). The ultra-wide format creates a cinematic backdrop for your profile that displays across all devices.
+
+### Desktop vs Mobile Display Differences
+Twitter displays headers very differently depending on the device:
+
+**Desktop:** Full 1500×500 banner displays above your profile. Your profile picture overlays the bottom-left corner. The header extends edge-to-edge.
+
+**Mobile:** Twitter crops the header to approximately **1500×420 pixels**, removing content from both top and bottom. Additionally, the profile picture and name may overlay different areas.
+
+### Safe Zone Strategy
+Design with the "mobile crop" in mind:
+
+**Vertical Safe Zone:** Keep critical content in the center 420 pixels vertically (from approximately y=40 to y=460).
+
+**Left Side:** Avoid the bottom-left 200×200 pixel area where the profile picture sits on desktop.
+
+**Center Focus:** Place your main message, tagline, or branding in the center of the image for guaranteed visibility across all devices.
+
+### Design Best Practices
+
+**Do:**
+- Use the space for your tagline, current project, or CTA
+- Maintain consistency with your overall brand colors
+- Create visual interest that complements your profile picture
+- Update seasonally or for major announcements
+- Test on both desktop and mobile before publishing
+
+**Don't:**
+- Place important text in the bottom-left corner (profile picture zone)
+- Use text smaller than 24pt (readability issues on mobile)
+- Clutter with too many elements—the space is wide but short
+- Forget to check mobile preview (most Twitter users are on mobile)
+- Use complex images that become confusing when cropped
+
+### Professional vs Personal Branding
+For professionals: Include your title, company, key skills, or portfolio link as visual elements. Subtle patterns with your brand colors create sophistication.
+
+For creators: Showcase your content type, latest work, or community call-to-action. Use consistent visual language that matches your content style.
+
+### Color and Composition Tips
+The header sits behind your profile content, so choose colors that don't clash with your profile picture. Consider how white or dark mode affects appearance. High-contrast, clean designs perform best. Gradients and subtle textures add depth without distraction.`,
       faq: [
         {
           question: "What size should a Twitter header be?",
@@ -325,6 +515,53 @@ export const platformImagePresets: PlatformImagePreset[] = [
       description: "Resize any image to the perfect LinkedIn profile banner size (1584x396). Free online tool for creating professional LinkedIn headers. No signup required.",
       h1: "LinkedIn Banner Resizer",
       intro: "Create a professional LinkedIn banner that establishes credibility. Upload any image and instantly resize it to LinkedIn's optimal 1584×396 dimensions.",
+      platformGuide: `## LinkedIn Profile Banner Guide for 2025
+
+### Official Size Requirements
+LinkedIn personal profile banners should be **1584×396 pixels** with a **4:1 aspect ratio**. Company page banners differ at 1128×191 pixels. Maximum file size is 8MB. Accepted formats include JPG and PNG. The ultra-wide format provides a professional backdrop that frames your entire profile section.
+
+### Desktop vs Mobile Display
+LinkedIn adapts banner display across devices:
+
+**Desktop:** Full banner displays behind your profile section. Your profile photo overlaps the bottom-left corner. The name/headline section sits below the banner.
+
+**Mobile:** Banner is cropped more aggressively—approximately the center **1584×280 pixels** displays. The profile photo sits in the center-bottom, not left.
+
+### Safe Zone Strategy
+
+**Left Side (Desktop):** Avoid placing important content in the left 200×200 pixel area where your profile picture overlays.
+
+**Center-Bottom (Mobile):** The profile photo sits center-bottom on mobile. Keep critical content in the top 2/3 of your banner.
+
+**Right 2/3 Rule:** The safest area for text and key visuals is the right two-thirds of your banner, visible on all devices.
+
+### Design Best Practices
+
+**Do:**
+- Include your value proposition or specialty
+- Use your brand colors consistently
+- Add subtle contact information or website
+- Create clean, professional compositions
+- Update for career changes or achievements
+
+**Don't:**
+- Use busy backgrounds that compete with your profile
+- Place text over your profile photo zone
+- Use generic stock photos (they look unprofessional)
+- Include too much text (keep it scannable)
+- Forget to preview on mobile before publishing
+
+### Professional Branding Elements
+Consider including: your job title and specialty, company logo (if appropriate), industry keywords, a clean tagline, or subtle contact icons. Many professionals use abstract gradients or subtle patterns with their brand colors for a polished look.
+
+### What High-Performing Profiles Include
+Top LinkedIn profiles often feature banners with: speaking engagements, book covers, achievement highlights, company branding, or clear value propositions. The banner should answer "what do you do?" at a glance.
+
+### Color Psychology for LinkedIn
+Blue (trust, professionalism), green (growth, finance), purple (creativity, innovation), and orange (energy, action) perform well. Avoid neon colors or busy patterns. Your banner should complement, not overpower, your professional photo.
+
+### Common Mistakes to Avoid
+Low-resolution images, outdated information, default gray banners, cluttered designs, and text that becomes unreadable when cropped. Always test on both desktop and the LinkedIn mobile app before finalizing.`,
       faq: [
         {
           question: "What size should a LinkedIn banner be?",

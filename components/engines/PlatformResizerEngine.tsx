@@ -97,6 +97,115 @@ function FAQSection({ faqs }: { faqs: FAQ[] }) {
   );
 }
 
+function PlatformGuide({ content }: { content: string }) {
+  const renderMarkdown = (text: string) => {
+    const lines = text.trim().split('\n');
+    const elements: React.ReactNode[] = [];
+    let currentList: string[] = [];
+    let inBoldSection = false;
+    let boldSectionTitle = '';
+    let boldSectionItems: string[] = [];
+
+    const flushList = () => {
+      if (currentList.length > 0) {
+        elements.push(
+          <ul key={`list-${elements.length}`} className="space-y-1 mb-4 ml-4">
+            {currentList.map((item, i) => (
+              <li key={i} className="text-gray-600 text-sm flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">•</span>
+                <span dangerouslySetInnerHTML={{ __html: formatBold(item) }} />
+              </li>
+            ))}
+          </ul>
+        );
+        currentList = [];
+      }
+    };
+
+    const flushBoldSection = () => {
+      if (boldSectionTitle && boldSectionItems.length > 0) {
+        elements.push(
+          <div key={`bold-section-${elements.length}`} className="mb-4">
+            <p className="font-semibold text-gray-800 mb-2">{boldSectionTitle}</p>
+            <ul className="space-y-1 ml-4">
+              {boldSectionItems.map((item, i) => (
+                <li key={i} className="text-gray-600 text-sm flex items-start gap-2">
+                  <span className="text-orange-500 mt-0.5">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+        boldSectionTitle = '';
+        boldSectionItems = [];
+        inBoldSection = false;
+      }
+    };
+
+    const formatBold = (text: string) => {
+      return text.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-gray-800">$1</strong>');
+    };
+
+    lines.forEach((line, index) => {
+      const trimmedLine = line.trim();
+      
+      if (trimmedLine.startsWith('## ')) {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <h2 key={`h2-${index}`} className="text-xl font-bold text-gray-900 mb-4 mt-6 first:mt-0">
+            {trimmedLine.replace('## ', '')}
+          </h2>
+        );
+      } else if (trimmedLine.startsWith('### ')) {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <h3 key={`h3-${index}`} className="text-lg font-semibold text-gray-800 mb-3 mt-5">
+            {trimmedLine.replace('### ', '')}
+          </h3>
+        );
+      } else if (trimmedLine.match(/^\*\*[^*]+:\*\*$/)) {
+        flushList();
+        flushBoldSection();
+        boldSectionTitle = trimmedLine.replace(/\*\*/g, '');
+        inBoldSection = true;
+      } else if (trimmedLine.startsWith('- ') && inBoldSection) {
+        boldSectionItems.push(trimmedLine.replace('- ', ''));
+      } else if (trimmedLine.startsWith('- ')) {
+        flushBoldSection();
+        currentList.push(trimmedLine.replace('- ', ''));
+      } else if (trimmedLine === '') {
+        flushList();
+        if (!inBoldSection) flushBoldSection();
+      } else {
+        flushList();
+        flushBoldSection();
+        elements.push(
+          <p 
+            key={`p-${index}`} 
+            className="text-gray-600 text-sm leading-relaxed mb-3"
+            dangerouslySetInnerHTML={{ __html: formatBold(trimmedLine) }}
+          />
+        );
+      }
+    });
+
+    flushList();
+    flushBoldSection();
+    return elements;
+  };
+
+  return (
+    <section className="mt-10 bg-white rounded-xl border p-6 md:p-8">
+      <div className="prose prose-sm max-w-none">
+        {renderMarkdown(content)}
+      </div>
+    </section>
+  );
+}
+
 function RelatedResizers({ currentSlug, relatedSlugs }: { currentSlug: string; relatedSlugs: string[] }) {
   const relatedPresets = relatedSlugs
     .filter(slug => slug !== currentSlug)
@@ -629,6 +738,8 @@ export default function PlatformResizerEngine({ tool }: PlatformResizerEnginePro
           )}
 
           <ResizerUI preset={preset} />
+
+          <PlatformGuide content={preset.seo.platformGuide} />
 
           {tool.cluster && (
             <div className="mt-6 p-4 bg-white rounded-lg border text-center">
