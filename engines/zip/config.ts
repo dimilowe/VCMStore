@@ -20,6 +20,7 @@ export type ZipEngineConfig = {
     contentGuide?: string;
     faq: { question: string; answer: string }[];
   };
+  relatedArticleSlugs: string[];
 };
 
 export const zipPresets: Record<string, ZipEngineConfig> = {
@@ -114,7 +115,8 @@ Our tool uses the **DEFLATE** compression algorithm at level 6, which provides a
           answer: 'Yes! The ZIP creator works on all devices including smartphones and tablets. Just tap to select files and download your ZIP.'
         }
       ]
-    }
+    },
+    relatedArticleSlugs: []
   }
 };
 

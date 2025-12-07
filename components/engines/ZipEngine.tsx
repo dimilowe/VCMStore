@@ -7,7 +7,7 @@ import { saveAs } from 'file-saver';
 import { 
   ArrowLeft, Upload, Download, FileArchive, Loader2, 
   AlertCircle, CheckCircle, ChevronDown, ChevronUp, X,
-  File, Image, FileText, Film, Music, Code, Trash2
+  File, Image, FileText, Film, Music, Code, Trash2, BookOpen
 } from 'lucide-react';
 import { ToolRecord } from '@/lib/toolsRepo';
 import { ZipEngineConfig, getZipPresetBySlug } from '@/engines/zip/config';
@@ -139,7 +139,8 @@ export default function ZipEngine({ tool }: ZipEngineProps) {
       title: `${tool.name} - VCM Suite`,
       metaDescription: tool.description || 'Create ZIP archives from your files',
       faq: []
-    }
+    },
+    relatedArticleSlugs: []
   };
 
   const totalSize = files.reduce((sum, f) => sum + f.size, 0);
@@ -423,6 +424,8 @@ export default function ZipEngine({ tool }: ZipEngineProps) {
 
         <PostResultUpsell />
 
+        <RelatedArticles articleSlugs={config.relatedArticleSlugs} />
+
         {config.seo.faq && config.seo.faq.length > 0 && (
           <FAQSection faqs={config.seo.faq} />
         )}
@@ -534,6 +537,38 @@ function ContentGuide({ content }: { content: string }) {
     <section className="mt-10 bg-white rounded-xl border p-6 md:p-8">
       <div className="prose prose-sm max-w-none">
         {renderMarkdown(content)}
+      </div>
+    </section>
+  );
+}
+
+function RelatedArticles({ articleSlugs }: { articleSlugs: string[] }) {
+  if (articleSlugs.length === 0) return null;
+
+  const articles = articleSlugs.map(slug => ({
+    slug,
+    title: slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  }));
+
+  return (
+    <section className="mt-10">
+      <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <BookOpen className="w-5 h-5 text-orange-500" />
+        Related Guides
+      </h2>
+      <div className="space-y-3">
+        {articles.map((article) => (
+          <Link
+            key={article.slug}
+            href={`/mbb/${article.slug}`}
+            className="block p-4 bg-white border rounded-lg hover:border-orange-300 hover:shadow-sm transition-all group"
+          >
+            <span className="font-medium text-gray-800 group-hover:text-orange-700">
+              {article.title}
+            </span>
+            <span className="block text-xs text-gray-400 mt-1">Read guide →</span>
+          </Link>
+        ))}
       </div>
     </section>
   );
