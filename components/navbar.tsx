@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, MessageCircle, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Images, RotateCcw, Youtube, Instagram, Twitter, Linkedin, Video, FileArchive } from "lucide-react";
+import { User, Bookmark, Menu, LayoutDashboard, ShieldCheck, Settings, LogOut, LogIn, ChevronDown, X, Sparkles, Trash2, Camera, Calculator, HelpCircle, Lightbulb, LinkIcon, FileImage, Image, FileText, Palette, Search, Wand2, Bot, Mic, Target, Network, Zap, Layout, Smile, Star, Heart, ArrowRight, FilePen, TrendingUp, Users, Images, RotateCcw, Youtube, Instagram, Twitter, Linkedin, Video, FileArchive } from "lucide-react";
 import GoogleTranslate from "@/components/GoogleTranslate";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,6 @@ const resourceCategories: ResourceCategory[] = [
   {
     name: "AI Tools",
     items: [
-      { label: "AI Chat", href: "/chat", description: "Strategy assistant for creators", icon: MessageCircle, iconBg: "bg-purple-500" },
       { label: "Thumbnail Coach", href: "/tools/ai-thumbnail-coach", description: "YouTube thumbnail analyzer", icon: Camera, iconBg: "bg-red-500" },
       { label: "YouTube Title Split-Test", href: "/tools/youtube-title-split-test", description: "A/B test YouTube titles", icon: RotateCcw, iconBg: "bg-red-500" },
       { label: "Logo Generator", href: "/tools/logo-generator", description: "AI-powered logo maker", icon: Palette, iconBg: "bg-pink-500" },
