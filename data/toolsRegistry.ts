@@ -35,6 +35,7 @@ export type EngineType =
   | "ai-generate"
   | "file-convert"
   | "file-edit"
+  | "zip"
   | "community"
   | "static"
   | "standalone";

@@ -9,6 +9,7 @@ export const ENGINE_COMPONENTS: Record<string, () => Promise<{ default: Componen
   'calculator': () => import('@/components/engines/CalculatorEngine'),
   'youtube-metrics-calculator': () => import('@/components/engines/CalculatorEngine'),
   'platform-resizer': () => import('@/components/engines/PlatformResizerEngine'),
+  'zip': () => import('@/components/engines/ZipEngine'),
 };
 
 export function getEngineLoader(engine: string | null): (() => Promise<{ default: ComponentType<EngineComponentProps> }>) | null {

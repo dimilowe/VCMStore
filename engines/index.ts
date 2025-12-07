@@ -121,6 +121,16 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     inputTypes: ["multi", "text", "image"],
     outputTypes: ["interactive", "image", "text", "display"],
     capabilities: ["custom"]
+  },
+  "zip": {
+    id: "zip",
+    name: "ZIP Archive Engine",
+    description: "Create and manage ZIP archives client-side",
+    inputTypes: ["file", "multi"],
+    outputTypes: ["download"],
+    sharedComponent: "components/engines/ZipEngine.tsx",
+    presetsFile: "engines/zip/config.ts",
+    capabilities: ["compress", "archive", "bundle"]
   }
 };
 
