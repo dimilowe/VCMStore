@@ -308,12 +308,10 @@ function ResizerUI({ preset }: { preset: PlatformImagePreset }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = (file: File) => {
     setError(null);
     setSuccess(false);
     setResizedBlobUrl(null);
@@ -332,6 +330,32 @@ function ResizerUI({ preset }: { preset: PlatformImagePreset }) {
     setSelectedFile(file);
     const url = URL.createObjectURL(file);
     setOriginalPreviewUrl(url);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
   };
 
   const handleResize = async () => {
@@ -381,11 +405,20 @@ function ResizerUI({ preset }: { preset: PlatformImagePreset }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
       {!selectedFile ? (
-        <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-orange-400 hover:bg-orange-50/50 transition-colors">
+        <label 
+          className={`flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-all ${
+            isDragging 
+              ? 'border-orange-500 bg-orange-50 scale-[1.02]' 
+              : 'border-gray-300 hover:border-orange-400 hover:bg-orange-50/50'
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <Upload className="w-12 h-12 text-gray-400 mb-3" />
+            <Upload className={`w-12 h-12 mb-3 transition-colors ${isDragging ? 'text-orange-500' : 'text-gray-400'}`} />
             <p className="mb-2 text-lg font-medium text-gray-700">
-              Click to upload an image
+              {isDragging ? 'Drop your image here' : 'Drag & drop or click to upload'}
             </p>
             <p className="text-sm text-gray-500">
               PNG, JPG, or WebP up to {preset.maxFileSizeMB}MB
