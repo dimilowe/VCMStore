@@ -13,6 +13,7 @@ import {
   LogOut,
   Package,
   FileText,
+  Upload,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -25,6 +26,12 @@ const NAV_ITEMS = [
     label: "Content Factory",
     icon: Factory,
     description: "Create clusters, tools, articles",
+  },
+  {
+    href: "/admin/cms-import",
+    label: "CMS Import",
+    icon: Upload,
+    description: "Bulk import JSON objects",
   },
   {
     href: "/admin/content-manager",
