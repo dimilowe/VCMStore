@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineUploader } from "@/components/inline-uploader";
-import { Plus, Edit, Trash2, BookOpen, Layers, Search, ChevronLeft, ChevronRight, Wrench, LayoutGrid, FileText, Zap, Globe } from "lucide-react";
+import { Plus, Edit, Trash2, BookOpen, Layers, Search, ChevronLeft, ChevronRight, Wrench, LayoutGrid, FileText, Zap, Globe, Activity } from "lucide-react";
 import Link from "next/link";
 
 interface Product {
@@ -336,6 +336,12 @@ export default function AdminPage() {
               <Button variant="outline">
                 <Globe className="mr-2 h-4 w-4" />
                 URL Registry
+              </Button>
+            </Link>
+            <Link href="/admin/seo-health">
+              <Button variant="outline">
+                <Activity className="mr-2 h-4 w-4" />
+                SEO Health
               </Button>
             </Link>
             <Button onClick={() => setShowForm(true)} className="bg-orange-500 hover:bg-orange-600">

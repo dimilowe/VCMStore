@@ -59,6 +59,7 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `youtube_rotation_log`: Log of title rotations with activation times
 - `cluster_articles`: AI-generated SEO articles linked to clusters (separate from manual blog posts)
 - `global_urls`: URL registry for domain-wide indexing control (URL, type, is_indexed, canonical, notes)
+- `seo_health_snapshots`: SEO health audit results per page (score, title, H1, meta, word count, schema, robots)
 
 ## Project Structure
 
@@ -291,6 +292,14 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-08: **SEO Health Console** - Internal admin tool for site-wide SEO auditing
+  - Created seo_health_snapshots table to store crawl results
+  - Built SEO scanner module (lib/seo/seoScanner.ts) that crawls indexed pages
+  - Extracts SEO signals: title, H1, meta description, word count, internal links, schema, robots meta
+  - Calculates overall health score (0-100) with deductions for issues
+  - Admin dashboard at /admin/seo-health with summary cards, filters, table, and detail modal
+  - Supports filtering by: Critical, Broken, Thin Content, No H1, No Meta, No Schema
+  - Protected by iron-session admin authentication
 - 2025-12-07: **Global URL Registry** - Centralized indexing control system for SEO
   - Created global_urls database table to track all URLs with indexing status
   - Built auto-discovery API at /api/global-urls/discover to scan app folder
