@@ -381,38 +381,75 @@ export default function SeoControlPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-2">
-                {snapshots.slice(0, 30).map((snapshot) => (
-                  <div
-                    key={snapshot.id}
-                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-3">
-                      {getScoreIcon(snapshot.overall_score)}
-                      <div>
-                        <div className="font-medium">{snapshot.url}</div>
-                        <div className="text-sm text-gray-500">
-                          {snapshot.word_count} words • {snapshot.page_type}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {snapshot.issues.length > 0 && (
-                        <Badge variant="outline" className="text-yellow-600">
-                          {snapshot.issues.length} issues
-                        </Badge>
-                      )}
-                      <span className={`font-bold ${getScoreColor(snapshot.overall_score)}`}>
-                        {snapshot.overall_score}
-                      </span>
-                      <Link href={snapshot.url} target="_blank">
-                        <Button variant="ghost" size="sm">
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium">URL</th>
+                      <th className="text-left px-4 py-3 font-medium">Type</th>
+                      <th className="text-center px-4 py-3 font-medium">H1</th>
+                      <th className="text-center px-4 py-3 font-medium">Score</th>
+                      <th className="text-center px-4 py-3 font-medium">Words</th>
+                      <th className="text-center px-4 py-3 font-medium">Links</th>
+                      <th className="text-left px-4 py-3 font-medium">Issues</th>
+                      <th className="text-center px-4 py-3 font-medium w-10"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {snapshots.map((snapshot) => (
+                      <tr key={snapshot.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <span className="font-medium">{snapshot.url.replace('http://localhost:5000', '')}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline">{snapshot.page_type}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {snapshot.has_h1 ? (
+                            <CheckCircle className="w-4 h-4 text-green-500 mx-auto" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-500 mx-auto" />
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`font-bold ${getScoreColor(snapshot.overall_score)}`}>
+                            {snapshot.overall_score}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-600">
+                          {snapshot.word_count}
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-600">
+                          {(snapshot as any).internal_links ?? '-'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-1">
+                            {!snapshot.has_h1 && (
+                              <span className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700">NO H1</span>
+                            )}
+                            {!snapshot.has_meta_description && (
+                              <span className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700">NO META</span>
+                            )}
+                            {snapshot.is_thin_content && (
+                              <span className="px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">THIN</span>
+                            )}
+                            {snapshot.issues.includes('Missing schema markup') && (
+                              <span className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700">NO SCHEMA</span>
+                            )}
+                            {snapshot.status_code !== 200 && (
+                              <span className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700">{snapshot.status_code}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <Link href={snapshot.url} target="_blank">
+                            <ExternalLink className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
