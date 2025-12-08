@@ -89,10 +89,10 @@ export async function POST(request: NextRequest) {
       title: "Homepage"
     });
 
-    // Also discover database-stored articles from cluster_articles
-    const articlesResult = await query(
-      `SELECT slug, title FROM cluster_articles`
-    );
+    // Discover all database-stored content
+
+    // Articles from cluster_articles
+    const articlesResult = await query(`SELECT slug, title FROM cluster_articles`);
     for (const article of articlesResult.rows) {
       discoveredUrls.push({
         url: `/articles/${article.slug}`,
@@ -101,10 +101,38 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Also discover MBBs from cms_objects
-    const mbbsResult = await query(
-      `SELECT slug, title FROM cms_objects WHERE type = 'mbb'`
-    );
+    // Blog posts from blog_posts
+    const blogResult = await query(`SELECT slug, title FROM blog_posts`);
+    for (const post of blogResult.rows) {
+      discoveredUrls.push({
+        url: `/newsletter/${post.slug}`,
+        type: "blog",
+        title: post.title
+      });
+    }
+
+    // Tools from tools table
+    const toolsResult = await query(`SELECT slug, name FROM tools WHERE slug IS NOT NULL`);
+    for (const tool of toolsResult.rows) {
+      discoveredUrls.push({
+        url: `/tools/${tool.slug}`,
+        type: "tool",
+        title: tool.name
+      });
+    }
+
+    // Products from products table
+    const productsResult = await query(`SELECT slug, name FROM products`);
+    for (const product of productsResult.rows) {
+      discoveredUrls.push({
+        url: `/product/${product.slug}`,
+        type: "product",
+        title: product.name
+      });
+    }
+
+    // MBBs from cms_objects
+    const mbbsResult = await query(`SELECT slug, title FROM cms_objects WHERE type = 'mbb'`);
     for (const mbb of mbbsResult.rows) {
       discoveredUrls.push({
         url: `/mbb/${mbb.slug}`,
