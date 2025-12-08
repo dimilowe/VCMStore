@@ -119,10 +119,16 @@ async function getArticleStatuses(articleSlugs: string[]): Promise<ArticleStatus
   
   try {
     const placeholders = articleSlugs.map((_, i) => `$${i + 1}`).join(", ");
+    // Query cms_objects for articles and join with global_urls for indexed status
     const result = await query(
-      `SELECT slug, title, content, is_published, is_indexed 
-       FROM cluster_articles 
-       WHERE slug IN (${placeholders})`,
+      `SELECT 
+         c.slug, 
+         c.data->>'title' as title, 
+         c.word_count,
+         COALESCE(g.is_indexed, false) as is_indexed
+       FROM cms_objects c
+       LEFT JOIN global_urls g ON g.cms_slug = c.slug
+       WHERE c.slug IN (${placeholders}) AND c.type = 'article'`,
       articleSlugs
     );
     
@@ -135,10 +141,11 @@ async function getArticleStatuses(articleSlugs: string[]): Promise<ArticleStatus
     
     for (const row of result.rows) {
       articleMap.set(row.slug, { 
-        title: row.title, 
-        isPublished: row.is_published === true,
+        title: row.title || row.slug, 
+        // Articles in cms_objects are considered published (drafts not yet imported)
+        isPublished: true,
         isIndexed: row.is_indexed === true,
-        contentLength: row.content?.length || 0,
+        contentLength: row.word_count || 0,
       });
     }
     
@@ -188,22 +195,28 @@ export async function getAllClustersOverview(): Promise<ClusterOverview[]> {
   if (uniqueSlugs.length > 0) {
     try {
       const placeholders = uniqueSlugs.map((_, i) => `$${i + 1}`).join(", ");
+      // Query cms_objects for articles and join with global_urls for indexed status
       const result = await query(
-        `SELECT slug, title, content, is_published, is_indexed 
-         FROM cluster_articles 
-         WHERE slug IN (${placeholders})`,
+        `SELECT 
+           c.slug, 
+           c.data->>'title' as title, 
+           c.word_count,
+           COALESCE(g.is_indexed, false) as is_indexed
+         FROM cms_objects c
+         LEFT JOIN global_urls g ON g.cms_slug = c.slug
+         WHERE c.slug IN (${placeholders}) AND c.type = 'article'`,
         uniqueSlugs
       );
       
       for (const row of result.rows) {
         articleStatusMap.set(row.slug, {
           slug: row.slug,
-          title: row.title,
+          title: row.title || row.slug,
           exists: true,
-          isDraft: !row.is_published,
-          isPublished: row.is_published === true,
+          isDraft: false,
+          isPublished: true,
           isIndexed: row.is_indexed === true,
-          contentLength: row.content?.length || 0,
+          contentLength: row.word_count || 0,
         });
       }
     } catch (error) {
