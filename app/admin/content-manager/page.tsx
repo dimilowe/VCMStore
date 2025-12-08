@@ -62,6 +62,7 @@ interface Article {
   is_indexed: boolean;
   is_published: boolean;
   cluster_slug: string | null;
+  cluster_title: string | null;
   word_count: number;
   health: "thin" | "ok" | "strong";
   source: "cluster_articles" | "cms_objects";
@@ -566,8 +567,10 @@ export default function ContentManagerPage() {
                           <div className="text-xs text-gray-400">{article.slug}</div>
                         </td>
                         <td className="px-4 py-3">
-                          {article.cluster_slug ? (
-                            <Badge variant="outline">{article.cluster_slug}</Badge>
+                          {article.cluster_title || article.cluster_slug ? (
+                            <Badge variant="outline" className="max-w-[200px] truncate" title={article.cluster_title || article.cluster_slug || ""}>
+                              {article.cluster_title || article.cluster_slug}
+                            </Badge>
                           ) : (
                             <span className="text-gray-300">—</span>
                           )}

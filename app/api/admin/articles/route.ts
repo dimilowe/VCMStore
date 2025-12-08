@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
 import { query } from "@/lib/db";
 import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
+import { CLUSTER_REGISTRY } from "@/data/clusterRegistry";
 
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
@@ -73,7 +74,12 @@ export async function GET(request: NextRequest) {
       ORDER BY created_at DESC
     `);
 
-    return NextResponse.json({ articles: result.rows });
+    const articles = result.rows.map(row => ({
+      ...row,
+      cluster_title: row.cluster_slug ? CLUSTER_REGISTRY[row.cluster_slug]?.pillarTitle || row.cluster_slug : null
+    }));
+
+    return NextResponse.json({ articles });
   } catch (error) {
     console.error("Failed to fetch articles:", error);
     return NextResponse.json({ error: "Failed to fetch articles" }, { status: 500 });
