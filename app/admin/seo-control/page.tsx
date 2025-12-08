@@ -444,7 +444,7 @@ export default function SeoControlPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <a href={snapshot.url} target="_blank" rel="noopener noreferrer">
+                          <a href={snapshot.url.replace("http://localhost:5000", "")} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="w-4 h-4 text-gray-400 hover:text-gray-600" />
                           </a>
                         </td>
@@ -570,7 +570,7 @@ export default function SeoControlPage() {
                             </button>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <a href={page.url} target="_blank" rel="noopener noreferrer">
+                            <a href={page.url.replace("http://localhost:5000", "")} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="w-4 h-4 text-gray-400 hover:text-gray-600" />
                             </a>
                           </td>
@@ -660,7 +660,7 @@ export default function SeoControlPage() {
                           </button>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <a href={urlEntry.url} target="_blank" rel="noopener noreferrer">
+                          <a href={urlEntry.url.replace("http://localhost:5000", "")} target="_blank" rel="noopener noreferrer">
                             <Button variant="ghost" size="sm">
                               <ExternalLink className="w-4 h-4" />
                             </Button>
