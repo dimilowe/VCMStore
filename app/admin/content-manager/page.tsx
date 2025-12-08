@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+export const dynamic = "force-dynamic";
+
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { CMSImportModal } from "@/components/admin/cms-import-modal";
