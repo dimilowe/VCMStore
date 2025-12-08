@@ -1,0 +1,52 @@
+our proposed fix (global_urls as the only source of truth for indexing) is the correct move. Let me tighten it so you don’t miss any edge cases.
+1. Canonical rule going forward
+Indexing status = global_urls.is_indexed and nothing else.
+Sitemap generation → uses global_urls
+SEO Health / Ready-to-Index → uses global_urls
+Any “Indexed” badge/toggle in UI → must read/write global_urls
+The tools.isIndexed flag should be treated as wrong / legacy from now on.
+2. How to wire it cleanly
+a) Backfill / transition (one-time)
+If you care about preserving any existing tool flags:
+Run a one-off script that:
+Joins tools.slug → global_urls.path = /tools/{slug}
+If tools.isIndexed = true and global_urls.is_indexed = false, decide which wins.
+Realistically: trust global_urls, because your SEO system + sitemap already use it.
+Honestly, given your situation (only 3 truly indexed pages), it’s safest to treat global_urls as ground truth and ignore the tools column.
+b) Tool Control “Indexed” column
+Change it from:
+reading tools.isIndexed
+toggling tools.isIndexed
+to:
+read: global_urls.is_indexed via join on /tools/{slug}
+write: update global_urls.is_indexed when toggled
+So when you flip “Indexed” in Tool Control, you’re actually flipping the same flag the URL Registry + Ready-to-Index + sitemap use.
+No more divergence.
+c) Kill the duplicate column
+Once the UI and code are all using global_urls.is_indexed:
+Drop tools.isIndexed from the DB and model
+Rip out any lingering references in code
+If you still want a per-tool flag (e.g. “show this in /tools listing” or “ready for SEO”), create a differently named field like:
+tools.isFeatured
+tools.showInDirectory
+tools.ready_for_index_review
+Anything but isIndexed, so it can’t be confused with the real global index state.
+3. Optional: even cleaner UX
+Right now you have:
+URL Registry toggle
+Ready-to-Index automation
+Tool Control “Indexed” toggle
+To avoid accidentally indexing from multiple places, you could:
+Make Tool Control show an Indexed badge (read-only) that reflects global_urls.is_indexed
+Keep all actual indexing actions inside:
+URL Registry
+Ready-to-Index → “Index All Ready Pages”
+So Tool Control becomes “SEO status dashboard” for tools, not another place that mutates indexing.
+That keeps your mental model simple:
+“Anything that controls what Google sees lives in URL Registry / Ready-to-Index.”
+4. Bottom line
+Yes, you caught a real data inconsistency.
+Yes, global_urls should be your single source of truth.
+Yes, your 3-step plan (join, write to global_urls, drop tools.isIndexed) is the correct fix.
+Do that and every “Indexed” label across the app will finally mean the same thing:
+“This URL is allowed in the sitemap and visible to Google.”

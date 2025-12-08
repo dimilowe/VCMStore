@@ -3,33 +3,8 @@ import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
 import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 import { canIndexTool } from "@/lib/toolInterlinking";
-import fs from "fs";
-import path from "path";
-
-interface RolloutConfig {
-  _comment?: string;
-  tools: Record<string, {
-    isIndexed?: boolean;
-    isFeatured?: boolean;
-    inDirectory?: boolean;
-    segment?: string;
-  }>;
-}
-
-function loadRolloutConfig(): RolloutConfig {
-  try {
-    const configPath = path.join(process.cwd(), "data/toolRolloutConfig.json");
-    const data = fs.readFileSync(configPath, "utf-8");
-    return JSON.parse(data);
-  } catch {
-    return { tools: {} };
-  }
-}
-
-function saveRolloutConfig(config: RolloutConfig): void {
-  const configPath = path.join(process.cwd(), "data/toolRolloutConfig.json");
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
-}
+import { query } from "@/lib/db";
+import { updateTool } from "@/lib/toolsRepo";
 
 export async function POST(request: NextRequest) {
   const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
@@ -61,15 +36,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const config = loadRolloutConfig();
-
-    if (!config.tools[slug]) {
-      config.tools[slug] = {};
+    if (field === "isIndexed") {
+      const toolUrl = `/tools/${slug}`;
+      const result = await query(
+        `INSERT INTO global_urls (url, type, is_indexed, indexed_at)
+         VALUES ($1, 'tool', $2, CASE WHEN $2 = true THEN NOW() ELSE NULL END)
+         ON CONFLICT (url) DO UPDATE SET 
+           is_indexed = $2, 
+           indexed_at = CASE WHEN $2 = true THEN NOW() ELSE NULL END`,
+        [toolUrl, value]
+      );
+      if (result.rowCount === 0) {
+        return NextResponse.json({ error: "Failed to update indexing status" }, { status: 500 });
+      }
+    } else {
+      const fieldMap: Record<string, string> = {
+        isFeatured: "featured",
+        inDirectory: "inDirectory",
+        segment: "segment",
+      };
+      const dbField = fieldMap[field] || field;
+      await updateTool(slug, { [dbField]: value });
     }
-
-    (config.tools[slug] as Record<string, unknown>)[field] = value;
-
-    saveRolloutConfig(config);
 
     return NextResponse.json({ success: true, slug, field, value });
   } catch (error) {
