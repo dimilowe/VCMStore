@@ -21,6 +21,19 @@ export async function getIndexedUrls(): Promise<GlobalUrl[]> {
   return result.rows;
 }
 
+export async function getAllPublicUrls(): Promise<GlobalUrl[]> {
+  const result = await query(
+    `SELECT id, url, title, type, is_indexed, canonical 
+     FROM global_urls 
+     WHERE url NOT LIKE '/admin%'
+       AND url NOT LIKE '/api%'
+       AND url NOT LIKE '/login%'
+       AND url NOT LIKE '/dashboard%'
+     ORDER BY url ASC`
+  );
+  return result.rows;
+}
+
 export async function scanPage(urlData: GlobalUrl): Promise<ScanResult> {
   const siteDomain = getSiteDomain();
   const fullUrl = `${siteDomain}${urlData.url}`;
@@ -190,7 +203,7 @@ export async function saveSnapshot(result: ScanResult): Promise<void> {
 }
 
 export async function runFullScan(batchSize: number = 10): Promise<ScanSummary> {
-  const urls = await getIndexedUrls();
+  const urls = await getAllPublicUrls();
   const summary: ScanSummary = {
     total_scanned: 0,
     successful: 0,

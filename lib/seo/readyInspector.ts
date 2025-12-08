@@ -143,6 +143,10 @@ export async function runReadyInspector(): Promise<{
     `SELECT id, url, type, is_indexed, manual_review_passed 
      FROM global_urls 
      WHERE is_indexed = false 
+       AND url NOT LIKE '/admin%'
+       AND url NOT LIKE '/api%'
+       AND url NOT LIKE '/login%'
+       AND url NOT LIKE '/dashboard%'
      ORDER BY url ASC`
   );
 
@@ -220,7 +224,11 @@ export async function indexReadyPages(): Promise<{
 }> {
   const readyPages = await query(
     `SELECT id, url FROM global_urls 
-     WHERE is_indexed = false AND is_ready_to_index = true`
+     WHERE is_indexed = false AND is_ready_to_index = true
+       AND url NOT LIKE '/admin%'
+       AND url NOT LIKE '/api%'
+       AND url NOT LIKE '/login%'
+       AND url NOT LIKE '/dashboard%'`
   );
 
   const indexedSlugs: string[] = [];
@@ -313,6 +321,10 @@ export async function getUnindexedPagesWithStatus(): Promise<{
        LIMIT 1
      ) s ON true
      WHERE g.is_indexed = false
+       AND g.url NOT LIKE '/admin%'
+       AND g.url NOT LIKE '/api%'
+       AND g.url NOT LIKE '/login%'
+       AND g.url NOT LIKE '/dashboard%'
      ORDER BY g.url ASC`
   );
 
