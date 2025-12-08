@@ -14,6 +14,7 @@ export interface OutfitEngineConfig {
   uploadHelpText: string;
   apiPath: string;
   faqs: OutfitEngineFaq[];
+  contentGuide?: string;
 }
 
 export const BASE_FAQS: OutfitEngineFaq[] = [
@@ -51,7 +52,33 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     uploadDescription: '',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## How This AI Outfit Generator Works
+
+This tool uses computer vision to analyze any outfit photo you upload. The AI identifies individual clothing items, accessories, and shoes, then generates search keywords to find similar products online.
+
+### Step 1: Upload Any Outfit Photo
+
+You can upload photos from anywhere:
+- Instagram screenshots of influencer outfits
+- Pinterest boards with fashion inspiration
+- Celebrity red carpet or street style photos
+- TikTok outfit of the day screenshots
+
+### Step 2: AI Identifies Each Item
+
+The AI breaks down the outfit into individual pieces like tops, bottoms, outerwear, shoes, and accessories. For each item, it generates descriptive keywords based on color, style, and material.
+
+### Step 3: Shop Similar Items
+
+For each detected item, you get links to similar products from popular retailers. Click any product to view it on the retailer's website.
+
+### Tips for Best Results
+
+- Use clear, well-lit photos where clothing is visible
+- Full-body outfit shots work better than close-ups
+- Avoid photos with multiple people or busy backgrounds
+- Higher resolution images give more accurate results`
   },
 
   'streetwear-outfit-finder': {
@@ -66,7 +93,30 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
       'Perfect for Instagram fits, Pinterest moodboards, or celebrity street style screenshots.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## The Streetwear Outfit Finder Guide
+
+Streetwear is about statement pieces, bold graphics, and mixing high and low fashion. This tool helps you find shoppable versions of any streetwear look you see online.
+
+### What Streetwear Pieces This Tool Finds
+
+- **Graphic tees and hoodies:** Band merch, vintage prints, designer collabs
+- **Cargo pants and baggy jeans:** Wide-leg fits, utility pockets, distressed denim
+- **Statement sneakers:** Jordans, Dunks, designer kicks, chunky trainers
+- **Outerwear:** Bomber jackets, puffer coats, varsity jackets
+- **Accessories:** Bucket hats, chains, crossbody bags
+
+### Best Sources for Streetwear Inspo
+
+Upload screenshots from these to find similar pieces:
+- Instagram fits from streetwear accounts
+- Pinterest boards with urban fashion
+- TikTok outfit check videos
+- Celebrity street style paparazzi shots
+
+### How to Layer Streetwear Outfits
+
+Streetwear is all about layering. Start with a base tee, add an open button-up or hoodie, and finish with outerwear. The AI will identify each layer separately so you can shop the full look.`
   },
 
   'date-night-outfit-generator': {
@@ -81,7 +131,29 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
       'Use screenshots from Instagram, TikTok, or Pinterest date-night looks.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Date Night Outfit Ideas with AI
+
+Finding the perfect date night outfit is easier when you have a reference photo. Upload any romantic outfit inspo and get shoppable alternatives in seconds.
+
+### Date Night Outfit Categories
+
+- **Dinner dates:** Elegant dresses, chic blouses with trousers, sophisticated jumpsuits
+- **Cocktail bars:** Statement tops, leather pants, strappy heels
+- **Casual dates:** Elevated basics, nice jeans, cute flats or ankle boots
+- **Special occasions:** Little black dresses, satin pieces, dressy accessories
+
+### Styling Tips for Date Night
+
+**Keep it simple:** One statement piece is enough. If your dress is bold, keep jewelry minimal.
+
+**Comfort matters:** You want to feel confident, not uncomfortable. If you never wear heels, stick with elegant flats.
+
+**Consider the venue:** A rooftop cocktail bar calls for different shoes than a beachside restaurant.
+
+### Finding Your Date Night Aesthetic
+
+Upload photos that match your personality. The AI will find pieces that recreate the vibe without forcing you into a style that doesn't feel like you.`
   },
 
   'office-outfit-generator': {
@@ -96,7 +168,31 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
       'Great for business casual inspiration, LinkedIn-style looks, and corporate outfits.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Office Outfit Ideas for Every Dress Code
+
+Whether your workplace is business formal or smart casual, this tool helps you find workwear pieces that match your office aesthetic.
+
+### Business Casual Essentials
+
+- **Blazers:** Structured jackets in neutral colors work with almost everything
+- **Trousers:** Tailored pants in black, navy, or gray
+- **Blouses:** Clean silhouettes, minimal patterns
+- **Smart shoes:** Loafers, low heels, polished flats
+
+### Building a Work Wardrobe
+
+The key to office dressing is having versatile pieces that mix and match. A good blazer, quality trousers, and a few neutral blouses can create weeks of outfits.
+
+### Dress Codes Explained
+
+**Business formal:** Suits, ties, structured dresses
+**Business casual:** Blazers optional, dress pants or chinos, collared shirts
+**Smart casual:** Nice jeans allowed, polished sneakers okay, no ties required
+
+### Finding Office Inspo
+
+Upload screenshots from LinkedIn, corporate Instagram accounts, or business fashion blogs. The AI will identify each piece so you can rebuild the look at your budget.`
   },
 
   'capsule-wardrobe-outfit-finder': {
