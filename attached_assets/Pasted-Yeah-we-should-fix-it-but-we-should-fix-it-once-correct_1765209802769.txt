@@ -1,0 +1,56 @@
+Yeah, we should fix it — but we should fix it once, correctly, not bolt on more duct tape.
+Right now you’ve got:
+CONTENT truth: cms_objects ✅
+Legacy junk: tools table still in the hot path ❌
+That’s exactly the opposite of the Three Truths architecture you just locked in.
+What we should do
+1️⃣ Move /tools/[slug] to read from cms_objects (not tools)
+Goal: Tools render from the same source as everything else.
+Tasks for Replit:
+Create a helper like lib/cms/getCmsToolBySlug.ts that:
+Queries cms_objects where type = 'tool' and slug = $slug
+Returns the CMS object including engine_config
+Update app/tools/[slug]/page.tsx to:
+Use getCmsToolBySlug(slug) instead of getToolBySlug from the tools table
+Pass the CMS object into your renderer (VCMRenderer / DynamicToolRenderer)
+Once that’s done, the tools table is no longer needed for rendering.
+2️⃣ Make the JSON importer write proper tool CMS objects
+Your importer should:
+Insert into cms_objects with:
+type: 'tool'
+slug
+title, description
+engine_config: { engine: 'zip', preset: 'zip-file-compression' }
+seo, interlink_*, monetization, etc.
+You already have the 7 ZIP objects shaped correctly — the missing piece is that the renderer is still looking at the wrong table.
+No need to sync into tools at all if we fix the resolver.
+3️⃣ (Optional) One-time backfill / deprecate tools table
+If anything still relies on tools (old admin views, dropdowns, etc.), then:
+Either:
+Run a one-time script to copy existing tools into cms_objects, or
+Update those admin screens to read from cms_objects too.
+But long-term, tools should be treated as deprecated.
+CONTENT truth = cms_objects. Full stop.
+What about the engine field being NULL?
+That only matters in the tools table.
+If we move rendering to cms_objects.engine_config.engine, that entire issue disappears.
+For your ZIP tools, the CMS JSON should already look like:
+"engine_config": {
+  "engine": "zip",
+  "preset": "zip-file-compression"
+}
+The renderer then does:
+switch (cms.engine_config.engine) {
+  case 'zip':
+    return <ZipEngine preset={cms.engine_config.preset} />;
+  // ...
+}
+So yeah: fix the architecture, don’t patch the symptom.
+Copy-paste prompt for Replit
+Here’s what to feed Replit AI:
+We’re migrating tools to use cms_objects as the content source.
+Create a helper lib/cms/getCmsToolBySlug.ts that queries the cms_objects table for a row where type = 'tool' and slug = $slug. It should return the full CMS object including engine_config, seo, etc.
+Update app/tools/[slug]/page.tsx so it uses getCmsToolBySlug instead of reading from the legacy tools table. The tool page should render via our existing renderer component (VCMRenderer / DynamicToolRenderer) using the CMS object.
+Do NOT write anything new to the tools table. From now on, tools are defined only in cms_objects. The JSON importer already inserts tool CMS objects; once this change is made, the 7 new ZIP tools will render correctly using engine_config.engine = "zip" and engine_config.preset.
+Keep all types and exports consistent and fix any TypeScript errors.
+Once that’s done, your 7 ZIP tools from the JSON importer will just work, and you can forget the tools table ever existed.
