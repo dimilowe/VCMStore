@@ -449,7 +449,7 @@ export function Navbar() {
                     </Button>
                     
                     {isProfileOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-[100] overflow-hidden">
                         <div className="py-2">
                           <Link href="/dashboard" onClick={() => setIsProfileOpen(false)}>
                             <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
