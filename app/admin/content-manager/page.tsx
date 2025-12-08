@@ -94,10 +94,14 @@ function ContentManagerInner() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [mbbs, setMbbs] = useState<MBB[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [articleSearchQuery, setArticleSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [articlePage, setArticlePage] = useState(1);
   const [filterEngine, setFilterEngine] = useState("all");
   const [filterIndexed, setFilterIndexed] = useState("all");
   const [filterCluster, setFilterCluster] = useState("all");
+  const [articleFilterCluster, setArticleFilterCluster] = useState("all");
+  const [articleFilterHealth, setArticleFilterHealth] = useState("all");
   const [selectedTools, setSelectedTools] = useState<Set<string>>(new Set());
   const [bulkCluster, setBulkCluster] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -300,6 +304,26 @@ function ContentManagerInner() {
   const paginatedTools = filteredTools.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
+  );
+
+  const filteredArticles = articles.filter((article) => {
+    const matchesSearch =
+      articleSearchQuery === "" ||
+      article.title.toLowerCase().includes(articleSearchQuery.toLowerCase()) ||
+      article.slug.toLowerCase().includes(articleSearchQuery.toLowerCase());
+    const matchesCluster =
+      articleFilterCluster === "all" ||
+      article.cluster_slug === articleFilterCluster;
+    const matchesHealth =
+      articleFilterHealth === "all" ||
+      article.health === articleFilterHealth;
+    return matchesSearch && matchesCluster && matchesHealth;
+  });
+
+  const totalArticlePages = Math.ceil(filteredArticles.length / ITEMS_PER_PAGE);
+  const paginatedArticles = filteredArticles.slice(
+    (articlePage - 1) * ITEMS_PER_PAGE,
+    articlePage * ITEMS_PER_PAGE
   );
 
   const getLinkStatusIcon = (status: string) => {
@@ -577,13 +601,54 @@ function ContentManagerInner() {
 
         {activeTab === "articles" && (
           <div className="space-y-4">
+            <div className="flex gap-3 items-center flex-wrap">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search articles..."
+                  value={articleSearchQuery}
+                  onChange={(e) => {
+                    setArticleSearchQuery(e.target.value);
+                    setArticlePage(1);
+                  }}
+                  className="pl-10"
+                />
+              </div>
+              <select
+                value={articleFilterCluster}
+                onChange={(e) => {
+                  setArticleFilterCluster(e.target.value);
+                  setArticlePage(1);
+                }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Clusters</option>
+                {clusters.map((cluster) => (
+                  <option key={cluster.pillarSlug} value={cluster.pillarSlug}>{cluster.pillarTitle}</option>
+                ))}
+              </select>
+              <select
+                value={articleFilterHealth}
+                onChange={(e) => {
+                  setArticleFilterHealth(e.target.value);
+                  setArticlePage(1);
+                }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Health</option>
+                <option value="strong">Strong</option>
+                <option value="ok">OK</option>
+                <option value="thin">Thin</option>
+              </select>
+            </div>
+
             <div className="text-sm text-gray-500">
-              {articles.length} articles total
+              Showing {paginatedArticles.length} of {filteredArticles.length} articles
             </div>
 
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading articles...</div>
-            ) : articles.length === 0 ? (
+            ) : filteredArticles.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
@@ -607,7 +672,7 @@ function ContentManagerInner() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {articles.map((article) => (
+                    {paginatedArticles.map((article) => (
                       <tr key={article.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="font-medium">{article.title}</div>
@@ -663,6 +728,34 @@ function ContentManagerInner() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {totalArticlePages > 1 && (
+              <div className="flex items-center justify-between pt-4">
+                <span className="text-sm text-gray-500">
+                  Page {articlePage} of {totalArticlePages}
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setArticlePage((p) => Math.max(1, p - 1))}
+                    disabled={articlePage === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setArticlePage((p) => Math.min(totalArticlePages, p + 1))}
+                    disabled={articlePage === totalArticlePages}
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
