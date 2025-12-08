@@ -6,26 +6,7 @@ import { CLUSTER_REGISTRY } from "@/data/clusterRegistry";
 import { getAllToolSkinsForEngine, ENGINE_KEYWORD_MATRICES } from "@/data/engineKeywordMatrix";
 import type { EngineType } from "@/engines";
 import { toolsRegistry } from "@/data/toolsRegistry";
-import fs from "fs";
-import path from "path";
-
-interface RolloutConfig {
-  tools: Record<string, {
-    isIndexed?: boolean;
-    isFeatured?: boolean;
-    inDirectory?: boolean;
-  }>;
-}
-
-function loadRolloutConfig(): RolloutConfig {
-  try {
-    const configPath = path.join(process.cwd(), "data/toolRolloutConfig.json");
-    const data = fs.readFileSync(configPath, "utf-8");
-    return JSON.parse(data);
-  } catch {
-    return { tools: {} };
-  }
-}
+import { query } from "@/lib/db";
 
 export async function GET() {
   const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
@@ -34,22 +15,26 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rolloutConfig = loadRolloutConfig();
+  const indexStatusResult = await query(
+    `SELECT url, is_indexed FROM global_urls WHERE url LIKE '/tools/%'`
+  );
+  const indexStatusMap = new Map<string, boolean>();
+  for (const row of indexStatusResult.rows) {
+    const slug = row.url.replace('/tools/', '');
+    indexStatusMap.set(slug, row.is_indexed);
+  }
 
   const legacyBySlug = new Map<string, typeof toolsRegistry[0]>();
   for (const tool of toolsRegistry) {
     legacyBySlug.set(tool.slug, tool);
   }
 
-  const allMatrixSkins = new Map<string, { isIndexed: boolean }>();
+  const allMatrixSkins = new Map<string, boolean>();
   const engineTypes = Object.keys(ENGINE_KEYWORD_MATRICES) as EngineType[];
   for (const engineType of engineTypes) {
     const skins = getAllToolSkinsForEngine(engineType);
     for (const skin of skins) {
-      const override = rolloutConfig.tools[skin.slug];
-      allMatrixSkins.set(skin.slug, {
-        isIndexed: override?.isIndexed ?? skin.isIndexed ?? false,
-      });
+      allMatrixSkins.set(skin.slug, indexStatusMap.get(skin.slug) ?? false);
     }
   }
 
@@ -59,12 +44,11 @@ export async function GET() {
 
     for (const slug of cluster.toolSlugs) {
       const legacy = legacyBySlug.get(slug);
-      const matrix = allMatrixSkins.get(slug);
-      const override = rolloutConfig.tools[slug];
+      const matrix = allMatrixSkins.has(slug);
 
       if (legacy || matrix) {
         toolCount++;
-        const isIndexed = override?.isIndexed ?? matrix?.isIndexed ?? (legacy ? true : false);
+        const isIndexed = indexStatusMap.get(slug) ?? false;
         if (isIndexed) indexedCount++;
       }
     }
