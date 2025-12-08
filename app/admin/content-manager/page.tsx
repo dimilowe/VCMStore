@@ -1,0 +1,462 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { AdminLayout } from "@/components/admin/admin-layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Wrench,
+  FileText,
+  LayoutGrid,
+  Layers,
+  Search,
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Star,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+} from "lucide-react";
+import Link from "next/link";
+
+interface ToolSkin {
+  slug: string;
+  name: string;
+  engineType: string;
+  segment: string;
+  clusterSlug: string;
+  isIndexed: boolean;
+  isFeatured: boolean;
+  inDirectory: boolean;
+  priority: string;
+  h1: string;
+  primaryKeyword: string;
+  linkStatus: {
+    status: "ready" | "warning" | "error";
+    label: string;
+    details: string[];
+  };
+}
+
+interface ClusterSummary {
+  id: string;
+  pillarSlug: string;
+  pillarTitle: string;
+  engineId: string;
+  toolCount: number;
+  indexedCount: number;
+  articleCount: number;
+}
+
+interface Article {
+  id: string;
+  slug: string;
+  title: string;
+  status: string;
+  cluster_slug: string | null;
+  word_count: number;
+}
+
+type TabType = "tools" | "articles" | "clusters" | "mbbs";
+
+export default function ContentManagerPage() {
+  const [activeTab, setActiveTab] = useState<TabType>("tools");
+  const [tools, setTools] = useState<ToolSkin[]>([]);
+  const [clusters, setClusters] = useState<ClusterSummary[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filterEngine, setFilterEngine] = useState("all");
+  const [filterIndexed, setFilterIndexed] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const ITEMS_PER_PAGE = 20;
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [toolsRes, clustersRes, articlesRes] = await Promise.all([
+        fetch("/api/admin/tools", { credentials: "include" }),
+        fetch("/api/admin/tools/clusters", { credentials: "include" }),
+        fetch("/api/admin/articles", { credentials: "include" }),
+      ]);
+      
+      if (toolsRes.ok) {
+        const data = await toolsRes.json();
+        setTools(data.tools || []);
+      }
+      if (clustersRes.ok) {
+        const data = await clustersRes.json();
+        setClusters(data.clusters || []);
+      }
+      if (articlesRes.ok) {
+        const data = await articlesRes.json();
+        setArticles(data.articles || []);
+      }
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleToolIndexed = async (slug: string, currentValue: boolean) => {
+    try {
+      const res = await fetch("/api/admin/tools/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, field: "isIndexed", value: !currentValue }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setTools((prev) =>
+          prev.map((t) => (t.slug === slug ? { ...t, isIndexed: !currentValue } : t))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update tool:", error);
+    }
+  };
+
+  const engineTypes = [...new Set(tools.map((t) => t.engineType))];
+
+  const filteredTools = tools.filter((tool) => {
+    const matchesSearch =
+      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.slug.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesEngine = filterEngine === "all" || tool.engineType === filterEngine;
+    const matchesIndexed =
+      filterIndexed === "all" ||
+      (filterIndexed === "indexed" && tool.isIndexed) ||
+      (filterIndexed === "not-indexed" && !tool.isIndexed);
+    return matchesSearch && matchesEngine && matchesIndexed;
+  });
+
+  const totalPages = Math.ceil(filteredTools.length / ITEMS_PER_PAGE);
+  const paginatedTools = filteredTools.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const getLinkStatusIcon = (status: string) => {
+    switch (status) {
+      case "ready":
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "warning":
+        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+      case "error":
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Wrench className="w-6 h-6 text-orange-500" />
+            Content Manager
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Review, edit, and manage your tools, articles, and clusters
+          </p>
+        </div>
+
+        <div className="flex gap-2 border-b">
+          {[
+            { id: "tools", label: `Tools (${tools.length})`, icon: Wrench },
+            { id: "articles", label: `Articles (${articles.length})`, icon: FileText },
+            { id: "clusters", label: `Clusters (${clusters.length})`, icon: LayoutGrid },
+            { id: "mbbs", label: "MBBs", icon: Layers },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id as TabType);
+                setCurrentPage(1);
+              }}
+              className={`px-4 py-2 flex items-center gap-2 border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? "border-orange-500 text-orange-600 font-medium"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === "tools" && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-3">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search tools..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="pl-10"
+                />
+              </div>
+              <select
+                value={filterEngine}
+                onChange={(e) => {
+                  setFilterEngine(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Engines</option>
+                {engineTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+              <select
+                value={filterIndexed}
+                onChange={(e) => {
+                  setFilterIndexed(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Status</option>
+                <option value="indexed">Indexed</option>
+                <option value="not-indexed">Not Indexed</option>
+              </select>
+            </div>
+
+            <div className="text-sm text-gray-500">
+              Showing {paginatedTools.length} of {filteredTools.length} tools
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-400">Loading tools...</div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium">Tool</th>
+                      <th className="text-left px-4 py-3 font-medium">Engine</th>
+                      <th className="text-left px-4 py-3 font-medium">Cluster</th>
+                      <th className="text-center px-4 py-3 font-medium">Links</th>
+                      <th className="text-center px-4 py-3 font-medium">Indexed</th>
+                      <th className="text-center px-4 py-3 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {paginatedTools.map((tool) => (
+                      <tr key={tool.slug} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{tool.name}</div>
+                          <div className="text-xs text-gray-400">{tool.slug}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline">{tool.engineType}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-gray-500">
+                          {tool.clusterSlug || "-"}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {getLinkStatusIcon(tool.linkStatus.status)}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => toggleToolIndexed(tool.slug, tool.isIndexed)}
+                            className="inline-flex"
+                          >
+                            {tool.isIndexed ? (
+                              <Eye className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <EyeOff className="w-5 h-5 text-gray-300" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <Link href={`/tools/${tool.slug}`} target="_blank">
+                            <Button variant="ghost" size="sm">
+                              <ExternalLink className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4">
+                <span className="text-sm text-gray-500">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "articles" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                {articles.length} articles total
+              </p>
+              <Link href="/admin/articles">
+                <Button variant="outline" size="sm">
+                  Open Article Control
+                  <ExternalLink className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-400">Loading articles...</div>
+            ) : articles.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500">No articles yet</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Articles are generated as part of clusters
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {articles.slice(0, 20).map((article) => (
+                  <div
+                    key={article.id}
+                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <div className="font-medium">{article.title}</div>
+                        <div className="text-sm text-gray-500">
+                          {article.slug} • {article.word_count || 0} words
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={article.status === "published" ? "default" : "secondary"}>
+                        {article.status}
+                      </Badge>
+                      <Link href={`/admin/articles/edit/${article.id}`}>
+                        <Button variant="ghost" size="sm">
+                          Edit
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "clusters" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                {clusters.length} clusters total
+              </p>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-400">Loading clusters...</div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {clusters.map((cluster) => (
+                  <Card key={cluster.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-lg">{cluster.pillarTitle}</CardTitle>
+                        <Badge variant="outline">{cluster.engineId}</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>{cluster.toolCount} tools</span>
+                        <span>{cluster.indexedCount} indexed</span>
+                        <span>{cluster.articleCount} articles</span>
+                      </div>
+                      <div className="mt-3 pt-3 border-t">
+                        <Link href={`/admin/clusters/${cluster.pillarSlug}`}>
+                          <Button variant="outline" size="sm" className="w-full">
+                            Manage Cluster
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "mbbs" && (
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <Link href="/admin/mbbs">
+                <Button variant="outline" size="sm">
+                  Open MBB Control
+                  <ExternalLink className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Layers className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                <p className="text-gray-500">MBB (Modular Building Block) Management</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Deep content blocks for tool pages
+                </p>
+                <Link href="/admin/mbbs">
+                  <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+                    Manage MBBs
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
+    </AdminLayout>
+  );
+}

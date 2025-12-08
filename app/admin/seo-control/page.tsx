@@ -1,0 +1,602 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { AdminLayout } from "@/components/admin/admin-layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Globe,
+  Activity,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Search,
+  RefreshCw,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Zap,
+  FileText,
+} from "lucide-react";
+import Link from "next/link";
+
+interface UrlEntry {
+  id: string;
+  url: string;
+  type: string;
+  title: string | null;
+  is_indexed: boolean;
+  canonical: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface SeoSnapshot {
+  id: string;
+  url: string;
+  status_code: number;
+  overall_score: number;
+  is_thin_content: boolean;
+  has_h1: boolean;
+  has_meta_description: boolean;
+  word_count: number;
+  issues: string[];
+  page_type: string;
+}
+
+interface ReadyPage {
+  id: string;
+  url: string;
+  type: string;
+  last_health_score: number | null;
+  is_ready_to_index: boolean;
+  word_count: number | null;
+  issues: string[];
+}
+
+type TabType = "overview" | "health" | "ready" | "registry";
+
+export default function SeoControlPage() {
+  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const [urls, setUrls] = useState<UrlEntry[]>([]);
+  const [snapshots, setSnapshots] = useState<SeoSnapshot[]>([]);
+  const [readyPages, setReadyPages] = useState<ReadyPage[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isScanning, setIsScanning] = useState(false);
+  const [isInspecting, setIsInspecting] = useState(false);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [urlsRes, snapshotsRes, readyRes] = await Promise.all([
+        fetch("/api/global-urls", { credentials: "include" }),
+        fetch("/api/admin/seo/snapshots", { credentials: "include" }),
+        fetch("/api/admin/seo/unindexed-pages", { credentials: "include" }),
+      ]);
+
+      if (urlsRes.ok) {
+        const data = await urlsRes.json();
+        setUrls(data.urls || []);
+      }
+      if (snapshotsRes.ok) {
+        const data = await snapshotsRes.json();
+        setSnapshots(data.snapshots || []);
+      }
+      if (readyRes.ok) {
+        const data = await readyRes.json();
+        setReadyPages(data.pages || []);
+      }
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleScan = async () => {
+    setIsScanning(true);
+    try {
+      const res = await fetch("/api/admin/seo/scan", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        await loadData();
+      }
+    } catch (error) {
+      console.error("Scan failed:", error);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handleInspect = async () => {
+    setIsInspecting(true);
+    try {
+      const res = await fetch("/api/admin/seo/ready-inspector", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        await loadData();
+      }
+    } catch (error) {
+      console.error("Inspect failed:", error);
+    } finally {
+      setIsInspecting(false);
+    }
+  };
+
+  const toggleIndexing = async (urlEntry: UrlEntry) => {
+    try {
+      const res = await fetch("/api/global-urls", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          id: urlEntry.id,
+          is_indexed: !urlEntry.is_indexed,
+        }),
+      });
+      if (res.ok) {
+        setUrls((prev) =>
+          prev.map((u) => (u.url === urlEntry.url ? { ...u, is_indexed: !urlEntry.is_indexed } : u))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to toggle indexing:", error);
+    }
+  };
+
+  const indexedCount = urls.filter((u) => u.is_indexed).length;
+  const healthyCount = snapshots.filter((s) => s.overall_score >= 80).length;
+  const readyCount = readyPages.filter((p) => p.is_ready_to_index).length;
+  const criticalCount = snapshots.filter((s) => s.overall_score < 50).length;
+
+  const filteredUrls = urls.filter((url) => {
+    const matchesSearch = url.url.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = filterType === "all" || url.type === filterType;
+    const matchesStatus =
+      filterStatus === "all" ||
+      (filterStatus === "indexed" && url.is_indexed) ||
+      (filterStatus === "not-indexed" && !url.is_indexed);
+    return matchesSearch && matchesType && matchesStatus;
+  });
+
+  const pageTypes = [...new Set(urls.map((u) => u.type))];
+
+  const getScoreColor = (score: number | null) => {
+    if (score === null) return "text-gray-400";
+    if (score >= 80) return "text-green-600";
+    if (score >= 50) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getScoreIcon = (score: number | null) => {
+    if (score === null) return <AlertTriangle className="w-4 h-4 text-gray-400" />;
+    if (score >= 80) return <CheckCircle className="w-4 h-4 text-green-500" />;
+    if (score >= 50) return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+    return <XCircle className="w-4 h-4 text-red-500" />;
+  };
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Globe className="w-6 h-6 text-orange-500" />
+            SEO Control Center
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Check health, approve for indexing, and manage your sitemap
+          </p>
+        </div>
+
+        <div className="flex gap-2 border-b">
+          {[
+            { id: "overview", label: "Overview", icon: Activity },
+            { id: "health", label: "SEO Health", icon: Activity },
+            { id: "ready", label: "Ready to Index", icon: Zap },
+            { id: "registry", label: "URL Registry", icon: Globe },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as TabType)}
+              className={`px-4 py-2 flex items-center gap-2 border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? "border-orange-500 text-orange-600 font-medium"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Total URLs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">{urls.length}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Indexed</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-green-600">{indexedCount}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Ready to Index</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-blue-600">{readyCount}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Critical Issues</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-red-600">{criticalCount}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("health")}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-blue-500" />
+                    SEO Health
+                  </CardTitle>
+                  <CardDescription>
+                    Scan pages for SEO issues
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">{snapshots.length} pages scanned</span>
+                    <Badge variant={healthyCount > 0 ? "default" : "secondary"}>
+                      {healthyCount} healthy
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("ready")}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-green-500" />
+                    Ready to Index
+                  </CardTitle>
+                  <CardDescription>
+                    Pages that pass quality checks
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">{readyPages.length} pages checked</span>
+                    <Badge variant="default" className="bg-green-500">
+                      {readyCount} ready
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("registry")}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-orange-500" />
+                    URL Registry
+                  </CardTitle>
+                  <CardDescription>
+                    Control sitemap indexing
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">{urls.length} total URLs</span>
+                    <Badge variant="outline">
+                      {indexedCount} in sitemap
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Publishing Workflow</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 p-4 rounded-lg bg-gray-50 text-center">
+                    <div className="text-2xl font-bold mb-1">{snapshots.length}</div>
+                    <div className="text-sm text-gray-500">Pages Scanned</div>
+                  </div>
+                  <div className="text-gray-300">→</div>
+                  <div className="flex-1 p-4 rounded-lg bg-blue-50 text-center">
+                    <div className="text-2xl font-bold text-blue-600 mb-1">{readyCount}</div>
+                    <div className="text-sm text-gray-500">Ready to Index</div>
+                  </div>
+                  <div className="text-gray-300">→</div>
+                  <div className="flex-1 p-4 rounded-lg bg-green-50 text-center">
+                    <div className="text-2xl font-bold text-green-600 mb-1">{indexedCount}</div>
+                    <div className="text-sm text-gray-500">In Sitemap</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === "health" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                {snapshots.length} pages with health data
+              </p>
+              <Button
+                onClick={handleScan}
+                disabled={isScanning}
+                className="bg-orange-500 hover:bg-orange-600"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isScanning ? "animate-spin" : ""}`} />
+                {isScanning ? "Scanning..." : "Run Full Scan"}
+              </Button>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-400">Loading...</div>
+            ) : snapshots.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Activity className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500">No health data yet</p>
+                  <Button
+                    onClick={handleScan}
+                    className="mt-4 bg-orange-500 hover:bg-orange-600"
+                  >
+                    Run First Scan
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {snapshots.slice(0, 30).map((snapshot) => (
+                  <div
+                    key={snapshot.id}
+                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50"
+                  >
+                    <div className="flex items-center gap-3">
+                      {getScoreIcon(snapshot.overall_score)}
+                      <div>
+                        <div className="font-medium">{snapshot.url}</div>
+                        <div className="text-sm text-gray-500">
+                          {snapshot.word_count} words • {snapshot.page_type}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {snapshot.issues.length > 0 && (
+                        <Badge variant="outline" className="text-yellow-600">
+                          {snapshot.issues.length} issues
+                        </Badge>
+                      )}
+                      <span className={`font-bold ${getScoreColor(snapshot.overall_score)}`}>
+                        {snapshot.overall_score}
+                      </span>
+                      <Link href={snapshot.url} target="_blank">
+                        <Button variant="ghost" size="sm">
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "ready" && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                {readyCount} of {readyPages.length} pages ready to index
+              </p>
+              <Button
+                onClick={handleInspect}
+                disabled={isInspecting}
+                className="bg-orange-500 hover:bg-orange-600"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isInspecting ? "animate-spin" : ""}`} />
+                {isInspecting ? "Inspecting..." : "Run Inspection"}
+              </Button>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-400">Loading...</div>
+            ) : readyPages.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Zap className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500">No pages inspected yet</p>
+                  <Button
+                    onClick={handleInspect}
+                    className="mt-4 bg-orange-500 hover:bg-orange-600"
+                  >
+                    Run First Inspection
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-2">
+                {readyPages.map((page) => (
+                  <div
+                    key={page.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                      page.is_ready_to_index ? "bg-green-50 border-green-200" : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {page.is_ready_to_index ? (
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                      )}
+                      <div>
+                        <div className="font-medium">{page.url}</div>
+                        <div className="text-sm text-gray-500">
+                          Score: {page.last_health_score ?? "N/A"} • {page.word_count ?? 0} words
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={page.is_ready_to_index ? "default" : "secondary"}>
+                        {page.is_ready_to_index ? "Ready" : "Not Ready"}
+                      </Badge>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const urlEntry = urls.find((u) => u.url === page.url);
+                          if (urlEntry) {
+                            toggleIndexing(urlEntry);
+                          }
+                        }}
+                        disabled={!page.is_ready_to_index}
+                      >
+                        {urls.find((u) => u.url === page.url)?.is_indexed ? (
+                          <>
+                            <Eye className="w-4 h-4 mr-1" />
+                            Indexed
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff className="w-4 h-4 mr-1" />
+                            Add to Index
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "registry" && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-3">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search URLs..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Types</option>
+                {pageTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Status</option>
+                <option value="indexed">Indexed</option>
+                <option value="not-indexed">Not Indexed</option>
+              </select>
+            </div>
+
+            <div className="text-sm text-gray-500">
+              {filteredUrls.length} URLs • {filteredUrls.filter((u) => u.is_indexed).length} indexed
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12 text-gray-400">Loading...</div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium">URL</th>
+                      <th className="text-left px-4 py-3 font-medium">Type</th>
+                      <th className="text-center px-4 py-3 font-medium">Health</th>
+                      <th className="text-center px-4 py-3 font-medium">Indexed</th>
+                      <th className="text-center px-4 py-3 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {filteredUrls.slice(0, 50).map((urlEntry) => (
+                      <tr key={urlEntry.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <div className="font-medium truncate max-w-md">{urlEntry.url}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline">{urlEntry.type}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="text-gray-400">-</span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => toggleIndexing(urlEntry)}
+                            className="inline-flex"
+                          >
+                            {urlEntry.is_indexed ? (
+                              <Eye className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <EyeOff className="w-5 h-5 text-gray-300" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <Link href={urlEntry.url} target="_blank">
+                            <Button variant="ghost" size="sm">
+                              <ExternalLink className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </AdminLayout>
+  );
+}
