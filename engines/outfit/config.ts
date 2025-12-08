@@ -207,7 +207,26 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Perfect for minimalists and anyone trying to get more outfits from fewer pieces.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Building a Capsule Wardrobe with AI
+
+A capsule wardrobe is a small collection of versatile pieces that mix and match to create many outfits. This tool helps you find pieces that work together.
+
+### The Core Capsule Formula
+
+- **5 tops:** Neutral colors, simple patterns, quality fabrics
+- **3 bottoms:** Jeans, trousers, skirt or shorts
+- **2 outerwear pieces:** Blazer, jacket, or cardigan
+- **3 pairs of shoes:** Sneakers, boots, and dress shoes
+- **Accessories:** Belt, bag, and a few pieces of jewelry
+
+### How to Use This Tool for Capsule Building
+
+Upload photos of outfits you love. The AI will identify each piece, and you can look for items that would work with what you already own.
+
+### Capsule Wardrobe Color Palettes
+
+Stick to a base of neutrals (black, white, gray, navy, beige) and add 1-2 accent colors. Every piece should work with at least 3 other items in your closet.`
   },
 
   'vacation-outfit-generator': {
@@ -222,7 +241,25 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Use travel photos, Pinterest boards, or Instagram resort outfits as your starting point.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Vacation Outfit Planning with AI
+
+Packing for vacation is easier when you plan outfits in advance. Upload inspo photos and find pieces that work for your trip.
+
+### Vacation Outfit Categories
+
+- **Beach days:** Swimwear, coverups, sandals, sun hats
+- **City exploring:** Comfortable walking shoes, breathable layers
+- **Resort dinners:** Flowy dresses, linen pants, dressy sandals
+- **Day trips:** Practical but cute outfits that photograph well
+
+### Packing Light Tips
+
+Choose pieces that work double duty. A linen shirt works for beach coverup and dinner. Neutral bottoms pair with multiple tops.
+
+### Finding Vacation Inspo
+
+Upload photos from travel bloggers, resort Instagram accounts, or Pinterest vacation boards. The AI will break down each look so you can recreate it.`
   },
 
   'winter-outfit-generator': {
@@ -237,7 +274,26 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Great for layered streetwear, city coats, and cozy knitwear inspiration.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Winter Outfit Ideas with AI
+
+Cold weather doesn't mean boring outfits. This tool helps you find coats, layers, and boots that look as good as they feel.
+
+### Winter Wardrobe Essentials
+
+- **Coats:** Wool coats, puffer jackets, parkas
+- **Knitwear:** Chunky sweaters, cardigans, turtlenecks
+- **Layers:** Long-sleeve tees, thermals, fleece
+- **Boots:** Ankle boots, knee-high boots, waterproof styles
+- **Accessories:** Scarves, beanies, gloves
+
+### Layering for Warmth and Style
+
+Start with a thin base layer, add a sweater or fleece, and finish with outerwear. The AI identifies each layer so you can shop the full look.
+
+### Winter Color Palettes
+
+Dark neutrals, rich jewel tones, and pops of color work well in winter. Upload photos that inspire you and find similar pieces.`
   },
 
   'summer-outfit-generator': {
@@ -252,7 +308,26 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Ideal for vacation fits, festivals, and warm-weather everyday outfits.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Summer Outfit Ideas with AI
+
+Hot weather calls for light fabrics and breezy silhouettes. Upload summer outfit inspo and find pieces that keep you cool.
+
+### Summer Wardrobe Staples
+
+- **Dresses:** Sundresses, midi dresses, maxi dresses
+- **Tops:** Tank tops, linen shirts, crop tops
+- **Bottoms:** Shorts, linen pants, flowy skirts
+- **Shoes:** Sandals, espadrilles, white sneakers
+- **Accessories:** Straw bags, sunglasses, sun hats
+
+### Fabrics That Keep You Cool
+
+Look for linen, cotton, and lightweight blends. Avoid synthetic fabrics that trap heat.
+
+### Summer Outfit Formulas
+
+Dress + sandals. Shorts + breezy top + sneakers. Skirt + tank + espadrilles. Keep it simple and breathable.`
   },
 
   'party-outfit-generator': {
@@ -267,7 +342,25 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Use screenshots from IG, TikTok, or Pinterest party fits.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Party Outfit Ideas with AI
+
+Going out calls for statement pieces and bold choices. Upload party outfit inspo and find pieces that make an entrance.
+
+### Party Outfit Categories
+
+- **Club nights:** Mini dresses, bodysuits, statement tops
+- **Birthday parties:** Sequins, metallics, dressy jumpsuits
+- **Cocktail events:** LBDs, sleek heels, elegant accessories
+- **House parties:** Elevated casual, nice jeans, cute tops
+
+### Statement Pieces That Work
+
+Pick one hero piece and build around it. A sequin dress needs minimal jewelry. A bold top pairs with simple bottoms.
+
+### Finding Party Inspo
+
+Upload screenshots from party TikToks, club Instagram accounts, or Pinterest night-out boards. The AI will identify each piece so you can recreate the vibe.`
   },
 
   'gym-outfit-generator': {
@@ -282,7 +375,26 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Great for gym mirror selfies, athleisure sets, and performance gear.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Gym & Athleisure Outfit Ideas with AI
+
+Whether you're hitting the gym or running errands, this tool helps you find activewear that performs and looks good.
+
+### Gym Wardrobe Essentials
+
+- **Leggings:** High-waist, squat-proof, compression
+- **Sports bras:** Supportive for your workout type
+- **Tops:** Tank tops, crop tops, long-sleeve layers
+- **Shoes:** Training shoes, running shoes, lifters
+- **Accessories:** Gym bags, headbands, water bottles
+
+### Athleisure vs Performance Gear
+
+Athleisure is for everyday wear—looks good, comfortable, but not necessarily performance-focused. Performance gear is built for specific workouts.
+
+### Finding Gym Inspo
+
+Upload gym mirror selfies, fitness influencer photos, or athleisure Pinterest boards. The AI identifies each piece so you can shop matching sets.`
   },
 
   'wedding-guest-outfit-generator': {
@@ -297,7 +409,26 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Use Pinterest boards or IG photos for dress codes like black tie, cocktail, or garden party.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Wedding Guest Outfit Ideas with AI
+
+Dress codes can be confusing. Upload wedding guest inspo and find pieces that match the vibe without overdoing it.
+
+### Wedding Dress Codes Explained
+
+- **Black tie:** Floor-length gowns, tuxedos
+- **Formal:** Cocktail dresses, dark suits
+- **Semi-formal:** Midi dresses, blazer combos
+- **Casual:** Sundresses, linen suits, nice separates
+- **Garden party:** Floral prints, pastels, dressy flats
+
+### What Not to Wear
+
+Avoid white, cream, or anything that could upstage the couple. Check if the invitation specifies colors to avoid.
+
+### Finding Wedding Guest Inspo
+
+Upload photos from wedding Pinterest boards, guest outfit TikToks, or formal event Instagram posts. The AI breaks down each look so you can recreate it within your budget.`
   },
 
   'aesthetic-outfit-generator': {
@@ -312,7 +443,27 @@ Upload screenshots from LinkedIn, corporate Instagram accounts, or business fash
       'Perfect for TikTok-core aesthetics, Pinterest boards, and moodboards.',
     uploadHelpText: 'JPG, PNG, or WebP. Max 5MB.',
     apiPath: '/api/tools/outfit-analyzer',
-    faqs: BASE_FAQS
+    faqs: BASE_FAQS,
+    contentGuide: `## Aesthetic Outfit Ideas with AI
+
+TikTok and Pinterest are full of distinct aesthetics. Upload any aesthetic outfit and find pieces that match the vibe.
+
+### Popular Aesthetics
+
+- **Clean girl:** Minimal makeup, slicked hair, neutral basics
+- **Coquette:** Bows, lace, soft pinks, feminine details
+- **Y2K:** Low-rise, butterfly clips, velour, baby tees
+- **Grunge:** Oversized flannels, combat boots, dark layers
+- **Dark academia:** Plaid, wool, Oxford shoes, structured pieces
+- **Coastal grandma:** Linen, neutrals, relaxed silhouettes
+
+### Building an Aesthetic Wardrobe
+
+Pick one aesthetic and commit. Upload multiple photos from that style to find recurring pieces and patterns.
+
+### Finding Aesthetic Inspo
+
+Use TikTok aesthetic hashtags, Pinterest moodboards, or Instagram style accounts. Upload your favorites and let the AI find shoppable matches.`
   }
 };
 

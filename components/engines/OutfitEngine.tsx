@@ -361,6 +361,10 @@ export default function OutfitEngine({ tool }: OutfitEngineProps) {
           </div>
         )}
 
+        {config.contentGuide && (
+          <ContentGuide content={config.contentGuide} />
+        )}
+
         {config.faqs.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
             <button
@@ -424,5 +428,73 @@ export default function OutfitEngine({ tool }: OutfitEngineProps) {
         <ExploreMoreTools currentTool={`/tools/${config.slug}`} />
       </div>
     </div>
+  );
+}
+
+function ContentGuide({ content }: { content: string }) {
+  const renderMarkdown = (text: string) => {
+    const lines = text.trim().split('\n');
+    const elements: React.ReactNode[] = [];
+    let currentList: string[] = [];
+
+    const flushList = () => {
+      if (currentList.length > 0) {
+        elements.push(
+          <ul key={`list-${elements.length}`} className="space-y-1 mb-4 ml-4">
+            {currentList.map((item, i) => (
+              <li key={i} className="text-gray-600 text-sm flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">•</span>
+                <span dangerouslySetInnerHTML={{ __html: formatBold(item) }} />
+              </li>
+            ))}
+          </ul>
+        );
+        currentList = [];
+      }
+    };
+
+    const formatBold = (text: string) => {
+      return text.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-gray-800">$1</strong>');
+    };
+
+    lines.forEach((line, index) => {
+      const trimmedLine = line.trim();
+      
+      if (trimmedLine.startsWith('## ')) {
+        flushList();
+        elements.push(
+          <h2 key={`h2-${index}`} className="text-xl font-bold text-gray-900 mb-4 mt-6 first:mt-0">
+            {trimmedLine.replace('## ', '')}
+          </h2>
+        );
+      } else if (trimmedLine.startsWith('### ')) {
+        flushList();
+        elements.push(
+          <h3 key={`h3-${index}`} className="text-lg font-semibold text-gray-800 mb-3 mt-5">
+            {trimmedLine.replace('### ', '')}
+          </h3>
+        );
+      } else if (trimmedLine.startsWith('- ')) {
+        currentList.push(trimmedLine.replace('- ', ''));
+      } else if (trimmedLine === '') {
+        flushList();
+      } else if (trimmedLine) {
+        flushList();
+        elements.push(
+          <p key={`p-${index}`} className="text-gray-600 text-sm mb-4" dangerouslySetInnerHTML={{ __html: formatBold(trimmedLine) }} />
+        );
+      }
+    });
+
+    flushList();
+    return elements;
+  };
+
+  return (
+    <section className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 mb-6">
+      <div className="prose prose-sm max-w-none">
+        {renderMarkdown(content)}
+      </div>
+    </section>
   );
 }
