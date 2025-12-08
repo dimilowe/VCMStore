@@ -59,9 +59,12 @@ interface Article {
   id: string;
   slug: string;
   title: string;
-  status: string;
+  is_indexed: boolean;
+  is_published: boolean;
   cluster_slug: string | null;
   word_count: number;
+  health: "thin" | "ok" | "strong";
+  source: "cluster_articles" | "cms_objects";
 }
 
 type TabType = "tools" | "articles" | "clusters" | "mbbs";
@@ -129,6 +132,30 @@ export default function ContentManagerPage() {
       }
     } catch (error) {
       console.error("Failed to update tool:", error);
+    }
+  };
+
+  const toggleArticleIndexed = async (article: Article) => {
+    try {
+      const res = await fetch("/api/admin/articles/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          id: article.id, 
+          slug: article.slug,
+          source: article.source,
+          field: "is_indexed", 
+          value: !article.is_indexed 
+        }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setArticles((prev) =>
+          prev.map((a) => (a.id === article.id ? { ...a, is_indexed: !article.is_indexed } : a))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update article:", error);
     }
   };
 
@@ -502,18 +529,10 @@ export default function ContentManagerPage() {
 
         {activeTab === "articles" && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">
-                {articles.length} articles total
-              </p>
-              <Link href="/admin/articles">
-                <Button variant="outline" size="sm">
-                  Open Article Control
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
+            <div className="text-sm text-gray-500">
+              {articles.length} articles total
             </div>
-            
+
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading articles...</div>
             ) : articles.length === 0 ? (
@@ -522,38 +541,78 @@ export default function ContentManagerPage() {
                   <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
                   <p className="text-gray-500">No articles yet</p>
                   <p className="text-sm text-gray-400 mt-1">
-                    Articles are generated as part of clusters
+                    Import articles via JSON or generate as part of clusters
                   </p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-2">
-                {articles.slice(0, 20).map((article) => (
-                  <div
-                    key={article.id}
-                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-gray-400" />
-                      <div>
-                        <div className="font-medium">{article.title}</div>
-                        <div className="text-sm text-gray-500">
-                          {article.slug} • {article.word_count || 0} words
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={article.status === "published" ? "default" : "secondary"}>
-                        {article.status}
-                      </Badge>
-                      <Link href={`/admin/articles/edit/${article.id}`}>
-                        <Button variant="ghost" size="sm">
-                          Edit
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium">Article</th>
+                      <th className="text-left px-4 py-3 font-medium">Cluster</th>
+                      <th className="text-center px-4 py-3 font-medium">Words</th>
+                      <th className="text-center px-4 py-3 font-medium">Health</th>
+                      <th className="text-center px-4 py-3 font-medium">Indexed</th>
+                      <th className="text-center px-4 py-3 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {articles.map((article) => (
+                      <tr key={article.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{article.title}</div>
+                          <div className="text-xs text-gray-400">{article.slug}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {article.cluster_slug ? (
+                            <Badge variant="outline">{article.cluster_slug}</Badge>
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-600">
+                          {article.word_count || 0}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <Badge
+                            className={
+                              article.health === "strong"
+                                ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                : article.health === "ok"
+                                ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                                : "bg-red-100 text-red-800 hover:bg-red-100"
+                            }
+                          >
+                            {article.health}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => toggleArticleIndexed(article)}
+                            className="inline-flex"
+                          >
+                            {article.is_indexed ? (
+                              <Eye className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <EyeOff className="w-5 h-5 text-gray-300" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <Link href={`/articles/${article.slug}`} target="_blank">
+                              <Button variant="ghost" size="sm">
+                                <ExternalLink className="w-4 h-4" />
+                              </Button>
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
