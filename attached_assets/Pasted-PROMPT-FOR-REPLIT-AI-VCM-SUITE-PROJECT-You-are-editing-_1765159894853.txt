@@ -1,0 +1,227 @@
+PROMPT FOR REPLIT AI (VCM SUITE PROJECT)
+You are editing my VCM Suite codebase. It’s a Next.js + TypeScript app with:
+App Router
+Neon Postgres
+Existing CMS / admin system
+Engines → Config → VCM Renderer architecture
+URL Registry + is_indexed flag
+SEO Health Console already implemented with seo_health_snapshots
+I want you to build a new internal admin feature:
+“Ready to Index” Auto-Inspector
+This is an internal-only tool (admin dashboard), not public.
+Its job:
+Scan all CMS/URL entries, merge with SEO Health data, and determine which pages are “Ready to Index”, then allow one-click “Index All Ready Pages”.
+1. Data Model Updates
+1.1. URL Registry
+Find the table/model that stores URL index metadata (it might be global_urls or similar – use the existing code).
+Add the following fields (or confirm they exist / wire them in):
+is_indexed (boolean) – already exists; leave as is
+last_health_score (integer, nullable) – latest overall score from seo_health_snapshots
+is_ready_to_index (boolean, default false) – derived flag that the Auto-Inspector sets
+manual_review_passed (boolean, default false) – indicates a human has inspected the page visually and approved it
+Add migrations as appropriate, following the project’s existing migration system.
+1.2. Link to SEO snapshots
+seo_health_snapshots should already exist from the SEO Health Console.
+We do NOT change its schema, but we:
+Use the latest snapshot per slug to calculate readiness.
+Persist the result (last_health_score, is_ready_to_index) back to URL Registry.
+2. “Ready to Index” Rules
+Implement a server-side function that determines if a page is “ready” based on combined CMS + SEO Health data.
+Create something like:
+src/lib/seo/readyInspector.ts (or follow existing lib structure).
+2.1 Inputs
+For each page/URL, you have:
+URL Registry record:
+slug / url
+is_indexed
+page_type (or equivalent)
+manual_review_passed
+Latest seo_health_snapshots entry for that slug:
+status_code
+word_count
+has_title
+has_h1
+has_meta_description
+robots_index
+has_expected_schema
+internal_links_out_count
+internal_links_in_count (may be basic)
+overall_score
+CMS object (via existing CMS API):
+type (tool/article/cluster/etc.)
+Interlink metadata (parent, siblings, tools) if available
+SEO metadata fields (title, description, slug)
+2.2 Rules for “Ready to Index”
+A page is “ready” if ALL of the following are true:
+Not already indexed
+is_indexed = false
+HTTP / technical health
+status_code = 200
+robots_index != "noindex"
+(we do not auto-index anything explicitly noindex)
+overall_score >= 75 (threshold; make this constant)
+Basic SEO metadata completeness
+has_title = true
+has_h1 = true
+has_meta_description = true
+has_expected_schema = true if page type is tool or article
+Content depth
+If page type = article:
+word_count >= 300
+Else (tool, cluster, other):
+word_count >= 150
+Interlinking sanity
+internal_links_out_count >= 3
+If internal_links_in_count exists and is tracked:
+Either internal_links_in_count >= 1
+Or, if 0, mark as “Almost Ready” (see below)
+Manual visual review
+manual_review_passed = true
+If everything above passes → is_ready_to_index = true.
+If all criteria except manual_review_passed are satisfied, mark as:
+“Needs Visual Review” (exposed in UI, but is_ready_to_index remains false)
+Make the logic explicit with clear comments.
+3. Auto-Inspector Backend Logic
+Create a server-side function to:
+Fetch all URLs from URL Registry where:
+is_indexed = false
+For each URL:
+Get latest seo_health_snapshots row for its slug (if none → cannot be ready; skip or flag as “needs scan”).
+Get associated CMS object (if missing → treat as not ready).
+Run the readiness rules.
+Update URL Registry:
+Set last_health_score to snapshot’s overall_score
+Set is_ready_to_index to true/false accordingly
+Implement this in something like:
+src/lib/seo/readyInspector.ts
+runReadyInspector(): Promise<{ updatedCount: number, readyCount: number, errors: number }>
+Then create an admin API endpoint or server action to trigger it:
+app/api/admin/seo/ready-inspector/route.ts (POST)
+Checks admin auth
+Calls runReadyInspector()
+Returns summary (pages evaluated, marked ready, etc.)
+4. “Index All Ready Pages” Action
+Create a second API endpoint:
+app/api/admin/seo/index-ready/route.ts (POST)
+Behavior:
+Auth guard: admin only.
+Fetch all URL Registry entries where:
+is_indexed = false
+is_ready_to_index = true
+For each:
+Set is_indexed = true
+Return:
+indexedCount
+list of slugs/URLs affected
+Make sure this operation:
+Only flips flags in URL Registry.
+Does NOT modify any unrelated data.
+Leaves a clear trail (you can add a indexed_at timestamp column if not present yet – optional but useful).
+5. Admin UI: Ready-to-Index Panel
+Add a new admin page under the existing admin architecture.
+5.1 Route
+Create:
+app/admin/ready-to-index/page.tsx
+Use the same admin layout, styling, and auth guard as other admin sections.
+5.2 UI Layout
+The page should have:
+A. Header
+Title: Ready to Index Inspector
+Short subtitle: Review and publish pages that are ready for SEO indexing.
+Two primary buttons:
+Run Inspector → calls /api/admin/seo/ready-inspector (POST)
+Index All Ready Pages → calls /api/admin/seo/index-ready (POST)
+Both buttons should show loading state and trigger a refresh of the data after success.
+B. Summary Cards
+Top row of KPIs, e.g.:
+Total Unindexed Pages
+Ready to Index (is_ready_to_index = true)
+Need Manual Review (manual_review_passed = false but otherwise healthy)
+Blocked / Not Ready (fails health/metadata/content rules)
+Use existing card / stat components from admin.
+C. Table of Pages
+Table listing only unindexed URLs (is_indexed = false), with:
+Columns:
+Slug / URL
+Page Type
+Health Score (last_health_score)
+Word Count
+Internal Links Out
+Internal Links In (if available)
+Manual Review (badge: ✅ Passed / ⏳ Needed)
+Ready Status (badge: Ready, Needs Review, Not Ready)
+Filters:
+Tabs or dropdown filter for:
+All
+Ready
+Needs Manual Review
+Not Ready
+Rows should be sortable by Health Score and Word Count.
+D. Manual Review Toggle
+In each row, add a control to toggle manual_review_passed:
+Checkbox or small toggle labeled Manual Review Passed
+When toggled:
+Call a small dedicated API route:
+app/api/admin/seo/manual-review/route.ts (POST)
+body: { urlId, manualReviewPassed: boolean }
+Update URL Registry
+After updating, optionally re-run the readiness check just for that URL (or mark it to be re-checked next time the inspector runs).
+After toggling manual_review_passed to true, the next “Run Inspector” should re-evaluate and likely mark the page is_ready_to_index = true if all other conditions are met.
+E. Detail Drawer
+Clicking a row should show a side drawer or modal with:
+URL + type
+Latest SEO snapshot data:
+status_code
+robots_index
+has_title / has_h1 / has_meta_description
+word_count
+has_expected_schema
+internal link counts
+CMS metadata (title, type, interlinking info)
+Plain language “Issue List”, e.g.:
+“Word count below threshold (148; min 150).”
+“Schema missing for tool page.”
+“Manual review not yet passed.”
+“Robots meta set to noindex.”
+Use existing components (drawer / modal) from admin if available.
+6. Screenshot Check (MVP Handling)
+We don’t need automated screenshot capture in v1. Instead:
+Treat manual_review_passed as the human screenshot/visual check.
+In comments, clearly mark this as the stand-in for “screenshot check” until a screenshot generator is added.
+Add a TODO comment in the inspector logic:
+// TODO: Replace manual_review_passed with actual screenshot-based visual QA in future (e.g. Playwright/Chromium capture + diff).
+7. Wiring with SEO Health Console
+On the SEO Health Console page, you can optionally:
+Display is_ready_to_index and manual_review_passed as extra columns or badges when viewing pages.
+Link out to the Ready-to-Index Inspector via a button like:
+“Open Ready Inspector”
+This is optional, but nice for UX.
+8. Auth & Safety
+All /admin/... pages and /api/admin/... routes must use the existing admin auth guard.
+Non-admin users must not be able to:
+Run the inspector
+Flip manual review
+Index pages
+Follow the same auth pattern you used for the SEO Health Console.
+9. Acceptance Criteria
+I should be able to:
+Go to /admin/ready-to-index while logged in as admin.
+Click Run Inspector:
+It evaluates all unindexed pages with existing SEO snapshots.
+It updates is_ready_to_index and last_health_score in URL Registry.
+See:
+A summary of how many are ready / need review / not ready.
+A table listing pages with correct badges and metrics.
+Mark individual pages as Manual Review Passed via UI.
+Run the inspector again and see some pages become Ready.
+Click Index All Ready Pages:
+All is_ready_to_index = true pages become is_indexed = true.
+They disappear from the unindexed list.
+Confirm:
+URL Registry DB reflects updated flags.
+SEO Health Console only includes indexed pages where appropriate.
+Build the entire feature end-to-end, strictly following existing patterns for:
+DB access
+API routes
+Admin layout
+Auth
