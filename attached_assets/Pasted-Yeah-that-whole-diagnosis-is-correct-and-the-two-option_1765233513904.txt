@@ -1,0 +1,57 @@
+Yeah, that whole diagnosis is correct and the “two options” framing is too small. You don’t pick A or B — you ultimately need both:
+Real article pages that render from cms_objects (no more 404s)
+A way to (re)generate article content with AI regardless of status
+Right now you’re in an in-between state:
+Articles exist in cms_objects
+Cluster health now sees them (good)
+But:
+There’s no /articles/[slug] route wired to cms_objects → 404
+The “Generate with AI” button was coded assuming “Missing = show button, Existing = hide button” → dumb assumption that breaks your new architecture
+Word count = 2 because the bodies that did import are basically empty/shells
+So:
+1. Yes, updating cluster health to read from cms_objects is correct
+That part is fine. Don’t roll that back.
+cms_objects is the content truth.
+cluster_articles is legacy.
+Cluster health using cms_objects is the right long-term move.
+Leave that change.
+2. What you should do next (in order)
+Step 1 – Build the actual article route (/articles/[slug]) from cms_objects
+You can’t ship a cluster with 404s. So first:
+Add app/articles/[slug]/page.tsx
+Fetch from cms_objects by slug where type = 'article'
+Pass that into your generic renderer (or a simple ArticleRenderer)
+If not found → 404
+Once that exists, “Preview” in admin can work, GA4 can track, and you can actually see the content you’re editing.
+This is Option A and it’s non-negotiable.
+Step 2 – Fix the admin logic for “Generate Articles with AI”
+The current behaviour:
+If article is Missing → show “Generate with AI”
+If article exists → hide the button
+That made sense back when cluster_articles was the only source and “exists = fully written.”
+Now, with cms_objects shells, that logic is wrong.
+What you actually want:
+Always show the AI button, but change what it does:
+If body is empty or wordCount < threshold → “Generate Article with AI”
+If body already has content → “Regenerate with AI” or “Improve with AI”
+So in admin:
+Don’t tie the button visibility to “Missing vs Existing”
+Tie it to “thin vs healthy” (or just always show it with different label)
+That’s your Option B, but done properly.
+Step 3 – Fix the body import issue
+“2 words” is a sign that your current JSON import didn’t store the full body string:
+Either:
+The JSON importer is trimming / truncating
+Or the content you fed it was genuinely tiny
+You should:
+Inspect one row from cms_objects for an article slug you know
+Confirm body column content length
+If it’s actually short → the import content was thin → we just need to overwrite via AI generator
+If it’s long but UI shows “2 words” → the word count logic is wrong (e.g., counting wrong field)
+Either way, once the AI generator is back and wired to cms_objects, this becomes a one-click fix.
+3. Direct answer to your question
+Option A vs Option B?
+You need both, but the priority is:
+Option A first – create /articles/[slug] reading from cms_objects
+Then Option B – adjust the admin so the AI button isn’t tied to “missing,” but to thin content or always visible
+Do not roll back the cms_objects change. That part is correct.
