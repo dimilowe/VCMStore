@@ -61,7 +61,6 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `global_urls`: URL registry for domain-wide indexing control (URL, type, is_indexed, canonical, notes)
 - `seo_health_snapshots`: SEO health audit results per page (score, title, H1, meta, word count, schema, robots)
 - `cms_objects`: JSON CMS objects for tools, articles, products (slug, type, cluster_slug, data JSONB, word_count, health)
-- `url_registry`: URL paths for CMS content with indexing status (path, type, cms_slug, is_indexed)
 
 ## Project Structure
 
@@ -296,12 +295,12 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ## Recent Changes
 - 2025-12-08: **CMS Bulk Import System** - No-code content management for tools, articles, and products
   - Created cms_objects table to store JSON CMS objects (slug, type, cluster_slug, data JSONB, word_count, health)
-  - Created url_registry table to track URL paths and indexing status for CMS content
+  - Added cms_slug column to global_urls for linking CMS objects to URL registry
   - Built bulk import API (/api/admin/cms/bulk-import) with:
     - JSON validation (type, slug required; engine_config required for tools)
     - Auto word count calculation from title, body, FAQ, pro_tips fields
     - Health scoring: thin (<600 words), ok (600-1200), strong (>1200 + FAQ + pro_tips)
-    - Upsert to cms_objects and url_registry with proper path mapping
+    - Upsert to cms_objects and global_urls with proper path mapping
     - Preserves is_indexed flag on updates (won't accidentally de-index pages)
   - Admin UI at /admin/cms-import with validate → import → results workflow
   - Path mapping: tool→/tools/, article→/articles/, mbb→/mbb/, cluster→/tools/clusters/

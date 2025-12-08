@@ -216,26 +216,16 @@ export async function POST(request: NextRequest) {
           status = "created";
         }
 
-        // Upsert into url_registry
-        const existingUrlResult = await query(
-          "SELECT id, is_indexed FROM url_registry WHERE path = $1",
-          [path]
+        // Upsert into global_urls (preserves is_indexed on update)
+        await query(
+          `INSERT INTO global_urls (url, type, cms_slug, is_indexed)
+           VALUES ($1, $2, $3, false)
+           ON CONFLICT (url) DO UPDATE
+           SET type = EXCLUDED.type,
+               cms_slug = EXCLUDED.cms_slug,
+               updated_at = now()`,
+          [path, obj.type, obj.slug]
         );
-
-        if (existingUrlResult.rows.length > 0) {
-          // Update but preserve is_indexed
-          await query(
-            `UPDATE url_registry SET type = $1, cms_slug = $2, updated_at = now() WHERE path = $3`,
-            [obj.type, obj.slug, path]
-          );
-        } else {
-          // Insert new with is_indexed = false
-          await query(
-            `INSERT INTO url_registry (path, type, cms_slug, is_indexed)
-             VALUES ($1, $2, $3, false)`,
-            [path, obj.type, obj.slug]
-          );
-        }
 
         results.push({
           slug: obj.slug,
