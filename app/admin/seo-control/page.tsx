@@ -51,9 +51,11 @@ interface ReadyPage {
   id: string;
   url: string;
   type: string;
+  page_type?: string;
   last_health_score: number | null;
   is_ready_to_index: boolean;
   word_count: number | null;
+  internal_links?: number;
   issues: string[];
 }
 
@@ -487,57 +489,96 @@ export default function SeoControlPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-2">
-                {readyPages.map((page) => (
-                  <div
-                    key={page.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${
-                      page.is_ready_to_index ? "bg-green-50 border-green-200" : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {page.is_ready_to_index ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                      )}
-                      <div>
-                        <div className="font-medium">{page.url}</div>
-                        <div className="text-sm text-gray-500">
-                          Score: {page.last_health_score ?? "N/A"} • {page.word_count ?? 0} words
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={page.is_ready_to_index ? "default" : "secondary"}>
-                        {page.is_ready_to_index ? "Ready" : "Not Ready"}
-                      </Badge>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const urlEntry = urls.find((u) => u.url === page.url);
-                          if (urlEntry) {
-                            toggleIndexing(urlEntry);
-                          }
-                        }}
-                        disabled={!page.is_ready_to_index}
-                      >
-                        {urls.find((u) => u.url === page.url)?.is_indexed ? (
-                          <>
-                            <Eye className="w-4 h-4 mr-1" />
-                            Indexed
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff className="w-4 h-4 mr-1" />
-                            Add to Index
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium">URL</th>
+                      <th className="text-left px-4 py-3 font-medium">Type</th>
+                      <th className="text-center px-4 py-3 font-medium">Score</th>
+                      <th className="text-center px-4 py-3 font-medium">Words</th>
+                      <th className="text-center px-4 py-3 font-medium">Links</th>
+                      <th className="text-center px-4 py-3 font-medium">Status</th>
+                      <th className="text-center px-4 py-3 font-medium">Indexed</th>
+                      <th className="text-center px-4 py-3 font-medium"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {readyPages.map((page) => {
+                      const urlEntry = urls.find((u) => u.url === page.url);
+                      const isIndexed = urlEntry?.is_indexed ?? false;
+                      const score = page.last_health_score ?? 0;
+                      const wordCount = page.word_count ?? 0;
+                      const hasIssues = page.issues && page.issues.length > 0;
+                      const isReady = page.is_ready_to_index;
+                      
+                      // Determine status
+                      let statusLabel = "Pending";
+                      let statusColor = "bg-gray-100 text-gray-600";
+                      if (isReady && score >= 80) {
+                        statusLabel = "Ready";
+                        statusColor = "bg-green-100 text-green-700";
+                      } else if (score < 80 || hasIssues) {
+                        statusLabel = "Needs Review";
+                        statusColor = "bg-yellow-100 text-yellow-700";
+                      }
+                      if (!isReady && score < 60) {
+                        statusLabel = "Not Ready";
+                        statusColor = "bg-red-100 text-red-700";
+                      }
+                      
+                      return (
+                        <tr key={page.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3">
+                            <div className="font-medium truncate max-w-xs">
+                              {page.url.replace("http://localhost:5000", "")}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="text-xs text-gray-500">{page.page_type || "static"}</span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`font-medium ${
+                              score >= 80 ? "text-green-600" :
+                              score >= 60 ? "text-yellow-600" : "text-red-600"
+                            }`}>
+                              {score}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center text-gray-600">
+                            {wordCount}
+                          </td>
+                          <td className="px-4 py-3 text-center text-gray-600">
+                            {page.internal_links ?? 0}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`px-2 py-1 text-xs rounded ${statusColor}`}>
+                              {statusLabel}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              onClick={() => urlEntry && toggleIndexing(urlEntry)}
+                              disabled={!isReady}
+                              className="inline-flex disabled:opacity-50"
+                            >
+                              {isIndexed ? (
+                                <Eye className="w-5 h-5 text-green-500" />
+                              ) : (
+                                <EyeOff className="w-5 h-5 text-gray-300" />
+                              )}
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <a href={page.url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                            </a>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
