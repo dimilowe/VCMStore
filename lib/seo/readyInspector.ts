@@ -299,8 +299,9 @@ export async function getUnindexedPagesWithStatus(): Promise<{
     is_ready_to_index: boolean;
     manual_review_passed: boolean;
     word_count: number | null;
-    internal_links_out_count: number | null;
+    internal_links: number;
     issues: string[];
+    needsManualReview?: boolean;
   }>;
   stats: {
     total: number;
@@ -361,7 +362,7 @@ export async function getUnindexedPagesWithStatus(): Promise<{
       is_ready_to_index: result.isReady,
       manual_review_passed: row.manual_review_passed,
       word_count: row.word_count,
-      internal_links_out_count: row.internal_links_out_count,
+      internal_links: row.internal_links_out_count ?? 0,
       issues: result.issues,
       needsManualReview: result.needsManualReview,
     };
