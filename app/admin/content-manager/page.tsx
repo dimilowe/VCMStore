@@ -415,8 +415,8 @@ export default function ContentManagerPage() {
               >
                 <option value="all">All Clusters</option>
                 <option value="unassigned">Unassigned Only</option>
-                {clusterSlugs.map((slug) => (
-                  <option key={slug} value={slug}>{slug}</option>
+                {clusters.map((cluster) => (
+                  <option key={cluster.pillarSlug} value={cluster.pillarSlug}>{cluster.pillarTitle}</option>
                 ))}
               </select>
             </div>
@@ -433,8 +433,8 @@ export default function ContentManagerPage() {
                 >
                   <option value="">Select cluster...</option>
                   <option value="__remove__">— Remove from cluster —</option>
-                  {clusterSlugs.map((slug) => (
-                    <option key={slug} value={slug}>{slug}</option>
+                  {clusters.map((cluster) => (
+                    <option key={cluster.pillarSlug} value={cluster.pillarSlug}>{cluster.pillarTitle}</option>
                   ))}
                 </select>
                 <Button
@@ -504,11 +504,13 @@ export default function ContentManagerPage() {
                           <select
                             value={tool.clusterSlug || ""}
                             onChange={(e) => updateToolCluster(tool.slug, e.target.value)}
-                            className="text-sm border rounded px-2 py-1 w-full max-w-[160px] bg-white"
+                            className="text-sm border rounded px-2 py-1 w-full max-w-[200px] bg-white"
                           >
                             <option value="">— None —</option>
-                            {clusterSlugs.map((slug) => (
-                              <option key={slug} value={slug}>{slug}</option>
+                            {clusters.map((cluster) => (
+                              <option key={cluster.pillarSlug} value={cluster.pillarSlug}>
+                                {cluster.pillarTitle}
+                              </option>
                             ))}
                           </select>
                         </td>
