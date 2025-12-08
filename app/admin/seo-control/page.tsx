@@ -70,6 +70,8 @@ export default function SeoControlPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [registryPage, setRegistryPage] = useState(1);
+  const REGISTRY_PER_PAGE = 25;
   const [isLoading, setIsLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [isInspecting, setIsInspecting] = useState(false);
@@ -608,13 +610,13 @@ export default function SeoControlPage() {
                 <Input
                   placeholder="Search URLs..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => { setSearchQuery(e.target.value); setRegistryPage(1); }}
                   className="pl-10"
                 />
               </div>
               <select
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
+                onChange={(e) => { setFilterType(e.target.value); setRegistryPage(1); }}
                 className="border rounded-md px-3 py-2 text-sm"
               >
                 <option value="all">All Types</option>
@@ -624,7 +626,7 @@ export default function SeoControlPage() {
               </select>
               <select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={(e) => { setFilterStatus(e.target.value); setRegistryPage(1); }}
                 className="border rounded-md px-3 py-2 text-sm"
               >
                 <option value="all">All Status</option>
@@ -640,19 +642,22 @@ export default function SeoControlPage() {
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading...</div>
             ) : (
-              <div className="border rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="text-left px-4 py-3 font-medium">URL</th>
-                      <th className="text-left px-4 py-3 font-medium">Type</th>
-                      <th className="text-center px-4 py-3 font-medium">Health</th>
-                      <th className="text-center px-4 py-3 font-medium">Indexed</th>
-                      <th className="text-center px-4 py-3 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {filteredUrls.slice(0, 50).map((urlEntry) => (
+              <div className="space-y-4">
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="text-left px-4 py-3 font-medium">URL</th>
+                        <th className="text-left px-4 py-3 font-medium">Type</th>
+                        <th className="text-center px-4 py-3 font-medium">Health</th>
+                        <th className="text-center px-4 py-3 font-medium">Indexed</th>
+                        <th className="text-center px-4 py-3 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {filteredUrls
+                        .slice((registryPage - 1) * REGISTRY_PER_PAGE, registryPage * REGISTRY_PER_PAGE)
+                        .map((urlEntry) => (
                       <tr key={urlEntry.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="font-medium truncate max-w-md">{urlEntry.url}</div>
@@ -686,6 +691,59 @@ export default function SeoControlPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+                
+                {/* Pagination */}
+                {filteredUrls.length > REGISTRY_PER_PAGE && (
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">
+                      Showing {(registryPage - 1) * REGISTRY_PER_PAGE + 1} - {Math.min(registryPage * REGISTRY_PER_PAGE, filteredUrls.length)} of {filteredUrls.length}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setRegistryPage(p => Math.max(1, p - 1))}
+                        disabled={registryPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE) }, (_, i) => i + 1)
+                          .filter(page => {
+                            const totalPages = Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE);
+                            if (totalPages <= 7) return true;
+                            if (page === 1 || page === totalPages) return true;
+                            if (Math.abs(page - registryPage) <= 1) return true;
+                            return false;
+                          })
+                          .map((page, idx, arr) => (
+                            <span key={page}>
+                              {idx > 0 && arr[idx - 1] !== page - 1 && (
+                                <span className="px-1 text-gray-400">...</span>
+                              )}
+                              <Button
+                                variant={registryPage === page ? "default" : "outline"}
+                                size="sm"
+                                className={registryPage === page ? "bg-orange-500 hover:bg-orange-600" : ""}
+                                onClick={() => setRegistryPage(page)}
+                              >
+                                {page}
+                              </Button>
+                            </span>
+                          ))}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setRegistryPage(p => Math.min(Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE), p + 1))}
+                        disabled={registryPage >= Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE)}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
