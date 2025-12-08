@@ -6,6 +6,21 @@ import { listTools, updateTool, ToolRecord } from "@/lib/toolsRepo";
 import { getPreflightStatus } from "@/lib/toolInterlinking";
 import { query } from "@/lib/db";
 
+interface CmsToolData {
+  title: string;
+  description?: string;
+  engine_config?: {
+    engine?: string;
+    preset?: string;
+    mode?: string;
+  };
+  isIndexed?: boolean;
+  interlink_parent?: string;
+  seo?: {
+    keywords?: string[];
+  };
+}
+
 export async function GET() {
   const session = await getIronSession<AdminSessionData>(await cookies(), sessionOptions);
   
@@ -16,52 +31,93 @@ export async function GET() {
   try {
     const dbTools = await listTools();
     
-    const toolSlugs = dbTools.map((t: ToolRecord) => `/tools/${t.slug}`);
+    // Also fetch tools from cms_objects
+    const cmsResult = await query(
+      `SELECT slug, cluster_slug, data FROM cms_objects WHERE type = 'tool'`
+    );
+    const cmsToolSlugs = new Set(cmsResult.rows.map((r: { slug: string }) => r.slug));
+    
+    // Combine all tool slugs for index status lookup
+    const allToolSlugs = [
+      ...dbTools.map((t: ToolRecord) => `/tools/${t.slug}`),
+      ...cmsResult.rows.map((r: { slug: string }) => `/tools/${r.slug}`)
+    ];
+    
     const indexStatusResult = await query(
       `SELECT url, is_indexed FROM global_urls WHERE url = ANY($1)`,
-      [toolSlugs]
+      [allToolSlugs]
     );
     const indexStatusMap = new Map<string, boolean>();
     for (const row of indexStatusResult.rows) {
       indexStatusMap.set(row.url, row.is_indexed);
     }
     
-    const tools = dbTools.map((tool: ToolRecord) => {
-      const categoryToSegment: Record<string, string> = {
-        creator: "creator",
-        social: "social",
-        image: "utility",
-        video: "utility",
-        writing: "utility",
-        business: "mbb",
-        file: "utility",
-        calculators: "mbb",
-        utilities: "utility",
-        ai: "creator",
-      };
-      
-      const segment = tool.segment || (tool.category ? categoryToSegment[tool.category] : null) || "utility";
-      const toolUrl = `/tools/${tool.slug}`;
-      const isIndexed = indexStatusMap.get(toolUrl) ?? false;
+    // Map legacy tools (exclude any that exist in cms_objects)
+    const legacyTools = dbTools
+      .filter((tool: ToolRecord) => !cmsToolSlugs.has(tool.slug))
+      .map((tool: ToolRecord) => {
+        const categoryToSegment: Record<string, string> = {
+          creator: "creator",
+          social: "social",
+          image: "utility",
+          video: "utility",
+          writing: "utility",
+          business: "mbb",
+          file: "utility",
+          calculators: "mbb",
+          utilities: "utility",
+          ai: "creator",
+        };
+        
+        const segment = tool.segment || (tool.category ? categoryToSegment[tool.category] : null) || "utility";
+        const toolUrl = `/tools/${tool.slug}`;
+        const isIndexed = indexStatusMap.get(toolUrl) ?? false;
+        
+        return {
+          slug: tool.slug,
+          name: tool.name,
+          engineType: tool.engine || "legacy",
+          segment,
+          clusterSlug: tool.cluster || "",
+          isIndexed,
+          isFeatured: tool.featured,
+          inDirectory: tool.inDirectory,
+          priority: tool.priority?.toString() || "50",
+          h1: tool.name,
+          primaryKeyword: tool.primaryKeyword || "",
+          linkStatus: getPreflightStatus(tool.slug),
+          status: tool.status,
+          source: tool.source,
+          category: tool.category,
+        };
+      });
+    
+    // Map CMS tools
+    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; data: CmsToolData }) => {
+      const data = row.data;
+      const toolUrl = `/tools/${row.slug}`;
+      const isIndexed = indexStatusMap.get(toolUrl) ?? data.isIndexed ?? false;
       
       return {
-        slug: tool.slug,
-        name: tool.name,
-        engineType: tool.engine || "legacy",
-        segment,
-        clusterSlug: tool.cluster || "",
+        slug: row.slug,
+        name: data.title || row.slug,
+        engineType: data.engine_config?.engine || "unknown",
+        segment: "utility",
+        clusterSlug: row.cluster_slug || data.interlink_parent || "",
         isIndexed,
-        isFeatured: tool.featured,
-        inDirectory: tool.inDirectory,
-        priority: tool.priority?.toString() || "50",
-        h1: tool.name,
-        primaryKeyword: tool.primaryKeyword || "",
-        linkStatus: getPreflightStatus(tool.slug),
-        status: tool.status,
-        source: tool.source,
-        category: tool.category,
+        isFeatured: false,
+        inDirectory: true,
+        priority: "50",
+        h1: data.title || row.slug,
+        primaryKeyword: data.seo?.keywords?.[0] || "",
+        linkStatus: getPreflightStatus(row.slug),
+        status: "active",
+        source: "cms",
+        category: "file",
       };
     });
+    
+    const tools = [...legacyTools, ...cmsTools];
 
     tools.sort((a, b) => {
       const segmentOrder: Record<string, number> = {
