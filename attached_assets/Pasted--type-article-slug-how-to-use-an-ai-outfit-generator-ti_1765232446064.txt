@@ -1,0 +1,187 @@
+[
+  {
+    "type": "article",
+    "slug": "how-to-use-an-ai-outfit-generator",
+    "title": "How to Use an AI Outfit Generator to Recreate Any Look",
+    "description": "Step-by-step guide to using AI outfit generators to copy outfits from Instagram, TikTok, Pinterest and more.",
+    "body": "## How to Use an AI Outfit Generator\n\nAI outfit generators let you upload any outfit photo and get similar shoppable pieces in seconds.\n\n### 1. Choose the Right Tool\n\nPick a tool that matches your vibe:\n\n- **Any look:** [Outfit Ideas Generator](/tools/outfit-ideas-ai)\n- **Streetwear:** [Streetwear Outfit Finder](/tools/streetwear-outfit-finder)\n- **Date night:** [Date Night Outfit Generator](/tools/date-night-outfit-generator)\n\n### 2. Upload Your Outfit Photo\n\nUse a clear, well-lit screenshot or photo where the outfit is fully visible.\n\n### 3. Review the Detected Items\n\nThe AI breaks the look into tops, bottoms, shoes and accessories and shows similar products.\n\n### 4. Shop the Pieces You Like\n\nClick through to retailers and mix and match until you’ve recreated the outfit.\n\nUse AI as a shortcut – you still decide what actually fits your style, body and budget.",
+    "seo_title": "How to Use an AI Outfit Generator to Recreate Any Look",
+    "seo_description": "Learn how to use AI outfit generators to copy outfits from Instagram, TikTok and Pinterest in a few clicks.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "streetwear-outfit-ideas-with-ai",
+      "date-night-outfit-ideas-with-ai"
+    ],
+    "interlink_tools": [
+      "outfit-ideas-ai",
+      "streetwear-outfit-finder",
+      "date-night-outfit-generator"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "streetwear-outfit-ideas-with-ai",
+    "title": "Streetwear Outfit Ideas Using a Free AI Outfit Generator",
+    "description": "Use an AI streetwear outfit finder to turn inspo photos into shoppable hoodies, cargos, sneakers and more.",
+    "body": "## Streetwear Outfit Ideas with AI\n\nInstead of hunting through endless product pages, let AI do the first pass.\n\n### Use a Streetwear-Specific Tool\n\nThe [Streetwear Outfit Finder](/tools/streetwear-outfit-finder) is tuned for:\n\n- Hoodies and graphic tees\n- Cargos and baggy denim\n- Statement sneakers and accessories\n\nUpload fits from Instagram or Pinterest and get instant product suggestions.\n\n### Tips for Better Streetwear Results\n\n- Use full-body photos, not just close-ups\n- Avoid heavy filters that change colors\n- Try multiple inspo photos to dial in your vibe",
+    "seo_title": "Streetwear Outfit Ideas Using a Free AI Outfit Generator",
+    "seo_description": "Turn streetwear inspo photos into shoppable outfits with a free AI streetwear outfit finder.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "how-to-use-an-ai-outfit-generator",
+      "aesthetic-outfits-from-pinterest-with-ai"
+    ],
+    "interlink_tools": [
+      "streetwear-outfit-finder",
+      "outfit-ideas-ai"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "date-night-outfit-ideas-with-ai",
+    "title": "Date Night Outfit Ideas – Let AI Build the Look for You",
+    "description": "Upload a romantic outfit inspo photo and let an AI date night outfit generator find similar dresses, heels and accessories.",
+    "body": "## Date Night Outfit Ideas with AI\n\nInstead of scrolling for hours, upload one photo and let AI do the heavy lifting.\n\n### The Fastest Way: Use a Date Night Outfit Generator\n\nTry the [Date Night Outfit Generator](/tools/date-night-outfit-generator) when you:\n\n- Screenshot a look from Instagram or TikTok\n- Save a Pinterest board of dinner outfits\n- Want similar pieces without the exact brand\n\n### Quick Styling Rules\n\n- Pick one statement piece (dress or shoes)\n- Keep 2–3 main colors\n- Let accessories match the metal tone (gold vs silver)\n\nUse the AI suggestions as a starting point, then swap pieces based on comfort and budget.",
+    "seo_title": "Date Night Outfit Ideas with an AI Outfit Generator",
+    "seo_description": "Use a free AI date night outfit generator to recreate romantic dinner and cocktail looks from any photo.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "how-to-use-an-ai-outfit-generator",
+      "wedding-guest-outfit-ideas-with-ai"
+    ],
+    "interlink_tools": [
+      "date-night-outfit-generator",
+      "outfit-ideas-ai"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "office-outfit-ideas-with-ai",
+    "title": "Office Outfit Ideas – Smart Casual Work Looks with AI",
+    "description": "Turn LinkedIn and Pinterest inspo into real work outfits using an AI office outfit generator.",
+    "body": "## Office Outfit Ideas with AI\n\nWorkwear doesn’t have to be boring or time-consuming to plan.\n\n### Use an Office Outfit Generator\n\nThe [Office Outfit Generator](/tools/office-outfit-generator) helps you:\n\n- Recreate blazer + trouser combos\n- Find smart shoes that match your office dress code\n- Build a few go-to uniforms you can repeat\n\n### Simple Workwear Framework\n\n- Start with neutral bottoms\n- Add a structured top or blazer\n- Bring in personality through one detail: shoes, watch, or bag",
+    "seo_title": "Office Outfit Ideas with a Free AI Outfit Generator",
+    "seo_description": "Use an AI office outfit generator to build smart casual work outfits from any inspo photo.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "capsule-wardrobe-outfits-with-ai"
+    ],
+    "interlink_tools": [
+      "office-outfit-generator",
+      "capsule-wardrobe-outfit-finder"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "capsule-wardrobe-outfits-with-ai",
+    "title": "Capsule Wardrobe Outfits – Build 20 Looks from 10 Pieces with AI",
+    "description": "Use an AI capsule wardrobe outfit generator to stretch a small closet into dozens of outfits.",
+    "body": "## Capsule Wardrobe Outfits with AI\n\nA capsule wardrobe is about getting more outfits out of fewer pieces.\n\n### Start with a Capsule-Friendly Tool\n\nThe [Capsule Wardrobe Outfit Finder](/tools/capsule-wardrobe-outfit-finder) focuses on:\n\n- Neutrals and repeatable basics\n- Pieces that mix and match easily\n- Simple silhouettes that layer well\n\nUpload photos of looks you like and let AI suggest similar pieces that actually work together.\n\n### Basic Capsule Formula\n\n- 2–3 bottoms\n- 3–5 tops\n- 1–2 layers\n- 2–3 pairs of shoes\n\nRotate these with accessories and you’ve got 20+ outfits.",
+    "seo_title": "Capsule Wardrobe Outfits Using an AI Outfit Generator",
+    "seo_description": "Use an AI capsule wardrobe outfit generator to create 20+ outfits from a small set of essentials.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "office-outfit-ideas-with-ai",
+      "vacation-outfit-planner-with-ai"
+    ],
+    "interlink_tools": [
+      "capsule-wardrobe-outfit-finder",
+      "outfit-ideas-ai"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "vacation-outfit-planner-with-ai",
+    "title": "Vacation Outfit Planner – Pack Light with an AI Outfit Generator",
+    "description": "Upload travel inspo photos and use an AI vacation outfit generator to build outfits that all fit in one suitcase.",
+    "body": "## Vacation Outfit Planner with AI\n\nPacking light is easier when your outfits are planned in advance.\n\n### Use the Vacation Outfit Generator\n\nThe [Vacation Outfit Generator](/tools/vacation-outfit-generator) helps you:\n\n- Turn resort and city inspo photos into real outfits\n- Balance swimwear, casual day looks and nicer dinners\n- Avoid packing 10 pieces you never actually wear\n\n### Packing Rules\n\n- Choose one main color palette\n- Make sure each piece works in 2–3 outfits\n- Plan outfits by day or activity, not just vibes",
+    "seo_title": "Vacation Outfit Planner with a Free AI Outfit Generator",
+    "seo_description": "Use an AI vacation outfit generator to plan travel outfits from a single carry-on.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "summer-outfit-ideas-with-ai",
+      "winter-outfit-ideas-with-ai"
+    ],
+    "interlink_tools": [
+      "vacation-outfit-generator",
+      "summer-outfit-generator",
+      "winter-outfit-generator"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "winter-outfit-ideas-with-ai",
+    "title": "Winter Outfit Ideas – Coats, Layers and Boots with AI",
+    "description": "Use an AI winter outfit generator to build layered looks that are actually warm and wearable.",
+    "body": "## Winter Outfit Ideas with AI\n\nCold-weather outfits are about layering without feeling bulky.\n\n### Use the Winter Outfit Generator\n\nThe [Winter Outfit Generator](/tools/winter-outfit-generator) focuses on:\n\n- Coats, knitwear and scarves\n- Practical but good-looking boots\n- Color palettes that don’t look muddy in low light\n\nUpload winter inspo photos and get similar shoppable pieces you can layer in real life.",
+    "seo_title": "Winter Outfit Ideas Using a Free AI Outfit Generator",
+    "seo_description": "Upload cold-weather outfit photos and let an AI winter outfit generator find coats, layers and boots for you.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "vacation-outfit-planner-with-ai"
+    ],
+    "interlink_tools": [
+      "winter-outfit-generator"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "summer-outfit-ideas-with-ai",
+    "title": "Summer Outfit Ideas – Light and Airy Looks with AI",
+    "description": "Turn summer inspo photos into breathable, shoppable outfits using an AI summer outfit generator.",
+    "body": "## Summer Outfit Ideas with AI\n\nSummer outfits need to be breathable, simple and repeatable.\n\n### Use the Summer Outfit Generator\n\nThe [Summer Outfit Generator](/tools/summer-outfit-generator) helps you:\n\n- Turn dress and shorts inspo into real outfits\n- Find sandals and light layers that match\n- Avoid heavy fabrics that are miserable in the heat",
+    "seo_title": "Summer Outfit Ideas Using a Free AI Outfit Generator",
+    "seo_description": "Use an AI summer outfit generator to build light and airy outfits from any inspo photo.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "vacation-outfit-planner-with-ai"
+    ],
+    "interlink_tools": [
+      "summer-outfit-generator"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "wedding-guest-outfit-ideas-with-ai",
+    "title": "Wedding Guest Outfit Ideas – Get Dress Codes Right with AI",
+    "description": "Upload wedding guest inspo photos and use an AI outfit generator to match dress codes without guessing.",
+    "body": "## Wedding Guest Outfit Ideas with AI\n\nDress codes are confusing. AI can at least sort the visuals out for you.\n\n### Use the Wedding Guest Outfit Generator\n\nThe [Wedding Guest Outfit Generator](/tools/wedding-guest-outfit-generator) helps you:\n\n- Match black tie, cocktail and garden party vibes\n- Find dresses, suits and shoes from inspo photos\n- Avoid showing up underdressed or way too extra\n\nUpload a few outfits from Pinterest and see what the AI pulls back.",
+    "seo_title": "Wedding Guest Outfit Ideas Using an AI Outfit Generator",
+    "seo_description": "Use an AI wedding guest outfit generator to hit dress codes without overthinking it.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "date-night-outfit-ideas-with-ai"
+    ],
+    "interlink_tools": [
+      "wedding-guest-outfit-generator",
+      "date-night-outfit-generator"
+    ],
+    "isIndexed": false
+  },
+  {
+    "type": "article",
+    "slug": "aesthetic-outfits-from-pinterest-with-ai",
+    "title": "Aesthetic Outfits from Pinterest – Turn Moodboards into Real Looks with AI",
+    "description": "Upload aesthetic inspo photos (clean girl, coquette, Y2K, grunge) and let an AI outfit generator build similar looks.",
+    "body": "## Aesthetic Outfits from Pinterest with AI\n\nMoodboards are great. AI makes them shoppable.\n\n### Use the Aesthetic Outfit Generator\n\nThe [Aesthetic Outfit Generator](/tools/aesthetic-outfit-generator) is tuned for:\n\n- Clean girl and soft minimalism\n- Coquette, Y2K and grunge aesthetics\n- TikTok and Pinterest-core outfits\n\nUpload a few panels from your board and let AI suggest similar pieces you can actually buy right now.",
+    "seo_title": "Aesthetic Outfits from Pinterest Using an AI Outfit Generator",
+    "seo_description": "Use an AI aesthetic outfit generator to turn Pinterest moodboards into real shoppable looks.",
+    "interlink_parent": "ai-outfit-generator-tools",
+    "interlink_siblings": [
+      "streetwear-outfit-ideas-with-ai"
+    ],
+    "interlink_tools": [
+      "aesthetic-outfit-generator",
+      "outfit-ideas-ai"
+    ],
+    "isIndexed": false
+  }
+]
