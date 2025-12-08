@@ -217,14 +217,16 @@ export async function POST(request: NextRequest) {
         }
 
         // Upsert into global_urls (preserves is_indexed on update)
+        const title = obj.seo?.metaTitle || obj.title || obj.slug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
         await query(
-          `INSERT INTO global_urls (url, type, cms_slug, is_indexed)
-           VALUES ($1, $2, $3, false)
+          `INSERT INTO global_urls (url, type, cms_slug, title, is_indexed)
+           VALUES ($1, $2, $3, $4, false)
            ON CONFLICT (url) DO UPDATE
            SET type = EXCLUDED.type,
                cms_slug = EXCLUDED.cms_slug,
+               title = COALESCE(EXCLUDED.title, global_urls.title),
                updated_at = now()`,
-          [path, obj.type, obj.slug]
+          [path, obj.type, obj.slug, title]
         );
 
         results.push({
