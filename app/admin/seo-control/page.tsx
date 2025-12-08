@@ -442,9 +442,9 @@ export default function SeoControlPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <Link href={snapshot.url} target="_blank">
+                          <a href={snapshot.url} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                          </Link>
+                          </a>
                         </td>
                       </tr>
                     ))}
@@ -619,11 +619,11 @@ export default function SeoControlPage() {
                           </button>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <Link href={urlEntry.url} target="_blank">
+                          <a href={urlEntry.url} target="_blank" rel="noopener noreferrer">
                             <Button variant="ghost" size="sm">
                               <ExternalLink className="w-4 h-4" />
                             </Button>
-                          </Link>
+                          </a>
                         </td>
                       </tr>
                     ))}
