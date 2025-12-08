@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { CMSImportModal } from "@/components/admin/cms-import-modal";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,9 @@ interface Article {
 type TabType = "tools" | "articles" | "clusters" | "mbbs";
 
 export default function ContentManagerPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("tools");
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as TabType) || "tools";
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [tools, setTools] = useState<ToolSkin[]>([]);
   const [clusters, setClusters] = useState<ClusterSummary[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
