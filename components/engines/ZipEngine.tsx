@@ -9,12 +9,12 @@ import {
   AlertCircle, CheckCircle, ChevronDown, ChevronUp, X,
   File, Image, FileText, Film, Music, Code, Trash2, BookOpen
 } from 'lucide-react';
-import { ToolRecord } from '@/lib/toolsRepo';
+import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { ZipEngineConfig, getZipPresetBySlug } from '@/engines/zip/config';
 import PostResultUpsell from '@/components/PostResultUpsell';
 
 interface ZipEngineProps {
-  tool: ToolRecord;
+  tool: ToolForRenderer;
 }
 
 interface FileItem {

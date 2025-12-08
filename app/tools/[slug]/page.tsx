@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getToolBySlug } from '@/lib/toolsRepo';
+import { getCmsToolBySlug } from '@/lib/cms/getCmsToolBySlug';
 import { isEngineSupported } from '@/lib/engineRegistry';
 import ToolPageClient from './ToolPageClient';
 
@@ -10,19 +10,23 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const tool = await getToolBySlug(slug, { includeDrafts: false });
+  const tool = await getCmsToolBySlug(slug, { includeDrafts: false });
 
   if (!tool) {
     return { title: 'Tool Not Found | VCM Suite' };
   }
 
+  const seoTitle = tool.seo?.metaTitle || `${tool.name} | Free Creator Tool | VCM Suite`;
+  const seoDescription = tool.seo?.metaDescription || tool.description || `Use ${tool.name} for free. Part of VCM Suite creator tools.`;
+  const seoKeywords = tool.seo?.keywords?.join(', ');
+
   return {
-    title: `${tool.name} | Free Creator Tool | VCM Suite`,
-    description: tool.description || `Use ${tool.name} for free. Part of VCM Suite creator tools.`,
-    keywords: tool.secondaryKeywords?.join(', ') || tool.primaryKeyword || undefined,
+    title: seoTitle,
+    description: seoDescription,
+    keywords: seoKeywords,
     openGraph: {
       title: tool.name,
-      description: tool.description || `Free ${tool.name} tool for creators.`,
+      description: seoDescription,
       type: 'website',
     },
   };
@@ -30,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ToolPage({ params }: PageProps) {
   const { slug } = await params;
-  const tool = await getToolBySlug(slug, { includeDrafts: true });
+  const tool = await getCmsToolBySlug(slug, { includeDrafts: true });
 
   if (!tool) {
     return notFound();

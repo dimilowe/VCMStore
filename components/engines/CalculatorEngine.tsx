@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Calculator, Info, RefreshCw, ChevronDown, ChevronUp, Flame, Bell, QrCode, ArrowRight, BookOpen } from 'lucide-react';
-import { ToolRecord } from '@/lib/toolsRepo';
+import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 
 interface CalculatorEngineProps {
-  tool: ToolRecord;
+  tool: ToolForRenderer;
 }
 
 interface FAQ {
@@ -406,14 +406,13 @@ const CONTENT_TYPE_LABELS: Record<string, string> = {
   'shorts': 'Shorts',
 };
 
-function getMetricFromDimensions(dimensions: Record<string, any> | null): string {
-  if (!dimensions) return 'ctr';
-  return dimensions.metric || 'ctr';
-}
-
-function getContentTypeFromDimensions(dimensions: Record<string, any> | null): string {
-  if (!dimensions) return 'longform';
-  return dimensions.content_type || 'longform';
+function getMetricFromPreset(preset: string | undefined): string {
+  if (!preset) return 'ctr';
+  const parts = preset.split('-');
+  if (parts.length > 0 && ['ctr', 'cpm', 'rpm', 'watchtime', 'avgviews', 'impressions'].includes(parts[parts.length - 1])) {
+    return parts[parts.length - 1];
+  }
+  return 'ctr';
 }
 
 function FAQItem({ faq, isOpen, onToggle }: { faq: FAQ; isOpen: boolean; onToggle: () => void }) {
@@ -722,7 +721,7 @@ function PostResultUpsell() {
   );
 }
 
-function ToolSchema({ tool, preset }: { tool: ToolRecord; preset: MetricPreset }) {
+function ToolSchema({ tool, preset }: { tool: ToolForRenderer; preset: MetricPreset }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -751,8 +750,7 @@ function ToolSchema({ tool, preset }: { tool: ToolRecord; preset: MetricPreset }
 }
 
 export default function CalculatorEngine({ tool }: CalculatorEngineProps) {
-  const metric = getMetricFromDimensions(tool.dimensions);
-  const contentType = getContentTypeFromDimensions(tool.dimensions);
+  const metric = getMetricFromPreset(tool.preset);
   const preset = YOUTUBE_METRIC_PRESETS[metric] || YOUTUBE_METRIC_PRESETS['ctr'];
   
   const [values, setValues] = useState<Record<string, string>>({});
@@ -816,9 +814,6 @@ export default function CalculatorEngine({ tool }: CalculatorEngineProps) {
             <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-8 text-white">
               <div className="flex items-center gap-3 mb-3">
                 <Calculator className="w-8 h-8" />
-                <span className="px-2 py-0.5 bg-white/20 rounded text-sm font-medium">
-                  {CONTENT_TYPE_LABELS[contentType] || contentType}
-                </span>
                 <span className="px-2 py-0.5 bg-white/20 rounded text-sm font-medium">
                   {preset.badgeLabel}
                 </span>
@@ -902,15 +897,15 @@ export default function CalculatorEngine({ tool }: CalculatorEngineProps) {
             </div>
           </div>
 
-          {tool.cluster && (
+          {tool.interlinkParent && (
             <div className="mt-6 p-4 bg-white rounded-lg border text-center">
               <p className="text-sm text-gray-600">
                 This tool is part of the{' '}
                 <Link
-                  href={`/tools/clusters/${tool.cluster}`}
+                  href={`/tools/clusters/${tool.interlinkParent}`}
                   className="text-orange-600 hover:text-orange-700 font-medium"
                 >
-                  {tool.cluster.replace(/-/g, ' ')}
+                  {tool.interlinkParent.replace(/-/g, ' ')}
                 </Link>{' '}
                 topic cluster.
               </p>
@@ -923,10 +918,10 @@ export default function CalculatorEngine({ tool }: CalculatorEngineProps) {
 
           <FAQSection faqs={preset.faqs} metric={metric} />
 
-          {tool.cluster && (
+          {tool.interlinkParent && (
             <>
-              <RelatedCalculators cluster={tool.cluster} currentSlug={tool.slug} />
-              <RelatedArticles cluster={tool.cluster} />
+              <RelatedCalculators cluster={tool.interlinkParent} currentSlug={tool.slug} />
+              <RelatedArticles cluster={tool.interlinkParent} />
             </>
           )}
         </article>

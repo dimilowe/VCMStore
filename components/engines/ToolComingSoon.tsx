@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, ArrowLeft, Wrench, Tag } from 'lucide-react';
-import { ToolRecord } from '@/lib/toolsRepo';
+import { Clock, ArrowLeft, Wrench } from 'lucide-react';
+import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 
 interface ToolComingSoonProps {
-  tool: ToolRecord;
+  tool: ToolForRenderer;
 }
 
 export default function ToolComingSoon({ tool }: ToolComingSoonProps) {
@@ -48,53 +48,16 @@ export default function ToolComingSoon({ tool }: ToolComingSoonProps) {
                   <span className="px-2 py-0.5 bg-gray-100 rounded">{tool.engine}</span>
                 </div>
               )}
-              {tool.cluster && (
+              {tool.interlinkParent && (
                 <div className="flex items-center gap-1.5">
-                  <span className="font-medium">Cluster:</span>
-                  <Link
-                    href={`/tools/clusters/${tool.cluster}`}
-                    className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
-                  >
-                    {tool.cluster}
-                  </Link>
-                </div>
-              )}
-              {tool.category && (
-                <div className="flex items-center gap-1.5">
-                  <span className="font-medium">Category:</span>
-                  <span className="px-2 py-0.5 bg-gray-100 rounded">{tool.category}</span>
-                </div>
-              )}
-            </div>
-
-            {tool.tags && tool.tags.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
-                {tool.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                  >
-                    <Tag className="w-3 h-3" />
-                    {tag}
+                  <span className="font-medium">Parent:</span>
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded">
+                    {tool.interlinkParent}
                   </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {tool.dimensions && Object.keys(tool.dimensions).length > 0 && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg text-left">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Tool Configuration</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {Object.entries(tool.dimensions).map(([key, value]) => (
-                  <div key={key} className="flex justify-between">
-                    <span className="text-gray-500 capitalize">{key.replace(/_/g, ' ')}:</span>
-                    <span className="font-medium text-gray-900">{String(value)}</span>
-                  </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
         <div className="mt-8 text-center">

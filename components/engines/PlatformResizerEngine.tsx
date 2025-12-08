@@ -7,11 +7,11 @@ import {
   AlertCircle, CheckCircle, ChevronDown, ChevronUp, ArrowRight,
   Flame, Bell, QrCode, BookOpen, Youtube, Instagram, Video, Linkedin
 } from 'lucide-react';
-import { ToolRecord } from '@/lib/toolsRepo';
+import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { PRESETS_BY_SLUG, PlatformImagePreset, platformImagePresets } from '@/data/platformImagePresets';
 
 interface PlatformResizerEngineProps {
-  tool: ToolRecord;
+  tool: ToolForRenderer;
 }
 
 const PLATFORM_ICONS: Record<string, React.ElementType> = {
@@ -357,7 +357,7 @@ function PostResultUpsell({ platformId }: { platformId: string }) {
   );
 }
 
-function ToolSchema({ tool, preset }: { tool: ToolRecord; preset: PlatformImagePreset }) {
+function ToolSchema({ tool, preset }: { tool: ToolForRenderer; preset: PlatformImagePreset }) {
   const toolUrl = `https://vcmsuite.com/tools/${tool.slug}`;
   
   const schema = {
@@ -650,7 +650,7 @@ function ResizerUI({ preset }: { preset: PlatformImagePreset }) {
   );
 }
 
-function MissingPresetFallback({ tool }: { tool: ToolRecord }) {
+function MissingPresetFallback({ tool }: { tool: ToolForRenderer }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-12">
@@ -741,15 +741,15 @@ export default function PlatformResizerEngine({ tool }: PlatformResizerEnginePro
 
           <PlatformGuide content={preset.seo.platformGuide} />
 
-          {tool.cluster && (
+          {tool.interlinkParent && (
             <div className="mt-6 p-4 bg-white rounded-lg border text-center">
               <p className="text-sm text-gray-600">
                 This tool is part of the{' '}
                 <Link
-                  href={`/tools/clusters/${tool.cluster}`}
+                  href={`/tools/clusters/${tool.interlinkParent}`}
                   className="text-orange-600 hover:text-orange-700 font-medium"
                 >
-                  {tool.cluster.replace(/-/g, ' ')}
+                  {tool.interlinkParent.replace(/-/g, ' ')}
                 </Link>{' '}
                 topic cluster.
               </p>

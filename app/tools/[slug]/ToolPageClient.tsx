@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState, ComponentType } from 'react';
-import { ToolRecord } from '@/lib/toolsRepo';
+import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { getEngineLoader, EngineComponentProps } from '@/lib/engineRegistry';
 import ToolComingSoon from '@/components/engines/ToolComingSoon';
 
 interface ToolPageClientProps {
-  tool: ToolRecord;
+  tool: ToolForRenderer;
   hasEngine: boolean;
 }
 

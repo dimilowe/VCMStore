@@ -1,8 +1,8 @@
 import { ComponentType } from 'react';
-import { ToolRecord } from './toolsRepo';
+import { ToolForRenderer } from './cms/getCmsToolBySlug';
 
 export interface EngineComponentProps {
-  tool: ToolRecord;
+  tool: ToolForRenderer;
 }
 
 export const ENGINE_COMPONENTS: Record<string, () => Promise<{ default: ComponentType<EngineComponentProps> }>> = {
