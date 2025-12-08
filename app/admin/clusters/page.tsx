@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { AdminLayout } from "@/components/admin/admin-layout";
 
 interface ClusterHealthScore {
   total: number;
@@ -32,52 +33,15 @@ interface ClusterOverview {
 }
 
 export default function AdminClustersPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [password, setPassword] = useState("");
   const [clusters, setClusters] = useState<ClusterOverview[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterEngine, setFilterEngine] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
+    loadClusters();
   }, []);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadClusters();
-    }
-  }, [isAuthenticated]);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/admin/check", { credentials: "include" });
-      const data = await res.json();
-      setIsAuthenticated(data.isAdmin);
-    } catch (error) {
-      console.error("Auth check failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-        credentials: "include",
-      });
-      if (res.ok) {
-        setIsAuthenticated(true);
-      }
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
 
   const loadClusters = async () => {
     try {
@@ -88,6 +52,8 @@ export default function AdminClustersPage() {
       }
     } catch (error) {
       console.error("Failed to load clusters:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -152,59 +118,12 @@ export default function AdminClustersPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <form onSubmit={handleLogin} className="bg-white p-8 rounded-lg shadow-md w-80">
-          <h1 className="text-xl font-bold mb-4 text-center">Admin Login</h1>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter admin password"
-            className="w-full border rounded px-3 py-2 mb-4"
-          />
-          <button
-            type="submit"
-            className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
-          >
-            Login
-          </button>
-        </form>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Cluster Control Panel</h1>
-            <p className="text-gray-600">Manage topical authority clusters for SEO dominance</p>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              href="/admin/tools"
-              className="px-4 py-2 text-sm bg-white border rounded hover:bg-gray-50"
-            >
-              Tool Control
-            </Link>
-            <Link
-              href="/admin"
-              className="px-4 py-2 text-sm bg-white border rounded hover:bg-gray-50"
-            >
-              Admin Home
-            </Link>
-          </div>
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Cluster Control Panel</h1>
+          <p className="text-gray-600">Manage topical authority clusters for SEO dominance</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border mb-6">
@@ -350,6 +269,6 @@ export default function AdminClustersPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
