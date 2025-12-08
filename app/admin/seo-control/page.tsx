@@ -66,6 +66,7 @@ export default function SeoControlPage() {
   const [urls, setUrls] = useState<UrlEntry[]>([]);
   const [snapshots, setSnapshots] = useState<SeoSnapshot[]>([]);
   const [readyPages, setReadyPages] = useState<ReadyPage[]>([]);
+  const [expectedLinks, setExpectedLinks] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -80,10 +81,11 @@ export default function SeoControlPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [urlsRes, snapshotsRes, readyRes] = await Promise.all([
+      const [urlsRes, snapshotsRes, readyRes, expectedRes] = await Promise.all([
         fetch("/api/global-urls", { credentials: "include" }),
         fetch("/api/admin/seo/snapshots", { credentials: "include" }),
         fetch("/api/admin/seo/unindexed-pages", { credentials: "include" }),
+        fetch("/api/admin/seo/expected-links", { credentials: "include" }),
       ]);
 
       if (urlsRes.ok) {
@@ -97,6 +99,10 @@ export default function SeoControlPage() {
       if (readyRes.ok) {
         const data = await readyRes.json();
         setReadyPages(data.pages || []);
+      }
+      if (expectedRes.ok) {
+        const data = await expectedRes.json();
+        setExpectedLinks(data.expectedLinks || {});
       }
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -498,6 +504,7 @@ export default function SeoControlPage() {
                       <th className="text-center px-4 py-3 font-medium">Score</th>
                       <th className="text-center px-4 py-3 font-medium">Words</th>
                       <th className="text-center px-4 py-3 font-medium">Links</th>
+                      <th className="text-center px-4 py-3 font-medium">Expected</th>
                       <th className="text-center px-4 py-3 font-medium">Status</th>
                       <th className="text-center px-4 py-3 font-medium">Indexed</th>
                       <th className="text-center px-4 py-3 font-medium"></th>
@@ -511,6 +518,8 @@ export default function SeoControlPage() {
                       const wordCount = page.word_count ?? 0;
                       const hasIssues = page.issues && page.issues.length > 0;
                       const isReady = page.is_ready_to_index;
+                      const cleanUrl = page.url.replace("http://localhost:5000", "");
+                      const expected = expectedLinks[cleanUrl] ?? 0;
                       
                       // Determine status
                       let statusLabel = "Pending";
@@ -550,6 +559,13 @@ export default function SeoControlPage() {
                           </td>
                           <td className="px-4 py-3 text-center text-gray-600">
                             {page.internal_links ?? 0}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {expected > 0 ? (
+                              <span className="text-blue-600 font-medium">{expected}</span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span className={`px-2 py-1 text-xs rounded ${statusColor}`}>
