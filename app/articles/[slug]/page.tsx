@@ -11,12 +11,6 @@ import { AdminSessionData, sessionOptions } from "@/lib/admin-session";
 import StyledArticleContent from "@/components/StyledArticleContent";
 import ArticleTemplate from "@/components/ArticleTemplate";
 import { ArticleContent, clusterThemes } from "@/lib/articleTypes";
-import ArticleEngine from "@/components/engines/ArticleEngine";
-import {
-  getCmsArticleBySlug,
-  getRelatedTools,
-  getRelatedArticles as getCmsRelatedArticles,
-} from "@/lib/cms/getCmsArticleBySlug";
 
 interface ClusterArticle {
   id: number;
@@ -41,7 +35,7 @@ function isStructuredContent(content: string): boolean {
   }
 }
 
-async function getLegacyArticle(slug: string, allowUnpublished: boolean = false): Promise<ClusterArticle | null> {
+async function getArticle(slug: string, allowUnpublished: boolean = false): Promise<ClusterArticle | null> {
   const whereClause = allowUnpublished 
     ? 'WHERE slug = $1' 
     : 'WHERE slug = $1 AND is_published = true';
@@ -78,7 +72,7 @@ async function incrementViewCount(articleId: number): Promise<void> {
   );
 }
 
-async function getLegacyRelatedArticles(clusterSlug: string, currentSlug: string): Promise<ClusterArticle[]> {
+async function getRelatedArticles(clusterSlug: string, currentSlug: string): Promise<ClusterArticle[]> {
   const result = await query(
     `SELECT id, title, slug, excerpt, cluster_slug
      FROM cluster_articles 
@@ -92,19 +86,7 @@ async function getLegacyRelatedArticles(clusterSlug: string, currentSlug: string
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  
-  const cmsArticle = await getCmsArticleBySlug(slug, { includeDrafts: true });
-  if (cmsArticle) {
-    return {
-      title: cmsArticle.seo.metaTitle || `${cmsArticle.title} - VCM Suite`,
-      description: cmsArticle.seo.metaDescription || cmsArticle.description || undefined,
-      openGraph: cmsArticle.seo.ogImage
-        ? { images: [{ url: cmsArticle.seo.ogImage }] }
-        : undefined,
-    };
-  }
-  
-  const article = await getLegacyArticle(slug);
+  const article = await getArticle(slug);
   
   if (!article) {
     return {
@@ -130,24 +112,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const adminUser = await isAdmin();
   
-  const cmsArticle = await getCmsArticleBySlug(slug, { includeDrafts: adminUser });
-  
-  if (cmsArticle) {
-    const [relatedTools, relatedArticles] = await Promise.all([
-      getRelatedTools(cmsArticle.interlinkTools),
-      getCmsRelatedArticles(cmsArticle.interlinkSiblings),
-    ]);
-
-    return (
-      <ArticleEngine
-        article={cmsArticle}
-        relatedTools={relatedTools}
-        relatedArticles={relatedArticles}
-      />
-    );
-  }
-  
-  const article = await getLegacyArticle(slug, adminUser);
+  const article = await getArticle(slug, adminUser);
   
   if (!article) {
     notFound();
@@ -193,7 +158,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     );
   }
   
-  const relatedArticles = await getLegacyRelatedArticles(article.cluster_slug, article.slug);
+  const relatedArticles = await getRelatedArticles(article.cluster_slug, article.slug);
   
   return (
     <div className="min-h-screen bg-gray-50">
