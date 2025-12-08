@@ -131,6 +131,17 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     sharedComponent: "components/engines/ZipEngine.tsx",
     presetsFile: "engines/zip/config.ts",
     capabilities: ["compress", "archive", "bundle"]
+  },
+  "outfit": {
+    id: "outfit",
+    name: "Outfit Analyzer Engine",
+    description: "AI-powered outfit analysis and shopping recommendations",
+    inputTypes: ["image"],
+    outputTypes: ["analysis", "display"],
+    sharedComponent: "components/engines/OutfitEngine.tsx",
+    presetsFile: "engines/outfit/config.ts",
+    apiRoutes: ["/api/tools/outfit-analyzer"],
+    capabilities: ["analyze", "recommend", "shop"]
   }
 };
 

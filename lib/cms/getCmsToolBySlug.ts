@@ -75,6 +75,7 @@ export const ENGINE_TO_CATEGORY: Record<string, { label: string; key: string }> 
   'community': { label: 'Creator Tools', key: 'creator' },
   'static': { label: 'Utilities', key: 'utilities' },
   'standalone': { label: 'Creator Tools', key: 'creator' },
+  'outfit': { label: 'AI Tools', key: 'ai' },
 };
 
 export async function getCmsToolBySlug(

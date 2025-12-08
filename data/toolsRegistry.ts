@@ -38,7 +38,8 @@ export type EngineType =
   | "zip"
   | "community"
   | "static"
-  | "standalone";
+  | "standalone"
+  | "outfit";
 
 export type InputType = "image" | "text" | "url" | "file" | "number" | "selection" | "none" | "multi";
 export type OutputType = "image" | "text" | "file" | "download" | "analysis" | "display" | "interactive";
