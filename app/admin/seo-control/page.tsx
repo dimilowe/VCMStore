@@ -19,6 +19,8 @@ import {
   EyeOff,
   Zap,
   FileText,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -72,6 +74,19 @@ export default function SeoControlPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [registryPage, setRegistryPage] = useState(1);
   const REGISTRY_PER_PAGE = 100;
+  
+  // SEO Health tab state
+  const [healthSearch, setHealthSearch] = useState("");
+  const [healthTypeFilter, setHealthTypeFilter] = useState("all");
+  const [healthPage, setHealthPage] = useState(1);
+  const HEALTH_PER_PAGE = 50;
+  
+  // Ready to Index tab state
+  const [readySearch, setReadySearch] = useState("");
+  const [readyStatusFilter, setReadyStatusFilter] = useState("all");
+  const [readyPage, setReadyPage] = useState(1);
+  const READY_PER_PAGE = 50;
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [isInspecting, setIsInspecting] = useState(false);
@@ -184,6 +199,42 @@ export default function SeoControlPage() {
   });
 
   const pageTypes = [...new Set(urls.map((u) => u.type))];
+  const snapshotPageTypes = [...new Set(snapshots.map((s) => s.page_type))];
+  
+  // Filter snapshots for SEO Health tab
+  const filteredSnapshots = snapshots.filter((snapshot) => {
+    const cleanUrl = snapshot.url.replace("http://localhost:5000", "");
+    const matchesSearch = cleanUrl.toLowerCase().includes(healthSearch.toLowerCase());
+    const matchesType = healthTypeFilter === "all" || snapshot.page_type === healthTypeFilter;
+    return matchesSearch && matchesType;
+  });
+  const totalHealthPages = Math.ceil(filteredSnapshots.length / HEALTH_PER_PAGE);
+  const paginatedSnapshots = filteredSnapshots.slice(
+    (healthPage - 1) * HEALTH_PER_PAGE,
+    healthPage * HEALTH_PER_PAGE
+  );
+  
+  // Filter readyPages for Ready to Index tab
+  const filteredReadyPages = readyPages.filter((page) => {
+    const cleanUrl = page.url.replace("http://localhost:5000", "");
+    const matchesSearch = cleanUrl.toLowerCase().includes(readySearch.toLowerCase());
+    const score = page.last_health_score ?? 0;
+    const isReady = page.is_ready_to_index && score >= 80;
+    const needsReview = !page.is_ready_to_index || (score >= 60 && score < 80);
+    const notReady = !page.is_ready_to_index && score < 60;
+    
+    const matchesStatus = 
+      readyStatusFilter === "all" ||
+      (readyStatusFilter === "ready" && isReady) ||
+      (readyStatusFilter === "needs-review" && needsReview) ||
+      (readyStatusFilter === "not-ready" && notReady);
+    return matchesSearch && matchesStatus;
+  });
+  const totalReadyPages = Math.ceil(filteredReadyPages.length / READY_PER_PAGE);
+  const paginatedReadyPages = filteredReadyPages.slice(
+    (readyPage - 1) * READY_PER_PAGE,
+    readyPage * READY_PER_PAGE
+  );
 
   const getScoreColor = (score: number | null) => {
     if (score === null) return "text-gray-400";
@@ -361,10 +412,26 @@ export default function SeoControlPage() {
 
         {activeTab === "health" && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">
-                {snapshots.length} pages with health data
-              </p>
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search URLs..."
+                  value={healthSearch}
+                  onChange={(e) => { setHealthSearch(e.target.value); setHealthPage(1); }}
+                  className="pl-10"
+                />
+              </div>
+              <select
+                value={healthTypeFilter}
+                onChange={(e) => { setHealthTypeFilter(e.target.value); setHealthPage(1); }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Types</option>
+                {snapshotPageTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
               <Button
                 onClick={handleScan}
                 disabled={isScanning}
@@ -374,6 +441,10 @@ export default function SeoControlPage() {
                 {isScanning ? "Scanning..." : "Run Full Scan"}
               </Button>
             </div>
+
+            <p className="text-sm text-gray-500">
+              {filteredSnapshots.length} pages with health data
+            </p>
 
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading...</div>
@@ -406,7 +477,7 @@ export default function SeoControlPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {snapshots.map((snapshot) => (
+                    {paginatedSnapshots.map((snapshot) => (
                       <tr key={snapshot.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <span className="font-medium">{snapshot.url.replace('http://localhost:5000', '')}</span>
@@ -462,15 +533,59 @@ export default function SeoControlPage() {
                 </table>
               </div>
             )}
+
+            {totalHealthPages > 1 && (
+              <div className="flex items-center justify-between pt-4">
+                <span className="text-sm text-gray-500">
+                  Page {healthPage} of {totalHealthPages}
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHealthPage((p) => Math.max(1, p - 1))}
+                    disabled={healthPage === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHealthPage((p) => Math.min(totalHealthPages, p + 1))}
+                    disabled={healthPage === totalHealthPages}
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === "ready" && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">
-                {readyCount} of {readyPages.length} pages ready to index
-              </p>
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search URLs..."
+                  value={readySearch}
+                  onChange={(e) => { setReadySearch(e.target.value); setReadyPage(1); }}
+                  className="pl-10"
+                />
+              </div>
+              <select
+                value={readyStatusFilter}
+                onChange={(e) => { setReadyStatusFilter(e.target.value); setReadyPage(1); }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Statuses</option>
+                <option value="ready">Ready</option>
+                <option value="needs-review">Needs Review</option>
+                <option value="not-ready">Not Ready</option>
+              </select>
               <Button
                 onClick={handleInspect}
                 disabled={isInspecting}
@@ -480,6 +595,10 @@ export default function SeoControlPage() {
                 {isInspecting ? "Inspecting..." : "Run Inspection"}
               </Button>
             </div>
+
+            <p className="text-sm text-gray-500">
+              {readyCount} of {filteredReadyPages.length} pages ready to index
+            </p>
 
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading...</div>
@@ -513,7 +632,7 @@ export default function SeoControlPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {readyPages.map((page) => {
+                    {paginatedReadyPages.map((page) => {
                       const urlEntry = urls.find((u) => u.url === page.url);
                       const isIndexed = urlEntry?.is_indexed ?? false;
                       const score = page.last_health_score ?? 0;
@@ -597,6 +716,34 @@ export default function SeoControlPage() {
                     })}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {totalReadyPages > 1 && (
+              <div className="flex items-center justify-between pt-4">
+                <span className="text-sm text-gray-500">
+                  Page {readyPage} of {totalReadyPages}
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setReadyPage((p) => Math.max(1, p - 1))}
+                    disabled={readyPage === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setReadyPage((p) => Math.min(totalReadyPages, p + 1))}
+                    disabled={readyPage === totalReadyPages}
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
