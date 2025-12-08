@@ -24,6 +24,7 @@ interface ClusterArticle {
   is_indexed: boolean;
   view_count: number;
   created_at: Date;
+  source: 'cms_objects' | 'cluster_articles';
 }
 
 function isStructuredContent(content: string): boolean {
@@ -36,6 +37,44 @@ function isStructuredContent(content: string): boolean {
 }
 
 async function getArticle(slug: string, allowUnpublished: boolean = false): Promise<ClusterArticle | null> {
+  // First try cms_objects (new unified content source)
+  const cmsResult = await query(
+    `SELECT 
+       c.id,
+       c.slug,
+       c.data->>'title' as title,
+       c.data->>'body' as content,
+       c.data->>'description' as excerpt,
+       c.data->'seo'->>'description' as meta_description,
+       c.cluster_slug,
+       c.created_at,
+       COALESCE(g.is_indexed, false) as is_indexed
+     FROM cms_objects c
+     LEFT JOIN global_urls g ON g.cms_slug = c.slug
+     WHERE c.slug = $1 AND c.type = 'article'
+     LIMIT 1`,
+    [slug]
+  );
+  
+  if (cmsResult.rows.length > 0) {
+    const row = cmsResult.rows[0];
+    return {
+      id: row.id,
+      title: row.title || row.slug,
+      slug: row.slug,
+      content: row.content || '',
+      excerpt: row.excerpt || row.meta_description,
+      meta_description: row.meta_description || row.excerpt,
+      cluster_slug: row.cluster_slug,
+      is_published: true, // articles in cms_objects are published
+      is_indexed: row.is_indexed === true,
+      view_count: 0, // cms_objects doesn't track this yet
+      created_at: row.created_at,
+      source: 'cms_objects',
+    };
+  }
+  
+  // Fallback to cluster_articles for legacy articles
   const whereClause = allowUnpublished 
     ? 'WHERE slug = $1' 
     : 'WHERE slug = $1 AND is_published = true';
@@ -52,7 +91,7 @@ async function getArticle(slug: string, allowUnpublished: boolean = false): Prom
     return null;
   }
   
-  return result.rows[0];
+  return { ...result.rows[0], source: 'cluster_articles' };
 }
 
 async function isAdmin(): Promise<boolean> {
@@ -73,6 +112,26 @@ async function incrementViewCount(articleId: number): Promise<void> {
 }
 
 async function getRelatedArticles(clusterSlug: string, currentSlug: string): Promise<ClusterArticle[]> {
+  // First try cms_objects
+  const cmsResult = await query(
+    `SELECT 
+       c.id,
+       c.slug,
+       c.data->>'title' as title,
+       c.data->>'description' as excerpt,
+       c.cluster_slug
+     FROM cms_objects c
+     WHERE c.cluster_slug = $1 AND c.slug != $2 AND c.type = 'article'
+     ORDER BY c.created_at DESC
+     LIMIT 3`,
+    [clusterSlug, currentSlug]
+  );
+  
+  if (cmsResult.rows.length > 0) {
+    return cmsResult.rows;
+  }
+  
+  // Fallback to cluster_articles
   const result = await query(
     `SELECT id, title, slug, excerpt, cluster_slug
      FROM cluster_articles 
@@ -120,7 +179,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   
   const isPreviewMode = !article.is_published && adminUser;
   
-  if (!isPreviewMode) {
+  // Only increment view count for legacy cluster_articles (not cms_objects)
+  if (!isPreviewMode && article.source === 'cluster_articles') {
     await incrementViewCount(article.id);
   }
   

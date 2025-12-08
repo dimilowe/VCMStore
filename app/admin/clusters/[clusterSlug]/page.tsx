@@ -592,15 +592,17 @@ export default function ClusterDetailPage() {
                   {cluster.articleStatuses?.filter(a => a.exists).length || 0}/{cluster.articleCount} drafts · {cluster.publishedArticleCount}/{cluster.articleCount} published
                 </p>
               </div>
-              {cluster.articleStatuses?.some(a => !a.exists) && (
-                <button
-                  onClick={handleCreateDrafts}
-                  disabled={isGenerating}
-                  className="px-3 py-1.5 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
-                >
-                  {isGenerating ? "Generating with AI..." : "Generate Articles with AI"}
-                </button>
-              )}
+              <button
+                onClick={handleCreateDrafts}
+                disabled={isGenerating}
+                className="px-3 py-1.5 text-sm bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50"
+              >
+                {isGenerating 
+                  ? "Generating with AI..." 
+                  : cluster.articleStatuses?.some(a => !a.exists || a.contentLength < 100)
+                    ? "Generate Articles with AI"
+                    : "Regenerate Articles with AI"}
+              </button>
             </div>
             <div className="space-y-3 max-h-[500px] overflow-y-auto">
               {cluster.articleStatuses?.length === 0 ? (
@@ -622,7 +624,7 @@ export default function ClusterDetailPage() {
                         <div className="text-xs text-gray-500">{article.slug}</div>
                         {article.exists && (
                           <div className="text-xs text-gray-400 mt-1">
-                            {article.contentLength > 0 ? `${Math.round(article.contentLength / 5)} words` : "Empty draft"}
+                            {article.contentLength > 0 ? `${article.contentLength} words` : "Empty draft"}
                           </div>
                         )}
                       </div>
