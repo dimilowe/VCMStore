@@ -59,8 +59,7 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
       "instagram-story-resizer",
       "tiktok-video-resizer",
       "youtube-thumbnail-resizer",
-      "twitter-header-resizer",
-      "linkedin-banner-resizer"
+      "twitter-header-resizer"
     ],
     articleSlugs: [
       "instagram-post-dimensions-guide",
@@ -214,6 +213,53 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
     ],
     primaryKeyword: "youtube metrics calculator",
     relatedKeywords: ["youtube ctr calculator", "youtube cpm calculator", "youtube retention calculator", "youtube analytics"]
+  },
+  "linkedin-content-optimizer": {
+    id: "linkedin-content-optimizer",
+    pillarSlug: "linkedin-content-optimizer",
+    pillarTitle: "Free LinkedIn Content Optimization Tools",
+    pillarDescription: "AI-powered tools to analyze and optimize your LinkedIn profile, posts, and content for maximum engagement.",
+    engineId: "ai-analysis",
+    toolSlugs: [
+      "linkedin-bio-analyzer",
+      "linkedin-caption-analyzer",
+      "linkedin-cta-analyzer",
+      "linkedin-hashtags-analyzer",
+      "linkedin-hook-analyzer",
+      "linkedin-thumbnail-analyzer",
+      "linkedin-banner-resizer"
+    ],
+    articleSlugs: [],
+    primaryKeyword: "linkedin optimization tools",
+    relatedKeywords: ["linkedin profile analyzer", "linkedin content tips", "linkedin engagement", "linkedin SEO"]
+  },
+  "seo-keyword-tools": {
+    id: "seo-keyword-tools",
+    pillarSlug: "seo-keyword-tools",
+    pillarTitle: "Free SEO & Keyword Research Tools",
+    pillarDescription: "Discover high-value keywords and optimize your content for search engines with our free SEO tools.",
+    engineId: "ai-analysis",
+    toolSlugs: [
+      "keyword-finder"
+    ],
+    articleSlugs: [],
+    primaryKeyword: "keyword research tools",
+    relatedKeywords: ["seo tools", "keyword finder", "search optimization", "keyword analysis"]
+  },
+  "brand-identity-tools": {
+    id: "brand-identity-tools",
+    pillarSlug: "brand-identity-tools",
+    pillarTitle: "Free Brand Identity & Naming Tools",
+    pillarDescription: "Create logos, generate business names, and craft memorable brand quotes with our free branding tools.",
+    engineId: "standalone",
+    toolSlugs: [
+      "logo-generator",
+      "name-combiner",
+      "maker-quotes-generator"
+    ],
+    articleSlugs: [],
+    primaryKeyword: "brand identity tools",
+    relatedKeywords: ["logo maker", "business name generator", "brand quotes", "branding tools"]
   }
 };
 
