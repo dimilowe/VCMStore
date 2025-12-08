@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
   try {
     const result = await query(`
       SELECT id, slug, title, excerpt, meta_description, cluster_slug, 
-             is_indexed, is_published, view_count, created_at, updated_at
+             is_indexed, is_published, view_count, created_at, updated_at,
+             COALESCE(array_length(regexp_split_to_array(COALESCE(content, ''), '\\s+'), 1), 0) as word_count
       FROM cluster_articles
       ORDER BY created_at DESC
     `);
