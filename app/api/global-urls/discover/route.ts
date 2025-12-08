@@ -89,6 +89,30 @@ export async function POST(request: NextRequest) {
       title: "Homepage"
     });
 
+    // Also discover database-stored articles from cluster_articles
+    const articlesResult = await query(
+      `SELECT slug, title FROM cluster_articles`
+    );
+    for (const article of articlesResult.rows) {
+      discoveredUrls.push({
+        url: `/articles/${article.slug}`,
+        type: "article",
+        title: article.title
+      });
+    }
+
+    // Also discover MBBs from cms_objects
+    const mbbsResult = await query(
+      `SELECT slug, title FROM cms_objects WHERE type = 'mbb'`
+    );
+    for (const mbb of mbbsResult.rows) {
+      discoveredUrls.push({
+        url: `/mbb/${mbb.slug}`,
+        type: "mbb",
+        title: mbb.title
+      });
+    }
+
     let inserted = 0;
     let existing = 0;
 
