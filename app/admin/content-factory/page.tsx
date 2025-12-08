@@ -31,27 +31,35 @@ type TabType = "overview" | "clusters" | "engines";
 export default function ContentFactoryPage() {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [clusters, setClusters] = useState<RecentCluster[]>([]);
+  const [totalToolsInDb, setTotalToolsInDb] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadClusters();
+    loadData();
   }, []);
 
-  const loadClusters = async () => {
+  const loadData = async () => {
     try {
-      const res = await fetch("/api/admin/tools/clusters", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
+      const [clustersRes, toolsRes] = await Promise.all([
+        fetch("/api/admin/tools/clusters", { credentials: "include" }),
+        fetch("/api/admin/tools", { credentials: "include" }),
+      ]);
+      if (clustersRes.ok) {
+        const data = await clustersRes.json();
         setClusters(data.clusters || []);
       }
+      if (toolsRes.ok) {
+        const data = await toolsRes.json();
+        setTotalToolsInDb(data.tools?.length || 0);
+      }
     } catch (error) {
-      console.error("Failed to load clusters:", error);
+      console.error("Failed to load data:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const totalTools = clusters.reduce((sum, c) => sum + c.toolCount, 0);
+  const toolsInClusters = clusters.reduce((sum, c) => sum + c.toolCount, 0);
   const totalArticles = clusters.reduce((sum, c) => sum + c.articleCount, 0);
 
   return (
@@ -92,7 +100,7 @@ export default function ContentFactoryPage() {
 
         {activeTab === "overview" && (
           <div className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-4 gap-4">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-500">Total Clusters</CardTitle>
@@ -106,7 +114,17 @@ export default function ContentFactoryPage() {
                   <CardTitle className="text-sm font-medium text-gray-500">Total Tools</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{totalTools}</div>
+                  <div className="text-3xl font-bold">{totalToolsInDb}</div>
+                  <div className="text-xs text-gray-400 mt-1">in database</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Tools in Clusters</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">{toolsInClusters}</div>
+                  <div className="text-xs text-gray-400 mt-1">{totalToolsInDb - toolsInClusters} unassigned</div>
                 </CardContent>
               </Card>
               <Card>
