@@ -196,6 +196,39 @@ npm run dev
 
 **Code Implementation**: See `lib/db.ts` which uses Neon serverless driver with WebSocket support.
 
+## Three Truths Architecture (2025-12-08)
+
+The codebase follows three contracts that define what is "real":
+
+### 1. CONTENT Truth
+All tools, products, clusters, articles live in `cms_objects` table.
+- Legacy stuff is frozen and never extended
+- Use the JSON importer to create new content
+- Type field: `'product' | 'tool' | 'article' | 'mbb' | 'cluster'`
+
+### 2. URL Truth  
+Only `global_urls` defines what is "real" for SEO.
+- SEO scanner reads from `global_urls`
+- Sitemap reads from `global_urls WHERE is_indexed = true`
+- Admin panels read from `global_urls`
+- Nothing custom per page anymore
+
+### 3. MONEY Truth
+Every monetized product uses `offer_key` as the identifier:
+- CMS `product_data` includes: `offer_key`, `primary_price_id`, `mode`, `checkout_strategy`
+- `/api/checkout` reads from CMS, passes `offer_key` in Stripe metadata
+- Webhook grants entitlements via `lib/offers.ts grantAccessForOffer()`
+- Entitlements keyed by `offer_key`, not slugs or price amounts
+
+**Adding a new paid product:**
+1. CMS: add `offer_key` + `primary_price_id` + `checkout_strategy: 'stripe'`
+2. Code: entitlements are granted automatically via `offer_key`
+
+**External apps (QR Social, C-Score):**
+- `checkout_strategy: 'external'`
+- `cta_primary_href` links to external app URL
+- No Stripe integration needed
+
 ## Design System
 
 ### Color Palette
