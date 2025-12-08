@@ -71,7 +71,7 @@ export default function SeoControlPage() {
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [registryPage, setRegistryPage] = useState(1);
-  const REGISTRY_PER_PAGE = 25;
+  const REGISTRY_PER_PAGE = 100;
   const [isLoading, setIsLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [isInspecting, setIsInspecting] = useState(false);
