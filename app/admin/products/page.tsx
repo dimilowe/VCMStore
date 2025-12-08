@@ -332,14 +332,11 @@ export default function AdminProductsPage() {
             <Card key={product.id}>
               <CardHeader>
                 {product.thumbnail_url && (
-                  <div className="w-full h-40 bg-gray-50 rounded mb-4 relative overflow-hidden">
-                    <Image
+                  <div className="w-full h-40 bg-gray-100 rounded mb-4 relative overflow-hidden flex items-center justify-center">
+                    <img
                       src={product.thumbnail_url}
                       alt={product.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-contain rounded"
-                      unoptimized
+                      className="max-w-full max-h-full object-contain rounded"
                     />
                   </div>
                 )}
