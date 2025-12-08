@@ -12,6 +12,7 @@ import {
   Globe,
   LogOut,
   Package,
+  FileText,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -163,6 +164,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <Button variant="outline" size="sm">
                   <Package className="w-4 h-4 mr-2" />
                   Products
+                </Button>
+              </Link>
+              <Link href="/admin/blog">
+                <Button variant="outline" size="sm">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Blog
                 </Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
