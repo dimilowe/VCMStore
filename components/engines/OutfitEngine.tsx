@@ -365,6 +365,8 @@ export default function OutfitEngine({ tool }: OutfitEngineProps) {
           <ContentGuide content={config.contentGuide} />
         )}
 
+        <PostResultUpsell />
+
         {config.faqs.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
             <button
