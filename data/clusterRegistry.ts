@@ -13,6 +13,41 @@ export interface TopicCluster {
 }
 
 export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
+  "ai-outfit-generator-tools": {
+    id: "ai-outfit-generator-tools",
+    pillarSlug: "ai-outfit-generator-tools",
+    pillarTitle: "AI Outfit Generator Tools – Find and Shop Any Look",
+    pillarDescription: "Free AI outfit generator tools that help you recreate any look from Instagram, TikTok, Pinterest and more.",
+    engineId: "outfit",
+    toolSlugs: [
+      "outfit-ideas-ai",
+      "streetwear-outfit-finder",
+      "date-night-outfit-generator",
+      "office-outfit-generator",
+      "capsule-wardrobe-outfit-finder",
+      "vacation-outfit-generator",
+      "winter-outfit-generator",
+      "summer-outfit-generator",
+      "party-outfit-generator",
+      "gym-outfit-generator",
+      "wedding-guest-outfit-generator",
+      "aesthetic-outfit-generator"
+    ],
+    articleSlugs: [
+      "how-to-use-an-ai-outfit-generator",
+      "streetwear-outfit-ideas-with-ai",
+      "date-night-outfit-ideas-with-ai",
+      "office-outfit-ideas-with-ai",
+      "capsule-wardrobe-outfits-with-ai",
+      "vacation-outfit-planner-with-ai",
+      "winter-outfit-ideas-with-ai",
+      "summer-outfit-ideas-with-ai",
+      "wedding-guest-outfit-ideas-with-ai",
+      "aesthetic-outfits-from-pinterest-with-ai"
+    ],
+    primaryKeyword: "ai outfit generator",
+    relatedKeywords: ["outfit finder", "shop any look", "recreate outfits", "fashion AI", "outfit ideas"]
+  },
   "social-media-image-sizes": {
     id: "social-media-image-sizes",
     pillarSlug: "social-media-image-sizes",
