@@ -292,6 +292,22 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-08: **Ready to Index Auto-Inspector** - Automated SEO readiness evaluation system
+  - Added global_urls columns: last_health_score, is_ready_to_index, manual_review_passed, indexed_at
+  - Created readyInspector.ts with comprehensive readiness rules:
+    - Score >= 75, HTTP 200, not noindex
+    - Has title, H1, meta description
+    - Schema required for tool/article/blog pages
+    - Word count: 300 for articles, 150 for others
+    - Internal links >= 3
+    - Manual visual review requirement
+  - Admin dashboard at /admin/ready-to-index with:
+    - Run Inspector and Index All Ready buttons
+    - Summary cards (total, ready, needs review, not ready)
+    - Filterable table with manual review toggle
+    - Detail modal with issues list
+  - One-click "Index All Ready Pages" to publish approved pages to sitemap
+  - Protected by iron-session admin authentication
 - 2025-12-08: **SEO Health Console** - Internal admin tool for site-wide SEO auditing
   - Created seo_health_snapshots table to store crawl results
   - Built SEO scanner module (lib/seo/seoScanner.ts) that crawls indexed pages
