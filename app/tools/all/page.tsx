@@ -1,17 +1,57 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { getAllToolsAlphabetically, toolsRegistry, CATEGORY_INFO } from "@/data/toolsRegistry";
+import { getAllCmsTools, ENGINE_TO_CATEGORY } from "@/lib/cms/getCmsToolBySlug";
+import { toolsRegistry, CATEGORY_INFO } from "@/data/toolsRegistry";
 
 export const metadata: Metadata = {
   title: "All Tools A-Z — VCM Suite Tools Directory",
-  description: `Browse the complete list of ${toolsRegistry.length}+ free online tools. Alphabetically sorted for easy discovery. Find any tool by name.`,
+  description: "Browse the complete list of 100+ free online tools. Alphabetically sorted for easy discovery. Find any tool by name.",
   robots: "index, follow"
 };
 
-function generateSchemaMarkup() {
-  const tools = getAllToolsAlphabetically();
+interface ToolForDirectory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  categoryLabel: string;
+  source: 'cms' | 'legacy';
+}
+
+async function getToolsForDirectory(): Promise<ToolForDirectory[]> {
+  const cmsTools = await getAllCmsTools({ includeDrafts: false });
   
+  const cmsSlugs = new Set(cmsTools.map(t => t.slug));
+  
+  const cmsToolsFormatted: ToolForDirectory[] = cmsTools.map(tool => ({
+    id: `cms-${tool.slug}`,
+    name: tool.name,
+    slug: tool.slug,
+    description: tool.description,
+    categoryLabel: ENGINE_TO_CATEGORY[tool.engine]?.label || 'Tools',
+    source: 'cms' as const,
+  }));
+  
+  const legacyToolsFormatted: ToolForDirectory[] = toolsRegistry
+    .filter(tool => !cmsSlugs.has(tool.slug))
+    .map(tool => ({
+      id: tool.id,
+      name: tool.name,
+      slug: tool.slug,
+      description: tool.description,
+      categoryLabel: CATEGORY_INFO[tool.category]?.label || 'Tools',
+      source: 'legacy' as const,
+    }));
+  
+  const allTools = [...cmsToolsFormatted, ...legacyToolsFormatted];
+  
+  allTools.sort((a, b) => a.name.localeCompare(b.name));
+  
+  return allTools;
+}
+
+function generateSchemaMarkup(tools: ToolForDirectory[]) {
   const itemListElements = tools.map((tool, index) => ({
     "@type": "ListItem",
     "position": index + 1,
@@ -39,11 +79,11 @@ function generateSchemaMarkup() {
   };
 }
 
-export default function AllToolsPage() {
-  const tools = getAllToolsAlphabetically();
-  const schema = generateSchemaMarkup();
+export default async function AllToolsPage() {
+  const tools = await getToolsForDirectory();
+  const schema = generateSchemaMarkup(tools);
   
-  const groupedByLetter: Record<string, typeof tools> = {};
+  const groupedByLetter: Record<string, ToolForDirectory[]> = {};
   tools.forEach(tool => {
     const letter = tool.name[0].toUpperCase();
     if (!groupedByLetter[letter]) {
@@ -118,7 +158,7 @@ export default function AllToolsPage() {
                       </div>
                       <div className="flex items-center gap-3 ml-4">
                         <span className="text-xs text-gray-400 bg-white px-2 py-1 rounded">
-                          {CATEGORY_INFO[tool.category].label}
+                          {tool.categoryLabel}
                         </span>
                         <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-orange-500 transition-colors" />
                       </div>

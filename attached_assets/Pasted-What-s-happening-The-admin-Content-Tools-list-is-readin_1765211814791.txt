@@ -1,0 +1,46 @@
+What’s happening:
+The admin “Content → Tools” list is reading from cms_objects. That’s where your 7 ZIP tools live.
+The All Tools A–Z page you screenshotted is **still reading from the old tools table**, not from cms_objects, and it doesn’t care about Indexed` at all.
+Those “Calorie Deficit Calculator / Emoji Combos / etc.” tools exist in the tools table, which is why they show up even though they’re not indexed in the URL registry.
+So:
+Indexed controls SEO/sitemap.
+The A–Z directory is still using the legacy tools table.
+Your ZIP tools:
+✅ Exist in cms_objects
+✅ Render fine on /tools/[slug]
+❌ Don’t exist in tools table
+→ Therefore they don’t appear in the legacy directory.
+What we should do (one-time architecture fix)
+We want one content truth: cms_objects for tools as well.
+1️⃣ Update All Tools directory to read from cms_objects
+Give this to Replit:
+The All Tools A–Z directory is still using the legacy `tools` table. I’ve migrated tool content into `cms_objects` and I want the directory to use `cms_objects` as the single source of truth.
+
+Please:
+
+1. Find the route for the All Tools listing page (the A–Z directory, e.g. `app/tools/page.tsx` or similar).
+
+2. Create a helper, e.g. `lib/cms/getAllCmsTools.ts`, that:
+   - Queries the `cms_objects` table
+   - Filters rows where `type = 'tool'`
+   - Returns the fields needed to render the directory (slug, title, description, engine_config, cluster/category if available).
+
+3. Update the All Tools page to use `getAllCmsTools` instead of reading from the legacy `tools` table.
+   - Keep the current A–Z grouping and category pills, but drive them from the CMS data.
+   - Ensure that tools like `zip-file-in-linux`, etc. from `cms_objects` appear in the list once this change is made.
+
+4. Do NOT reintroduce or depend on the `tools` table for rendering. The content truth for tools should now be `cms_objects` only.
+
+5. Make sure the page still compiles and loads correctly.
+Once that’s done, your 7 ZIP tools will show up in the master directory automatically.
+2️⃣ About the “Links = ❌” column
+That X just means: “No internal links detected yet.”
+Cluster = None + no pillar/articles ⇒ there’s nothing linking in/out, so X is expected.
+A cluster prompt would have generated:
+a Zip Tools cluster object
+pillar + support articles with interlink metadata
+internal links between tools + articles
+→ those would start flipping to ✅ as pages go live.
+You can:
+Create a Zip Tools cluster now and assign these 7 tools to it (good housekeeping), then
+Later run a full cluster prompt for ZIP, import the articles, and the link checker will start going green as actual links exist.

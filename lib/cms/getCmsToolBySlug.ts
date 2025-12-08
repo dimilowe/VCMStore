@@ -52,12 +52,30 @@ export interface ToolForRenderer {
   preset?: string;
   mode?: string;
   isIndexed: boolean;
+  clusterSlug?: string | null;
   seo?: ToolSeoConfig;
   monetization?: ToolMonetization;
   interlinkParent?: string;
   interlinkSiblings?: string[];
   interlinkTools?: string[];
 }
+
+export const ENGINE_TO_CATEGORY: Record<string, { label: string; key: string }> = {
+  'zip': { label: 'File Tools', key: 'file' },
+  'calculator': { label: 'Calculators', key: 'calculators' },
+  'platform-resizer': { label: 'Image Tools', key: 'image' },
+  'image-compress': { label: 'Image Tools', key: 'image' },
+  'image-convert': { label: 'Image Tools', key: 'image' },
+  'text-transform': { label: 'Writing Tools', key: 'writing' },
+  'text-analysis': { label: 'Writing Tools', key: 'writing' },
+  'ai-analysis': { label: 'AI Tools', key: 'ai' },
+  'ai-generate': { label: 'AI Tools', key: 'ai' },
+  'file-convert': { label: 'File Tools', key: 'file' },
+  'file-edit': { label: 'File Tools', key: 'file' },
+  'community': { label: 'Creator Tools', key: 'creator' },
+  'static': { label: 'Utilities', key: 'utilities' },
+  'standalone': { label: 'Creator Tools', key: 'creator' },
+};
 
 export async function getCmsToolBySlug(
   slug: string,
@@ -92,6 +110,7 @@ export async function getCmsToolBySlug(
     preset: data.engine_config?.preset,
     mode: data.engine_config?.mode,
     isIndexed,
+    clusterSlug: row.cluster_slug,
     seo: data.seo,
     monetization: data.monetization,
     interlinkParent: data.interlink_parent,
@@ -127,6 +146,7 @@ export async function getAllCmsTools(
       preset: data.engine_config?.preset,
       mode: data.engine_config?.mode,
       isIndexed: data.isIndexed ?? false,
+      clusterSlug: row.cluster_slug,
       seo: data.seo,
       monetization: data.monetization,
       interlinkParent: data.interlink_parent,
