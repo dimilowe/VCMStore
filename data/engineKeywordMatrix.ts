@@ -370,6 +370,7 @@ export const ENGINE_KEYWORD_MATRICES: Record<EngineType, EngineKeywordMatrix | n
   "static": null,
   "standalone": null,
   "zip": null,
+  "outfit": null,
 };
 
 export function getAllToolSkinsForEngine(engineId: EngineType): ToolSkin[] {
