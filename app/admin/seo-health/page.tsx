@@ -69,6 +69,7 @@ export default function SeoHealthPage() {
   const [snapshots, setSnapshots] = useState<SeoSnapshot[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedSnapshot, setSelectedSnapshot] = useState<SeoSnapshot | null>(null);
@@ -117,7 +118,8 @@ export default function SeoHealthPage() {
     }
   };
 
-  const loadSnapshots = async () => {
+  const loadSnapshots = async (showLoading = false) => {
+    if (showLoading) setIsRefreshing(true);
     try {
       const params = new URLSearchParams();
       if (filter !== "all") params.set("filter", filter);
@@ -131,6 +133,8 @@ export default function SeoHealthPage() {
       setStats(data.stats || null);
     } catch (error) {
       console.error("Load snapshots failed:", error);
+    } finally {
+      if (showLoading) setIsRefreshing(false);
     }
   };
 
@@ -251,9 +255,9 @@ export default function SeoHealthPage() {
                   </>
                 )}
               </Button>
-              <Button variant="outline" onClick={loadSnapshots}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
+              <Button variant="outline" onClick={() => loadSnapshots(true)} disabled={isRefreshing}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Refreshing...' : 'Refresh'}
               </Button>
               <Button variant="outline" onClick={clearSnapshots}>
                 <Trash2 className="h-4 w-4 mr-2" />
