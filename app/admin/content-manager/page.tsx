@@ -69,6 +69,18 @@ interface Article {
   source: "cluster_articles" | "cms_objects";
 }
 
+interface MBB {
+  id: string;
+  slug: string;
+  title: string;
+  mbb_type: string | null;
+  cluster_slug: string | null;
+  cluster_title: string | null;
+  is_indexed: boolean;
+  word_count: number;
+  health: "thin" | "ok" | "strong";
+}
+
 type TabType = "tools" | "articles" | "clusters" | "mbbs";
 
 export default function ContentManagerPage() {
@@ -78,6 +90,7 @@ export default function ContentManagerPage() {
   const [tools, setTools] = useState<ToolSkin[]>([]);
   const [clusters, setClusters] = useState<ClusterSummary[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [mbbs, setMbbs] = useState<MBB[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filterEngine, setFilterEngine] = useState("all");
@@ -96,10 +109,11 @@ export default function ContentManagerPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [toolsRes, clustersRes, articlesRes] = await Promise.all([
+      const [toolsRes, clustersRes, articlesRes, mbbsRes] = await Promise.all([
         fetch("/api/admin/tools", { credentials: "include" }),
         fetch("/api/admin/tools/clusters", { credentials: "include" }),
         fetch("/api/admin/articles", { credentials: "include" }),
+        fetch("/api/admin/mbbs", { credentials: "include" }),
       ]);
       
       if (toolsRes.ok) {
@@ -113,6 +127,10 @@ export default function ContentManagerPage() {
       if (articlesRes.ok) {
         const data = await articlesRes.json();
         setArticles(data.articles || []);
+      }
+      if (mbbsRes.ok) {
+        const data = await mbbsRes.json();
+        setMbbs(data.mbbs || []);
       }
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -160,6 +178,28 @@ export default function ContentManagerPage() {
       }
     } catch (error) {
       console.error("Failed to update article:", error);
+    }
+  };
+
+  const toggleMbbIndexed = async (mbb: MBB) => {
+    try {
+      const res = await fetch("/api/admin/mbbs/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          slug: mbb.slug,
+          field: "is_indexed", 
+          value: !mbb.is_indexed 
+        }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setMbbs((prev) =>
+          prev.map((m) => (m.id === mbb.id ? { ...m, is_indexed: !mbb.is_indexed } : m))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update MBB:", error);
     }
   };
 
@@ -667,28 +707,101 @@ export default function ContentManagerPage() {
 
         {activeTab === "mbbs" && (
           <div className="space-y-4">
-            <div className="flex justify-end">
-              <Link href="/admin/mbbs">
-                <Button variant="outline" size="sm">
-                  Open MBB Control
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-500">{mbbs.length} MBBs total</p>
             </div>
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Layers className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">MBB (Modular Building Block) Management</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Deep content blocks for tool pages
-                </p>
-                <Link href="/admin/mbbs">
-                  <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
-                    Manage MBBs
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            
+            {mbbs.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Layers className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500">No MBBs imported yet</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Import MBBs using the Import JSON button
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="bg-white rounded-lg border overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">MBB</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cluster</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Words</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Health</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Indexed</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {mbbs.map((mbb) => (
+                      <tr key={mbb.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{mbb.title}</div>
+                          <div className="text-xs text-gray-400">{mbb.slug}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {mbb.mbb_type ? (
+                            <Badge variant="outline">{mbb.mbb_type}</Badge>
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {mbb.cluster_title || mbb.cluster_slug ? (
+                            <Badge variant="outline" className="max-w-[200px] truncate" title={mbb.cluster_title || mbb.cluster_slug || ""}>
+                              {mbb.cluster_title || mbb.cluster_slug}
+                            </Badge>
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-600">
+                          {mbb.word_count || 0}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <Badge
+                            variant="outline"
+                            className={
+                              mbb.health === "strong"
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : mbb.health === "ok"
+                                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                : "bg-red-50 text-red-700 border-red-200"
+                            }
+                          >
+                            {mbb.health}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => toggleMbbIndexed(mbb)}
+                            className="inline-flex"
+                          >
+                            {mbb.is_indexed ? (
+                              <Eye className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <EyeOff className="w-5 h-5 text-gray-300" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <Link href={`/mbb/${mbb.slug}`} target="_blank">
+                              <Button variant="ghost" size="sm">
+                                <ExternalLink className="w-4 h-4" />
+                              </Button>
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>
