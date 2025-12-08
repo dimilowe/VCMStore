@@ -73,6 +73,9 @@ export default function ContentManagerPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterEngine, setFilterEngine] = useState("all");
   const [filterIndexed, setFilterIndexed] = useState("all");
+  const [filterCluster, setFilterCluster] = useState("all");
+  const [selectedTools, setSelectedTools] = useState<Set<string>>(new Set());
+  const [bulkCluster, setBulkCluster] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const ITEMS_PER_PAGE = 20;
 
@@ -126,7 +129,80 @@ export default function ContentManagerPage() {
     }
   };
 
+  const updateToolCluster = async (slug: string, clusterSlug: string) => {
+    try {
+      const res = await fetch("/api/admin/tools/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, field: "clusterSlug", value: clusterSlug || null }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setTools((prev) =>
+          prev.map((t) => (t.slug === slug ? { ...t, clusterSlug } : t))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update tool cluster:", error);
+    }
+  };
+
+  const bulkAssignCluster = async () => {
+    if (selectedTools.size === 0) return;
+    const isRemove = bulkCluster === "__remove__";
+    const clusterValue = isRemove ? "" : bulkCluster;
+    if (!bulkCluster) return;
+    
+    const updates = Array.from(selectedTools).map((slug) =>
+      fetch("/api/admin/tools/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, field: "clusterSlug", value: clusterValue || null }),
+        credentials: "include",
+      })
+    );
+    await Promise.all(updates);
+    setTools((prev) =>
+      prev.map((t) =>
+        selectedTools.has(t.slug) ? { ...t, clusterSlug: clusterValue } : t
+      )
+    );
+    setSelectedTools(new Set());
+    setBulkCluster("");
+  };
+
+  const toggleToolSelection = (slug: string) => {
+    setSelectedTools((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else {
+        next.add(slug);
+      }
+      return next;
+    });
+  };
+
+  const toggleAllOnPage = () => {
+    const slugsOnPage = paginatedTools.map((t) => t.slug);
+    const allSelected = slugsOnPage.every((s) => selectedTools.has(s));
+    if (allSelected) {
+      setSelectedTools((prev) => {
+        const next = new Set(prev);
+        slugsOnPage.forEach((s) => next.delete(s));
+        return next;
+      });
+    } else {
+      setSelectedTools((prev) => {
+        const next = new Set(prev);
+        slugsOnPage.forEach((s) => next.add(s));
+        return next;
+      });
+    }
+  };
+
   const engineTypes = [...new Set(tools.map((t) => t.engineType))];
+  const clusterSlugs = [...new Set(clusters.map((c) => c.pillarSlug))];
 
   const filteredTools = tools.filter((tool) => {
     const matchesSearch =
@@ -137,7 +213,11 @@ export default function ContentManagerPage() {
       filterIndexed === "all" ||
       (filterIndexed === "indexed" && tool.isIndexed) ||
       (filterIndexed === "not-indexed" && !tool.isIndexed);
-    return matchesSearch && matchesEngine && matchesIndexed;
+    const matchesCluster =
+      filterCluster === "all" ||
+      (filterCluster === "unassigned" && !tool.clusterSlug) ||
+      tool.clusterSlug === filterCluster;
+    return matchesSearch && matchesEngine && matchesIndexed && matchesCluster;
   });
 
   const totalPages = Math.ceil(filteredTools.length / ITEMS_PER_PAGE);
@@ -237,7 +317,55 @@ export default function ContentManagerPage() {
                 <option value="indexed">Indexed</option>
                 <option value="not-indexed">Not Indexed</option>
               </select>
+              <select
+                value={filterCluster}
+                onChange={(e) => {
+                  setFilterCluster(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Clusters</option>
+                <option value="unassigned">Unassigned Only</option>
+                {clusterSlugs.map((slug) => (
+                  <option key={slug} value={slug}>{slug}</option>
+                ))}
+              </select>
             </div>
+
+            {selectedTools.size > 0 && (
+              <div className="flex items-center gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <span className="text-sm font-medium text-orange-700">
+                  {selectedTools.size} selected
+                </span>
+                <select
+                  value={bulkCluster}
+                  onChange={(e) => setBulkCluster(e.target.value)}
+                  className="border rounded-md px-3 py-1.5 text-sm"
+                >
+                  <option value="">Select cluster...</option>
+                  <option value="__remove__">— Remove from cluster —</option>
+                  {clusterSlugs.map((slug) => (
+                    <option key={slug} value={slug}>{slug}</option>
+                  ))}
+                </select>
+                <Button
+                  onClick={bulkAssignCluster}
+                  disabled={!bulkCluster}
+                  size="sm"
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  Assign to Cluster
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedTools(new Set())}
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
 
             <div className="text-sm text-gray-500">
               Showing {paginatedTools.length} of {filteredTools.length} tools
@@ -250,6 +378,14 @@ export default function ContentManagerPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b">
                     <tr>
+                      <th className="px-4 py-3 w-10">
+                        <input
+                          type="checkbox"
+                          checked={paginatedTools.length > 0 && paginatedTools.every((t) => selectedTools.has(t.slug))}
+                          onChange={toggleAllOnPage}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                      </th>
                       <th className="text-left px-4 py-3 font-medium">Tool</th>
                       <th className="text-left px-4 py-3 font-medium">Engine</th>
                       <th className="text-left px-4 py-3 font-medium">Cluster</th>
@@ -260,7 +396,15 @@ export default function ContentManagerPage() {
                   </thead>
                   <tbody className="divide-y">
                     {paginatedTools.map((tool) => (
-                      <tr key={tool.slug} className="hover:bg-gray-50">
+                      <tr key={tool.slug} className={`hover:bg-gray-50 ${selectedTools.has(tool.slug) ? "bg-orange-50" : ""}`}>
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedTools.has(tool.slug)}
+                            onChange={() => toggleToolSelection(tool.slug)}
+                            className="w-4 h-4 rounded border-gray-300"
+                          />
+                        </td>
                         <td className="px-4 py-3">
                           <div className="font-medium">{tool.name}</div>
                           <div className="text-xs text-gray-400">{tool.slug}</div>
@@ -268,8 +412,17 @@ export default function ContentManagerPage() {
                         <td className="px-4 py-3">
                           <Badge variant="outline">{tool.engineType}</Badge>
                         </td>
-                        <td className="px-4 py-3 text-gray-500">
-                          {tool.clusterSlug || "-"}
+                        <td className="px-4 py-3">
+                          <select
+                            value={tool.clusterSlug || ""}
+                            onChange={(e) => updateToolCluster(tool.slug, e.target.value)}
+                            className="text-sm border rounded px-2 py-1 w-full max-w-[160px] bg-white"
+                          >
+                            <option value="">— None —</option>
+                            {clusterSlugs.map((slug) => (
+                              <option key={slug} value={slug}>{slug}</option>
+                            ))}
+                          </select>
                         </td>
                         <td className="px-4 py-3 text-center">
                           {getLinkStatusIcon(tool.linkStatus.status)}

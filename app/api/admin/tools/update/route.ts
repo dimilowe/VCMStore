@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing slug or field" }, { status: 400 });
     }
 
-    const allowedFields = ["isIndexed", "isFeatured", "inDirectory", "segment"];
+    const allowedFields = ["isIndexed", "isFeatured", "inDirectory", "segment", "clusterSlug"];
     if (!allowedFields.includes(field)) {
       return NextResponse.json({ error: "Invalid field" }, { status: 400 });
     }
@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
         isFeatured: "featured",
         inDirectory: "inDirectory",
         segment: "segment",
+        clusterSlug: "cluster_slug",
       };
       const dbField = fieldMap[field] || field;
       await updateTool(slug, { [dbField]: value });
