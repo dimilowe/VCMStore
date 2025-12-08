@@ -1,0 +1,126 @@
+{
+  "objects": [
+    {
+      "type": "product",
+      "slug": "ape-pro-monthly",
+      "cluster_slug": "ape",
+      "data": {
+        "title": "APE Pro - Monthly",
+        "description": "Turn every link into a paywall with APE Pro - the creator's monetization toolkit.",
+        "seo_title": "APE Pro Monthly - Auto Paywall Everything for Creators",
+        "seo_description": "Unlock unlimited paywalls, split payouts, QR codes, and more. APE Pro is the ultimate monetization tool for serious creators.",
+        "thumbnail_url": "/images/products/ape-pro.png",
+        
+        "product_data": {
+          "stripe_product_id": "prod_XXX",
+          "primary_price_id": "price_XXX_monthly",
+          "additional_prices": [
+            {
+              "id": "price_XXX_annual",
+              "label": "Annual (2 months free)",
+              "badge": "Best value"
+            }
+          ],
+          
+          "hero_badge": "Most Popular",
+          "hero_title": "Turn Every Link Into Money",
+          "hero_subtitle": "For serious creators who want instant monetization without the tech headache.",
+          
+          "bullets": [
+            "Unlimited paywalls - gate any content, anywhere",
+            "Split payouts with collaborators automatically",
+            "QR codes for every offer",
+            "Real-time analytics dashboard",
+            "Priority support"
+          ],
+          
+          "feature_sections": [
+            {
+              "title": "Monetization Made Simple",
+              "items": [
+                "One-click paywall creation",
+                "Works with any platform",
+                "No coding required",
+                "Mobile-optimized checkout"
+              ]
+            },
+            {
+              "title": "Built for Teams",
+              "items": [
+                "Automatic revenue splits",
+                "Team member management",
+                "Shared analytics",
+                "Collaboration tools"
+              ]
+            }
+          ],
+          
+          "cta_primary_label": "Start APE Pro",
+          "cta_secondary_label": "Watch Demo",
+          "cta_secondary_href": "/demo/ape",
+          
+          "faq": [
+            {
+              "question": "Can I cancel anytime?",
+              "answer": "Yes! Cancel anytime with no questions asked. Your access continues until the end of your billing period."
+            },
+            {
+              "question": "Do I need technical skills?",
+              "answer": "Not at all. APE is designed for creators, not developers. If you can copy and paste a link, you can use APE."
+            },
+            {
+              "question": "What payment methods do you accept?",
+              "answer": "We accept all major credit cards through Stripe. Your payment info is never stored on our servers."
+            }
+          ],
+          
+          "pro_tips": [
+            "Start with your highest-value content to test demand before paywalling everything.",
+            "Use QR codes in your video content to drive direct purchases.",
+            "Set up split payouts before collaborating to avoid awkward money conversations later."
+          ],
+          
+          "recommended_slugs": ["ape-starter", "ape-enterprise", "qr-social"],
+          
+          "is_featured": true,
+          "is_hidden_from_store": false
+        },
+        
+        "body": [
+          {
+            "type": "heading",
+            "content": "Why Creators Choose APE Pro",
+            "level": 2
+          },
+          {
+            "type": "paragraph",
+            "content": "Most creators leave money on the table. They post content for free, hoping brands will eventually pay them. APE Pro flips the script - now every piece of content you create can generate revenue directly from your audience."
+          },
+          {
+            "type": "heading",
+            "content": "How It Works",
+            "level": 3
+          },
+          {
+            "type": "list",
+            "items": [
+              "Create your paywall in seconds",
+              "Share the APE link anywhere",
+              "Get paid instantly when fans access your content",
+              "Track everything in your dashboard"
+            ]
+          },
+          {
+            "type": "callout",
+            "content": "Pro Tip: Creators who paywall their behind-the-scenes content see 40% higher engagement than those who only sell finished products.",
+            "variant": "tip"
+          }
+        ],
+        
+        "interlink_parent": "ape",
+        "interlink_siblings": ["ape-starter", "ape-enterprise"],
+        "interlink_tools": ["ape-link-generator", "qr-social"]
+      }
+    }
+  ]
+}

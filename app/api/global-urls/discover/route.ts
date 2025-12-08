@@ -132,12 +132,22 @@ export async function POST(request: NextRequest) {
     }
 
     // MBBs from cms_objects
-    const mbbsResult = await query(`SELECT slug, title FROM cms_objects WHERE type = 'mbb'`);
+    const mbbsResult = await query(`SELECT slug, data->>'title' as title FROM cms_objects WHERE type = 'mbb'`);
     for (const mbb of mbbsResult.rows) {
       discoveredUrls.push({
         url: `/mbb/${mbb.slug}`,
         type: "mbb",
         title: mbb.title
+      });
+    }
+
+    // CMS Products from cms_objects (new CMS-driven products at /products/{slug})
+    const cmsProductsResult = await query(`SELECT slug, data->>'title' as title FROM cms_objects WHERE type = 'product'`);
+    for (const product of cmsProductsResult.rows) {
+      discoveredUrls.push({
+        url: `/products/${product.slug}`,
+        type: "product",
+        title: product.title
       });
     }
 

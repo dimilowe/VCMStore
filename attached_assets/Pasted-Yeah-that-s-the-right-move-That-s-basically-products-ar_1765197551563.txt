@@ -1,0 +1,130 @@
+Yeah, that’s the right move. That’s basically “products are just another CMS object,” and the products table is demoted to Stripe plumbing + bookkeeping. That’s where you want to be.
+Let me tighten your plan and point out the traps before you hit them.
+1. Architecture verdict
+Yes, this is clean.
+You’re doing:
+Content & SEO layer → cms_objects (type = "product")
+Money & webhooks layer → products table + Stripe
+That gives you:
+One rendering system (VCM Renderer) for everything
+One source of truth for slugs, copy, CTAs, interlinking
+Stripe-only tables for events, not UX/layout
+That’s correct.
+2. What product_data actually needs
+Don’t half-design this or it’ll bite you later. I’d structure it like this:
+type ProductData = {
+  stripe_product_id?: string;      // optional, mostly for sanity
+  primary_price_id: string;        // main Stripe price
+  additional_prices?: {
+    id: string;
+    label: string;                 // "Annual (2 months free)", "Team plan", etc.
+    badge?: string;                // "Best value", "Popular"
+  }[];
+
+  hero_badge?: string;             // "New", "Beta", "Lifetime access"
+  hero_title: string;
+  hero_subtitle: string;
+
+  bullets: string[];               // key benefits
+  feature_sections?: {
+    title: string;
+    items: string[];
+  }[];
+
+  cta_primary_label: string;       // "Get APE Pro"
+  cta_secondary_label?: string;    // "View demo"
+  cta_secondary_href?: string;     // link to /docs, /demo video, etc.
+
+  faq?: { question: string; answer: string }[];
+
+  pro_tips?: string[];             // your Pro Tips block
+
+  recommended_slugs?: string[];    // for "Recommended for you" block
+
+  // Optional: offer flags
+  is_featured?: boolean;
+  is_hidden_from_store?: boolean;
+};
+And your cms_objects product entries should still carry the normal stuff:
+type: "product"
+slug, title, description
+seo_* fields
+interlink_parent, interlink_siblings, interlink_tools
+body for long-form sales copy (your SEO text wall)
+3. ProductRenderer vs VCM Renderer
+You don’t want a totally separate universe here.
+Correct pattern:
+VCM Renderer sees cms_object.type === "product"
+It calls ProductRenderer as the page body for that type
+ProductRenderer:
+Receives the whole CMS object
+Uses product_data to render the hero, bullets, CTAs, pricing table, FAQ, Pro Tips, Recommended block
+Renders body as the long-form text under the product layout
+That keeps the rule intact: “Engines generate configs, Renderer decides layout; CMS object holds the data and metadata.”
+4. /products/[slug] route changes
+Your plan is right, but be explicit:
+Stop reading from products table for page content.
+In the route:
+// pseudo-code
+const cmsObject = await db.cms_objects.findFirst({
+  where: { type: "product", slug: params.slug }
+});
+
+if (!cmsObject) notFound();
+
+return <VCMRenderer cmsObject={cmsObject} />;
+The products table should now be used only for:
+Stripe → DB mirroring (products, prices)
+Internal management dashboards if you want them
+Mapping price IDs to “offer keys” (see next point)
+5. Stripe plumbing: avoid ID hell
+Critical: webhooks.
+You need a deterministic way to go from a Stripe event → the CMS product → the user’s access.
+Pick one of these patterns and stick with it:
+Option A – Stripe metadata → CMS slug
+On each Stripe price, set metadata: { cms_slug: "ape-pro" }
+Webhook handler reads price.id → metadata.cms_slug → fetch cms_objects by slug
+Option B – Internal offer_key
+product_data includes offer_key: "APE_PRO_MONTHLY"
+Stripe price metadata includes the same offer_key
+Webhook handler reads price metadata.offer_key → maps to internal logic, CMS is just for UI
+Either way, don’t try to reverse-map by name/amount. That breaks the second you change pricing or copy.
+6. Discovery / URL registry
+Your last bullet:
+Update discovery endpoint - Ensure products from cms_objects are picked up in URL registry
+Yes:
+URL discovery should just look at cms_objects (type in [article, tool, product, mbb, etc.])
+Products become just another URL in the registry with:
+type = "product"
+isIndexed flag
+cluster fields if they belong to a cluster (e.g. “Creator Monetization Tools” pillar)
+That keeps your “toggle on / off, safe indexing” architecture intact.
+7. Product JSON templates (migration strategy)
+For existing stuff (APE Pro, JobJet, etc.) I’d do:
+One canonical template per product in your cms-import JSON
+Each object already structured with:
+type: "product"
+slug: "ape-pro"
+Full product_data
+interlink_* fields
+Full body with long sales copy + FAQ
+Then:
+Import into cms_objects with your existing JSON-import pipeline
+Manually verify in admin:
+Hero appears correctly
+Stripe price IDs are wired
+Interlinking is correct
+isIndexed stays OFF until you’re happy
+8. Clean-up reality check
+Products table stays for Stripe webhook handling, but product pages are CMS-driven - good?
+Yes, with this nuance:
+products / prices tables:
+purely Stripe mirrors + access-control plumbing
+maybe a cms_slug or offer_key field for linking to CMS
+cms_objects:
+actual, canonical UI/SEO/product content
+defines what shows up on /products, homepage carousels, “Recommended for you,” etc.
+If you follow that split, you get:
+Swappable front-ends (product page redesigns with zero DB migrations)
+A/B testing via CMS only (duplicate product objects, different slugs/layouts, same Stripe price)
+Future: localized product pages (/es/products/ape-pro) without touching Stripe
