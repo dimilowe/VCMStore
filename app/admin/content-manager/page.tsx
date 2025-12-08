@@ -85,7 +85,7 @@ interface MBB {
 
 type TabType = "tools" | "articles" | "clusters" | "mbbs";
 
-export default function ContentManagerPage() {
+function ContentManagerInner() {
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as TabType) || "tools";
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
@@ -810,5 +810,13 @@ export default function ContentManagerPage() {
         )}
       </div>
     </AdminLayout>
+  );
+}
+
+export default function ContentManagerPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <ContentManagerInner />
+    </Suspense>
   );
 }
