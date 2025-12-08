@@ -7,13 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Factory,
   FolderEdit,
   Globe,
   LogOut,
   Package,
   FileText,
-  Upload,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -22,26 +20,14 @@ interface AdminLayoutProps {
 
 const NAV_ITEMS = [
   {
-    href: "/admin/content-factory",
-    label: "Content Factory",
-    icon: Factory,
-    description: "Create clusters, tools, articles",
-  },
-  {
-    href: "/admin/cms-import",
-    label: "CMS Import",
-    icon: Upload,
-    description: "Bulk import JSON objects",
-  },
-  {
     href: "/admin/content-manager",
-    label: "Content Manager",
+    label: "Content",
     icon: FolderEdit,
-    description: "Edit & review content",
+    description: "View, edit, and import content",
   },
   {
     href: "/admin/seo-control",
-    label: "SEO Control",
+    label: "SEO",
     icon: Globe,
     description: "Health, indexing, publishing",
   },

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/admin-layout";
+import { CMSImportModal } from "@/components/admin/cms-import-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import {
   CheckCircle,
   AlertTriangle,
   XCircle,
+  Upload,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -77,6 +79,7 @@ export default function ContentManagerPage() {
   const [selectedTools, setSelectedTools] = useState<Set<string>>(new Set());
   const [bulkCluster, setBulkCluster] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [showImportModal, setShowImportModal] = useState(false);
   const ITEMS_PER_PAGE = 20;
 
   useEffect(() => {
@@ -241,15 +244,29 @@ export default function ContentManagerPage() {
 
   return (
     <AdminLayout>
+      <CMSImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportComplete={() => loadData()}
+      />
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Wrench className="w-6 h-6 text-orange-500" />
-            Content Manager
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Review, edit, and manage your tools, articles, and clusters
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <Wrench className="w-6 h-6 text-orange-500" />
+              Content
+            </h1>
+            <p className="text-gray-500 mt-1">
+              View, edit, and import content
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowImportModal(true)}
+            className="bg-orange-500 hover:bg-orange-600"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Import JSON
+          </Button>
         </div>
 
         <div className="flex gap-2 border-b">
