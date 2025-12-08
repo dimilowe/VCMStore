@@ -1,0 +1,198 @@
+PROMPT FOR REPLIT AI (VCM SUITE PROJECT)
+You are editing my VCM Suite codebase. It’s a Next.js app with:
+App Router
+TypeScript
+Neon Postgres
+Existing CMS / admin system
+Engines → Config → Renderer architecture
+An admin area already in place (use the same auth/guarding patterns as current admin routes)
+I want you to build a new internal admin module called:
+VCM SEO Health Console
+This is not a public-facing tool. It lives only in the VCM Suite admin dashboard.
+1. High-Level Goal
+Create a complete SEO Health Console that:
+Reads all CMS objects that are intended to be indexable (isIndexed = true).
+Crawls the live rendered pages for those objects.
+Stores a snapshot of important SEO/technical metrics in Postgres.
+Calculates simple health flags + a score per page.
+Exposes an admin dashboard where I can:
+Run a scan (manually for now).
+See overall SEO health metrics.
+Filter & inspect pages with issues.
+This is an MVP, but it needs to work end-to-end.
+2. Database Layer
+Inspect the project and use the existing DB stack (Prisma / Drizzle / custom queries, etc.). Do NOT invent a new ORM.
+2.1 Create seo_health_snapshots table/model
+Add a new table/model named seo_health_snapshots with at least these fields:
+id (primary key)
+slug (string) – page slug or full path used by the renderer.
+url (string) – the actual URL crawled.
+status_code (integer)
+load_time_ms (integer, nullable)
+has_title (boolean)
+has_h1 (boolean)
+has_meta_description (boolean)
+word_count (integer)
+robots_index (string, e.g. "index" | "noindex" | "missing")
+canonical_target (string, nullable)
+internal_links_out_count (integer)
+internal_links_in_count (integer, default 0 for now)
+is_thin_content (boolean)
+has_expected_schema (boolean)
+page_type (string, e.g. "tool" | "article" | "cluster" | "other")
+snapshot_date (timestamp, default now)
+overall_score (integer between 0–100)
+Make sure migrations are created/updated correctly based on the project’s existing migration system.
+3. Crawling & Snapshot Logic
+Create a server-side scan function that:
+Fetches the list of CMS objects that:
+Are intended for public SEO (e.g. isIndexed = true in the CMS model).
+Use the existing CMS store / types (inspect current CMS types & storage).
+For each CMS object:
+Derive the public URL (e.g. https://<site-domain>/<slug>).
+Use the existing routing patterns to construct URLs.
+Fetch the page HTML using fetch() on the server.
+Measure response time in ms (simple performance.now() before/after fetch).
+Parse HTML using an existing HTML parsing approach in the project if available; otherwise, add a lightweight HTML parser (like cheerio or similar) on the server side only.
+Extract:
+HTTP Status Code
+From the fetch response.
+Title
+<title> text (check if present and non-empty).
+H1
+First <h1> present (check existence).
+Meta Description
+<meta name="description" content="...">
+Robots Meta
+<meta name="robots" content="index,follow">
+Interpret it into:
+"index" if index is allowed.
+"noindex" if disallowed.
+"missing" if no robots meta.
+Canonical Tag
+<link rel="canonical" href="...">
+Word Count
+Take the visible text from <main> or entire <body> (simplify: strip tags and count words).
+Internal Links Out
+Count number of <a> tags whose href points to same domain or starts with /.
+Internal Links In
+For MVP, set to 0 or compute a very naive approximation:
+Option A (scrappy): In a second pass, build a map of links (slug → list of slugs it links to) in memory for this run and compute inbound counts.
+Option B: For v1, just leave internal_links_in_count = 0 and mark TODO in comments.
+Expected Schema
+If CMS type indicates tool or article, check presence of at least one <script type="application/ld+json">. Set has_expected_schema = true if found, else false.
+Thin Content Detection (MVP heuristic):
+is_thin_content = true if:
+word_count < 300 AND page type is article; OR
+word_count < 150 for other pages.
+Page Type:
+Infer from the CMS object (type field if you have it):
+"tool", "article", "cluster", "other".
+Overall Score Calculation (MVP heuristic):
+Implement a simple scoring function, something like:
+Start at 100.
+Deduct:
+-20 if status_code != 200.
+-15 if robots_index = "noindex" but CMS isIndexed = true.
+-10 if has_title = false.
+-10 if has_h1 = false.
+-10 if has_meta_description = false.
+-10 if is_thin_content = true.
+-10 if has_expected_schema = false for tools/articles.
+-5 if internal_links_out_count < 3.
+Clamp final score to [0, 100].
+Insert a row into seo_health_snapshots for each page scanned.
+Implementation details:
+Put the scanning logic in a server-side module, e.g. src/lib/seo/seoScanner.ts (follow the project’s conventions).
+Create a dedicated server action or API route to trigger a scan, e.g.:
+app/api/admin/seo/scan/route.ts (POST)
+It should:
+Read CMS objects with isIndexed = true.
+Batch over them (e.g. 20–50 per run).
+Call the scan logic.
+Return basic summary (pages scanned, errors count).
+Make sure to:
+Limit concurrent fetches to avoid overwhelming the server (e.g. a simple Promise.all with small batch chunks).
+Handle errors gracefully and continue scanning other pages.
+4. Admin UI: SEO Health Console
+Create an admin page at something like:
+app/admin/seo-health/page.tsx
+Use the same admin layout, styling, auth guard, and component system that existing admin pages use.
+The page should include:
+Header Section
+Title: SEO Health Console
+A one-line description: Internal SEO health dashboard for VCM Suite pages.
+A Run Scan button:
+Triggers a client-side fetch POST to /api/admin/seo/scan.
+Shows loading state.
+On success, refreshes the data (e.g. using router.refresh()).
+Summary / KPI Cards (top row)
+Use existing card components if available. Show:
+Overall Average Score (0–100) across latest snapshots per slug.
+# of Pages Scanned (count of distinct slugs).
+# of Critical Issues (pages where overall_score < 60 or status_code != 200).
+# of Thin Content Pages (is_thin_content = true).
+Filters + Table
+Filter controls:
+Dropdowns / buttons for:
+All / Critical / Thin / Broken / No H1 / No Meta Description / No Schema
+Search by slug.
+Table columns:
+Slug
+Page Type
+Status Code
+Score
+Word Count
+Internal Links Out
+Robots
+Thin?
+Schema?
+Snapshot Date
+Clicking a row should open a detail drawer or modal showing:
+Full URL
+All boolean flags with labels
+The CMS info:
+isIndexed
+page type
+target keyword or title from CMS (if available)
+A list of issues in plain language, e.g.:
+“No H1 found.”
+“Thin content (154 words).”
+“Robots set to noindex but isIndexed = true in CMS.”
+“No schema detected for tool page.”
+Data Fetching
+In the page loader/server component, fetch:
+The latest snapshot per slug (you can e.g. use DISTINCT ON (slug) or a subquery to get max snapshot_date per slug).
+Pass this to the client component to render.
+Styling & UX
+Match existing admin styling (tailwind / custom styles).
+Use color coding for score:
+Green (80–100)
+Yellow (60–79)
+Red (< 60)
+Use badges/chips for flags (e.g., “THIN”, “NO H1”, “NO META”, “NO SCHEMA”, “NOINDEX”).
+5. Wiring It All Together
+Ensure the admin route is protected the same way as other admin pages:
+Only logged-in admin users can access admin/seo-health and the scan API.
+Ensure the scan API does not run for anonymous users.
+6. Developer Experience & Comments
+Add clear comments in key files:
+Explain what the SEO Health Console is for.
+Mark obvious TODOs for future versions:
+“TODO: plug into Google Search Console”
+“TODO: compute real internal_links_in_count.”
+Keep all TypeScript types clean and located in an appropriate place (e.g. src/lib/seo/types.ts).
+7. Acceptance Criteria
+I should be able to:
+Go to /admin/seo-health while logged in as admin.
+See summary metrics and a table of pages (based on the latest snapshots).
+Click Run Scan, wait for it to finish, and see:
+The dashboard update with new snapshot data.
+See which pages are:
+Broken (non-200)
+Thin
+Missing H1/title/meta
+Misconfigured robots vs isIndexed
+Missing schema
+Click on any page and view a clear list of SEO issues.
+Implement everything end-to-end in this project. Use the existing patterns and components already present in VCM Suite.
