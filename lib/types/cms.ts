@@ -1,8 +1,15 @@
 export type ProductData = {
   stripe_product_id?: string;
-  primary_price_id: string;
-  mode?: 'payment' | 'subscription';
+  primary_price_id: string | null;
+  mode?: 'payment' | 'subscription' | null;
   offer_key?: string;
+  
+  checkout_strategy: 'stripe' | 'external';
+  external_url?: string;
+  
+  success_path?: string | null;
+  cancel_path?: string | null;
+  
   additional_prices?: {
     id: string;
     label: string;
@@ -23,8 +30,6 @@ export type ProductData = {
 
   cta_primary_label: string;
   cta_primary_href?: string;
-  checkout_strategy?: 'stripe' | 'external';
-  external_url?: string;
   cta_secondary_label?: string;
   cta_secondary_href?: string;
 

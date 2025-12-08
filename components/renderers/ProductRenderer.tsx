@@ -25,21 +25,22 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
     );
   }
 
-  const handleCheckout = async (priceId: string, mode?: string, offerKey?: string) => {
+  const handleCheckout = async (overridePriceId?: string, overrideMode?: string, overrideOfferKey?: string) => {
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          priceId,
-          mode: mode || productData.mode || 'payment',
-          offerKey: offerKey || productData.offer_key,
-          cmsSlug: cmsObject.slug,
+          slug: cmsObject.slug,
+          ...(overridePriceId && { priceId: overridePriceId }),
+          ...(overrideMode && { mode: overrideMode }),
+          ...(overrideOfferKey && { offerKey: overrideOfferKey }),
         }),
       });
       const result = await response.json();
       if (result.error) {
         console.error('Checkout error:', result.error);
+        alert('Checkout error: ' + result.error);
         return;
       }
       if (result.url) {
@@ -79,10 +80,10 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-              ) : productData.primary_price_id ? (
+              ) : productData.checkout_strategy === 'stripe' ? (
                 <Button
                   size="lg"
-                  onClick={() => handleCheckout(productData.primary_price_id)}
+                  onClick={() => handleCheckout()}
                   className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-lg"
                 >
                   {productData.cta_primary_label}
@@ -300,14 +301,27 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">
             {productData.hero_subtitle}
           </p>
-          <Button
-            size="lg"
-            onClick={() => handleCheckout(productData.primary_price_id)}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-lg"
-          >
-            {productData.cta_primary_label}
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          {productData.checkout_strategy === 'stripe' ? (
+            <Button
+              size="lg"
+              onClick={() => handleCheckout()}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-lg"
+            >
+              {productData.cta_primary_label}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          ) : productData.checkout_strategy === 'external' && productData.cta_primary_href ? (
+            <Button
+              size="lg"
+              asChild
+              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-lg"
+            >
+              <Link href={productData.cta_primary_href} target="_blank" rel="noopener noreferrer">
+                {productData.cta_primary_label}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          ) : null}
         </div>
       </section>
 

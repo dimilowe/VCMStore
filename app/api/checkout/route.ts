@@ -19,105 +19,98 @@ function getBaseUrl(request: NextRequest): string {
   return `${forwardedProto || protocol}://${host}`;
 }
 
+async function getCmsProductBySlug(slug: string) {
+  const result = await query(
+    `SELECT * FROM cms_objects WHERE slug = $1 AND type = 'product'`,
+    [slug]
+  );
+  return result.rows[0] || null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { priceId, mode, offerKey, cmsSlug, productId } = body;
+    const { slug, priceId: overridePriceId, mode: overrideMode, offerKey: overrideOfferKey } = body;
 
-    if (!priceId && !productId) {
+    if (!slug) {
       return NextResponse.json(
-        { error: "Missing priceId or productId" },
+        { error: "Missing product slug" },
         { status: 400 }
+      );
+    }
+
+    const cmsObject = await getCmsProductBySlug(slug);
+    if (!cmsObject) {
+      return NextResponse.json(
+        { error: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    const productData = cmsObject.data?.product_data;
+    if (!productData) {
+      return NextResponse.json(
+        { error: "Product has no product_data configured" },
+        { status: 500 }
+      );
+    }
+
+    if (productData.checkout_strategy !== 'stripe') {
+      return NextResponse.json(
+        { error: "Product not configured for Stripe checkout" },
+        { status: 400 }
+      );
+    }
+
+    const priceId = overridePriceId || productData.primary_price_id;
+    const mode = overrideMode || productData.mode || 'payment';
+    const offerKey = overrideOfferKey || productData.offer_key;
+
+    if (!priceId) {
+      return NextResponse.json(
+        { error: "No Stripe price ID configured for this product" },
+        { status: 500 }
+      );
+    }
+
+    if (!offerKey) {
+      return NextResponse.json(
+        { error: "No offer_key configured for this product" },
+        { status: 500 }
       );
     }
 
     const stripe = getStripeClient();
     const baseUrl = getBaseUrl(request);
 
-    if (priceId) {
-      if (!cmsSlug) {
-        return NextResponse.json(
-          { error: "Missing cmsSlug for CMS product checkout" },
-          { status: 400 }
-        );
-      }
+    const successUrl = productData.success_path
+      ? `${baseUrl}${productData.success_path}`
+      : `${baseUrl}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}&product=${slug}`;
 
-      const checkoutMode = mode === 'subscription' ? 'subscription' : 'payment';
-      const effectiveOfferKey = offerKey || cmsSlug.toUpperCase().replace(/-/g, '_');
-      
-      const successUrl = `${baseUrl}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}&product=${cmsSlug}`;
-      const cancelUrl = `${baseUrl}/products/${cmsSlug}?canceled=true`;
+    const cancelUrl = productData.cancel_path
+      ? `${baseUrl}${productData.cancel_path}`
+      : `${baseUrl}/products/${slug}?canceled=true`;
 
-      const session = await stripe.checkout.sessions.create({
-        mode: checkoutMode,
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        metadata: {
-          offerKey: effectiveOfferKey,
-          cmsSlug: cmsSlug,
-          checkoutType: 'cms',
+    const checkoutMode = mode === 'subscription' ? 'subscription' : 'payment';
+
+    const session = await stripe.checkout.sessions.create({
+      mode: checkoutMode,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
         },
-      });
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        offer_key: offerKey,
+        cms_slug: slug,
+        checkout_type: 'cms',
+      },
+    });
 
-      return NextResponse.json({ url: session.url });
-    }
-
-    if (productId) {
-      const result = await query(
-        "SELECT * FROM products WHERE id = $1",
-        [productId]
-      );
-
-      const product = result.rows[0];
-
-      if (!product) {
-        return NextResponse.json({ error: "Product not found" }, { status: 404 });
-      }
-
-      const imageUrl = product.thumbnail_url?.startsWith('http') ? product.thumbnail_url : undefined;
-      
-      const session = await stripe.checkout.sessions.create({
-        mode: product.price_type === "subscription" ? "subscription" : "payment",
-        line_items: [
-          {
-            price_data: {
-              currency: "usd",
-              product_data: {
-                name: product.name,
-                description: product.description,
-                ...(imageUrl && { images: [imageUrl] }),
-              },
-              unit_amount: Math.round(product.price),
-              ...(product.price_type === "subscription" && {
-                recurring: {
-                  interval: "month",
-                },
-              }),
-            },
-            quantity: 1,
-          },
-        ],
-        success_url: `${baseUrl}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/product/${product.slug}?canceled=true`,
-        metadata: {
-          productId: product.id.toString(),
-          checkoutType: 'legacy',
-        },
-      });
-
-      return NextResponse.json({ url: session.url });
-    }
-
-    return NextResponse.json(
-      { error: "Invalid checkout request" },
-      { status: 400 }
-    );
+    return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("Checkout error:", error);
     return NextResponse.json(
