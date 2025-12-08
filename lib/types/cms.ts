@@ -1,10 +1,14 @@
 export type ProductData = {
   stripe_product_id?: string;
   primary_price_id: string;
+  mode?: 'payment' | 'subscription';
+  offer_key?: string;
   additional_prices?: {
     id: string;
     label: string;
     badge?: string;
+    mode?: 'payment' | 'subscription';
+    offer_key?: string;
   }[];
 
   hero_badge?: string;

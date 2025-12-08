@@ -25,16 +25,25 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
     );
   }
 
-  const handleCheckout = async (priceId: string) => {
+  const handleCheckout = async (priceId: string, mode?: string, offerKey?: string) => {
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ 
+          priceId,
+          mode: mode || productData.mode || 'payment',
+          offerKey: offerKey || productData.offer_key,
+          cmsSlug: cmsObject.slug,
+        }),
       });
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
+      const result = await response.json();
+      if (result.error) {
+        console.error('Checkout error:', result.error);
+        return;
+      }
+      if (result.url) {
+        window.location.href = result.url;
       }
     } catch (error) {
       console.error('Checkout error:', error);
@@ -88,7 +97,7 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
                     key={price.id}
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleCheckout(price.id)}
+                    onClick={() => handleCheckout(price.id, price.mode, price.offer_key)}
                     className="text-gray-600 hover:text-orange-600"
                   >
                     {price.label}
