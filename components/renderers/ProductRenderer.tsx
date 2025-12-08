@@ -68,7 +68,7 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {productData.is_external_app && productData.cta_primary_href ? (
+              {productData.checkout_strategy === 'external' && productData.cta_primary_href ? (
                 <Button
                   size="lg"
                   asChild

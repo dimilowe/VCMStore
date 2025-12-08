@@ -1,0 +1,60 @@
+1. QR Social = external app, not local checkout
+For the QR Social CMS object, update product_data to something like:
+product_data: {
+  hero_badge: "Free Tool",
+  hero_title: "QR Social",
+  hero_subtitle: "Turn every QR code into a social funnel.",
+  bullets: [
+    "Create QR codes with built-in social CTAs",
+    "Send people directly into your monetization flows",
+    "Track engagement and conversions over time"
+  ],
+
+  // KEY PART:
+  checkout_strategy: "external",
+  external_url: "https://qrsocial.studio",
+
+  cta_primary_label: "Open QR Social",
+  cta_primary_href: "https://qrsocial.studio",
+  cta_secondary_label: "Learn more",
+  cta_secondary_href: "/blog/how-qr-social-works", // optional
+
+  // No Stripe IDs needed:
+  primary_price_id: null
+}
+Then in ProductRenderer, you branch:
+const data = cmsObject.product_data;
+
+const handlePrimaryClick = () => {
+  if (data.checkout_strategy === "external" && data.cta_primary_href) {
+    window.location.href = data.cta_primary_href;
+    return;
+  }
+
+  // fallback / default: Stripe checkout
+  startStripeCheckout();
+};
+So QR Social just jumps out to the actual app, and never touches /api/checkout.
+2. Stripe stays for the other products
+Stripe wiring still makes sense for:
+C-Score (if you’re charging here)
+Ultimate Brand Deal Rolodex
+Brand Collab Guide
+How I Monetize My Dance Content
+Those can keep:
+checkout_strategy: "stripe"
+primary_price_id: "price_xxx"
+offer_key: "CSCORE_COACH_MONTHLY", etc.
+And use the /api/checkout + webhook flow we just designed.
+Only QR Social is special-cased as an external app in this system.
+3. What you should change right now
+In CMS for QR Social:
+Remove / ignore primary_price_id.
+Add checkout_strategy: "external" (or similar flag).
+Set cta_primary_href to https://qrsocial.studio.
+In ProductRenderer:
+If checkout_strategy === "external" → simple window.location.href = cta_primary_href.
+Else → call /api/checkout.
+For testing Stripe:
+Don’t use QR Social as the test product.
+Use something like Rolodex or C-Score as your first real Stripe-backed product page.

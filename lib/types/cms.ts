@@ -23,7 +23,8 @@ export type ProductData = {
 
   cta_primary_label: string;
   cta_primary_href?: string;
-  is_external_app?: boolean;
+  checkout_strategy?: 'stripe' | 'external';
+  external_url?: string;
   cta_secondary_label?: string;
   cta_secondary_href?: string;
 
