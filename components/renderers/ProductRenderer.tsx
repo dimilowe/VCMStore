@@ -68,14 +68,27 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                onClick={() => handleCheckout(productData.primary_price_id)}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-lg"
-              >
-                {productData.cta_primary_label}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              {productData.is_external_app && productData.cta_primary_href ? (
+                <Button
+                  size="lg"
+                  asChild
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-lg"
+                >
+                  <Link href={productData.cta_primary_href} target="_blank" rel="noopener noreferrer">
+                    {productData.cta_primary_label}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              ) : productData.primary_price_id ? (
+                <Button
+                  size="lg"
+                  onClick={() => handleCheckout(productData.primary_price_id)}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-6 text-lg"
+                >
+                  {productData.cta_primary_label}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              ) : null}
               {productData.cta_secondary_label && productData.cta_secondary_href && (
                 <Button
                   size="lg"
@@ -83,7 +96,7 @@ export function ProductRenderer({ cmsObject }: ProductRendererProps) {
                   asChild
                   className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-6 text-lg"
                 >
-                  <Link href={productData.cta_secondary_href}>
+                  <Link href={productData.cta_secondary_href} target="_blank" rel="noopener noreferrer">
                     {productData.cta_secondary_label}
                   </Link>
                 </Button>
