@@ -293,6 +293,14 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-08: **CMS-Based Product Pages** - Products now render from cms_objects instead of products table
+  - Created ProductData type with hero, CTAs, bullets, feature_sections, FAQ, pro_tips, Stripe IDs
+  - Built ProductRenderer component for rendering CMS product objects
+  - Created VCMRenderer that delegates to appropriate renderer based on content type
+  - New /products/[slug] route reads from cms_objects where type='product'
+  - products table remains for Stripe webhook plumbing, not content source
+  - Discovery endpoint updated to scan cms_objects for products
+  - Template: docs/cms-product-template.json shows full product JSON structure
 - 2025-12-08: **CMS Bulk Import System** - No-code content management for tools, articles, and products
   - Created cms_objects table to store JSON CMS objects (slug, type, cluster_slug, data JSONB, word_count, health)
   - Added cms_slug column to global_urls for linking CMS objects to URL registry
