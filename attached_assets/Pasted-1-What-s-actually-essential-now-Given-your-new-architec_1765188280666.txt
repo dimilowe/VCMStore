@@ -1,0 +1,68 @@
+1. What’s actually essential now
+Given your new architecture, these are the only core admin jobs:
+Content – see/edit all CMS objects (tools, articles, products, clusters), plus import JSON
+SEO – control indexing (is_indexed) + see health for each URL
+(Optional) Monetization artifacts – Products/Stripe stuff if it’s not yet CMS-based
+Everything else is just a filter or a different way of looking at the same data.
+2. How to collapse what you have
+Based on that Replit summary of existing pages, here’s what I would do.
+A. Keep – but MERGE
+/admin/content-manager
+/admin/cms-import
+Merge these into one page called Content in the nav:
+Main table:
+type, slug, title, cluster, word_count, health, isIndexed (read-only)
+actions: “Edit JSON”, “View Live”
+Filters:
+type (tool/article/product/support)
+cluster_slug
+health (thin/ok/strong)
+isIndexed (yes/no)
+Button: “Import JSON” → opens your CMS Import UI as a modal/side panel
+Under the hood you can keep /admin/cms-import as a route if you want, but it should not be a separate nav item. It’s just a feature of the Content page now.
+Result: ONE Content page does “see everything + import more”.
+B. Keep – as SEO
+/admin/seo-control
+This becomes your single SEO page in nav:
+Table from global_urls joined with cms_objects:
+url, type, cluster, word_count, health, isIndexed (toggle)
+Filters:
+type
+cluster
+Ready to Index = health in [ok, strong] AND isIndexed=false
+You do all indexing decisions here. No other “SEO health / indexing / ready-to-index” pages.
+Result: ONE SEO page for all crawl / index decisions.
+C. Optional Keep – Money stuff
+/admin/products
+If Products are still tied to Stripe in a separate schema and you’re actually using them, keep Products as its own nav item for now.
+Long term, you can convert products into CMS objects too (type=product) and control them via the Content screen – but you don’t have to solve that today.
+/admin/blog + /admin/blog/edit/[id]
+Ask yourself bluntly: are you actually using the rich blog editor, or are we going to move blog posts to CMS JSON like everything else?
+If you barely use it → hide Blog from the nav and plan a migration later.
+If you actively write in it → keep Blog as a separate nav item for now and treat it as “legacy rich editor” until you’re ready to unify.
+If you want max simplicity now, I’d aim for:
+Nav = Content | SEO | Products | (Blog if really needed)
+3. What you can safely kill now
+Given CMS Import + Content Manager:
+You can trash or hide these from nav:
+/admin/content-factory – old generation flow, replaced by CMS Import
+/admin/articles – redundant; just filter type = article in Content
+/admin/tools – redundant; filter type = tool
+/admin/mbbs – redundant; again, just types + filters
+/admin/clusters – redundant; cluster is a column + filter in Content
+/admin/seo-health – merge its info into Content’s health column
+/admin/ready-to-index – a filter inside SEO page, not its own page
+/admin/indexing – duplicate of SEO Control
+/admin/engines – you rarely touch this; remove it from nav, keep the route if you ever need it manually
+Important: you don’t have to actually delete the routes immediately – you can just remove them from the sidebar so your brain only sees what matters.
+4. Target final admin nav
+Short term realistic goal:
+Content (merged content-manager + cms-import)
+SEO (seo-control)
+Products (if you need Stripe catalog control)
+Blog (only if you truly use the rich editor)
+If you’re ruthless and willing to move blog/products into CMS later, your endgame nav is literally:
+Content | SEO
+Everything else becomes a filter, a column, or a modal inside those two.
+So: ignore Replit’s “5 pages max” suggestion – that’s still too many.
+Your architecture is powerful enough that you don’t need 10 views to manage it. Two core screens + 1–2 optional money/blog screens is the clean version.
