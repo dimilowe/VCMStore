@@ -1,22 +1,25 @@
-export interface OutfitEngineFaq {
-  q: string;
-  a: string;
-}
+Let’s treat this as done:
+Engine is registered ✅
+Legacy tool untouched ✅
+Engine selection via { engine: 'outfit', preset: '...' } ✅
+Now you just need a presets map and some CMS tool entries to light up the cluster.
+1. Presets map for engines/outfit/config.ts
+I’ll assume your OutfitEngineConfig looks roughly like:
+slug
+title
+subtitle
+badgeLabel
+badgeIcon?
+uploadTitle
+uploadDescription?
+uploadHelpText
+apiPath
+faqs
+If your field names differ slightly, just adjust – the copy/structure is what matters.
+Add something like this to engines/outfit/config.ts:
+import type { OutfitEngineConfig } from './types-or-interface-file';
 
-export interface OutfitEngineConfig {
-  slug: string;
-  title: string;
-  subtitle: string;
-  badgeLabel: string;
-  badgeIcon?: 'camera' | 'sparkles' | 'shopping-bag';
-  uploadTitle: string;
-  uploadDescription?: string;
-  uploadHelpText: string;
-  apiPath: string;
-  faqs: OutfitEngineFaq[];
-}
-
-export const BASE_FAQS: OutfitEngineFaq[] = [
+export const BASE_FAQS: OutfitEngineConfig['faqs'] = [
   {
     q: 'How does this outfit finder work?',
     a: 'Upload any outfit photo and our AI analyzes it to identify items like tops, pants, shoes, and accessories. For each item, we generate search keywords and find similar products from shopping sites so you can recreate the look.'
@@ -35,11 +38,12 @@ export const BASE_FAQS: OutfitEngineFaq[] = [
   },
   {
     q: 'Are the product links always exact matches?',
-    a: 'We look for visually similar items. Prices and availability may vary. Always double-check details on the retailer\'s website before purchasing.'
+    a: 'We look for visually similar items. Prices and availability may vary. Always double-check details on the retailer’s website before purchasing.'
   }
 ];
 
 export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
+  // 1) General “any look” preset
   'outfit-ideas-ai': {
     slug: 'outfit-ideas-ai',
     title: 'Outfit Ideas Generator – Shop Any Look',
@@ -54,6 +58,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 2) Streetwear-focused preset
   'streetwear-outfit-finder': {
     slug: 'streetwear-outfit-finder',
     title: 'Streetwear Outfit Finder – Shop Urban Looks',
@@ -69,6 +74,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 3) Date night preset
   'date-night-outfit-generator': {
     slug: 'date-night-outfit-generator',
     title: 'Date Night Outfit Generator – Recreate Any Romantic Look',
@@ -84,6 +90,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 4) Office / business casual preset
   'office-outfit-generator': {
     slug: 'office-outfit-generator',
     title: 'Office Outfit Generator – Smart Casual Work Looks',
@@ -99,6 +106,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 5) Capsule wardrobe preset
   'capsule-wardrobe-outfit-finder': {
     slug: 'capsule-wardrobe-outfit-finder',
     title: 'Capsule Wardrobe Outfit Finder – Mix & Match Essentials',
@@ -114,6 +122,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 6) Vacation / resort preset
   'vacation-outfit-generator': {
     slug: 'vacation-outfit-generator',
     title: 'Vacation Outfit Generator – Beach & Resort Looks',
@@ -129,6 +138,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 7) Winter layers preset
   'winter-outfit-generator': {
     slug: 'winter-outfit-generator',
     title: 'Winter Outfit Generator – Coats, Layers & Boots',
@@ -144,6 +154,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 8) Summer preset
   'summer-outfit-generator': {
     slug: 'summer-outfit-generator',
     title: 'Summer Outfit Generator – Light & Airy Looks',
@@ -159,6 +170,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 9) Party / club preset
   'party-outfit-generator': {
     slug: 'party-outfit-generator',
     title: 'Party Outfit Generator – Club & Night Out Looks',
@@ -174,6 +186,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 10) Gym / athleisure preset
   'gym-outfit-generator': {
     slug: 'gym-outfit-generator',
     title: 'Gym Outfit Generator – Athleisure & Workout Looks',
@@ -189,6 +202,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 11) Wedding guest preset
   'wedding-guest-outfit-generator': {
     slug: 'wedding-guest-outfit-generator',
     title: 'Wedding Guest Outfit Generator – Formal & Semi-Formal Looks',
@@ -204,6 +218,7 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   },
 
+  // 12) Aesthetic / TikTok-core preset
   'aesthetic-outfit-generator': {
     slug: 'aesthetic-outfit-generator',
     title: 'Aesthetic Outfit Generator – TikTok & Pinterest Styles',
@@ -219,7 +234,27 @@ export const OUTFIT_PRESETS: Record<string, OutfitEngineConfig> = {
     faqs: BASE_FAQS
   }
 };
-
-export function getOutfitPresetBySlug(slug: string): OutfitEngineConfig | null {
-  return OUTFIT_PRESETS[slug] || null;
+If your file already defines two presets, you can just lift the new keys (3–12) and drop them into your existing OUTFIT_PRESETS map.
+2. CMS tool entries (how you actually use them)
+For each preset you want live, the CMS tool just needs:
+{
+  "type": "tool",
+  "slug": "date-night-outfit-generator",          // must match route
+  "title": "Date Night Outfit Generator – Recreate Any Romantic Look",
+  "description": "Upload a date-night outfit photo and get AI-powered shoppable matches.",
+  "engine": "outfit",
+  "engine_config": {
+    "engine": "outfit",
+    "preset": "date-night-outfit-generator"       // <– key in OUTFIT_PRESETS
+  },
+  "seo_title": "Date Night Outfit Generator – Recreate Any Romantic Look with AI",
+  "seo_description": "Upload a date-night outfit photo and instantly find similar shoppable items using AI.",
+  "interlink_parent": "fashion-outfit-tools",
+  "interlink_siblings": [
+    "outfit-ideas-ai",
+    "streetwear-outfit-finder",
+    "office-outfit-generator"
+  ],
+  "interlink_tools": []
 }
+Repeat that pattern for any preset key from OUTFIT_PRESETS.
