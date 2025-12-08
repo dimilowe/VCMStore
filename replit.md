@@ -292,6 +292,13 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-08: **Admin UI Consolidation** - Simplified scattered admin pages into 3 master panels
+  - Content Factory (/admin/content-factory): Create clusters, tools, and articles in one place
+  - Content Manager (/admin/content-manager): Edit tools, articles, pillars, clusters with tabbed interface
+  - SEO Control Center (/admin/seo-control): Combined SEO Health, Ready to Index, URL Registry tabs
+  - Created shared AdminLayout component with centralized authentication
+  - /admin now redirects to /admin/content-factory, Products moved to /admin/products
+  - Workflow mirrors actual use: Create → Edit → Publish
 - 2025-12-08: **Ready to Index Auto-Inspector** - Automated SEO readiness evaluation system
   - Added global_urls columns: last_health_score, is_ready_to_index, manual_review_passed, indexed_at
   - Created readyInspector.ts with comprehensive readiness rules:
