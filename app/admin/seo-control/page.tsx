@@ -696,13 +696,13 @@ export default function SeoControlPage() {
                           <td className="px-4 py-3 text-center">
                             <button
                               onClick={() => urlEntry && toggleIndexing(urlEntry)}
-                              disabled={!isReady}
-                              className="inline-flex disabled:opacity-50"
+                              className="inline-flex hover:opacity-70 transition-opacity cursor-pointer"
+                              title={isIndexed ? "Click to remove from sitemap" : "Click to add to sitemap"}
                             >
                               {isIndexed ? (
                                 <Eye className="w-5 h-5 text-green-500" />
                               ) : (
-                                <EyeOff className="w-5 h-5 text-gray-300" />
+                                <EyeOff className="w-5 h-5 text-gray-400 hover:text-green-400" />
                               )}
                             </button>
                           </td>
