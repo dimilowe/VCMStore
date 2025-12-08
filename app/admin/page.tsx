@@ -344,6 +344,12 @@ export default function AdminPage() {
                 SEO Health
               </Button>
             </Link>
+            <Link href="/admin/ready-to-index">
+              <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
+                <Zap className="mr-2 h-4 w-4" />
+                Ready to Index
+              </Button>
+            </Link>
             <Button onClick={() => setShowForm(true)} className="bg-orange-500 hover:bg-orange-600">
               <Plus className="mr-2 h-4 w-4" />
               Add Product
