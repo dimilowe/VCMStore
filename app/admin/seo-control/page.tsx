@@ -997,8 +997,8 @@ export default function SeoControlPage() {
                               </span>
                             </td>
                             <td className="px-3 py-3 text-center">
-                              <span className="font-medium text-gray-600">
-                                {row.linksInbound}
+                              <span className={`font-medium ${row.linksInbound > 0 ? "text-gray-600" : "text-gray-300"}`}>
+                                {row.linksInbound > 0 ? row.linksInbound : "—"}
                               </span>
                             </td>
                             <td className="px-3 py-3 text-center">

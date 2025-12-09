@@ -65,6 +65,7 @@ export async function scanPage(urlData: GlobalUrl): Promise<ScanResult> {
       robots_index: 'missing',
       canonical_target: null,
       internal_links_out_count: 0,
+      internal_link_targets: [],
       is_thin_content: true,
       has_expected_schema: false,
       page_type: urlData.type || 'other',
@@ -106,11 +107,35 @@ export async function scanPage(urlData: GlobalUrl): Promise<ScanResult> {
   const cleanText = mainContent.replace(/\s+/g, ' ').trim();
   const wordCount = cleanText.split(/\s+/).filter(w => w.length > 0).length;
   
-  const internalLinks = $('a[href]').filter((_, el) => {
+  const internalLinkTargets: string[] = [];
+  $('a[href]').each((_, el) => {
     const href = $(el).attr('href') || '';
-    return href.startsWith('/') || href.includes(siteDomain.replace(/^https?:\/\//, ''));
+    let cleanPath = '';
+    
+    if (href.startsWith('/') && !href.startsWith('//')) {
+      cleanPath = href.split('?')[0].split('#')[0];
+    } else if (href.includes(siteDomain.replace(/^https?:\/\//, ''))) {
+      try {
+        const parsed = new URL(href);
+        cleanPath = parsed.pathname.split('?')[0].split('#')[0];
+      } catch {}
+    }
+    
+    if (cleanPath) {
+      cleanPath = cleanPath.replace(/\/+/g, '/');
+      if (cleanPath !== '/' && cleanPath.endsWith('/')) {
+        cleanPath = cleanPath.slice(0, -1);
+      }
+      if (!cleanPath.startsWith('/')) {
+        cleanPath = '/' + cleanPath;
+      }
+      if (cleanPath && cleanPath !== urlData.url) {
+        internalLinkTargets.push(cleanPath);
+      }
+    }
   });
-  const internalLinksOutCount = internalLinks.length;
+  const uniqueInternalLinks = [...new Set(internalLinkTargets)];
+  const internalLinksOutCount = uniqueInternalLinks.length;
   if (internalLinksOutCount < 3) {
     issues.push(`Low internal linking (${internalLinksOutCount} links)`);
   }
@@ -157,6 +182,7 @@ export async function scanPage(urlData: GlobalUrl): Promise<ScanResult> {
     robots_index: robotsIndex,
     canonical_target: canonical,
     internal_links_out_count: internalLinksOutCount,
+    internal_link_targets: uniqueInternalLinks,
     is_thin_content: isThinContent,
     has_expected_schema: hasExpectedSchema,
     page_type: urlData.type || 'other',
@@ -211,6 +237,8 @@ export async function runFullScan(batchSize: number = 10): Promise<ScanSummary> 
     errors: [],
   };
 
+  const allResults: ScanResult[] = [];
+
   for (let i = 0; i < urls.length; i += batchSize) {
     const batch = urls.slice(i, i + batchSize);
     const results = await Promise.all(
@@ -218,11 +246,11 @@ export async function runFullScan(batchSize: number = 10): Promise<ScanSummary> 
         try {
           const result = await scanPage(urlData);
           await saveSnapshot(result);
-          return { success: result.status_code === 200, error: null };
+          return { success: result.status_code === 200, error: null, result };
         } catch (error) {
           const errorMsg = `Error scanning ${urlData.url}: ${error instanceof Error ? error.message : 'Unknown'}`;
           summary.errors.push(errorMsg);
-          return { success: false, error: errorMsg };
+          return { success: false, error: errorMsg, result: null };
         }
       })
     );
@@ -231,10 +259,33 @@ export async function runFullScan(batchSize: number = 10): Promise<ScanSummary> 
       summary.total_scanned++;
       if (r.success) {
         summary.successful++;
+        if (r.result) {
+          allResults.push(r.result);
+        }
       } else {
         summary.failed++;
       }
     }
+  }
+
+  const inboundCounts: Record<string, number> = {};
+  for (const result of allResults) {
+    for (const target of result.internal_link_targets) {
+      if (!inboundCounts[target]) {
+        inboundCounts[target] = 0;
+      }
+      inboundCounts[target]++;
+    }
+  }
+
+  for (const [slug, count] of Object.entries(inboundCounts)) {
+    await query(
+      `UPDATE seo_health_snapshots 
+       SET internal_links_in_count = $1 
+       WHERE slug = $2 
+       AND snapshot_date = (SELECT MAX(snapshot_date) FROM seo_health_snapshots WHERE slug = $2)`,
+      [count, slug]
+    );
   }
 
   return summary;

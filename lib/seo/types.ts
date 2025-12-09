@@ -35,6 +35,7 @@ export interface ScanResult {
   robots_index: 'index' | 'noindex' | 'missing';
   canonical_target: string | null;
   internal_links_out_count: number;
+  internal_link_targets: string[];
   is_thin_content: boolean;
   has_expected_schema: boolean;
   page_type: string;
