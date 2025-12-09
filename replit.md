@@ -60,7 +60,14 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - `cluster_articles`: AI-generated SEO articles linked to clusters (separate from manual blog posts)
 - `global_urls`: URL registry for domain-wide indexing control (URL, type, is_indexed, canonical, notes)
 - `seo_health_snapshots`: SEO health audit results per page (score, title, H1, meta, word count, schema, robots)
-- `cms_objects`: JSON CMS objects for tools, articles, products (slug, type, cluster_slug, data JSONB, word_count, health)
+- `cms_objects`: JSON CMS objects for tools, articles, products (slug, type, cluster_slug, data JSONB, word_count, health, cloud_tags text[])
+
+### Cloud Tag Matrix
+Tools can be tagged with VCM Cloud affiliations to display contextual upsell blocks:
+- **lib/clouds.ts**: Defines 8 VCM Cloud product bundles (Creation, Video, Writing/SEO, File/Data, Monetization, Intelligence, Music/Performance, Growth/Distribution)
+- **Admin UI**: Cloud tags column in tools table with modal editor for checkbox selection
+- **CloudUpsellBlock**: Renders on tool pages when cloudTags.length > 0, showing related VCM Cloud products
+- **Database**: cloud_tags stored as text[] in cms_objects table
 
 ## Project Structure
 
