@@ -66,8 +66,18 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 Tools can be tagged with VCM Cloud affiliations to display contextual upsell blocks:
 - **lib/clouds.ts**: Defines 8 VCM Cloud product bundles (Creation, Video, Writing/SEO, File/Data, Monetization, Intelligence, Music/Performance, Growth/Distribution)
 - **Admin UI**: Cloud tags column in tools table with modal editor for checkbox selection
-- **CloudUpsellBlock**: Renders on tool pages when cloudTags.length > 0, showing related VCM Cloud products
+- **CloudUpsellBlock**: Renders on tool pages when cloudTags.length > 0, showing related VCM Cloud products with links to cloud dashboards
 - **Database**: cloud_tags stored as text[] in cms_objects table
+
+### Cloud Dashboard Engine
+Each VCM Cloud has a dedicated dashboard page at /clouds/[cloud-slug]:
+- **CloudDashboardEngine**: components/engines/CloudDashboardEngine.tsx renders Adobe-style cloud landing pages
+- **Route**: app/clouds/[cloud]/page.tsx with CloudPageClient wrapper
+- **Data fetcher**: lib/cms/getCmsCloudBySlug.ts fetches cloud_dashboard CMS objects
+- **Engine config**: hero block, featured products, app row, shortcuts, recent files placeholder
+- **Database columns**: engine TEXT and engine_config JSONB on cms_objects table
+- **Seeded dashboards**: All 8 clouds have CMS objects (creation-cloud, video-cloud, writing-seo-cloud, etc.)
+- **Funnel flow**: Tool → CloudUpsellBlock → Cloud Dashboard → Product/Store page
 
 ## Project Structure
 
