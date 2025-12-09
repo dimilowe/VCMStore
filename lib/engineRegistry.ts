@@ -3,6 +3,9 @@ import { ToolForRenderer } from './cms/getCmsToolBySlug';
 
 export interface EngineComponentProps {
   tool: ToolForRenderer;
+  canUsePro?: boolean;
+  canUseBasic?: boolean;
+  entitlementsLoading?: boolean;
 }
 
 export const ENGINE_COMPONENTS: Record<string, () => Promise<{ default: ComponentType<EngineComponentProps> }>> = {

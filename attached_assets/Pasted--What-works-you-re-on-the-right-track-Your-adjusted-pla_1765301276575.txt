@@ -1,0 +1,225 @@
+✅ What works (you’re on the right track)
+Your adjusted plan:
+Create cloud_entitlements table via SQL
+Add types in lib/types/cloudEntitlements.ts
+Helpers in lib/cloudEntitlements.ts using lib/db.ts
+Extend grantAccessForOffer()
+API/page to show access + demo hasAccess() in tool UI
+is architecturally sound for your current stack:
+Neon + raw SQL → correct to use lib/db.ts’s query() instead of trying to force a Supabase-style client.
+Iron-session → correct to fetch entitlements via an API route for client components.
+Existing grantAccessForOffer() → correct place to hook cloud entitlements. That keeps “MONEY Truth” in one function.
+ToolPageClient demo → good. You want one canonical pattern everyone can copy/paste when you start mass-adding Pro gates.
+The overall shape is exactly what you need:
+DB table for cloud entitlements
+Type-level representation
+Server helpers
+Offer → entitlement mapping
+Client access check in tools
+So yes: this is the right bridge to make the Kingmaker Plan executable.
+⚠️ What might break / cause pain later
+Here’s where I’d push back / tighten things:
+1. You already have an entitlements table
+You said:
+grantAccessForOffer() inserts into purchases and entitlements tables
+So you need to decide:
+Option A: Extend the existing entitlements table to also handle clouds
+Option B: Create a separate cloud_entitlements table
+Architecturally, I’d lean Option B:
+Product/file-level access ≠ cloud subscription access
+Different lifecycles, different semantics, different queries
+You won’t accidentally nuke product entitlements touching cloud logic
+Just be intentional: don’t create a second “entitlements” that’s basically the same thing. Either keep them separate conceptually (products vs clouds) or unify them properly. Half-merge is where bugs live.
+2. You must enforce uniqueness at DB level
+You need to guarantee one row per (user_id, cloud_id), regardless of how many times Stripe webhooks fire.
+In raw SQL:
+alter table cloud_entitlements
+  add constraint cloud_entitlements_user_cloud_unique
+  unique (user_id, cloud_id);
+And when you upsert in lib/cloudEntitlements.ts, use that constraint, not manual “check then insert” logic.
+3. Don’t overcomplicate “page to show user access” right now
+That’s nice UX, but not critical.
+The critical path is:
+Stripe → webhook → grantAccessForOffer() → cloud_entitlements
+Tool → API /api/me/cloud-entitlements → hasAccess() → show/hide Pro UI
+A full “My Clouds” dashboard can come later. Don’t let “extra UI” delay gating.
+4. Be careful with client-side fetch for entitlements
+You’re using client components for tools, so your instinct:
+“we'll need an API route to fetch entitlements client-side”
+is correct. Just:
+Don’t fetch this from the public side with userId in the body/query.
+Use iron-session on the API route to resolve the user server-side.
+Pattern:
+// app/api/me/cloud-entitlements/route.ts
+import { getUserFromSession } from '@/lib/user-session';
+import { NextResponse } from 'next/server';
+import { getCloudEntitlementsForUser } from '@/lib/cloudEntitlements';
+
+export async function GET() {
+  const user = await getUserFromSession();
+  if (!user) return NextResponse.json({ entitlements: [] });
+
+  const entitlements = await getCloudEntitlementsForUser(user.id);
+  return NextResponse.json({ entitlements });
+}
+Then in ToolPageClient.tsx:
+const { data } = useSWR('/api/me/cloud-entitlements', fetcher);
+const entitlements = data?.entitlements ?? [];
+const canUsePro = hasAccess(entitlements, 'creation', 'pro');
+Keep all trust on the server.
+🔁 Push it further (how to upgrade the plan)
+Here’s how I’d tighten your plan so it’s actually “production-clean” and not a hacky first pass.
+1. Define the Cloud + Tier types once, reuse everywhere
+lib/types/cloudEntitlements.ts:
+export const CLOUD_IDS = [
+  'creation',
+  'video',
+  'writing',
+  'file',
+  'monetization',
+  'intelligence',
+  'music',
+  'growth',
+  'shopping',
+  'advertising',
+] as const;
+export type CloudId = (typeof CLOUD_IDS)[number];
+
+export const ENTITLEMENT_TIERS = ['free','basic','pro','enterprise'] as const;
+export type EntitlementTier = (typeof ENTITLEMENT_TIERS)[number];
+
+export interface CloudEntitlement {
+  id: string;
+  user_id: string;
+  cloud_id: CloudId;
+  tier: EntitlementTier;
+  source: 'stripe' | 'manual_grant' | 'bundle' | 'promotion';
+  status: 'active' | 'past_due' | 'canceled' | 'trial';
+  valid_from: string;
+  valid_to: string | null;
+  created_at: string;
+  updated_at: string;
+}
+Then reuse CLOUD_IDS + ENTITLEMENT_TIERS in SQL CHECKs, admin dashboards, etc., so you don’t drift.
+2. Use your existing query() helper properly
+lib/cloudEntitlements.ts:
+import { query } from '@/lib/db';
+import type { CloudEntitlement, CloudId, EntitlementTier } from '@/lib/types/cloudEntitlements';
+
+const TIER_ORDER: EntitlementTier[] = ['free','basic','pro','enterprise'];
+
+export function hasAccess(
+  entitlements: CloudEntitlement[] | undefined,
+  cloud: CloudId,
+  required: EntitlementTier
+): boolean {
+  if (!entitlements?.length) return false;
+
+  const record = entitlements.find(
+    (e) => e.cloud_id === cloud && e.status === 'active'
+  );
+  if (!record) return false;
+
+  return TIER_ORDER.indexOf(record.tier) >= TIER_ORDER.indexOf(required);
+}
+
+export async function getCloudEntitlementsForUser(userId: string) {
+  const { rows } = await query<CloudEntitlement>(
+    `select * from cloud_entitlements
+     where user_id = $1
+       and status in ('active','trial')`,
+    [userId]
+  );
+  return rows;
+}
+
+export async function upsertCloudEntitlement(args: {
+  userId: string;
+  cloudId: CloudId;
+  tier: EntitlementTier;
+  source: 'stripe' | 'manual_grant' | 'bundle' | 'promotion';
+  status?: 'active' | 'past_due' | 'canceled' | 'trial';
+  validFrom?: Date;
+  validTo?: Date | null;
+}) {
+  const {
+    userId,
+    cloudId,
+    tier,
+    source,
+    status = 'active',
+    validFrom = new Date(),
+    validTo = null,
+  } = args;
+
+  await query(
+    `insert into cloud_entitlements
+       (user_id, cloud_id, tier, source, status, valid_from, valid_to)
+     values ($1,$2,$3,$4,$5,$6,$7)
+     on conflict (user_id, cloud_id)
+     do update set
+       tier = excluded.tier,
+       source = excluded.source,
+       status = excluded.status,
+       valid_from = excluded.valid_from,
+       valid_to = excluded.valid_to,
+       updated_at = now()`,
+    [userId, cloudId, tier, source, status, validFrom, validTo]
+  );
+}
+That keeps all DB touchpoints centralized and clean.
+3. Extend grantAccessForOffer() via a simple map (not hard-coded if/else soup)
+In lib/offers.ts:
+import { upsertCloudEntitlement } from '@/lib/cloudEntitlements';
+import type { CloudId, EntitlementTier } from '@/lib/types/cloudEntitlements';
+
+const CLOUD_OFFER_MAP: Record<
+  string,
+  { cloudId: CloudId; tier: EntitlementTier }[]
+> = {
+  // Single-cloud examples
+  'cloud_creation_basic_monthly': [{ cloudId: 'creation', tier: 'basic' }],
+  'cloud_creation_pro_monthly': [{ cloudId: 'creation', tier: 'pro' }],
+
+  // All-clouds example
+  'cloud_all_pro_monthly': [
+    { cloudId: 'creation', tier: 'pro' },
+    { cloudId: 'video', tier: 'pro' },
+    { cloudId: 'writing', tier: 'pro' },
+    // ...etc
+  ],
+};
+
+export async function grantAccessForOffer(offerKey: string, userId: string) {
+  // existing product / purchase access logic
+  // ...
+
+  const cloudEnts = CLOUD_OFFER_MAP[offerKey];
+  if (cloudEnts) {
+    for (const { cloudId, tier } of cloudEnts) {
+      await upsertCloudEntitlement({
+        userId,
+        cloudId,
+        tier,
+        source: 'stripe',
+      });
+    }
+  }
+
+  // keep all your current logic below this
+}
+That gives you a single, explicit registry of which plans unlock which clouds.
+4. In the tool UI, keep the pattern dead simple
+In ToolPageClient.tsx or whatever the root client component is:
+const { data } = useSWR('/api/me/cloud-entitlements', fetcher);
+const entitlements = data?.entitlements ?? [];
+
+const canUsePro = hasAccess(entitlements, toolCloudId, 'pro');
+// toolCloudId: 'creation' | 'video' | etc, passed in from the server side per tool config
+The important thing: each tool knows which cloud it belongs to, and that’s just a string from the DB / engine config.
+Bottom line
+Your plan is good enough to start.
+With the tweaks above, it becomes clean enough to scale.
+You’re correctly adapting to Neon + raw SQL.
+You’re correctly routing through grantAccessForOffer.
+You’re correctly recognizing the need for an API endpoint because of client components.

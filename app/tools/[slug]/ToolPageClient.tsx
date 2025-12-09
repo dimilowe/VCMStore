@@ -5,6 +5,8 @@ import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { getEngineLoader, EngineComponentProps } from '@/lib/engineRegistry';
 import ToolComingSoon from '@/components/engines/ToolComingSoon';
 import { CloudUpsellBlock } from '@/components/clouds/CloudUpsellBlock';
+import { hasAccess, cloudSlugToId } from '@/lib/cloudEntitlements';
+import type { CloudEntitlement } from '@/lib/types/cloudEntitlements';
 
 interface ToolPageClientProps {
   tool: ToolForRenderer;
@@ -14,6 +16,20 @@ interface ToolPageClientProps {
 export default function ToolPageClient({ tool, hasEngine }: ToolPageClientProps) {
   const [EngineComponent, setEngineComponent] = useState<ComponentType<EngineComponentProps> | null>(null);
   const [loading, setLoading] = useState(hasEngine);
+  const [entitlements, setEntitlements] = useState<CloudEntitlement[]>([]);
+  const [entitlementsLoading, setEntitlementsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/user/entitlements')
+      .then(res => res.json())
+      .then(data => {
+        setEntitlements(data.entitlements || []);
+        setEntitlementsLoading(false);
+      })
+      .catch(() => {
+        setEntitlementsLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     if (!hasEngine || !tool.engine) {
@@ -37,6 +53,11 @@ export default function ToolPageClient({ tool, hasEngine }: ToolPageClientProps)
       });
   }, [hasEngine, tool.engine]);
 
+  const primaryCloudTag = tool.cloudTags?.[0];
+  const primaryCloudId = primaryCloudTag ? cloudSlugToId(primaryCloudTag) : null;
+  const canUsePro = primaryCloudId && hasAccess(entitlements, primaryCloudId, 'pro');
+  const canUseBasic = primaryCloudId && hasAccess(entitlements, primaryCloudId, 'basic');
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -54,7 +75,12 @@ export default function ToolPageClient({ tool, hasEngine }: ToolPageClientProps)
 
   return (
     <>
-      <EngineComponent tool={tool} />
+      <EngineComponent 
+        tool={tool} 
+        canUsePro={canUsePro || false}
+        canUseBasic={canUseBasic || false}
+        entitlementsLoading={entitlementsLoading}
+      />
       {tool.cloudTags && tool.cloudTags.length > 0 && (
         <div className="max-w-4xl mx-auto px-4 pb-12">
           <CloudUpsellBlock cloudSlugs={tool.cloudTags} />

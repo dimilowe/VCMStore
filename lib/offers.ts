@@ -1,4 +1,6 @@
 import { query } from '@/lib/db';
+import { grantCloudEntitlement } from '@/lib/cloudEntitlements';
+import type { CloudId, EntitlementTier } from '@/lib/types/cloudEntitlements';
 
 type GrantAccessParams = {
   userId: string;
@@ -7,6 +9,44 @@ type GrantAccessParams = {
   stripeCustomerId?: string | null;
   stripeSessionId?: string | null;
   amountTotal?: number | null;
+};
+
+const CLOUD_OFFER_MAP: Record<
+  string,
+  { cloudId: CloudId; tier: EntitlementTier }[]
+> = {
+  'cloud_creation_basic_monthly': [{ cloudId: 'creation', tier: 'basic' }],
+  'cloud_creation_pro_monthly': [{ cloudId: 'creation', tier: 'pro' }],
+  'cloud_video_basic_monthly': [{ cloudId: 'video', tier: 'basic' }],
+  'cloud_video_pro_monthly': [{ cloudId: 'video', tier: 'pro' }],
+  'cloud_writing_basic_monthly': [{ cloudId: 'writing', tier: 'basic' }],
+  'cloud_writing_pro_monthly': [{ cloudId: 'writing', tier: 'pro' }],
+  'cloud_file_basic_monthly': [{ cloudId: 'file', tier: 'basic' }],
+  'cloud_file_pro_monthly': [{ cloudId: 'file', tier: 'pro' }],
+  'cloud_monetization_basic_monthly': [{ cloudId: 'monetization', tier: 'basic' }],
+  'cloud_monetization_pro_monthly': [{ cloudId: 'monetization', tier: 'pro' }],
+  'cloud_intelligence_basic_monthly': [{ cloudId: 'intelligence', tier: 'basic' }],
+  'cloud_intelligence_pro_monthly': [{ cloudId: 'intelligence', tier: 'pro' }],
+  'cloud_music_basic_monthly': [{ cloudId: 'music', tier: 'basic' }],
+  'cloud_music_pro_monthly': [{ cloudId: 'music', tier: 'pro' }],
+  'cloud_growth_basic_monthly': [{ cloudId: 'growth', tier: 'basic' }],
+  'cloud_growth_pro_monthly': [{ cloudId: 'growth', tier: 'pro' }],
+  'cloud_shopping_basic_monthly': [{ cloudId: 'shopping', tier: 'basic' }],
+  'cloud_shopping_pro_monthly': [{ cloudId: 'shopping', tier: 'pro' }],
+  'cloud_advertising_basic_monthly': [{ cloudId: 'advertising', tier: 'basic' }],
+  'cloud_advertising_pro_monthly': [{ cloudId: 'advertising', tier: 'pro' }],
+  'cloud_all_pro_monthly': [
+    { cloudId: 'creation', tier: 'pro' },
+    { cloudId: 'video', tier: 'pro' },
+    { cloudId: 'writing', tier: 'pro' },
+    { cloudId: 'file', tier: 'pro' },
+    { cloudId: 'monetization', tier: 'pro' },
+    { cloudId: 'intelligence', tier: 'pro' },
+    { cloudId: 'music', tier: 'pro' },
+    { cloudId: 'growth', tier: 'pro' },
+    { cloudId: 'shopping', tier: 'pro' },
+    { cloudId: 'advertising', tier: 'pro' },
+  ],
 };
 
 export async function grantAccessForOffer(params: GrantAccessParams): Promise<void> {
@@ -31,6 +71,18 @@ export async function grantAccessForOffer(params: GrantAccessParams): Promise<vo
      ON CONFLICT DO NOTHING`,
     [userId, cmsSlug, "purchase", JSON.stringify({ offerKey })]
   );
+
+  const cloudEnts = CLOUD_OFFER_MAP[offerKey];
+  if (cloudEnts) {
+    for (const { cloudId, tier } of cloudEnts) {
+      await grantCloudEntitlement({
+        userId: parseInt(userId, 10),
+        cloudId,
+        tier,
+        source: 'stripe',
+      });
+    }
+  }
 
   console.log(`[Offers] Granted access: userId=${userId}, offerKey=${offerKey}, cmsSlug=${cmsSlug}`);
 }
@@ -84,6 +136,18 @@ export async function claimPendingPurchases(userId: string, email: string): Prom
        ON CONFLICT DO NOTHING`,
       [userId, purchase.product_slug, "purchase", JSON.stringify({ offerKey })]
     );
+
+    const cloudEnts = CLOUD_OFFER_MAP[offerKey];
+    if (cloudEnts) {
+      for (const { cloudId, tier } of cloudEnts) {
+        await grantCloudEntitlement({
+          userId: parseInt(userId, 10),
+          cloudId,
+          tier,
+          source: 'stripe',
+        });
+      }
+    }
 
     claimed++;
   }
