@@ -10,14 +10,14 @@ type CloudDashboardProps = {
 };
 
 const CLOUD_GRADIENTS: Record<string, string> = {
-  "creation-cloud": "from-pink-500 to-pink-600",
-  "video-cloud": "from-orange-500 to-orange-600",
-  "writing-seo-cloud": "from-blue-500 to-blue-600",
-  "file-data-cloud": "from-gray-500 to-gray-600",
-  "monetization-cloud": "from-yellow-500 to-amber-600",
-  "intelligence-cloud": "from-purple-500 to-purple-600",
-  "music-performance-cloud": "from-green-500 to-green-600",
-  "growth-distribution-cloud": "from-rose-500 to-rose-600",
+  "creation-cloud": "linear-gradient(135deg, #ec4899 0%, #f472b6 100%)",
+  "video-cloud": "linear-gradient(135deg, #f97316 0%, #fb923c 100%)",
+  "writing-seo-cloud": "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)",
+  "file-data-cloud": "linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)",
+  "monetization-cloud": "linear-gradient(135deg, #eab308 0%, #f59e0b 100%)",
+  "intelligence-cloud": "linear-gradient(135deg, #a855f7 0%, #c084fc 100%)",
+  "music-performance-cloud": "linear-gradient(135deg, #22c55e 0%, #4ade80 100%)",
+  "growth-distribution-cloud": "linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)",
 };
 
 const CLOUD_ICONS: Record<string, ElementType> = {
@@ -42,7 +42,7 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
-        <section className={`rounded-2xl bg-gradient-to-r ${gradient} p-8 text-white shadow-lg`}>
+        <section className="rounded-2xl p-8 text-white shadow-lg" style={{ background: gradient }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
               <IconComponent className="w-6 h-6" />
