@@ -594,7 +594,8 @@ export default function SeoControlPage() {
                       <th className="text-center px-4 py-3 font-medium">H1</th>
                       <th className="text-center px-4 py-3 font-medium">Score</th>
                       <th className="text-center px-4 py-3 font-medium">Words</th>
-                      <th className="text-center px-4 py-3 font-medium">Links</th>
+                      <th className="text-center px-4 py-3 font-medium">In</th>
+                      <th className="text-center px-4 py-3 font-medium">Out</th>
                       <th className="text-left px-4 py-3 font-medium">Issues</th>
                       <th className="text-center px-4 py-3 font-medium w-10"></th>
                     </tr>
@@ -623,8 +624,13 @@ export default function SeoControlPage() {
                         <td className="px-4 py-3 text-center text-gray-600">
                           {snapshot.word_count}
                         </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`font-medium ${(snapshot as any).internal_links_in_count > 0 ? "text-gray-600" : "text-gray-300"}`}>
+                            {(snapshot as any).internal_links_in_count > 0 ? (snapshot as any).internal_links_in_count : "—"}
+                          </span>
+                        </td>
                         <td className="px-4 py-3 text-center text-gray-600">
-                          {(snapshot as any).internal_links ?? '-'}
+                          {(snapshot as any).internal_links_out_count ?? '-'}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-1">
@@ -752,7 +758,8 @@ export default function SeoControlPage() {
                       <th className="text-left px-4 py-3 font-medium">Type</th>
                       <th className="text-center px-4 py-3 font-medium">Score</th>
                       <th className="text-center px-4 py-3 font-medium">Words</th>
-                      <th className="text-center px-4 py-3 font-medium">Links</th>
+                      <th className="text-center px-4 py-3 font-medium">In</th>
+                      <th className="text-center px-4 py-3 font-medium">Out</th>
                       <th className="text-center px-4 py-3 font-medium">Expected</th>
                       <th className="text-center px-4 py-3 font-medium">Status</th>
                       <th className="text-center px-4 py-3 font-medium">Indexed</th>
@@ -804,6 +811,11 @@ export default function SeoControlPage() {
                           </td>
                           <td className="px-4 py-3 text-center text-gray-600">
                             {wordCount || '-'}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`font-medium ${(page as any).internal_links_in > 0 ? "text-gray-600" : "text-gray-300"}`}>
+                              {(page as any).internal_links_in > 0 ? (page as any).internal_links_in : "—"}
+                            </span>
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span className={`font-medium ${linksMetStatus ? "text-green-600" : "text-orange-600"}`}>

@@ -436,6 +436,7 @@ export async function getUnindexedPagesWithStatus(): Promise<{
     manual_review_passed: boolean;
     word_count: number | null;
     internal_links: number;
+    internal_links_in: number;
     expected_links: number | null;
     issues: string[];
     needsManualReview?: boolean;
@@ -462,7 +463,7 @@ export async function getUnindexedPagesWithStatus(): Promise<{
 
   const urlsResult = await query(
     `SELECT g.id, g.url, g.type, g.last_health_score, g.is_ready_to_index, g.manual_review_passed,
-            s.word_count, s.internal_links_out_count, s.has_title, s.has_h1, s.has_meta_description,
+            s.word_count, s.internal_links_out_count, s.internal_links_in_count, s.has_title, s.has_h1, s.has_meta_description,
             s.has_expected_schema, s.status_code, s.robots_index, s.overall_score
      FROM global_urls g
      LEFT JOIN LATERAL (
@@ -523,6 +524,7 @@ export async function getUnindexedPagesWithStatus(): Promise<{
       manual_review_passed: row.manual_review_passed,
       word_count: row.word_count,
       internal_links: row.internal_links_out_count ?? 0,
+      internal_links_in: row.internal_links_in_count ?? 0,
       expected_links: result.expectedLinks,
       issues: result.issues,
       needsManualReview: result.needsManualReview,
