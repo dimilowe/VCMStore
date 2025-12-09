@@ -107,21 +107,34 @@ export async function scanPage(urlData: GlobalUrl): Promise<ScanResult> {
   const cleanText = mainContent.replace(/\s+/g, ' ').trim();
   const wordCount = cleanText.split(/\s+/).filter(w => w.length > 0).length;
   
+  const siteHostname = new URL(siteDomain).hostname.replace(/^www\./, '');
+  const allowedHosts = [siteHostname, `www.${siteHostname}`, 'localhost'];
+  
   const internalLinkTargets: string[] = [];
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href') || '';
     let cleanPath = '';
     
-    if (href.startsWith('/') && !href.startsWith('//')) {
-      cleanPath = href.split('?')[0].split('#')[0];
-    } else if (href.includes(siteDomain.replace(/^https?:\/\//, ''))) {
-      try {
+    try {
+      if (href.startsWith('/') && !href.startsWith('//')) {
+        cleanPath = href.split('?')[0].split('#')[0];
+      } else if (href.startsWith('//')) {
+        const parsed = new URL(`https:${href}`);
+        const hrefHost = parsed.hostname.replace(/^www\./, '');
+        if (allowedHosts.includes(hrefHost) || allowedHosts.includes(parsed.hostname)) {
+          cleanPath = parsed.pathname;
+        }
+      } else if (href.startsWith('http')) {
         const parsed = new URL(href);
-        cleanPath = parsed.pathname.split('?')[0].split('#')[0];
-      } catch {}
-    }
+        const hrefHost = parsed.hostname.replace(/^www\./, '');
+        if (allowedHosts.includes(hrefHost) || allowedHosts.includes(parsed.hostname)) {
+          cleanPath = parsed.pathname;
+        }
+      }
+    } catch {}
     
     if (cleanPath) {
+      cleanPath = cleanPath.split('?')[0].split('#')[0];
       cleanPath = cleanPath.replace(/\/+/g, '/');
       if (cleanPath !== '/' && cleanPath.endsWith('/')) {
         cleanPath = cleanPath.slice(0, -1);
