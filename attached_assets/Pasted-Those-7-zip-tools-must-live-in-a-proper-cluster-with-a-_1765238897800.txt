@@ -1,0 +1,47 @@
+Those 7 zip tools must live in a proper cluster with a pillar, not just be thrown into CLUSTER_REGISTRY halfway.
+Here’s how I’d structure it and what to tell Replit.
+1. Concept: one dedicated zip cluster
+Create a single cluster, something like:
+Cluster key: zip-file-tools
+Pillar page: /pillars/zip-file-tools (or /answers/zip-file-tools if your other clusters use answers)
+Tools: the 7 CMS zip tools (whatever their slugs are)
+articleSlugs: empty array for now, to be filled later
+That gives you:
+Sibling links between all 7 zip tools
+A pillar link from each tool
+Room to later add 1–3 support articles for stronger expected link counts
+2. Example CLUSTER_REGISTRY entry
+Adapt this to your actual slugs + pillar path and match whatever shape clusterRegistry.ts uses:
+// data/clusterRegistry.ts
+
+export const CLUSTER_REGISTRY: ClusterRegistry = {
+  // ...existing clusters...
+
+  "zip-file-tools": {
+    label: "Zip File Tools",
+    pillarSlug: "/pillars/zip-file-tools", // or /answers/zip-file-tools
+    toolSlugs: [
+      "zip-file-creator",
+      "image-zipper",
+      "folder-zipper",
+      "pdf-zipper",
+      "multi-file-zipper",
+      "zip-extractor",
+      "zip-compressor",
+    ],
+    articleSlugs: [
+      // fill in later, e.g.:
+      // "/answers/how-to-compress-files-online",
+      // "/answers/zip-vs-rar-vs-7z",
+    ],
+  },
+};
+(Replace the tool slugs with your real 7; point pillarSlug at whatever route you’ll use.)
+3. Message you can send back
+I can see that the 7 zip-file tools are CMS-structured but not part of any topic cluster yet. I want these treated as a full cluster with a pillar page, not just floating tools.
+I’ll add a zip-file-tools cluster to clusterRegistry with:
+pillarSlug: /pillars/zip-file-tools (or whatever pillar path we standardize on)
+toolSlugs: all 7 CMS zip tools
+articleSlugs: an empty array for now that we can populate with support articles later
+Once that’s in place, the expected-links logic (siblings + min(articles, 3) + pillar) will apply correctly to all zip tools, and they’ll be fully wired into the cluster architecture.
+That gives them a clear, correct cluster with pillar + future article hooks, and it keeps your expected-link counts honest.
