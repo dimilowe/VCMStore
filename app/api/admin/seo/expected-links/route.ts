@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
 import { sessionOptions, AdminSessionData } from "@/lib/admin-session";
 import { CLUSTER_REGISTRY } from "@/data/clusterRegistry";
+import { query } from "@/lib/db";
 
 interface ExpectedLinksMap {
   [url: string]: number;
@@ -17,6 +18,26 @@ export async function GET() {
 
   try {
     const expectedLinks: ExpectedLinksMap = {};
+    const cmsTools = new Set<string>();
+    const legacyTools: string[] = [];
+
+    const cmsResult = await query(
+      `SELECT slug FROM cms_objects WHERE type = 'tool'`
+    );
+    for (const row of cmsResult.rows) {
+      cmsTools.add(row.slug);
+    }
+
+    const allToolsResult = await query(
+      `SELECT url FROM global_urls WHERE url LIKE '/tools/%' AND url NOT LIKE '/tools/all' AND url NOT LIKE '/tools/clusters/%' AND url NOT LIKE '%/embed' AND url NOT LIKE '%/success'`
+    );
+
+    for (const row of allToolsResult.rows) {
+      const slug = row.url.replace('/tools/', '');
+      if (!cmsTools.has(slug)) {
+        legacyTools.push(row.url);
+      }
+    }
 
     for (const [clusterId, cluster] of Object.entries(CLUSTER_REGISTRY)) {
       const toolCount = cluster.toolSlugs.length;
@@ -42,7 +63,7 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ expectedLinks });
+    return NextResponse.json({ expectedLinks, legacyTools });
   } catch (error) {
     console.error("Failed to calculate expected links:", error);
     return NextResponse.json({ error: "Failed to calculate expected links" }, { status: 500 });

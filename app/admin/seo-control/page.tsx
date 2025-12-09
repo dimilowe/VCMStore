@@ -69,6 +69,7 @@ export default function SeoControlPage() {
   const [snapshots, setSnapshots] = useState<SeoSnapshot[]>([]);
   const [readyPages, setReadyPages] = useState<ReadyPage[]>([]);
   const [expectedLinks, setExpectedLinks] = useState<Record<string, number>>({});
+  const [legacyTools, setLegacyTools] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -120,6 +121,7 @@ export default function SeoControlPage() {
       if (expectedRes.ok) {
         const data = await expectedRes.json();
         setExpectedLinks(data.expectedLinks || {});
+        setLegacyTools(data.legacyTools || []);
       }
     } catch (error) {
       console.error("Failed to load data:", error);
