@@ -6,7 +6,9 @@ export type CloudSlug =
   | "monetization"
   | "intelligence"
   | "music_performance"
-  | "growth_distribution";
+  | "growth_distribution"
+  | "shopping"
+  | "advertising";
 
 export type CloudConfig = {
   slug: CloudSlug;
@@ -63,6 +65,18 @@ export const CLOUDS: CloudConfig[] = [
     name: "VCM Distribution & Growth Cloud",
     shortDescription: "Hashtags, comments system, distribution, and funnel rails.",
     productSlug: "vcm-growth-distribution-cloud",
+  },
+  {
+    slug: "shopping",
+    name: "VCM Shopping Cloud",
+    shortDescription: "Tools for outfits, styling, shopping boards, lookbooks, product mixing, and shoppable content.",
+    productSlug: "vcm-shopping-cloud",
+  },
+  {
+    slug: "advertising",
+    name: "VCM Advertising Cloud",
+    shortDescription: "Tools for paid reach, ads, campaign testing, funnels, optimizations, and marketing workflows.",
+    productSlug: "vcm-advertising-cloud",
   },
 ];
 
