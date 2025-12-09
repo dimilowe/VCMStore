@@ -52,15 +52,12 @@ export async function POST(request: NextRequest) {
     } else if (field === "cloudTags") {
       const tags = Array.isArray(value) ? value : [];
       const defaultData = JSON.stringify({ title: slug });
-      const result = await query(
+      await query(
         `INSERT INTO cms_objects (slug, type, cloud_tags, data, created_at, updated_at)
          VALUES ($2, 'tool', $1, $3::jsonb, NOW(), NOW())
          ON CONFLICT (slug) DO UPDATE SET cloud_tags = $1, updated_at = NOW()`,
         [tags, slug, defaultData]
       );
-      if (result.rowCount === 0) {
-        return NextResponse.json({ error: "Failed to save cloud tags" }, { status: 500 });
-      }
     } else {
       const fieldMap: Record<string, string> = {
         isFeatured: "featured",
