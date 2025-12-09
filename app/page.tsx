@@ -103,42 +103,62 @@ async function getLatestDrops(): Promise<Product[]> {
   }
 }
 
-const creatorApps = [
+const vcmClouds = [
   {
-    name: "APE",
-    description: "AI-Powered Engagement",
-    icon: Zap,
-    href: "/vcm-os",
-    gradient: "app-card-pink"
+    name: "Creation",
+    description: "AI Image & Design",
+    icon: Palette,
+    href: "/clouds/creation-cloud",
+    gradient: "bg-gradient-to-br from-pink-500 to-rose-600"
   },
   {
-    name: "QR Social",
-    description: "Social QR Networking",
-    icon: QrCode,
-    href: "https://qrsocial.studio",
-    gradient: "app-card-blue",
-    external: true
+    name: "Video",
+    description: "Editing & Analysis",
+    icon: Youtube,
+    href: "/clouds/video-cloud",
+    gradient: "bg-gradient-to-br from-red-500 to-orange-600"
   },
   {
-    name: "Nudge",
-    description: "Smart Notifications",
-    icon: Bell,
-    href: "/vcm-os",
-    gradient: "app-card-yellow"
+    name: "Writing",
+    description: "SEO & Content",
+    icon: FilePen,
+    href: "/clouds/writing-seo-cloud",
+    gradient: "bg-gradient-to-br from-blue-500 to-indigo-600"
   },
   {
-    name: "Stemly",
-    description: "Music Stem Editor",
+    name: "Files",
+    description: "Convert & Compress",
+    icon: FileText,
+    href: "/clouds/file-data-cloud",
+    gradient: "bg-gradient-to-br from-cyan-500 to-blue-600"
+  },
+  {
+    name: "Monetize",
+    description: "Revenue Tools",
+    icon: ShoppingBag,
+    href: "/clouds/monetization-cloud",
+    gradient: "bg-gradient-to-br from-green-500 to-emerald-600"
+  },
+  {
+    name: "Intelligence",
+    description: "AI Automation",
+    icon: Sparkles,
+    href: "/clouds/intelligence-cloud",
+    gradient: "bg-gradient-to-br from-purple-500 to-violet-600"
+  },
+  {
+    name: "Music",
+    description: "Stems & Audio",
     icon: Music,
-    href: "/vcm-os",
-    gradient: "app-card-teal"
+    href: "/clouds/music-performance-cloud",
+    gradient: "bg-gradient-to-br from-teal-500 to-cyan-600"
   },
   {
-    name: "C-Score",
-    description: "Calorie Calculator",
-    icon: Flame,
-    href: "/vcm-os",
-    gradient: "app-card-orange"
+    name: "Growth",
+    description: "Distribution & Reach",
+    icon: TrendingUp,
+    href: "/clouds/growth-distribution-cloud",
+    gradient: "bg-gradient-to-br from-amber-500 to-orange-600"
   },
 ];
 
@@ -185,26 +205,25 @@ export default async function HomePage() {
       <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
-            Creator Apps
+            VCM Clouds
           </h1>
           <p className="text-gray-500 text-lg mb-12">
-            Unified tools for modern creators
+            AI-powered tool suites for modern creators
           </p>
 
-          {/* Creator Apps Grid - VCM OS Style */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-12">
-            {creatorApps.map((app) => (
+          {/* VCM Clouds Grid */}
+          <div className="grid grid-cols-4 gap-4 md:gap-6 mb-12 max-w-3xl mx-auto">
+            {vcmClouds.map((cloud) => (
               <Link
-                key={app.name}
-                href={app.href}
-                target={app.href.startsWith('http') ? '_blank' : undefined}
+                key={cloud.name}
+                href={cloud.href}
                 className="group flex flex-col items-center"
               >
-                <div className={`w-24 h-24 md:w-28 md:h-28 ${app.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <app.icon className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                <div className={`w-16 h-16 md:w-20 md:h-20 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <cloud.icon className="w-7 h-7 md:w-9 md:h-9 text-white" />
                 </div>
-                <span className="text-sm font-semibold text-gray-900">{app.name}</span>
-                <span className="text-xs text-gray-500">{app.description}</span>
+                <span className="text-xs md:text-sm font-semibold text-gray-900">{cloud.name}</span>
+                <span className="text-[10px] md:text-xs text-gray-500 hidden sm:block">{cloud.description}</span>
               </Link>
             ))}
           </div>
@@ -348,26 +367,25 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Explore VCM OS */}
+      {/* Explore VCM Clouds */}
       <section className="pt-10 pb-6 px-4 bg-gray-900">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-            Explore VCM OS
+            Explore VCM Clouds
           </h2>
 
-          {/* Creator Apps Grid - VCM OS Style */}
-          <div className="flex flex-wrap items-center justify-center gap-5 mb-8">
-            {creatorApps.map((app) => (
+          {/* VCM Clouds Grid */}
+          <div className="grid grid-cols-4 gap-4 md:gap-5 mb-8 max-w-2xl mx-auto">
+            {vcmClouds.map((cloud) => (
               <Link
-                key={app.name}
-                href={app.href}
-                target={app.href.startsWith('http') ? '_blank' : undefined}
+                key={cloud.name}
+                href={cloud.href}
                 className="group flex flex-col items-center"
               >
-                <div className={`w-20 h-20 md:w-24 md:h-24 ${app.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <app.icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
+                <div className={`w-14 h-14 md:w-18 md:h-18 ${cloud.gradient} rounded-xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <cloud.icon className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </div>
-                <span className="text-xs font-semibold text-white">{app.name}</span>
+                <span className="text-[10px] md:text-xs font-semibold text-white">{cloud.name}</span>
               </Link>
             ))}
           </div>
@@ -389,7 +407,7 @@ export default async function HomePage() {
               Browse Tools
             </Link>
           </div>
-          <p className="text-gray-400 text-sm">Unified tools for modern creators</p>
+          <p className="text-gray-400 text-sm">AI-powered tool suites for modern creators</p>
         </div>
       </section>
 
