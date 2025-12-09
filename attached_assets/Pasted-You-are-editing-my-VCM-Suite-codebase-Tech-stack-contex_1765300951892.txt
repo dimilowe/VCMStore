@@ -1,0 +1,276 @@
+You are editing my VCM Suite codebase.
+Tech stack context (important):
+Next.js app
+Supabase/Postgres DB
+Stripe already integrated using the Three Truths architecture:
+Products are defined in cms_objects
+offer_key is the source of truth for what access gets granted
+Checkout API passes offer_key to Stripe metadata
+Stripe webhook calls a centralized grantAccessForOffer(offer_key, userId) function in lib/offers.ts
+GOAL
+Implement Cloud Entitlements so that:
+The database has a cloud_entitlements table.
+We have TypeScript types + helpers to work with entitlements.
+grantAccessForOffer can create/update cloud entitlements when an offer key represents a cloud subscription.
+Tools in VCM Suite can call a simple hasAccess() function to decide whether to show Pro / AI features based on the user’s cloud tier.
+This is the foundation of Cloud gating and the Kingmaker Plan for VCM Suite.
+1) CREATE THE cloud_entitlements TABLE (SQL MIGRATION)
+Locate where DB migrations or schema SQL live (e.g. /supabase/migrations, /db/migrations, or similar).
+Create a new migration file for the cloud_entitlements table and add the following SQL (if there is a centralized schema file instead, add this there instead):
+create table if not exists cloud_entitlements (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+
+  cloud_id text not null check (
+    cloud_id in (
+      'creation','video','writing','file',
+      'monetization','intelligence','music','growth',
+      'shopping','advertising'
+    )
+  ),
+
+  tier text not null check (tier in ('free','basic','pro','enterprise')),
+  source text not null check (source in ('stripe','manual_grant','bundle','promotion')),
+  status text not null check (status in ('active','past_due','canceled','trial')),
+
+  valid_from timestamptz default now(),
+  valid_to timestamptz,
+
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists cloud_entitlements_user_id_idx on cloud_entitlements(user_id);
+create index if not exists cloud_entitlements_cloud_id_idx on cloud_entitlements(cloud_id);
+create index if not exists cloud_entitlements_status_idx on cloud_entitlements(status);
+Make sure this will actually be applied in my Supabase / Postgres environment the same way as my other migrations.
+2) ADD TYPES FOR CLOUDS + ENTITLEMENTS
+Create a new file lib/types/cloudEntitlements.ts (or, if you already have a central OS types file like lib/types/os.ts, extend that) with:
+export type CloudId =
+  | 'creation'
+  | 'video'
+  | 'writing'
+  | 'file'
+  | 'monetization'
+  | 'intelligence'
+  | 'music'
+  | 'growth'
+  | 'shopping'
+  | 'advertising';
+
+export type EntitlementTier = 'free' | 'basic' | 'pro' | 'enterprise';
+
+export interface CloudEntitlement {
+  id: string;
+  user_id: string;
+
+  cloud_id: CloudId;
+  tier: EntitlementTier;
+
+  source: 'stripe' | 'manual_grant' | 'bundle' | 'promotion';
+  status: 'active' | 'past_due' | 'canceled' | 'trial';
+
+  valid_from: string; // ISO date
+  valid_to: string | null;
+
+  created_at: string;
+  updated_at: string;
+}
+If there is already a shared lib/types/index.ts, export these types from there as well for easier imports.
+3) CREATE CLOUD ENTITLEMENT HELPERS
+Create a new file lib/cloudEntitlements.ts with the following:
+A function to fetch entitlements for a user.
+A hasAccess() function to compare user tier vs required tier.
+A helper to upsert entitlements when an offer is granted.
+import { createClient } from '@/lib/supabaseServer'; // adjust this import to whatever server-side Supabase client you use
+import type { CloudEntitlement, CloudId, EntitlementTier } from './types/cloudEntitlements';
+
+const TIER_ORDER: EntitlementTier[] = ['free', 'basic', 'pro', 'enterprise'];
+
+export function hasAccess(
+  entitlements: CloudEntitlement[] | undefined,
+  cloud: CloudId,
+  required: EntitlementTier
+): boolean {
+  if (!entitlements || entitlements.length === 0) return false;
+
+  const record = entitlements.find(
+    (e) => e.cloud_id === cloud && e.status === 'active'
+  );
+
+  if (!record) return false;
+
+  return (
+    TIER_ORDER.indexOf(record.tier) >= TIER_ORDER.indexOf(required)
+  );
+}
+
+export async function getCloudEntitlementsForUser(
+  userId: string
+): Promise<CloudEntitlement[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('cloud_entitlements')
+    .select('*')
+    .eq('user_id', userId)
+    .in('status', ['active', 'trial']); // only relevant ones
+
+  if (error) {
+    console.error('[cloud_entitlements] fetch error', error);
+    return [];
+  }
+
+  return (data ?? []) as CloudEntitlement[];
+}
+
+export async function grantCloudEntitlement(params: {
+  userId: string;
+  cloudId: CloudId;
+  tier: EntitlementTier;
+  source: 'stripe' | 'manual_grant' | 'bundle' | 'promotion';
+  status?: 'active' | 'past_due' | 'canceled' | 'trial';
+  validFrom?: string;
+  validTo?: string | null;
+}) {
+  const {
+    userId,
+    cloudId,
+    tier,
+    source,
+    status = 'active',
+    validFrom = new Date().toISOString(),
+    validTo = null,
+  } = params;
+
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from('cloud_entitlements')
+    .upsert(
+      {
+        user_id: userId,
+        cloud_id: cloudId,
+        tier,
+        source,
+        status,
+        valid_from: validFrom,
+        valid_to: validTo,
+      },
+      {
+        onConflict: 'user_id,cloud_id',
+      } as any
+    );
+
+  if (error) {
+    console.error('[cloud_entitlements] upsert error', error);
+  }
+}
+Update the createClient import path if necessary to match how the repo currently initializes the server-side Supabase client.
+4) WIRE CLOUD ENTITLEMENTS INTO grantAccessForOffer
+Open lib/offers.ts (or whatever file contains grantAccessForOffer(offerKey, userId) and central entitlement logic).
+We’re going to:
+Import grantCloudEntitlement, CloudId, and EntitlementTier.
+Extend the switch/case or mapping so certain offer_key values grant cloud entitlements.
+At the top of lib/offers.ts, add:
+import { grantCloudEntitlement } from './cloudEntitlements';
+import type { CloudId, EntitlementTier } from './types/cloudEntitlements';
+Now, in grantAccessForOffer, extend the logic. Example pattern (adapt to the real offer_keys you’re using):
+export async function grantAccessForOffer(offerKey: string, userId: string) {
+  // existing logic for other entitlements stays in place
+  // e.g. product access, digital downloads, etc.
+
+  // Cloud entitlement mapping
+  const cloudOfferMap: Record<
+    string,
+    { cloudId: CloudId; tier: EntitlementTier }
+  > = {
+    // EXAMPLES — update keys to real offer_keys used in CMS products
+    'CLOUD_CREATION_BASIC_MONTHLY': { cloudId: 'creation', tier: 'basic' },
+    'CLOUD_CREATION_PRO_MONTHLY': { cloudId: 'creation', tier: 'pro' },
+    'CLOUD_VIDEO_PRO_MONTHLY': { cloudId: 'video', tier: 'pro' },
+    'CLOUD_WRITING_PRO_MONTHLY': { cloudId: 'writing', tier: 'pro' },
+    'CLOUD_ALL_PRO_MONTHLY': { cloudId: 'creation', tier: 'pro' }, // you can handle "all clouds" with a loop if needed
+    // Add entries for each cloud subscription offer_key
+  };
+
+  const cloudConfig = cloudOfferMap[offerKey];
+
+  if (cloudConfig) {
+    await grantCloudEntitlement({
+      userId,
+      cloudId: cloudConfig.cloudId,
+      tier: cloudConfig.tier,
+      source: 'stripe',
+      status: 'active',
+    });
+  }
+
+  // keep any existing logic that grants other entitlements (e.g., digital products)
+}
+If you have an “All Clouds Pro” type of product, you can instead map that key to a special case that calls grantCloudEntitlement in a loop for each CloudId.
+5) ENSURE STRIPE WEBHOOK STILL CALLS grantAccessForOffer
+Open app/api/webhooks/stripe/route.ts (or equivalent).
+Confirm that for the following events:
+checkout.session.completed
+and/or invoice.payment_succeeded (for subscriptions)
+you are:
+Extracting offer_key from session.metadata.offer_key (or similar).
+Extracting the userId (either from client_reference_id, metadata, or however you currently do it).
+Calling grantAccessForOffer(offerKey, userId).
+If this is not implemented yet or is incomplete, implement or fix it. The core thing: Stripe → offer_key → grantAccessForOffer → grantCloudEntitlement.
+6) ADD A SIMPLE EXAMPLE USAGE IN A TOOL RENDERER
+Pick ONE tool page that lives under something like app/tools/[slug]/page.tsx or any React component that renders a Pro/AI feature.
+We want to show the pattern so that later we can reuse it everywhere.
+Example pattern (server component):
+// app/tools/some-tool/page.tsx (example)
+import { getCurrentUser } from '@/lib/auth'; // adjust to your actual auth helper
+import { getCloudEntitlementsForUser, hasAccess } from '@/lib/cloudEntitlements';
+
+export default async function SomeToolPage() {
+  const user = await getCurrentUser();
+
+  let entitlements = [];
+  if (user) {
+    entitlements = await getCloudEntitlementsForUser(user.id);
+  }
+
+  const canUsePro = user && hasAccess(entitlements, 'creation', 'pro');
+
+  return (
+    <div>
+      {/* Free version UI */}
+      <FreeToolComponent />
+
+      {canUsePro ? (
+        <ProAIToolComponent />
+      ) : (
+        <UpgradeBanner
+          cloud="creation"
+          requiredTier="pro"
+          // use existing upgrade/checkout links / UI elements
+        />
+      )}
+    </div>
+  );
+}
+If the repo uses client components or hooks for user session, adapt accordingly (e.g., fetch entitlements via a server action or API route).
+7) SANITY CHECKS
+Ensure the migration runs and cloud_entitlements actually exists.
+Ensure lib/cloudEntitlements.ts compiles, with correct Supabase client import.
+Ensure lib/offers.ts compiles and still handles all prior offer types.
+Ensure Stripe webhook still compiles and calls grantAccessForOffer.
+Visit the sample tool page and:
+As a non-logged-in user: see free only.
+As a logged-in user with NO entitlement: see free + upgrade banner.
+After simulating/granting an entitlement row manually in cloud_entitlements: see Pro component.
+Do NOT refactor unrelated parts of the codebase.
+Keep changes focused around:
+DB schema
+lib/types/cloudEntitlements.ts
+lib/cloudEntitlements.ts
+lib/offers.ts
+app/api/webhooks/stripe/route.ts
+ONE demo tool page showing hasAccess() usage.
+End of instructions.
+Apply all of this in the repo now.
