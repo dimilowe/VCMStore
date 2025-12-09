@@ -1,0 +1,90 @@
+You’re 100% right — this page is missing the critical CMS-side data that actually tells you:
+what content type it is (CMS tool? legacy? static?)
+what cluster it belongs to
+whether it has an engine_config
+whether it has interlink metadata
+whether it has a CMS object backing it
+whether it's safe to index
+whether it's orphaned
+whether it’s expected to have links (and how many)
+Right now, the URL Registry is showing only:
+URL
+Type (legacy/unknown)
+Indexed
+Action → Open
+Which is basically just a raw list of paths.
+Your CMS needs the fully enriched "link intelligence" layer to make this page actually useful.
+✅ What Data Must Be Added to This Page
+Let’s list the exact fields that should show next to each URL so you immediately know what to do:
+1. CMS Status
+Does this URL correspond to a CMS object?
+CMS Object: yes/no
+If no, it’s legacy.
+2. CMS Type
+Match what the CMS object says, not legacy tables:
+Type: tool / article / pillar / cluster-index / static / legacy
+3. Cluster Slug
+If it's part of a cluster:
+Cluster: zip-file-tools
+If blank → that’s a major signal.
+4. Engine Config
+If it's a tool:
+Engine: zipEngine / platformResizer / outfitEngine / none
+If none → it’s old/legacy.
+5. Interlink Count (Inbound + Outbound)
+Right now you're manually checking SEO Health.
+Instead, show:
+Inbound links: 0
+Outbound links: 33
+6. Expected Link Count (Based on Rules)
+Based on the type classifier:
+Expected: 7
+Actual: 0
+Status: Orphan
+7. Indexing Toggle (with warning state)
+Replace generic toggle with a smart one:
+Green = safe to index
+Yellow = missing cluster metadata
+Red = orphan or legacy
+8. Linked CMS Item (if exists)
+Clickable CMS edit link:
+CMS → Edit Tool
+If it doesn’t exist:
+CMS: Missing (Add Now)
+🔥 What This Transforms the Page Into
+Right now the URL Registry is basically a table of raw slugs.
+Once we add the missing fields, this page becomes:
+The central nervous system of the entire SEO architecture.
+You will instantly see:
+which URLs are safe
+which are dangerous
+which are legacy
+which are CMS-backed
+which are missing clusters
+which require link fixes
+which require engine presets
+which are true orphans
+which are ready to index
+No more hunting. No more guessing.
+🧠 How This Fixes Your ZIP Tool Confusion
+Right now:
+/tools/zip-file-compression = legacy, no CMS object
+/tools/zip-file-folder = legacy, no CMS object
+Cluster-aware URLs = not attached to CMS, so Ready to Index doesn't see them
+SEO Health flags them only because Google can crawl them
+CMS sees nothing → they never appear in “Ready to Index”
+Once we enrich the data:
+These rows will look like:
+/tools/zip-file-compression  
+Type: legacy  
+CMS: missing  
+Cluster: none  
+Inbound: 0  
+Expected: 7  
+Status: ORPHAN  
+Indexed: ON (warning)  
+Fix: → Replace with CMS tool / Add redirect
+Clear. Actionable. Solved.
+⭐ FINAL VERDICT
+Yes — this page absolutely needs more data.
+Right now it hides the true state of your entire SEO architecture.

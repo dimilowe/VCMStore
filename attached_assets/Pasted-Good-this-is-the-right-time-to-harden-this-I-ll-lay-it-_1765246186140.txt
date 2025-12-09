@@ -1,0 +1,202 @@
+Good, this is the right time to harden this.
+I’ll lay it out as one concrete upgrade you can hand to Replit: backend changes + frontend changes + what happens to the ZIP ghosts.
+1. Add a URL classifier (single source of truth)
+Create lib/seo/urlClassifier.ts:
+// pseudo-types
+type UrlKind =
+  | "cms-tool"
+  | "cms-article"
+  | "cms-pillar"
+  | "cms-product"
+  | "system"
+  | "legacy";
+
+type UrlStatus =
+  | "ready"
+  | "needs_links"
+  | "needs_review"
+  | "legacy"
+  | "system";
+
+export interface UrlRegistryRow {
+  url: string;
+  basePath: string;          // "/tools", "/newsletter", etc.
+  kind: UrlKind;
+  status: UrlStatus;
+  isIndexed: boolean;
+
+  // CMS / cluster info
+  cmsId?: string;
+  cmsType?: string;          // "tool" | "article" | ...
+  clusterSlug?: string | null;
+  engine?: string | null;    // "zipEngine", etc.
+
+  // link intelligence
+  linksInbound: number;
+  linksOutbound: number;
+  expectedLinks: number | null;
+
+  // misc
+  seoScore?: number | null;
+}
+Implementation logic (server-side):
+Load raw URLs from global_urls.
+LEFT JOIN to cms_objects on slug.
+Look up cluster from CLUSTER_REGISTRY (toolSlugs, articleSlugs, pillarSlug).
+Read internal-link snapshot (whatever table you store inbound/outbound links in).
+Run classification function:
+function classify(raw: {
+  url: string;
+  globalType: string | null;
+  cmsType: string | null;
+  cmsData: any | null;
+}): UrlKind {
+  const isCms = !!raw.cmsType;
+
+  if (!isCms) {
+    // hard-coded system routes
+    if (["/store", "/tools", "/settings", "/saved", "/ideas", "/ideas/new"].includes(raw.url)) {
+      return "system";
+    }
+    return "legacy";
+  }
+
+  if (raw.cmsType === "tool") return "cms-tool";
+  if (raw.cmsType === "article") return "cms-article";
+  if (raw.cmsType === "pillar" || raw.url.startsWith("/tools/clusters")) return "cms-pillar";
+  if (raw.cmsType === "product") return "cms-product";
+
+  return "legacy";
+}
+Then compute expected links (same logic we already agreed for the Ready Inspector):
+function expectedLinksFor(row: UrlRegistryRow, cluster?: ClusterConfig | null): number | null {
+  if (row.kind === "system" || row.kind === "legacy") return null;
+
+  if (row.kind === "cms-tool" && cluster) {
+    const siblings = cluster.toolSlugs.length - 1;
+    const articleCount = cluster.articleSlugs?.length ?? 0;
+    return siblings + Math.min(articleCount, 3) + 1; // + pillar
+  }
+
+  if (row.kind === "cms-article" && cluster) {
+    return 3; // pillar + 2 tools baseline
+  }
+
+  if (row.kind === "cms-pillar" && cluster) {
+    const tools = cluster.toolSlugs.length;
+    const articles = cluster.articleSlugs?.length ?? 0;
+    return tools + Math.min(articles, 3);
+  }
+
+  // generic CMS page baseline
+  return 3;
+}
+Then compute status:
+function computeStatus(row: UrlRegistryRow, seoScore: number | null): UrlStatus {
+  if (row.kind === "system") return "system";
+  if (row.kind === "legacy") return "legacy";
+
+  const score = seoScore ?? 0;
+
+  if (row.expectedLinks == null) {
+    if (score >= 80 && row.linksOutbound >= 3) return "ready";
+    return "needs_review";
+  }
+
+  if (row.linksInbound < 1 || row.linksOutbound < row.expectedLinks) {
+    return "needs_links";
+  }
+
+  if (score < 80) return "needs_review";
+
+  return "ready";
+}
+Expose this via an admin API: GET /api/admin/url-registry returning UrlRegistryRow[] with filters for:
+kind
+status
+indexed
+2. Upgrade the URL Registry UI
+In app/admin/seo/url-registry/page.tsx (or wherever the table lives), change the table columns to use the enriched rows:
+New columns
+URL (as you have)
+Kind – badge:
+CMS Tool / CMS Article / Pillar / Product / Legacy / System
+Cluster – e.g. zip-file-tools or –
+Engine – zipEngine, platformResizer, etc.
+Links – inbound / outbound (e.g. 0 / 7)
+Expected – numeric or –
+Status – pill:
+Green: Ready
+Orange: Needs Links / Needs Review
+Grey: System
+Red: Legacy
+Indexed – toggle (disabled for System; warning when ON for Legacy)
+Actions
+View
+“Open CMS” (if cmsId)
+Maybe “Mark Legacy / Add Redirect”
+Rough JSX:
+<Badge variant={kindToVariant(row.kind)}>{labelForKind(row.kind)}</Badge>
+
+<span>{row.clusterSlug ?? "—"}</span>
+<span>{row.engine ?? "—"}</span>
+<span>{row.linksInbound} / {row.linksOutbound}</span>
+<span>{row.expectedLinks ?? "—"}</span>
+
+<StatusPill status={row.status} />
+
+<IndexedToggle
+  disabled={row.kind === "system"}
+  warning={row.kind === "legacy"}
+  checked={row.isIndexed}
+/>
+Add filters at the top:
+Kind filter: All / CMS Tools / Articles / Pillars / Legacy / System
+Status filter: All / Ready / Needs Links / Needs Review / Legacy / System
+Search: by URL or cluster slug
+Now you can:
+Filter Kind = legacy → see all crap you should de-index or redirect.
+Filter Status = ready → safe list to toggle ON.
+Filter Kind = cms-tool, Status = needs_links → tools that need internal links.
+3. Handle the ZIP pages specifically
+With this upgrade, your ZIP rows will look like:
+/tools/zip-file-compression
+kind: legacy
+linksInbound: 0
+linksOutbound: 7
+expectedLinks: null
+status: legacy
+indexed: ON currently → this will show as a red-row / warning
+/tools/zip-file-folder
+same as above
+Actions to take now (even before the code refactor lands):
+In URL Registry, toggle Indexed OFF for:
+/tools/zip-file-compression
+/tools/zip-file-folder
+Add 301 redirects:
+// next.config.js redirects()
+{
+  source: "/tools/zip-file-compression",
+  destination: "/tools/zip-file-compressor",
+  permanent: true,
+},
+{
+  source: "/tools/zip-file-folder",
+  destination: "/tools/zip-folder-maker",
+  permanent: true,
+},
+Leave only the CMS ZIP tools (zip-file-compressor, etc.) as index candidates.
+Once the URL Registry UI is upgraded, those two will permanently live in the Legacy bucket with Indexed = false, and you’ll never mistake them for cluster members again.
+4. End state you’re aiming for
+When this is done, the URL Registry becomes:
+Your control tower:
+one glance tells you: CMS vs legacy vs system
+you can see clusters, engines, link health, and readiness in one place
+Directly aligned with the Ready Inspector:
+both use the same classifier + expected-link rules
+no more contradictions between “healthy” and “orphaned”
+Safe for scaling:
+you can drop JSON for new clusters, run the inspector, and instantly know:
+which URLs are ready
+which need links
+which are legacy junk
