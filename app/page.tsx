@@ -205,7 +205,7 @@ export default async function HomePage() {
       <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
-            VCM Clouds
+            Creator Clouds
           </h1>
           <p className="text-gray-500 text-lg mb-12">
             AI-powered tool suites for modern creators
@@ -371,7 +371,7 @@ export default async function HomePage() {
       <section className="pt-10 pb-6 px-4 bg-gray-900">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-            Explore VCM Clouds
+            Explore Creator Clouds
           </h2>
 
           {/* VCM Clouds Grid - 4x2 */}
