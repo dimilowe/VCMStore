@@ -126,17 +126,18 @@ export async function GET(request: NextRequest) {
     `);
 
     const snapshotsResult = await query(`
-      SELECT url, internal_links, overall_score
+      SELECT slug, internal_links_out_count, internal_links_in_count, overall_score
       FROM seo_health_snapshots
-      WHERE crawled_at = (
-        SELECT MAX(crawled_at) FROM seo_health_snapshots s2 WHERE s2.url = seo_health_snapshots.url
+      WHERE snapshot_date = (
+        SELECT MAX(snapshot_date) FROM seo_health_snapshots s2 WHERE s2.slug = seo_health_snapshots.slug
       )
     `);
 
-    const snapshotMap = new Map<string, { links: number; score: number }>();
+    const snapshotMap = new Map<string, { linksIn: number; linksOut: number; score: number }>();
     for (const row of snapshotsResult.rows) {
-      snapshotMap.set(row.url, {
-        links: row.internal_links || 0,
+      snapshotMap.set(row.slug, {
+        linksIn: row.internal_links_in_count || 0,
+        linksOut: row.internal_links_out_count || 0,
         score: row.overall_score || 0
       });
     }
@@ -146,7 +147,8 @@ export async function GET(request: NextRequest) {
     for (const row of urlsResult.rows) {
       const url = row.url;
       const snapshot = snapshotMap.get(url);
-      const linksOutbound = snapshot?.links || 0;
+      const linksInbound = snapshot?.linksIn || 0;
+      const linksOutbound = snapshot?.linksOut || 0;
       const seoScore = snapshot?.score || row.last_health_score || null;
 
       const isSystem = SYSTEM_URLS.has(url) || url.startsWith('/admin');
@@ -244,7 +246,7 @@ export async function GET(request: NextRequest) {
         cmsType: row.cms_type || null,
         clusterSlug: clusterId,
         engine: row.engine || null,
-        linksInbound: 0,
+        linksInbound,
         linksOutbound,
         expectedLinks,
         seoScore

@@ -964,7 +964,8 @@ export default function SeoControlPage() {
                         <th className="text-left px-3 py-3 font-medium">Kind</th>
                         <th className="text-left px-3 py-3 font-medium">Cluster</th>
                         <th className="text-left px-3 py-3 font-medium">Engine</th>
-                        <th className="text-center px-3 py-3 font-medium">Links</th>
+                        <th className="text-center px-3 py-3 font-medium">In</th>
+                        <th className="text-center px-3 py-3 font-medium">Out</th>
                         <th className="text-center px-3 py-3 font-medium">Expected</th>
                         <th className="text-center px-3 py-3 font-medium">Status</th>
                         <th className="text-center px-3 py-3 font-medium">Indexed</th>
@@ -993,6 +994,11 @@ export default function SeoControlPage() {
                             <td className="px-3 py-3">
                               <span className="text-xs text-gray-500">
                                 {row.engine || "—"}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <span className="font-medium text-gray-600">
+                                {row.linksInbound}
                               </span>
                             </td>
                             <td className="px-3 py-3 text-center">
