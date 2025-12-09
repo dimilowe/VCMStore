@@ -212,18 +212,18 @@ export default async function HomePage() {
           </p>
 
           {/* VCM Clouds Grid - 4x2 */}
-          <div className="grid grid-cols-4 gap-4 md:gap-6 mb-12 max-w-3xl mx-auto">
+          <div className="grid grid-cols-4 gap-4 md:gap-8 mb-12 max-w-4xl mx-auto">
             {vcmClouds.map((cloud) => (
               <Link
                 key={cloud.name}
                 href={cloud.href}
                 className="group flex flex-col items-center"
               >
-                <div className={`w-20 h-20 md:w-24 md:h-24 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <cloud.icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
+                <div className={`w-24 h-24 md:w-28 md:h-28 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <cloud.icon className="w-10 h-10 md:w-12 md:h-12 text-white" />
                 </div>
-                <span className="text-xs md:text-sm font-semibold text-gray-900">{cloud.name}</span>
-                <span className="text-[10px] md:text-xs text-gray-500">{cloud.description}</span>
+                <span className="text-sm font-semibold text-gray-900">{cloud.name}</span>
+                <span className="text-xs text-gray-500">{cloud.description}</span>
               </Link>
             ))}
           </div>
@@ -375,17 +375,17 @@ export default async function HomePage() {
           </h2>
 
           {/* VCM Clouds Grid - 4x2 */}
-          <div className="grid grid-cols-4 gap-4 md:gap-5 mb-8 max-w-2xl mx-auto">
+          <div className="grid grid-cols-4 gap-4 md:gap-6 mb-8 max-w-3xl mx-auto">
             {vcmClouds.map((cloud) => (
               <Link
                 key={cloud.name}
                 href={cloud.href}
                 className="group flex flex-col items-center"
               >
-                <div className={`w-16 h-16 md:w-20 md:h-20 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <cloud.icon className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                <div className={`w-20 h-20 md:w-24 md:h-24 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <cloud.icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
                 </div>
-                <span className="text-[10px] md:text-xs font-semibold text-white">{cloud.name}</span>
+                <span className="text-xs font-semibold text-white">{cloud.name}</span>
               </Link>
             ))}
           </div>
