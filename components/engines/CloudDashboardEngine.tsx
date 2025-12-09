@@ -3,7 +3,7 @@
 import { useState, useEffect, type ElementType } from "react";
 import type { CloudDashboardEngineConfig, CMSObject } from "@/lib/types/cms";
 import Link from "next/link";
-import { Sparkles, ArrowRight, Clock, Zap, Palette, Video, PenTool, FolderOpen, DollarSign, Brain, Music, TrendingUp, Wrench } from "lucide-react";
+import { Sparkles, ArrowRight, Clock, Zap, Palette, Video, PenTool, FolderOpen, DollarSign, Brain, Music, TrendingUp, Wrench, Shirt, Megaphone } from "lucide-react";
 
 type CloudDashboardProps = {
   cms: CMSObject & { engine_config: CloudDashboardEngineConfig };
@@ -26,6 +26,8 @@ const CLOUD_GRADIENTS: Record<string, string> = {
   "intelligence-cloud": "linear-gradient(135deg, #a855f7 0%, #c084fc 100%)",
   "music-performance-cloud": "linear-gradient(135deg, #22c55e 0%, #4ade80 100%)",
   "growth-distribution-cloud": "linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)",
+  "shopping-cloud": "linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)",
+  "advertising-cloud": "linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)",
 };
 
 const CLOUD_ICONS: Record<string, ElementType> = {
@@ -37,6 +39,8 @@ const CLOUD_ICONS: Record<string, ElementType> = {
   "intelligence-cloud": Brain,
   "music-performance-cloud": Music,
   "growth-distribution-cloud": TrendingUp,
+  "shopping-cloud": Shirt,
+  "advertising-cloud": Megaphone,
 };
 
 export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {

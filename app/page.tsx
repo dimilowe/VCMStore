@@ -36,7 +36,8 @@ import {
   Link2,
   FileText,
   ShoppingBag,
-  FilePen
+  FilePen,
+  Shirt
 } from "lucide-react";
 
 interface BlogPost {
@@ -159,6 +160,20 @@ const vcmClouds = [
     icon: TrendingUp,
     href: "/clouds/growth-distribution-cloud",
     gradient: "bg-gradient-to-br from-rose-500 to-red-600"
+  },
+  {
+    name: "Shopping",
+    description: "Outfits & Styling",
+    icon: Shirt,
+    href: "/clouds/shopping-cloud",
+    gradient: "bg-gradient-to-br from-pink-500 to-rose-500"
+  },
+  {
+    name: "Advertising",
+    description: "Ads & Campaigns",
+    icon: Megaphone,
+    href: "/clouds/advertising-cloud",
+    gradient: "bg-gradient-to-br from-sky-500 to-indigo-500"
   },
 ];
 
