@@ -260,6 +260,25 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
     articleSlugs: [],
     primaryKeyword: "brand identity tools",
     relatedKeywords: ["logo maker", "business name generator", "brand quotes", "branding tools"]
+  },
+  "zip-file-tools": {
+    id: "zip-file-tools",
+    pillarSlug: "zip-file-tools",
+    pillarTitle: "Free ZIP File Tools: Compress, Create & Protect",
+    pillarDescription: "Online tools to create, compress, and password-protect ZIP files without software.",
+    engineId: "standalone",
+    toolSlugs: [
+      "zip-file-compression",
+      "zip-file-folder",
+      "zip-file-in-linux",
+      "zip-file-linux",
+      "zip-file-make",
+      "zip-file-on-linux",
+      "zip-file-password-protection"
+    ],
+    articleSlugs: [],
+    primaryKeyword: "zip file tools",
+    relatedKeywords: ["zip file creator", "compress files", "password protect zip", "file compression"]
   }
 };
 

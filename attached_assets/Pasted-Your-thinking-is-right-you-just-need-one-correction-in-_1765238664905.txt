@@ -1,0 +1,40 @@
+Your thinking is right, you just need one correction in how you classify things.
+Key point: “Legacy” should only ever apply to tools, not to cluster articles.
+How to think about it
+CMS-structured tools
+Live in cms_objects with type = 'tool' (or whatever you’re using for tools)
+Use cluster architecture + interlinking
+Should have expected links
+Cluster articles (pillars, support, answers, etc.)
+Also CMS-backed (in cms_objects / cluster_articles)
+Definitely not legacy
+They’re part of the cluster linking logic, even if they’re not “tools”
+Legacy tools
+Appear in global_urls as type tool (or under /tools/...)
+Do not have a CMS entry (cms_objects or whatever your new source of truth is)
+Should not get expected-links numbers
+Should be visually flagged as “Legacy – No Cluster”
+So this part needs tightening:
+“25 CMS tools in cms_objects (outfit generators, resizers, zip-file tools). Everything else in global_urls is legacy”
+Not quite. Correct version:
+25 CMS tools → new architecture, cluster-aware ✅
+Other entries in global_urls:
+If it’s a tool URL with no CMS backing → legacy tool ❌
+If it’s an article/pillar/blog/etc. → not legacy, just content ✅
+What to tell Replit
+You want the expected-links API to return flags, not just a separate list. Here’s a clean version you can send:
+Now I can clearly see which tools are CMS-structured: there are 25 CMS tools in cms_objects (outfit generators, resizers, zip tools).
+Articles and pillars that belong to clusters are also CMS-backed and should not be treated as legacy – only tools without a CMS entry should be considered legacy.
+Can you update the expected-links API to:
+Join global_urls with cms_objects
+For each URL, return flags like:
+isCmsTool – CMS entry exists and type = tool
+isCmsArticle – CMS entry exists and type = article/pillar/answer/etc.
+isLegacyTool – global_urls entry is a tool but has no CMS entry
+Keep expected-links logic only for isCmsTool items
+In the Ready panel, show a clear status like “Legacy – No Cluster” for isLegacyTool rows instead of an expected links number.
+That way:
+CMS tools participate fully in the cluster + expected-links system
+Articles/pillars are treated as normal cluster content
+Legacy tools are visually separated as outside the new architecture.
+That keeps your SEO logic honest and gives you a clean migration path.

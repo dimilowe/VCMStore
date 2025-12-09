@@ -684,7 +684,9 @@ export default function SeoControlPage() {
                             {page.internal_links ?? 0}
                           </td>
                           <td className="px-4 py-3 text-center">
-                            {expected > 0 ? (
+                            {legacyTools.includes(cleanUrl) ? (
+                              <span className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-500">Legacy</span>
+                            ) : expected > 0 ? (
                               <span className="text-blue-600 font-medium">{expected}</span>
                             ) : (
                               <span className="text-gray-400">-</span>
