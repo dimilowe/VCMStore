@@ -25,23 +25,13 @@ import {
   Cloud,
   X,
 } from "lucide-react";
-import { CLOUDS } from "@/lib/clouds";
+import { CLOUDS, type CloudSlug } from "@/lib/clouds";
 
 interface LinkStatus {
   status: "ready" | "warning" | "error";
   label: string;
   details: string[];
 }
-
-type CloudSlug =
-  | "creation"
-  | "video"
-  | "writing_seo"
-  | "file_data"
-  | "monetization"
-  | "intelligence"
-  | "music_performance"
-  | "growth_distribution";
 
 interface ToolSkin {
   slug: string;

@@ -18,6 +18,8 @@ const CLOUD_SLUG_TO_DASHBOARD: Record<CloudSlug, string> = {
   intelligence: "intelligence-cloud",
   music_performance: "music-performance-cloud",
   growth_distribution: "growth-distribution-cloud",
+  shopping: "shopping-cloud",
+  advertising: "advertising-cloud",
 };
 
 export function CloudUpsellBlock({ cloudSlugs }: CloudUpsellBlockProps) {
