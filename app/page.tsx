@@ -205,7 +205,7 @@ export default async function HomePage() {
       <section className="py-12 md:py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
-            Creator Clouds
+            VCM Creator Clouds
           </h1>
           <p className="text-gray-500 text-lg mb-12">
             AI-powered tool suites for modern creators
