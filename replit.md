@@ -326,6 +326,26 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-09: **Type-Based SEO Ready Rules** - Intelligent readiness evaluation based on page type and cluster architecture
+  - Created lib/seo/urlClassifier.ts as central classification utility:
+    - Configurable thresholds: MIN_READY_SCORE=80, BASELINE_INTERNAL_LINKS=3
+    - URL classification: isLegacyTool, isCmsTool, isCmsArticle, isPillar, isOtherCms
+    - Cluster detection via CLUSTER_REGISTRY integration
+    - Slug normalization utilities for URL/slug consistency
+  - Type-specific expected links computation:
+    - Cluster tools: siblings + pillar + min(articles, 3)
+    - Cluster articles: 3 (pillar + 2 tools)
+    - Pillars: all tools + min(articles, 3)
+    - Other CMS pages: 3 baseline
+    - Legacy tools: null (out of scope)
+  - Four-state status system: Ready, Needs Links, Needs Review, Legacy
+  - Updated readyInspector.ts to use classifier and compare actual vs expected links
+  - SEO Control UI now shows:
+    - Status breakdown summary (X Ready, X Needs Links, X Needs Review, X Legacy)
+    - Cluster ID displayed under each URL for context
+    - Links column color-coded (green=met, orange=under)
+    - Filter dropdown with Ready/Needs Links/Needs Review/Legacy options
+  - Workflow simplified: Filter by Ready → toggle indexed, ignore Legacy, fix Needs Links
 - 2025-12-08: **CMS-Based Product Pages** - Products now render from cms_objects instead of products table
   - Created ProductData type with hero, CTAs, bullets, feature_sections, FAQ, pro_tips, Stripe IDs
   - Built ProductRenderer component for rendering CMS product objects
