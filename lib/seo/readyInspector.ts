@@ -1,9 +1,11 @@
 import { query } from '@/lib/db';
-
-const MIN_SCORE_THRESHOLD = 75;
-const MIN_WORD_COUNT_ARTICLE = 300;
-const MIN_WORD_COUNT_OTHER = 150;
-const MIN_INTERNAL_LINKS_OUT = 3;
+import { 
+  getCmsToolSlugs, 
+  getCmsArticleSlugs, 
+  classifyUrl, 
+  SEO_THRESHOLDS,
+  UrlClassification 
+} from './urlClassifier';
 
 export interface ReadinessResult {
   urlId: string;
@@ -13,13 +15,25 @@ export interface ReadinessResult {
   isReady: boolean;
   needsManualReview: boolean;
   issues: string[];
+  internalLinks: number;
+  expectedLinks: number | null;
+  status: 'Ready' | 'Needs Links' | 'Needs Review' | 'Legacy';
+  clusterId: string | null;
+  classification: {
+    isLegacyTool: boolean;
+    isCmsTool: boolean;
+    isCmsArticle: boolean;
+    isPillar: boolean;
+    isOtherCms: boolean;
+  };
 }
 
 export interface InspectorSummary {
   evaluated: number;
   readyCount: number;
+  needsLinksCount: number;
   needsReviewCount: number;
-  notReadyCount: number;
+  legacyCount: number;
   noSnapshotCount: number;
   errors: number;
 }
@@ -47,7 +61,8 @@ interface SnapshotRecord {
 export function evaluateReadiness(
   url: UrlRecord,
   snapshot: SnapshotRecord | null,
-  manualReviewPassed: boolean
+  manualReviewPassed: boolean,
+  classification: UrlClassification
 ): ReadinessResult {
   const issues: string[] = [];
   const slug = url.url;
@@ -62,6 +77,40 @@ export function evaluateReadiness(
       isReady: false,
       needsManualReview: false,
       issues: ['No SEO health snapshot available - run a scan first'],
+      internalLinks: 0,
+      expectedLinks: classification.expectedLinks,
+      status: classification.isLegacyTool ? 'Legacy' : 'Needs Review',
+      clusterId: classification.clusterId,
+      classification: {
+        isLegacyTool: classification.isLegacyTool,
+        isCmsTool: classification.isCmsTool,
+        isCmsArticle: classification.isCmsArticle,
+        isPillar: classification.isPillar,
+        isOtherCms: classification.isOtherCms,
+      },
+    };
+  }
+
+  if (classification.isLegacyTool) {
+    return {
+      urlId: url.id,
+      slug,
+      pageType,
+      healthScore: snapshot.overall_score,
+      isReady: false,
+      needsManualReview: false,
+      issues: ['Legacy tool - not in CMS architecture'],
+      internalLinks: snapshot.internal_links_out_count,
+      expectedLinks: null,
+      status: 'Legacy',
+      clusterId: null,
+      classification: {
+        isLegacyTool: true,
+        isCmsTool: false,
+        isCmsArticle: false,
+        isPillar: false,
+        isOtherCms: false,
+      },
     };
   }
 
@@ -73,8 +122,8 @@ export function evaluateReadiness(
     issues.push('Robots meta is set to noindex');
   }
 
-  if (snapshot.overall_score < MIN_SCORE_THRESHOLD) {
-    issues.push(`Health score ${snapshot.overall_score} is below minimum ${MIN_SCORE_THRESHOLD}`);
+  if (snapshot.overall_score < SEO_THRESHOLDS.MIN_READY_SCORE) {
+    issues.push(`Health score ${snapshot.overall_score} is below minimum ${SEO_THRESHOLDS.MIN_READY_SCORE}`);
   }
 
   if (!snapshot.has_title) {
@@ -95,20 +144,38 @@ export function evaluateReadiness(
   }
 
   const minWords = pageType === 'article' 
-    ? MIN_WORD_COUNT_ARTICLE 
-    : MIN_WORD_COUNT_OTHER;
+    ? SEO_THRESHOLDS.MIN_WORD_COUNT_ARTICLE 
+    : SEO_THRESHOLDS.MIN_WORD_COUNT_OTHER;
   
   if (snapshot.word_count < minWords) {
     issues.push(`Word count ${snapshot.word_count} is below minimum ${minWords} for ${pageType}`);
   }
 
-  if (snapshot.internal_links_out_count < MIN_INTERNAL_LINKS_OUT) {
-    issues.push(`Only ${snapshot.internal_links_out_count} internal links (minimum ${MIN_INTERNAL_LINKS_OUT})`);
+  const actualLinks = snapshot.internal_links_out_count;
+  const expectedLinks = classification.expectedLinks;
+
+  if (expectedLinks !== null && actualLinks < expectedLinks) {
+    issues.push(`Only ${actualLinks} internal links (expected ${expectedLinks})`);
+  } else if (expectedLinks === null && actualLinks < SEO_THRESHOLDS.BASELINE_INTERNAL_LINKS) {
+    issues.push(`Only ${actualLinks} internal links (minimum ${SEO_THRESHOLDS.BASELINE_INTERNAL_LINKS})`);
   }
 
   const technicallyReady = issues.length === 0;
+  const meetsLinkRequirement = expectedLinks !== null 
+    ? actualLinks >= expectedLinks 
+    : actualLinks >= SEO_THRESHOLDS.BASELINE_INTERNAL_LINKS;
 
-  if (!manualReviewPassed && technicallyReady) {
+  let status: 'Ready' | 'Needs Links' | 'Needs Review' | 'Legacy' = classification.status;
+  
+  if (!meetsLinkRequirement) {
+    status = 'Needs Links';
+  } else if (!technicallyReady || !manualReviewPassed) {
+    status = 'Needs Review';
+  } else {
+    status = 'Ready';
+  }
+
+  if (!manualReviewPassed && technicallyReady && meetsLinkRequirement) {
     return {
       urlId: url.id,
       slug,
@@ -117,6 +184,17 @@ export function evaluateReadiness(
       isReady: false,
       needsManualReview: true,
       issues: ['Awaiting manual visual review'],
+      internalLinks: actualLinks,
+      expectedLinks,
+      status: 'Needs Review',
+      clusterId: classification.clusterId,
+      classification: {
+        isLegacyTool: classification.isLegacyTool,
+        isCmsTool: classification.isCmsTool,
+        isCmsArticle: classification.isCmsArticle,
+        isPillar: classification.isPillar,
+        isOtherCms: classification.isOtherCms,
+      },
     };
   }
 
@@ -129,9 +207,20 @@ export function evaluateReadiness(
     slug,
     pageType,
     healthScore: snapshot.overall_score,
-    isReady: technicallyReady && manualReviewPassed,
-    needsManualReview: technicallyReady && !manualReviewPassed,
+    isReady: technicallyReady && manualReviewPassed && meetsLinkRequirement,
+    needsManualReview: technicallyReady && meetsLinkRequirement && !manualReviewPassed,
     issues,
+    internalLinks: actualLinks,
+    expectedLinks,
+    status,
+    clusterId: classification.clusterId,
+    classification: {
+      isLegacyTool: classification.isLegacyTool,
+      isCmsTool: classification.isCmsTool,
+      isCmsArticle: classification.isCmsArticle,
+      isPillar: classification.isPillar,
+      isOtherCms: classification.isOtherCms,
+    },
   };
 }
 
@@ -139,6 +228,9 @@ export async function runReadyInspector(): Promise<{
   summary: InspectorSummary;
   results: ReadinessResult[];
 }> {
+  const cmsToolSlugs = await getCmsToolSlugs();
+  const cmsArticleSlugs = await getCmsArticleSlugs();
+
   const unindexedUrls = await query(
     `SELECT id, url, type, is_indexed, manual_review_passed 
      FROM global_urls 
@@ -152,8 +244,9 @@ export async function runReadyInspector(): Promise<{
 
   const results: ReadinessResult[] = [];
   let readyCount = 0;
+  let needsLinksCount = 0;
   let needsReviewCount = 0;
-  let notReadyCount = 0;
+  let legacyCount = 0;
   let noSnapshotCount = 0;
   let errors = 0;
 
@@ -170,18 +263,36 @@ export async function runReadyInspector(): Promise<{
       );
 
       const snapshot = snapshotResult.rows[0] as SnapshotRecord | undefined;
-      const result = evaluateReadiness(url, snapshot || null, url.manual_review_passed);
+      
+      const classification = await classifyUrl(
+        url.url,
+        snapshot?.internal_links_out_count ?? 0,
+        snapshot?.overall_score ?? null,
+        url.manual_review_passed,
+        cmsToolSlugs,
+        cmsArticleSlugs
+      );
+
+      const result = evaluateReadiness(url, snapshot || null, url.manual_review_passed, classification);
       results.push(result);
 
       if (!snapshot) {
         noSnapshotCount++;
-        notReadyCount++;
-      } else if (result.isReady) {
-        readyCount++;
-      } else if (result.needsManualReview) {
-        needsReviewCount++;
-      } else {
-        notReadyCount++;
+      }
+
+      switch (result.status) {
+        case 'Ready':
+          readyCount++;
+          break;
+        case 'Needs Links':
+          needsLinksCount++;
+          break;
+        case 'Needs Review':
+          needsReviewCount++;
+          break;
+        case 'Legacy':
+          legacyCount++;
+          break;
       }
 
       await query(
@@ -201,6 +312,17 @@ export async function runReadyInspector(): Promise<{
         isReady: false,
         needsManualReview: false,
         issues: ['Error during evaluation'],
+        internalLinks: 0,
+        expectedLinks: null,
+        status: 'Needs Review',
+        clusterId: null,
+        classification: {
+          isLegacyTool: false,
+          isCmsTool: false,
+          isCmsArticle: false,
+          isPillar: false,
+          isOtherCms: false,
+        },
       });
     }
   }
@@ -209,8 +331,9 @@ export async function runReadyInspector(): Promise<{
     summary: {
       evaluated: unindexedUrls.rows.length,
       readyCount,
+      needsLinksCount,
       needsReviewCount,
-      notReadyCount,
+      legacyCount,
       noSnapshotCount,
       errors,
     },
@@ -252,11 +375,14 @@ export async function indexReadyPages(): Promise<{
 export async function toggleManualReview(
   urlId: string,
   passed: boolean
-): Promise<{ isReadyToIndex: boolean }> {
+): Promise<{ isReadyToIndex: boolean; status: string }> {
   await query(
     `UPDATE global_urls SET manual_review_passed = $1 WHERE id = $2`,
     [passed, urlId]
   );
+
+  const cmsToolSlugs = await getCmsToolSlugs();
+  const cmsArticleSlugs = await getCmsArticleSlugs();
 
   const urlResult = await query(
     `SELECT id, url, type, is_indexed, manual_review_passed FROM global_urls WHERE id = $1`,
@@ -264,7 +390,7 @@ export async function toggleManualReview(
   );
   
   if (urlResult.rows.length === 0) {
-    return { isReadyToIndex: false };
+    return { isReadyToIndex: false, status: 'Needs Review' };
   }
 
   const url = urlResult.rows[0] as UrlRecord;
@@ -280,14 +406,24 @@ export async function toggleManualReview(
   );
 
   const snapshot = snapshotResult.rows[0] as SnapshotRecord | undefined;
-  const result = evaluateReadiness(url, snapshot || null, passed);
+  
+  const classification = await classifyUrl(
+    url.url,
+    snapshot?.internal_links_out_count ?? 0,
+    snapshot?.overall_score ?? null,
+    passed,
+    cmsToolSlugs,
+    cmsArticleSlugs
+  );
+
+  const result = evaluateReadiness(url, snapshot || null, passed, classification);
 
   await query(
     `UPDATE global_urls SET is_ready_to_index = $1 WHERE id = $2`,
     [result.isReady, urlId]
   );
 
-  return { isReadyToIndex: result.isReady };
+  return { isReadyToIndex: result.isReady, status: result.status };
 }
 
 export async function getUnindexedPagesWithStatus(): Promise<{
@@ -300,16 +436,30 @@ export async function getUnindexedPagesWithStatus(): Promise<{
     manual_review_passed: boolean;
     word_count: number | null;
     internal_links: number;
+    expected_links: number | null;
     issues: string[];
     needsManualReview?: boolean;
+    status: 'Ready' | 'Needs Links' | 'Needs Review' | 'Legacy';
+    clusterId: string | null;
+    classification: {
+      isLegacyTool: boolean;
+      isCmsTool: boolean;
+      isCmsArticle: boolean;
+      isPillar: boolean;
+      isOtherCms: boolean;
+    };
   }>;
   stats: {
     total: number;
     ready: number;
+    needsLinks: number;
     needsReview: number;
-    notReady: number;
+    legacy: number;
   };
 }> {
+  const cmsToolSlugs = await getCmsToolSlugs();
+  const cmsArticleSlugs = await getCmsArticleSlugs();
+
   const urlsResult = await query(
     `SELECT g.id, g.url, g.type, g.last_health_score, g.is_ready_to_index, g.manual_review_passed,
             s.word_count, s.internal_links_out_count, s.has_title, s.has_h1, s.has_meta_description,
@@ -329,7 +479,7 @@ export async function getUnindexedPagesWithStatus(): Promise<{
      ORDER BY g.url ASC`
   );
 
-  const pages = urlsResult.rows.map((row: any) => {
+  const pages = await Promise.all(urlsResult.rows.map(async (row: any) => {
     const snapshot = row.overall_score !== null ? {
       overall_score: row.overall_score,
       status_code: row.status_code,
@@ -342,6 +492,15 @@ export async function getUnindexedPagesWithStatus(): Promise<{
       internal_links_out_count: row.internal_links_out_count,
     } : null;
 
+    const classification = await classifyUrl(
+      row.url,
+      snapshot?.internal_links_out_count ?? 0,
+      snapshot?.overall_score ?? null,
+      row.manual_review_passed ?? false,
+      cmsToolSlugs,
+      cmsArticleSlugs
+    );
+
     const result = evaluateReadiness(
       {
         id: row.id,
@@ -351,7 +510,8 @@ export async function getUnindexedPagesWithStatus(): Promise<{
         manual_review_passed: row.manual_review_passed,
       },
       snapshot,
-      row.manual_review_passed
+      row.manual_review_passed,
+      classification
     );
 
     return {
@@ -363,16 +523,21 @@ export async function getUnindexedPagesWithStatus(): Promise<{
       manual_review_passed: row.manual_review_passed,
       word_count: row.word_count,
       internal_links: row.internal_links_out_count ?? 0,
+      expected_links: result.expectedLinks,
       issues: result.issues,
       needsManualReview: result.needsManualReview,
+      status: result.status,
+      clusterId: result.clusterId,
+      classification: result.classification,
     };
-  });
+  }));
 
   const stats = {
     total: pages.length,
-    ready: pages.filter((p: any) => p.is_ready_to_index).length,
-    needsReview: pages.filter((p: any) => p.needsManualReview).length,
-    notReady: pages.filter((p: any) => !p.is_ready_to_index && !p.needsManualReview).length,
+    ready: pages.filter((p: any) => p.status === 'Ready').length,
+    needsLinks: pages.filter((p: any) => p.status === 'Needs Links').length,
+    needsReview: pages.filter((p: any) => p.status === 'Needs Review').length,
+    legacy: pages.filter((p: any) => p.status === 'Legacy').length,
   };
 
   return { pages, stats };

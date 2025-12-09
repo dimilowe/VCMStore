@@ -57,8 +57,18 @@ interface ReadyPage {
   last_health_score: number | null;
   is_ready_to_index: boolean;
   word_count: number | null;
-  internal_links?: number;
+  internal_links: number;
+  expected_links: number | null;
   issues: string[];
+  status: 'Ready' | 'Needs Links' | 'Needs Review' | 'Legacy';
+  clusterId: string | null;
+  classification: {
+    isLegacyTool: boolean;
+    isCmsTool: boolean;
+    isCmsArticle: boolean;
+    isPillar: boolean;
+    isOtherCms: boolean;
+  };
 }
 
 type TabType = "overview" | "health" | "ready" | "registry";
@@ -187,7 +197,10 @@ export default function SeoControlPage() {
 
   const indexedCount = urls.filter((u) => u.is_indexed).length;
   const healthyCount = snapshots.filter((s) => s.overall_score >= 80).length;
-  const readyCount = readyPages.filter((p) => p.is_ready_to_index).length;
+  const readyCount = readyPages.filter((p) => p.status === "Ready").length;
+  const needsLinksCount = readyPages.filter((p) => p.status === "Needs Links").length;
+  const needsReviewCount = readyPages.filter((p) => p.status === "Needs Review").length;
+  const legacyCount = readyPages.filter((p) => p.status === "Legacy").length;
   const criticalCount = snapshots.filter((s) => s.overall_score < 50).length;
 
   const filteredUrls = urls.filter((url) => {
@@ -220,16 +233,13 @@ export default function SeoControlPage() {
   const filteredReadyPages = readyPages.filter((page) => {
     const cleanUrl = page.url.replace("http://localhost:5000", "");
     const matchesSearch = cleanUrl.toLowerCase().includes(readySearch.toLowerCase());
-    const score = page.last_health_score ?? 0;
-    const isReady = page.is_ready_to_index && score >= 80;
-    const needsReview = !page.is_ready_to_index || (score >= 60 && score < 80);
-    const notReady = !page.is_ready_to_index && score < 60;
     
     const matchesStatus = 
       readyStatusFilter === "all" ||
-      (readyStatusFilter === "ready" && isReady) ||
-      (readyStatusFilter === "needs-review" && needsReview) ||
-      (readyStatusFilter === "not-ready" && notReady);
+      (readyStatusFilter === "ready" && page.status === "Ready") ||
+      (readyStatusFilter === "needs-links" && page.status === "Needs Links") ||
+      (readyStatusFilter === "needs-review" && page.status === "Needs Review") ||
+      (readyStatusFilter === "legacy" && page.status === "Legacy");
     return matchesSearch && matchesStatus;
   });
   const totalReadyPages = Math.ceil(filteredReadyPages.length / READY_PER_PAGE);
@@ -585,8 +595,9 @@ export default function SeoControlPage() {
               >
                 <option value="all">All Statuses</option>
                 <option value="ready">Ready</option>
+                <option value="needs-links">Needs Links</option>
                 <option value="needs-review">Needs Review</option>
-                <option value="not-ready">Not Ready</option>
+                <option value="legacy">Legacy</option>
               </select>
               <Button
                 onClick={handleInspect}
@@ -598,9 +609,13 @@ export default function SeoControlPage() {
               </Button>
             </div>
 
-            <p className="text-sm text-gray-500">
-              {readyCount} of {filteredReadyPages.length} pages ready to index
-            </p>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span className="text-green-600 font-medium">{readyCount} Ready</span>
+              <span className="text-blue-600 font-medium">{needsLinksCount} Needs Links</span>
+              <span className="text-yellow-600 font-medium">{needsReviewCount} Needs Review</span>
+              <span className="text-gray-500">{legacyCount} Legacy</span>
+              <span className="text-gray-400 ml-auto">{readyPages.length} total pages</span>
+            </div>
 
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading...</div>
@@ -639,62 +654,63 @@ export default function SeoControlPage() {
                       const isIndexed = urlEntry?.is_indexed ?? false;
                       const score = page.last_health_score ?? 0;
                       const wordCount = page.word_count ?? 0;
-                      const hasIssues = page.issues && page.issues.length > 0;
-                      const isReady = page.is_ready_to_index;
                       const cleanUrl = page.url.replace("http://localhost:5000", "");
-                      const expected = expectedLinks[cleanUrl] ?? 0;
                       
-                      // Determine status
-                      let statusLabel = "Pending";
-                      let statusColor = "bg-gray-100 text-gray-600";
-                      if (isReady && score >= 80) {
-                        statusLabel = "Ready";
-                        statusColor = "bg-green-100 text-green-700";
-                      } else if (score < 80 || hasIssues) {
-                        statusLabel = "Needs Review";
-                        statusColor = "bg-yellow-100 text-yellow-700";
-                      }
-                      if (!isReady && score < 60) {
-                        statusLabel = "Not Ready";
-                        statusColor = "bg-red-100 text-red-700";
-                      }
+                      const statusColors: Record<string, string> = {
+                        Ready: "bg-green-100 text-green-700",
+                        "Needs Links": "bg-blue-100 text-blue-700",
+                        "Needs Review": "bg-yellow-100 text-yellow-700",
+                        Legacy: "bg-gray-100 text-gray-500",
+                      };
+                      const statusColor = statusColors[page.status] || "bg-gray-100 text-gray-600";
+                      
+                      const linksMetStatus = page.expected_links !== null 
+                        ? page.internal_links >= page.expected_links 
+                        : page.internal_links >= 3;
                       
                       return (
                         <tr key={page.id} className="hover:bg-gray-50">
                           <td className="px-4 py-3">
-                            <div className="font-medium truncate max-w-xs">
-                              {page.url.replace("http://localhost:5000", "")}
+                            <div className="font-medium truncate max-w-xs" title={cleanUrl}>
+                              {cleanUrl}
                             </div>
+                            {page.clusterId && (
+                              <div className="text-xs text-gray-400 mt-0.5">
+                                Cluster: {page.clusterId}
+                              </div>
+                            )}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs text-gray-500">{page.page_type || "static"}</span>
+                            <span className="text-xs text-gray-500">{page.type || "static"}</span>
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span className={`font-medium ${
                               score >= 80 ? "text-green-600" :
                               score >= 60 ? "text-yellow-600" : "text-red-600"
                             }`}>
-                              {score}
+                              {score || '-'}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-center text-gray-600">
-                            {wordCount}
-                          </td>
-                          <td className="px-4 py-3 text-center text-gray-600">
-                            {page.internal_links ?? 0}
+                            {wordCount || '-'}
                           </td>
                           <td className="px-4 py-3 text-center">
-                            {legacyTools.includes(cleanUrl) ? (
-                              <span className="px-2 py-1 text-xs rounded bg-gray-100 text-gray-500">Legacy</span>
-                            ) : expected > 0 ? (
-                              <span className="text-blue-600 font-medium">{expected}</span>
-                            ) : (
+                            <span className={`font-medium ${linksMetStatus ? "text-green-600" : "text-orange-600"}`}>
+                              {page.internal_links}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {page.status === "Legacy" ? (
                               <span className="text-gray-400">-</span>
+                            ) : page.expected_links !== null ? (
+                              <span className="text-blue-600 font-medium">{page.expected_links}</span>
+                            ) : (
+                              <span className="text-gray-400">3</span>
                             )}
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span className={`px-2 py-1 text-xs rounded ${statusColor}`}>
-                              {statusLabel}
+                              {page.status}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-center">
@@ -711,7 +727,7 @@ export default function SeoControlPage() {
                             </button>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <a href={page.url.replace("http://localhost:5000", "")} target="_blank" rel="noopener noreferrer">
+                            <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="w-4 h-4 text-gray-400 hover:text-gray-600" />
                             </a>
                           </td>
