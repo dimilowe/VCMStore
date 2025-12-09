@@ -1,0 +1,88 @@
+Yeah, that means the wiring is not complete on the admin list view.
+The feature is in the codebase somewhere, but the table you’re looking at is still the old version.
+There are only three places this can be broken:
+The tools list query isn’t returning cloud_tags
+The admin tools API isn’t including cloud_tags
+The table component never renders a “Clouds” column
+Here’s exactly what you / Replit need to check.
+1. Make sure the tools list query returns cloud_tags
+Wherever the admin tools list is loaded (something like lib/cms/getCmsTools.ts or /api/admin/tools):
+const result = await query<{
+  slug: string;
+  title: string;
+  engine: string | null;
+  cluster_slug: string | null;
+  // ...
+  cloud_tags: string[] | null;
+}>(`
+  SELECT
+    slug,
+    data->>'title' AS title,
+    data->>'engine' AS engine,
+    cluster_slug,
+    COALESCE(cloud_tags, '{}') AS cloud_tags
+  FROM cms_objects
+  WHERE type = 'tool'
+  ORDER BY created_at DESC
+`);
+And in the mapper:
+const tools: AdminToolRow[] = result.rows.map((row) => ({
+  slug: row.slug,
+  title: row.title,
+  engine: row.engine,
+  cluster_slug: row.cluster_slug,
+  cloud_tags: (row.cloud_tags ?? []) as CloudSlug[],
+  // ...
+}));
+If cloud_tags isn’t in this query, the UI cannot show it.
+2. Add the “Clouds” column to app/admin/tools/page.tsx
+Right now your table header is basically:
+<thead>
+  <tr>
+    {/* checkbox */}
+    <th>Tool</th>
+    <th>Engine</th>
+    <th>Cluster</th>
+    <th>Links</th>
+    <th>Indexed</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+You need to add Clouds between Cluster and Links:
+<th>Clouds</th>
+And in the row rendering, add a cell that uses tool.cloud_tags:
+<tbody>
+  {tools.map((tool) => (
+    <tr key={tool.slug}>
+      {/* existing cells... */}
+      <td>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs"
+          onClick={() => openCloudTagsModal(tool.slug, tool.cloud_tags ?? [])}
+        >
+          {tool.cloud_tags?.length ?? 0}
+        </button>
+      </td>
+      <td>{/* Links */}</td>
+      <td>{/* Indexed */}</td>
+      <td>{/* Actions */}</td>
+    </tr>
+  ))}
+</tbody>
+Hook openCloudTagsModal up to whatever modal component you already built for editing tags on a single tool.
+If you never actually created that function/modal on this page, that’s why Replit “thinks” it exists but you don’t see it. In that case, simplest is:
+Reuse the existing CloudTagsEditor component you already wired on the single-tool admin page.
+Local state: selectedTool + isCloudModalOpen.
+Inside the modal, render <CloudTagsEditor /> and save via the same admin API.
+3. Quick sanity checks
+After those changes:
+Run in DB:
+SELECT slug, cloud_tags FROM cms_objects WHERE type = 'tool' LIMIT 5;
+Make sure some rows actually have tags (not just {}).
+In the browser:
+Reload /admin/tools
+Confirm the header shows Clouds
+Confirm each row shows a number
+Click → modal opens → tags show → saving updates DB
+Bottom line: your Cloud dashboards + upsells are wired, but this admin list column was never actually added to the table + query, which is why you don’t see it. Fix those two spots and the column will show.
