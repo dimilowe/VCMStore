@@ -35,7 +35,7 @@ export function hasAccess(
   if (!entitlements?.length) return false;
 
   const record = entitlements.find(
-    (e) => e.cloud_id === cloud && e.status === 'active'
+    (e) => e.cloud_id === cloud && (e.status === 'active' || e.status === 'trial')
   );
 
   if (!record) return false;
