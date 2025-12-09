@@ -36,6 +36,32 @@ interface UrlEntry {
   updated_at: string;
 }
 
+type UrlKind = "cms-tool" | "cms-article" | "cms-pillar" | "cms-product" | "system" | "legacy";
+type UrlStatus = "Ready" | "Needs Links" | "Needs Review" | "Legacy" | "System";
+
+interface EnrichedUrlRow {
+  id: string;
+  url: string;
+  kind: UrlKind;
+  status: UrlStatus;
+  isIndexed: boolean;
+  cmsId: string | null;
+  cmsType: string | null;
+  clusterSlug: string | null;
+  engine: string | null;
+  linksInbound: number;
+  linksOutbound: number;
+  expectedLinks: number | null;
+  seoScore: number | null;
+}
+
+interface RegistrySummary {
+  total: number;
+  indexed: number;
+  byKind: Record<string, number>;
+  byStatus: Record<string, number>;
+}
+
 interface SeoSnapshot {
   id: string;
   url: string;
@@ -80,9 +106,13 @@ export default function SeoControlPage() {
   const [readyPages, setReadyPages] = useState<ReadyPage[]>([]);
   const [expectedLinks, setExpectedLinks] = useState<Record<string, number>>({});
   const [legacyTools, setLegacyTools] = useState<string[]>([]);
+  const [enrichedRegistry, setEnrichedRegistry] = useState<EnrichedUrlRow[]>([]);
+  const [registrySummary, setRegistrySummary] = useState<RegistrySummary | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterKind, setFilterKind] = useState("all");
+  const [filterRegistryStatus, setFilterRegistryStatus] = useState("all");
   const [registryPage, setRegistryPage] = useState(1);
   const REGISTRY_PER_PAGE = 100;
   
@@ -109,11 +139,12 @@ export default function SeoControlPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [urlsRes, snapshotsRes, readyRes, expectedRes] = await Promise.all([
+      const [urlsRes, snapshotsRes, readyRes, expectedRes, enrichedRes] = await Promise.all([
         fetch("/api/global-urls", { credentials: "include" }),
         fetch("/api/admin/seo/snapshots", { credentials: "include" }),
         fetch("/api/admin/seo/unindexed-pages", { credentials: "include" }),
         fetch("/api/admin/seo/expected-links", { credentials: "include" }),
+        fetch("/api/admin/seo/url-registry/enriched", { credentials: "include" }),
       ]);
 
       if (urlsRes.ok) {
@@ -132,6 +163,11 @@ export default function SeoControlPage() {
         const data = await expectedRes.json();
         setExpectedLinks(data.expectedLinks || {});
         setLegacyTools(data.legacyTools || []);
+      }
+      if (enrichedRes.ok) {
+        const data = await enrichedRes.json();
+        setEnrichedRegistry(data.rows || []);
+        setRegistrySummary(data.summary || null);
       }
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -189,9 +225,71 @@ export default function SeoControlPage() {
         setUrls((prev) =>
           prev.map((u) => (u.url === urlEntry.url ? { ...u, is_indexed: !urlEntry.is_indexed } : u))
         );
+        setEnrichedRegistry((prev) =>
+          prev.map((r) => (r.id === urlEntry.id ? { ...r, isIndexed: !r.isIndexed } : r))
+        );
       }
     } catch (error) {
       console.error("Failed to toggle indexing:", error);
+    }
+  };
+
+  const toggleEnrichedIndexing = async (row: EnrichedUrlRow) => {
+    try {
+      const res = await fetch("/api/global-urls", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          id: row.id,
+          is_indexed: !row.isIndexed,
+        }),
+      });
+      if (res.ok) {
+        setEnrichedRegistry((prev) =>
+          prev.map((r) => (r.id === row.id ? { ...r, isIndexed: !r.isIndexed } : r))
+        );
+        setUrls((prev) =>
+          prev.map((u) => (u.id === row.id ? { ...u, is_indexed: !row.isIndexed } : u))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to toggle indexing:", error);
+    }
+  };
+
+  const getKindBadgeStyle = (kind: UrlKind) => {
+    switch (kind) {
+      case "cms-tool": return "bg-blue-100 text-blue-700";
+      case "cms-article": return "bg-purple-100 text-purple-700";
+      case "cms-pillar": return "bg-indigo-100 text-indigo-700";
+      case "cms-product": return "bg-green-100 text-green-700";
+      case "system": return "bg-gray-100 text-gray-600";
+      case "legacy": return "bg-red-100 text-red-700";
+      default: return "bg-gray-100 text-gray-600";
+    }
+  };
+
+  const getKindLabel = (kind: UrlKind) => {
+    switch (kind) {
+      case "cms-tool": return "CMS Tool";
+      case "cms-article": return "Article";
+      case "cms-pillar": return "Pillar";
+      case "cms-product": return "Product";
+      case "system": return "System";
+      case "legacy": return "Legacy";
+      default: return kind;
+    }
+  };
+
+  const getStatusPillStyle = (status: UrlStatus) => {
+    switch (status) {
+      case "Ready": return "bg-green-100 text-green-700";
+      case "Needs Links": return "bg-orange-100 text-orange-700";
+      case "Needs Review": return "bg-yellow-100 text-yellow-700";
+      case "Legacy": return "bg-red-100 text-red-700";
+      case "System": return "bg-gray-100 text-gray-600";
+      default: return "bg-gray-100 text-gray-600";
     }
   };
 
@@ -246,6 +344,19 @@ export default function SeoControlPage() {
   const paginatedReadyPages = filteredReadyPages.slice(
     (readyPage - 1) * READY_PER_PAGE,
     readyPage * READY_PER_PAGE
+  );
+
+  const filteredEnrichedRegistry = enrichedRegistry.filter((row) => {
+    const matchesSearch = row.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (row.clusterSlug && row.clusterSlug.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesKind = filterKind === "all" || row.kind === filterKind;
+    const matchesStatus = filterRegistryStatus === "all" || row.status === filterRegistryStatus;
+    return matchesSearch && matchesKind && matchesStatus;
+  });
+  const totalRegistryPages = Math.ceil(filteredEnrichedRegistry.length / REGISTRY_PER_PAGE);
+  const paginatedEnrichedRegistry = filteredEnrichedRegistry.slice(
+    (registryPage - 1) * REGISTRY_PER_PAGE,
+    registryPage * REGISTRY_PER_PAGE
   );
 
   const getScoreColor = (score: number | null) => {
@@ -771,100 +882,168 @@ export default function SeoControlPage() {
 
         {activeTab === "registry" && (
           <div className="space-y-4">
+            {registrySummary && (
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                <div className="p-3 bg-gray-50 rounded-lg text-center">
+                  <div className="text-2xl font-bold">{registrySummary.total}</div>
+                  <div className="text-xs text-gray-500">Total</div>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-blue-600">{registrySummary.byKind["cms-tool"] || 0}</div>
+                  <div className="text-xs text-blue-600">CMS Tools</div>
+                </div>
+                <div className="p-3 bg-green-50 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-green-600">{registrySummary.byStatus["Ready"] || 0}</div>
+                  <div className="text-xs text-green-600">Ready</div>
+                </div>
+                <div className="p-3 bg-orange-50 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-orange-600">{registrySummary.byStatus["Needs Links"] || 0}</div>
+                  <div className="text-xs text-orange-600">Needs Links</div>
+                </div>
+                <div className="p-3 bg-yellow-50 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{registrySummary.byStatus["Needs Review"] || 0}</div>
+                  <div className="text-xs text-yellow-600">Needs Review</div>
+                </div>
+                <div className="p-3 bg-red-50 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-red-600">{registrySummary.byStatus["Legacy"] || 0}</div>
+                  <div className="text-xs text-red-600">Legacy</div>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-wrap gap-3">
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
-                  placeholder="Search URLs..."
+                  placeholder="Search URLs or clusters..."
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setRegistryPage(1); }}
                   className="pl-10"
                 />
               </div>
               <select
-                value={filterType}
-                onChange={(e) => { setFilterType(e.target.value); setRegistryPage(1); }}
+                value={filterKind}
+                onChange={(e) => { setFilterKind(e.target.value); setRegistryPage(1); }}
                 className="border rounded-md px-3 py-2 text-sm"
               >
-                <option value="all">All Types</option>
-                {pageTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
+                <option value="all">All Kinds</option>
+                <option value="cms-tool">CMS Tools</option>
+                <option value="cms-article">Articles</option>
+                <option value="cms-pillar">Pillars</option>
+                <option value="cms-product">Products</option>
+                <option value="system">System</option>
+                <option value="legacy">Legacy</option>
               </select>
               <select
-                value={filterStatus}
-                onChange={(e) => { setFilterStatus(e.target.value); setRegistryPage(1); }}
+                value={filterRegistryStatus}
+                onChange={(e) => { setFilterRegistryStatus(e.target.value); setRegistryPage(1); }}
                 className="border rounded-md px-3 py-2 text-sm"
               >
                 <option value="all">All Status</option>
-                <option value="indexed">Indexed</option>
-                <option value="not-indexed">Not Indexed</option>
+                <option value="Ready">Ready</option>
+                <option value="Needs Links">Needs Links</option>
+                <option value="Needs Review">Needs Review</option>
+                <option value="Legacy">Legacy</option>
+                <option value="System">System</option>
               </select>
             </div>
 
             <div className="text-sm text-gray-500">
-              {filteredUrls.length} URLs • {filteredUrls.filter((u) => u.is_indexed).length} indexed
+              {filteredEnrichedRegistry.length} URLs • {filteredEnrichedRegistry.filter((r) => r.isIndexed).length} indexed
             </div>
 
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading...</div>
             ) : (
               <div className="space-y-4">
-                <div className="border rounded-lg overflow-hidden">
+                <div className="border rounded-lg overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="text-left px-4 py-3 font-medium">URL</th>
-                        <th className="text-left px-4 py-3 font-medium">Type</th>
-                        <th className="text-center px-4 py-3 font-medium">Health</th>
-                        <th className="text-center px-4 py-3 font-medium">Indexed</th>
-                        <th className="text-center px-4 py-3 font-medium">Actions</th>
+                        <th className="text-left px-3 py-3 font-medium">URL</th>
+                        <th className="text-left px-3 py-3 font-medium">Kind</th>
+                        <th className="text-left px-3 py-3 font-medium">Cluster</th>
+                        <th className="text-left px-3 py-3 font-medium">Engine</th>
+                        <th className="text-center px-3 py-3 font-medium">Links</th>
+                        <th className="text-center px-3 py-3 font-medium">Expected</th>
+                        <th className="text-center px-3 py-3 font-medium">Status</th>
+                        <th className="text-center px-3 py-3 font-medium">Indexed</th>
+                        <th className="text-center px-3 py-3 font-medium">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {filteredUrls
-                        .slice((registryPage - 1) * REGISTRY_PER_PAGE, registryPage * REGISTRY_PER_PAGE)
-                        .map((urlEntry) => (
-                      <tr key={urlEntry.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3">
-                          <div className="font-medium truncate max-w-md">{urlEntry.url}</div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge variant="outline">{urlEntry.type}</Badge>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className="text-gray-400">-</span>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => toggleIndexing(urlEntry)}
-                            className="inline-flex"
-                          >
-                            {urlEntry.is_indexed ? (
-                              <Eye className="w-5 h-5 text-green-500" />
-                            ) : (
-                              <EyeOff className="w-5 h-5 text-gray-300" />
-                            )}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <a href={urlEntry.url.replace("http://localhost:5000", "")} target="_blank" rel="noopener noreferrer">
-                            <Button variant="ghost" size="sm">
-                              <ExternalLink className="w-4 h-4" />
-                            </Button>
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                      {paginatedEnrichedRegistry.map((row) => {
+                        const linksMet = row.expectedLinks === null || row.linksOutbound >= row.expectedLinks;
+                        const isLegacyWarning = row.kind === "legacy" && row.isIndexed;
+                        return (
+                          <tr key={row.id} className={`hover:bg-gray-50 ${isLegacyWarning ? "bg-red-50" : ""}`}>
+                            <td className="px-3 py-3">
+                              <div className="font-medium truncate max-w-[250px]">{row.url}</div>
+                            </td>
+                            <td className="px-3 py-3">
+                              <span className={`px-2 py-1 rounded text-xs ${getKindBadgeStyle(row.kind)}`}>
+                                {getKindLabel(row.kind)}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3">
+                              <span className="text-xs text-gray-500 truncate max-w-[100px] block">
+                                {row.clusterSlug || "—"}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3">
+                              <span className="text-xs text-gray-500">
+                                {row.engine || "—"}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <span className={`font-medium ${linksMet ? "text-green-600" : "text-orange-600"}`}>
+                                {row.linksOutbound}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <span className="text-blue-600 font-medium">
+                                {row.expectedLinks ?? "—"}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <span className={`px-2 py-1 rounded text-xs ${getStatusPillStyle(row.status)}`}>
+                                {row.status}
+                              </span>
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <button
+                                onClick={() => toggleEnrichedIndexing(row)}
+                                disabled={row.kind === "system"}
+                                className={`inline-flex ${row.kind === "system" ? "opacity-50 cursor-not-allowed" : "hover:opacity-70 cursor-pointer"}`}
+                                title={row.kind === "system" ? "System pages cannot be toggled" : 
+                                       row.kind === "legacy" && !row.isIndexed ? "Warning: This is a legacy page" :
+                                       row.isIndexed ? "Click to remove from sitemap" : "Click to add to sitemap"}
+                              >
+                                {row.isIndexed ? (
+                                  <Eye className={`w-5 h-5 ${isLegacyWarning ? "text-red-500" : "text-green-500"}`} />
+                                ) : (
+                                  <EyeOff className={`w-5 h-5 ${row.kind === "legacy" ? "text-red-300" : "text-gray-300"}`} />
+                                )}
+                              </button>
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <a href={row.url} target="_blank" rel="noopener noreferrer">
+                                <Button variant="ghost" size="sm">
+                                  <ExternalLink className="w-4 h-4" />
+                                </Button>
+                              </a>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
                 
-                {/* Pagination */}
-                {filteredUrls.length > REGISTRY_PER_PAGE && (
+                {totalRegistryPages > 1 && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-500">
-                      Showing {(registryPage - 1) * REGISTRY_PER_PAGE + 1} - {Math.min(registryPage * REGISTRY_PER_PAGE, filteredUrls.length)} of {filteredUrls.length}
+                      Showing {(registryPage - 1) * REGISTRY_PER_PAGE + 1} - {Math.min(registryPage * REGISTRY_PER_PAGE, filteredEnrichedRegistry.length)} of {filteredEnrichedRegistry.length}
                     </div>
                     <div className="flex gap-2">
                       <Button
@@ -873,40 +1052,17 @@ export default function SeoControlPage() {
                         onClick={() => setRegistryPage(p => Math.max(1, p - 1))}
                         disabled={registryPage === 1}
                       >
+                        <ChevronLeft className="w-4 h-4" />
                         Previous
                       </Button>
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE) }, (_, i) => i + 1)
-                          .filter(page => {
-                            const totalPages = Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE);
-                            if (totalPages <= 7) return true;
-                            if (page === 1 || page === totalPages) return true;
-                            if (Math.abs(page - registryPage) <= 1) return true;
-                            return false;
-                          })
-                          .map((page, idx, arr) => (
-                            <span key={page}>
-                              {idx > 0 && arr[idx - 1] !== page - 1 && (
-                                <span className="px-1 text-gray-400">...</span>
-                              )}
-                              <Button
-                                variant={registryPage === page ? "default" : "outline"}
-                                size="sm"
-                                className={registryPage === page ? "bg-orange-500 hover:bg-orange-600" : ""}
-                                onClick={() => setRegistryPage(page)}
-                              >
-                                {page}
-                              </Button>
-                            </span>
-                          ))}
-                      </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setRegistryPage(p => Math.min(Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE), p + 1))}
-                        disabled={registryPage >= Math.ceil(filteredUrls.length / REGISTRY_PER_PAGE)}
+                        onClick={() => setRegistryPage(p => Math.min(totalRegistryPages, p + 1))}
+                        disabled={registryPage >= totalRegistryPages}
                       >
                         Next
+                        <ChevronRight className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
