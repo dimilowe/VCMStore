@@ -130,7 +130,7 @@ const vcmClouds = [
     description: "Convert & Compress",
     icon: FileText,
     href: "/clouds/file-data-cloud",
-    gradient: "app-card-teal"
+    gradient: "bg-gradient-to-br from-gray-400 to-gray-500"
   },
   {
     name: "Monetize",
@@ -151,7 +151,7 @@ const vcmClouds = [
     description: "Stems & Audio",
     icon: Music,
     href: "/clouds/music-performance-cloud",
-    gradient: "bg-gradient-to-br from-emerald-500 to-green-600"
+    gradient: "bg-gradient-to-br from-lime-500 to-green-500"
   },
   {
     name: "Growth",
