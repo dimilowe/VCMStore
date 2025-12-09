@@ -4,6 +4,7 @@ import { useEffect, useState, ComponentType } from 'react';
 import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { getEngineLoader, EngineComponentProps } from '@/lib/engineRegistry';
 import ToolComingSoon from '@/components/engines/ToolComingSoon';
+import { CloudUpsellBlock } from '@/components/clouds/CloudUpsellBlock';
 
 interface ToolPageClientProps {
   tool: ToolForRenderer;
@@ -51,5 +52,14 @@ export default function ToolPageClient({ tool, hasEngine }: ToolPageClientProps)
     return <ToolComingSoon tool={tool} />;
   }
 
-  return <EngineComponent tool={tool} />;
+  return (
+    <>
+      <EngineComponent tool={tool} />
+      {tool.cloudTags && tool.cloudTags.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 pb-12">
+          <CloudUpsellBlock cloudSlugs={tool.cloudTags} />
+        </div>
+      )}
+    </>
+  );
 }

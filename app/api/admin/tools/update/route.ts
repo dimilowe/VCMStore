@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing slug or field" }, { status: 400 });
     }
 
-    const allowedFields = ["isIndexed", "isFeatured", "inDirectory", "segment", "clusterSlug"];
+    const allowedFields = ["isIndexed", "isFeatured", "inDirectory", "segment", "clusterSlug", "cloudTags"];
     if (!allowedFields.includes(field)) {
       return NextResponse.json({ error: "Invalid field" }, { status: 400 });
     }
@@ -48,6 +48,15 @@ export async function POST(request: NextRequest) {
       );
       if (result.rowCount === 0) {
         return NextResponse.json({ error: "Failed to update indexing status" }, { status: 500 });
+      }
+    } else if (field === "cloudTags") {
+      const tags = Array.isArray(value) ? value : [];
+      const result = await query(
+        `UPDATE cms_objects SET cloud_tags = $1, updated_at = NOW() WHERE slug = $2 AND type = 'tool'`,
+        [tags, slug]
+      );
+      if (result.rowCount === 0) {
+        return NextResponse.json({ error: "Tool not found in CMS" }, { status: 404 });
       }
     } else {
       const fieldMap: Record<string, string> = {

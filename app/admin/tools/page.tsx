@@ -22,7 +22,10 @@ import {
   CheckCircle,
   AlertTriangle,
   XCircle,
+  Cloud,
+  X,
 } from "lucide-react";
+import { CLOUDS } from "@/lib/clouds";
 
 interface LinkStatus {
   status: "ready" | "warning" | "error";
@@ -30,12 +33,23 @@ interface LinkStatus {
   details: string[];
 }
 
+type CloudSlug =
+  | "creation"
+  | "video"
+  | "writing_seo"
+  | "file_data"
+  | "monetization"
+  | "intelligence"
+  | "music_performance"
+  | "growth_distribution";
+
 interface ToolSkin {
   slug: string;
   name: string;
   engineType: string;
   segment: string;
   clusterSlug: string;
+  cloudTags?: CloudSlug[];
   isIndexed: boolean;
   isFeatured: boolean;
   inDirectory: boolean;
@@ -44,6 +58,7 @@ interface ToolSkin {
   h1: string;
   primaryKeyword: string;
   linkStatus: LinkStatus;
+  source?: string;
 }
 
 interface ClusterSummary {
@@ -75,6 +90,9 @@ export default function AdminToolsPage() {
   const [filterSegment, setFilterSegment] = useState<string>("all");
   const [filterIndexed, setFilterIndexed] = useState<string>("all");
   const [filterLinkStatus, setFilterLinkStatus] = useState<string>("all");
+
+  const [editingCloudTags, setEditingCloudTags] = useState<{ slug: string; tags: CloudSlug[] } | null>(null);
+  const [savingCloudTags, setSavingCloudTags] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -199,6 +217,37 @@ export default function AdminToolsPage() {
       }
     } catch (error) {
       console.error("Failed to update tool:", error);
+    }
+  };
+
+  const saveCloudTags = async () => {
+    if (!editingCloudTags) return;
+    setSavingCloudTags(true);
+    try {
+      const res = await fetch("/api/admin/tools/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          slug: editingCloudTags.slug, 
+          field: "cloudTags", 
+          value: editingCloudTags.tags 
+        }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setTools((prev) =>
+          prev.map((t) => (t.slug === editingCloudTags.slug ? { ...t, cloudTags: editingCloudTags.tags } : t))
+        );
+        setEditingCloudTags(null);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to save cloud tags");
+      }
+    } catch (error) {
+      console.error("Failed to save cloud tags:", error);
+      alert("Failed to save cloud tags");
+    } finally {
+      setSavingCloudTags(false);
     }
   };
 
@@ -443,6 +492,7 @@ export default function AdminToolsPage() {
                         <th className="text-left p-4 font-medium text-gray-600">Name</th>
                         <th className="text-left p-4 font-medium text-gray-600">Engine</th>
                         <th className="text-left p-4 font-medium text-gray-600">Cluster</th>
+                        <th className="text-center p-4 font-medium text-gray-600">Clouds</th>
                         <th className="text-center p-4 font-medium text-gray-600">Link Status</th>
                         <th className="text-center p-4 font-medium text-gray-600">Indexed</th>
                         <th className="text-center p-4 font-medium text-gray-600">Featured</th>
@@ -471,6 +521,24 @@ export default function AdminToolsPage() {
                           </td>
                           <td className="p-4">
                             <span className="text-sm text-gray-600">{tool.clusterSlug || "-"}</span>
+                          </td>
+                          <td className="p-4 text-center">
+                            {tool.source === "cms" ? (
+                              <button
+                                onClick={() => setEditingCloudTags({ slug: tool.slug, tags: tool.cloudTags || [] })}
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
+                                  (tool.cloudTags?.length || 0) > 0
+                                    ? "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                }`}
+                                title="Edit cloud tags"
+                              >
+                                <Cloud className="w-3 h-3" />
+                                {(tool.cloudTags?.length || 0) > 0 ? tool.cloudTags!.length : "0"}
+                              </button>
+                            ) : (
+                              <span className="text-xs text-gray-400">-</span>
+                            )}
                           </td>
                           <td className="p-4 text-center">
                             <div 
@@ -651,6 +719,82 @@ export default function AdminToolsPage() {
           </div>
         )}
       </div>
+
+      {editingCloudTags && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b">
+              <div>
+                <h3 className="font-semibold text-gray-900">Edit Cloud Tags</h3>
+                <p className="text-sm text-gray-500">{editingCloudTags.slug}</p>
+              </div>
+              <button
+                onClick={() => setEditingCloudTags(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-gray-600 mb-4">
+                Assign this tool to one or more VCM Clouds. Tools without tags break the flywheel.
+              </p>
+              <div className="space-y-2">
+                {CLOUDS.map((cloud) => {
+                  const checked = editingCloudTags.tags.includes(cloud.slug);
+                  return (
+                    <label
+                      key={cloud.slug}
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        checked ? "bg-purple-50 border-purple-300" : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 w-4 h-4 accent-purple-500"
+                        checked={checked}
+                        onChange={() => {
+                          if (checked) {
+                            setEditingCloudTags({
+                              ...editingCloudTags,
+                              tags: editingCloudTags.tags.filter((t) => t !== cloud.slug),
+                            });
+                          } else {
+                            setEditingCloudTags({
+                              ...editingCloudTags,
+                              tags: [...editingCloudTags.tags, cloud.slug],
+                            });
+                          }
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm text-gray-900">{cloud.name}</div>
+                        <div className="text-xs text-gray-500">{cloud.shortDescription}</div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2 p-4 border-t bg-gray-50 rounded-b-xl">
+              <Button
+                variant="outline"
+                onClick={() => setEditingCloudTags(null)}
+                disabled={savingCloudTags}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={saveCloudTags}
+                disabled={savingCloudTags}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                {savingCloudTags ? "Saving..." : "Save Cloud Tags"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

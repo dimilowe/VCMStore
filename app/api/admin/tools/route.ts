@@ -33,7 +33,7 @@ export async function GET() {
     
     // Also fetch tools from cms_objects
     const cmsResult = await query(
-      `SELECT slug, cluster_slug, data FROM cms_objects WHERE type = 'tool'`
+      `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data FROM cms_objects WHERE type = 'tool'`
     );
     const cmsToolSlugs = new Set(cmsResult.rows.map((r: { slug: string }) => r.slug));
     
@@ -93,7 +93,7 @@ export async function GET() {
       });
     
     // Map CMS tools
-    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; data: CmsToolData }) => {
+    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; cloud_tags: string[]; data: CmsToolData }) => {
       const data = row.data;
       const toolUrl = `/tools/${row.slug}`;
       const isIndexed = indexStatusMap.get(toolUrl) ?? data.isIndexed ?? false;
@@ -104,6 +104,7 @@ export async function GET() {
         engineType: data.engine_config?.engine || "unknown",
         segment: "utility",
         clusterSlug: row.cluster_slug || data.interlink_parent || "",
+        cloudTags: row.cloud_tags || [],
         isIndexed,
         isFeatured: false,
         inDirectory: true,
