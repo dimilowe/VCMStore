@@ -1,0 +1,198 @@
+You are working inside my VCM Suite codebase (Next.js + TypeScript + Postgres). I want you to implement the "VCM Cloud Tag Matrix" as a real, working feature.
+
+## GOAL
+
+Add **cloud tagging** to my CMS objects so that:
+
+1. Every tool/article/etc can be tagged with one or more **VCM Clouds**
+2. Tool pages can show a **Cloud Upsell Block** based on those tags
+3. This is all driven by the existing **cms_objects** table (content truth)
+4. No tool is an "orphan" – everything should be able to belong to one or more clouds from a fixed list
+
+We have **8 Clouds**:
+
+- `creation` – VCM AI Creation Cloud
+- `video` – VCM AI Video Cloud
+- `writing_seo` – VCM AI Writing & SEO Cloud
+- `file_data` – VCM File & Data Cloud
+- `monetization` – VCM Creator Monetization Cloud
+- `intelligence` – VCM AI Intelligence Cloud
+- `music_performance` – VCM Music, Audio & Performance Cloud
+- `growth_distribution` – VCM Distribution & Growth Cloud
+
+I want these to be treated as a stable enum across:
+- DB
+- TypeScript types
+- Admin CMS UI
+- Tool renderer (for upsells)
+
+---
+
+## STEP 1 – DB MIGRATION
+
+Add cloud tags to `cms_objects`.
+
+### Requirements
+
+- Add a `cloud_tags` column to `cms_objects`
+- Type: `text[]` (string array)
+- Default: empty array
+- This should be optional for now (not required for all rows)
+
+Write a SQL migration like:
+
+```sql
+ALTER TABLE cms_objects
+  ADD COLUMN IF NOT EXISTS cloud_tags text[] NOT NULL DEFAULT '{}';
+Put this in the correct migrations folder / format for this project and wire it into whatever migration runner we’re already using (check existing migrations and follow the same pattern).
+STEP 2 – TYPESCRIPT TYPES
+Update the CMS types to understand cloud tags.
+Find our core CMS types file (likely something like lib/types/cms.ts or similar).
+Add a CloudSlug type:
+export type CloudSlug =
+  | "creation"
+  | "video"
+  | "writing_seo"
+  | "file_data"
+  | "monetization"
+  | "intelligence"
+  | "music_performance"
+  | "growth_distribution";
+Extend the CMSObject (or equivalent) type to include:
+cloud_tags?: CloudSlug[];
+If we have specific subtypes for tools (e.g. ToolCMSObject or ToolForRenderer), make sure cloud_tags is included there too so it flows all the way to the renderer layer.
+STEP 3 – DATA ACCESS LAYER
+Wherever we load cms_objects from the DB, make sure cloud_tags is included:
+Any queries in lib/db/cms.ts (or similar) that select from cms_objects should now select cloud_tags as well.
+Any mappers that convert DB rows → TS objects should map cloud_tags into the CloudSlug[] field.
+Double-check:
+Tool renderer data loader
+Admin CMS loader
+Any API endpoints returning CMS objects
+STEP 4 – ADMIN CMS UI: CLOUD TAG EDITOR
+Add a simple multi-select control in the admin interface for editing cloud_tags on a CMS object (at minimum for tools, but ideally available for any CMS object type).
+Find the admin CMS editor page for a single object (maybe app/admin/cms/[slug]/page.tsx or similar).
+Add a Cloud Tags section with:
+A list of 8 checkbox options based on the CloudSlug enum.
+When checked/unchecked, it updates cloud_tags in the local form state.
+On save, it sends cloud_tags back in the payload so it persists to the DB.
+Use labels like:
+"VCM AI Creation Cloud"
+"VCM AI Video Cloud"
+"VCM AI Writing & SEO Cloud"
+"VCM File & Data Cloud"
+"VCM Creator Monetization Cloud"
+"VCM AI Intelligence Cloud"
+"VCM Music, Audio & Performance Cloud"
+"VCM Distribution & Growth Cloud"
+But store the actual CloudSlug value ("creation", "video", etc.) in the DB, not the label.
+STEP 5 – CLOUD METADATA REGISTRY (IN CODE)
+Create a central registry describing each Cloud: internal slug, display name, short description, and (for now) a placeholder pricing slug.
+Create a file like lib/clouds.ts (or extend an existing config file) with something like:
+
+import type { CloudSlug } from "./types/cms"; // adjust import path as needed
+
+export type CloudConfig = {
+  slug: CloudSlug;
+  name: string;
+  shortDescription: string;
+  productSlug: string; // matches a CMS/Stripe product in the future
+};
+
+export const CLOUDS: CloudConfig[] = [
+  {
+    slug: "creation",
+    name: "VCM AI Creation Cloud",
+    shortDescription: "AI-powered image, design, and visual creation workflows.",
+    productSlug: "vcm-creation-cloud",
+  },
+  {
+    slug: "video",
+    name: "VCM AI Video Cloud",
+    shortDescription: "Short-form editing, hooks, subtitles, and script analysis.",
+    productSlug: "vcm-video-cloud",
+  },
+  {
+    slug: "writing_seo",
+    name: "VCM AI Writing & SEO Cloud",
+    shortDescription: "SEO articles, clusters, rewriters, and SERP domination.",
+    productSlug: "vcm-writing-seo-cloud",
+  },
+  {
+    slug: "file_data",
+    name: "VCM File & Data Cloud",
+    shortDescription: "Files, PDFs, compression, conversion, and structured data flows.",
+    productSlug: "vcm-file-data-cloud",
+  },
+  {
+    slug: "monetization",
+    name: "VCM Creator Monetization Cloud",
+    shortDescription: "APE, OfferRail, Upsell Exchange, QR Social, and ad rails.",
+    productSlug: "vcm-monetization-cloud",
+  },
+  {
+    slug: "intelligence",
+    name: "VCM AI Intelligence Cloud",
+    shortDescription: "Semantic search, recommendations, signals, and automations.",
+    productSlug: "vcm-intelligence-cloud",
+  },
+  {
+    slug: "music_performance",
+    name: "VCM Music & Performance Cloud",
+    shortDescription: "Stems, Tracetune, filters, and performance tooling.",
+    productSlug: "vcm-music-performance-cloud",
+  },
+  {
+    slug: "growth_distribution",
+    name: "VCM Distribution & Growth Cloud",
+    shortDescription: "Hashtags, comments system, distribution, and funnel rails.",
+    productSlug: "vcm-growth-distribution-cloud",
+  },
+];
+
+export const CLOUD_CONFIG_BY_SLUG: Record<CloudSlug, CloudConfig> =
+  CLOUDS.reduce((acc, cloud) => {
+    acc[cloud.slug] = cloud;
+    return acc;
+  }, {} as Record<CloudSlug, CloudConfig>);
+We will use this registry in the upsell component.
+STEP 6 – TOOL PAGE: CLOUD UPSELL BLOCK
+On each tool page (e.g. /tools/[slug]):
+Make sure the tool’s CMSObject (or ToolForRenderer) includes cloud_tags.
+Create a new component like CloudUpsellBlock.tsx that:
+Accepts cloudSlugs: CloudSlug[]
+Looks up their configs using CLOUD_CONFIG_BY_SLUG
+Renders a simple card or horizontal strip like:
+Title: "Unlock full power with VCM Clouds"
+For each cloud tag:
+Cloud name
+Short description
+A CTA button: “Explore [Cloud Name]”
+For now, link can be /clouds/[cloudSlug] or /store/clouds/[productSlug] (we can wire actual routes later)
+On the tool page, if cloud_tags is non-empty, render this block near the bottom of the page (below the main tool UI, above any footer).
+The core usage will look like:
+import { CloudUpsellBlock } from "@/components/clouds/CloudUpsellBlock";
+
+if (tool.cloud_tags && tool.cloud_tags.length > 0) {
+  return <CloudUpsellBlock cloudSlugs={tool.cloud_tags} />;
+}
+Keep the styling consistent with existing marketing/upsell blocks (cards, gradient background, etc.), but don’t overcomplicate styling – just make it clean and obvious.
+STEP 7 – GUARDRAILS & DEFAULTS
+If a tool has no cloud_tags defined yet → don’t render the upsell block (we’ll fill tags later in CMS).
+If a tool has tags that don’t match the enum → fail loudly in dev (type safety).
+Keep all cloud logic config-based, not hardcoded in the page.
+STEP 8 – QUICK TEST CASE
+Create a quick manual test:
+Pick an existing tool in CMS (e.g. Instagram Resizer).
+In the admin CMS editor, set:
+cloud_tags = ["creation", "growth_distribution"]
+Reload its public tool page.
+Confirm that a Cloud Upsell Block appears.
+Confirm it shows both “VCM AI Creation Cloud” and “VCM Distribution & Growth Cloud”.
+Confirm each has a CTA button.
+Once this is working, the "VCM Cloud Tag Matrix" is live in the codebase and every future tool can participate in the flywheel just by tagging it in CMS.
+Please implement all of this step-by-step, reusing existing project patterns and file structures. Show me the diffs or list of changed files once you’re done.
+
+That’s your “paste into Replit” payload.
+
+Once their AI wires this in, your clouds and tools are officially connected and the flywheel becomes real at the code level.
