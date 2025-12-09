@@ -46,7 +46,9 @@ export async function GET() {
       const toolCount = cluster.toolSlugs.length;
       const articleCount = cluster.articleSlugs.length;
       
-      const pillarUrl = `/pillars/${cluster.pillarSlug}`;
+      const pillarUrl = cluster.pillarSlug.startsWith('/') 
+        ? cluster.pillarSlug 
+        : `/tools/${cluster.pillarSlug}`;
       expectedLinks[pillarUrl] = toolCount + articleCount;
 
       for (const toolSlug of cluster.toolSlugs) {

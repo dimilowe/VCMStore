@@ -1,0 +1,83 @@
+Yeah, that’s the right pattern. Pillars living at /tools/[cluster-slug] keeps everything consistent and “tools-first”, which is what you want.
+A few sharp tweaks so you don’t miss anything:
+1. Pillar route + cluster registry
+If pillar pages live at /tools/[cluster-slug], then for the zip cluster:
+Route:
+app/tools/zip-file-tools/page.tsx
+In CLUSTER_REGISTRY, make sure the pillar slug matches the actual URL:
+pillarSlug: "/tools/zip-file-tools",
+toolSlugs: [
+  // your 7 zip tools
+],
+articleSlugs: [],
+Then the expected-links code should just use cluster.pillarSlug directly, no manual /tools/${...} concatenation needed.
+2. What the pillar page needs (minimum viable pillar)
+For app/tools/zip-file-tools/page.tsx, make sure it includes:
+✅ SEO meta (title, description, canonical, etc.)
+✅ Hero section
+“Online ZIP file tools” / “Compress, extract, and manage ZIPs in one place”
+✅ Quick reference table
+7 rows, one per tool, with:
+Name
+Short description
+Link to /tools/[slug]
+✅ Tool cards
+Same 7 tools again, more visual, each with:
+H3 title
+One-line benefit
+CTA button → tool URL
+✅ Pro tips block
+“When to compress vs resize”
+“How much to compress before quality dies”
+“Best practices when sending large ZIPs”
+✅ FAQ section with schema
+3–5 common questions:
+Is it safe?
+Is there a file size limit?
+Do you store my files?
+Is this free?
+Add JSON-LD <script type="application/ld+json"> for FAQ markup
+✅ CTA
+“Start with [Best general tool] → button”
+Or “Pick a tool below to begin”
+Also: make sure the pillar links back to each tool (which you’re doing via table/cards). That’s how you get the internal link count up.
+3. Expected-links API change
+Right now you were thinking:
+Update expected-links API to use /tools/${cluster.pillarSlug}
+Better: don’t double-prefix.
+If pillarSlug in the registry is already /tools/zip-file-tools, the API should just do:
+const pillarUrl = cluster.pillarSlug; // already full path
+Then your expected links logic is:
+expectedLinks = siblingTools + Math.min(articleSlugs.length, 3) + 1; // pillar
+No /pillars/ assumptions anywhere.
+4. Global URLs + CMS object
+Two things people always forget:
+CMS object for the pillar, not just the file:
+Add a cms_objects entry for zip-file-tools with:
+type: "pillar" or "article" (whatever you use)
+slug: "zip-file-tools"
+path: "/tools/zip-file-tools"
+SEO fields
+Interlink metadata (parent cluster, siblings if you’re tracking)
+Global URLs registry entry:
+url: "/tools/zip-file-tools"
+title: "Zip File Tools"
+source: "cms" (if you track source)
+is_indexed: false by default, then you toggle on when ready
+That’s what makes it appear in the SEO panel and Ready to Index.
+5. Sanity check on your plan
+Your list:
+Create pillar at /tools/zip-file-tools with hero, table, cards, pro tips, FAQ, CTA
+Update expected-links API to use the actual route
+Register in global_urls so it appears in SEO panel
+Yes.
+Add:
+Make sure CLUSTER_REGISTRY.pillarSlug = "/tools/zip-file-tools"
+Create a CMS object for the pillar, not just the route
+Do that, and the zip cluster will be “proper”:
+One pillar
+7 tools
+All interlinked
+Correct expected links
+Shows up clean in admin
+That’s exactly how it should work.

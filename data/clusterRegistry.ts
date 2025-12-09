@@ -263,7 +263,7 @@ export const CLUSTER_REGISTRY: Record<string, TopicCluster> = {
   },
   "zip-file-tools": {
     id: "zip-file-tools",
-    pillarSlug: "zip-file-tools",
+    pillarSlug: "/tools/zip-file-tools",
     pillarTitle: "Free ZIP File Tools: Compress, Create & Protect",
     pillarDescription: "Online tools to create, compress, and password-protect ZIP files without software.",
     engineId: "standalone",
