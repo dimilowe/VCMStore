@@ -1,0 +1,101 @@
+✅ THE ACTUAL REPLIT PROMPT (PASTE THIS DIRECTLY INTO REPLIT CHAT)
+Replit — please add two new clouds to the VCM Cloud system. They must be named:
+Shopping Cloud
+slug/id = shopping
+Advertising Cloud
+slug/id = advertising
+Follow the existing architecture exactly.
+Do not remove or rewrite anything — only extend.
+1. Update the CloudId type
+Find the file where CloudId is defined (usually lib/constants/clouds.ts or similar) and add:
+| 'shopping'
+| 'advertising'
+to the existing CloudId union.
+2. Add both clouds to CLOUD_REGISTRY
+In the same file, extend the CLOUD_REGISTRY with:
+shopping: {
+  id: 'shopping',
+  name: 'Shopping Cloud',
+  slug: 'shopping',
+  description:
+    'Tools for outfits, styling, shopping boards, lookbooks, product mixing, and shoppable content.',
+  icon: 'shirt',
+  color: 'from-pink-500 to-rose-500',
+  order: 9,
+},
+advertising: {
+  id: 'advertising',
+  name: 'Advertising Cloud',
+  slug: 'advertising',
+  description:
+    'Tools for paid reach, ads, campaign testing, funnels, optimizations, and marketing workflows.',
+  icon: 'megaphone',
+  color: 'from-sky-500 to-indigo-500',
+  order: 10,
+},
+Ensure both are added to any CLOUD_LIST or exported array used for dropdowns.
+3. Add DB upserts in the cloud seed script
+Find the cloud seeding file (often prisma/seed.ts, db/seeds/clouds.ts, or similar).
+Add two upserts:
+await db.cloud.upsert({
+  where: { slug: 'shopping' },
+  update: {
+    name: 'Shopping Cloud',
+    description:
+      'Tools for outfits, styling, shopping boards, lookbooks, product mixing, and shoppable content.',
+  },
+  create: {
+    slug: 'shopping',
+    name: 'Shopping Cloud',
+    description:
+      'Tools for outfits, styling, shopping boards, lookbooks, product mixing, and shoppable content.',
+  },
+});
+
+await db.cloud.upsert({
+  where: { slug: 'advertising' },
+  update: {
+    name: 'Advertising Cloud',
+    description:
+      'Tools for paid reach, ads, campaign testing, funnels, optimizations, and marketing workflows.',
+  },
+  create: {
+    slug: 'advertising',
+    name: 'Advertising Cloud',
+    description:
+      'Tools for paid reach, ads, campaign testing, funnels, optimizations, and marketing workflows.',
+  },
+});
+Run the cloud seeder after modifying.
+4. Update CMS Cloud Dropdown UI
+Search for any UI component that renders a Cloud selection dropdown (e.g., admin tool editor).
+Make sure the dropdown pulls from CLOUD_REGISTRY OR add:
+{ value: 'shopping', label: 'Shopping Cloud' }
+{ value: 'advertising', label: 'Advertising Cloud' }
+5. Add new cloud dashboards
+Create the pages:
+/clouds/shopping
+/clouds/advertising
+Each should use your existing CloudDashboard component:
+export default function Page() {
+  return <CloudDashboard cloudId="shopping" />;
+}
+and
+export default function Page() {
+  return <CloudDashboard cloudId="advertising" />;
+}
+6. Assign tools to these clouds
+Update CMS objects so:
+Outfit Generator → "cloud": "shopping"
+ClipFits → "cloud": "shopping"
+YouTube Title Tester → "cloud": "advertising"
+Any A/B testing tools → "cloud": "advertising"
+Ad Overlay / Toast integrations → "cloud": "advertising" when ready
+Important Requirements for Replit
+Do NOT modify pricing or subscriptions yet
+Do NOT alter existing clouds
+Do NOT rename or delete any existing cloud
+These clouds must show up everywhere the others do: dashboards, CMS, tool metadata, dropdowns, API endpoints
+✔ END OF PROMPT
+Paste that whole block into Replit exactly as written.
+It will guide Replit to implement everything cleanly and consistently.
