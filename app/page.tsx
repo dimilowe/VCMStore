@@ -109,56 +109,56 @@ const vcmClouds = [
     description: "AI Image & Design",
     icon: Palette,
     href: "/clouds/creation-cloud",
-    gradient: "bg-gradient-to-br from-pink-500 to-rose-600"
+    gradient: "app-card-pink"
   },
   {
     name: "Video",
     description: "Editing & Analysis",
     icon: Youtube,
     href: "/clouds/video-cloud",
-    gradient: "bg-gradient-to-br from-red-500 to-orange-600"
+    gradient: "app-card-orange"
   },
   {
     name: "Writing",
     description: "SEO & Content",
     icon: FilePen,
     href: "/clouds/writing-seo-cloud",
-    gradient: "bg-gradient-to-br from-blue-500 to-indigo-600"
+    gradient: "app-card-blue"
   },
   {
     name: "Files",
     description: "Convert & Compress",
     icon: FileText,
     href: "/clouds/file-data-cloud",
-    gradient: "bg-gradient-to-br from-cyan-500 to-blue-600"
+    gradient: "app-card-teal"
   },
   {
     name: "Monetize",
     description: "Revenue Tools",
     icon: ShoppingBag,
     href: "/clouds/monetization-cloud",
-    gradient: "bg-gradient-to-br from-green-500 to-emerald-600"
+    gradient: "app-card-yellow"
   },
   {
     name: "Intelligence",
     description: "AI Automation",
     icon: Sparkles,
     href: "/clouds/intelligence-cloud",
-    gradient: "bg-gradient-to-br from-purple-500 to-violet-600"
+    gradient: "app-card-purple"
   },
   {
     name: "Music",
     description: "Stems & Audio",
     icon: Music,
     href: "/clouds/music-performance-cloud",
-    gradient: "bg-gradient-to-br from-teal-500 to-cyan-600"
+    gradient: "app-card-teal"
   },
   {
     name: "Growth",
     description: "Distribution & Reach",
     icon: TrendingUp,
     href: "/clouds/growth-distribution-cloud",
-    gradient: "bg-gradient-to-br from-amber-500 to-orange-600"
+    gradient: "app-card-orange"
   },
 ];
 
@@ -212,18 +212,18 @@ export default async function HomePage() {
           </p>
 
           {/* VCM Clouds Grid */}
-          <div className="grid grid-cols-4 gap-4 md:gap-6 mb-12 max-w-3xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-6 mb-12">
             {vcmClouds.map((cloud) => (
               <Link
                 key={cloud.name}
                 href={cloud.href}
                 className="group flex flex-col items-center"
               >
-                <div className={`w-16 h-16 md:w-20 md:h-20 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <cloud.icon className="w-7 h-7 md:w-9 md:h-9 text-white" />
+                <div className={`w-24 h-24 md:w-28 md:h-28 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <cloud.icon className="w-10 h-10 md:w-12 md:h-12 text-white" />
                 </div>
-                <span className="text-xs md:text-sm font-semibold text-gray-900">{cloud.name}</span>
-                <span className="text-[10px] md:text-xs text-gray-500 hidden sm:block">{cloud.description}</span>
+                <span className="text-sm font-semibold text-gray-900">{cloud.name}</span>
+                <span className="text-xs text-gray-500">{cloud.description}</span>
               </Link>
             ))}
           </div>
@@ -375,17 +375,17 @@ export default async function HomePage() {
           </h2>
 
           {/* VCM Clouds Grid */}
-          <div className="grid grid-cols-4 gap-4 md:gap-5 mb-8 max-w-2xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-5 mb-8">
             {vcmClouds.map((cloud) => (
               <Link
                 key={cloud.name}
                 href={cloud.href}
                 className="group flex flex-col items-center"
               >
-                <div className={`w-14 h-14 md:w-18 md:h-18 ${cloud.gradient} rounded-xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
-                  <cloud.icon className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                <div className={`w-20 h-20 md:w-24 md:h-24 ${cloud.gradient} rounded-2xl flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition-transform`}>
+                  <cloud.icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
                 </div>
-                <span className="text-[10px] md:text-xs font-semibold text-white">{cloud.name}</span>
+                <span className="text-xs font-semibold text-white">{cloud.name}</span>
               </Link>
             ))}
           </div>
