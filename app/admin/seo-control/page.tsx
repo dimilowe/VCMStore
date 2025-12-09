@@ -114,6 +114,7 @@ export default function SeoControlPage() {
   const [filterKind, setFilterKind] = useState("all");
   const [filterRegistryStatus, setFilterRegistryStatus] = useState("all");
   const [registryPage, setRegistryPage] = useState(1);
+  const [registrySort, setRegistrySort] = useState("url-asc");
   const REGISTRY_PER_PAGE = 100;
   
   // SEO Health tab state
@@ -353,8 +354,36 @@ export default function SeoControlPage() {
     const matchesStatus = filterRegistryStatus === "all" || row.status === filterRegistryStatus;
     return matchesSearch && matchesKind && matchesStatus;
   });
-  const totalRegistryPages = Math.ceil(filteredEnrichedRegistry.length / REGISTRY_PER_PAGE);
-  const paginatedEnrichedRegistry = filteredEnrichedRegistry.slice(
+
+  const sortedEnrichedRegistry = [...filteredEnrichedRegistry].sort((a, b) => {
+    switch (registrySort) {
+      case "url-asc":
+        return a.url.localeCompare(b.url);
+      case "url-desc":
+        return b.url.localeCompare(a.url);
+      case "indexed-first":
+        return (b.isIndexed ? 1 : 0) - (a.isIndexed ? 1 : 0);
+      case "unindexed-first":
+        return (a.isIndexed ? 1 : 0) - (b.isIndexed ? 1 : 0);
+      case "links-in-desc":
+        return b.linksInbound - a.linksInbound;
+      case "links-in-asc":
+        return a.linksInbound - b.linksInbound;
+      case "links-out-desc":
+        return b.linksOutbound - a.linksOutbound;
+      case "links-out-asc":
+        return a.linksOutbound - b.linksOutbound;
+      case "score-desc":
+        return (b.seoScore ?? 0) - (a.seoScore ?? 0);
+      case "score-asc":
+        return (a.seoScore ?? 0) - (b.seoScore ?? 0);
+      default:
+        return a.url.localeCompare(b.url);
+    }
+  });
+
+  const totalRegistryPages = Math.ceil(sortedEnrichedRegistry.length / REGISTRY_PER_PAGE);
+  const paginatedEnrichedRegistry = sortedEnrichedRegistry.slice(
     (registryPage - 1) * REGISTRY_PER_PAGE,
     registryPage * REGISTRY_PER_PAGE
   );
@@ -957,6 +986,32 @@ export default function SeoControlPage() {
                 <option value="Needs Review">Needs Review</option>
                 <option value="Legacy">Legacy</option>
                 <option value="System">System</option>
+              </select>
+              <select
+                value={registrySort}
+                onChange={(e) => { setRegistrySort(e.target.value); setRegistryPage(1); }}
+                className="border rounded-md px-3 py-2 text-sm"
+              >
+                <optgroup label="URL">
+                  <option value="url-asc">URL A→Z</option>
+                  <option value="url-desc">URL Z→A</option>
+                </optgroup>
+                <optgroup label="Indexed">
+                  <option value="indexed-first">Indexed First</option>
+                  <option value="unindexed-first">Unindexed First</option>
+                </optgroup>
+                <optgroup label="Inbound Links">
+                  <option value="links-in-desc">Inbound High→Low</option>
+                  <option value="links-in-asc">Inbound Low→High</option>
+                </optgroup>
+                <optgroup label="Outbound Links">
+                  <option value="links-out-desc">Outbound High→Low</option>
+                  <option value="links-out-asc">Outbound Low→High</option>
+                </optgroup>
+                <optgroup label="SEO Score">
+                  <option value="score-desc">Score High→Low</option>
+                  <option value="score-asc">Score Low→High</option>
+                </optgroup>
               </select>
             </div>
 
