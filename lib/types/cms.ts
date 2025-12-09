@@ -73,12 +73,44 @@ export type ContentBlock = {
   variant?: 'info' | 'warning' | 'tip';
 };
 
+export type CloudDashboardEngineConfig = {
+  hero: {
+    title: string;
+    subtitle?: string;
+    primaryToolSlug: string;
+    mode: "image" | "video" | "text";
+    showModeSwitcher: boolean;
+  };
+  featuredProducts: {
+    title: string;
+    description: string;
+    product_slug?: string;
+    tool_slug?: string;
+    primaryCta: { label: string; href: string };
+    secondaryCta?: { label: string; href: string };
+    badge?: "Pro" | "New" | "Beta";
+  }[];
+  appRow: {
+    tool_slug: string;
+  }[];
+  shortcuts: {
+    title: string;
+    description: string;
+    icon_tool_slug: string;
+    target_tool_slug: string;
+    preset_key?: string;
+  }[];
+  showRecentFiles: boolean;
+};
+
 export type CMSObject = {
   id: string;
   slug: string;
-  type: 'product' | 'tool' | 'article' | 'mbb' | 'cluster';
+  type: 'product' | 'tool' | 'article' | 'mbb' | 'cluster' | 'cloud_dashboard';
   cluster_slug?: string;
   cloud_tags?: CloudSlug[];
+  engine?: string;
+  engine_config?: CloudDashboardEngineConfig;
   data: CMSObjectData;
   word_count: number;
   health: 'thin' | 'ok' | 'strong';

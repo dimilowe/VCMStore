@@ -1,0 +1,69 @@
+✅ Order of tasks (this is the correct sequence)
+Add configuration type for dashboard
+Define CloudDashboardEngineConfig in lib/types/cms.ts.
+Add "CloudDashboardEngine" to your EngineName union.
+Plug it into your EngineConfig union.
+Make sure CMSObject.engine can be "CloudDashboardEngine" and engine_config typed accordingly.
+Create dashboard engine component
+components/engines/CloudDashboardEngine.tsx with:
+hero block
+featuredProducts row
+appRow chips
+shortcuts grid
+recent files placeholder
+Register dashboard engine for use
+In your main renderer switch (e.g. CmsRenderer), add:
+case "CloudDashboardEngine":
+  return <CloudDashboardEngine cms={cms as any} />;
+At this point, any CMS object with engine: "CloudDashboardEngine" won’t crash.
+Create page for cloud details (route)
+Either:
+Use your existing CMS page route (if it already handles arbitrary slugs via cms_objects), or
+Add /clouds/[slug] page that:
+Loads CMS object by slug (creation-cloud, video-cloud, etc.)
+Passes it into CmsRenderer.
+Keep routing dumb: it should just fetch CMS + render engine.
+Add way to get cloud data
+You already have the CLOUDS registry; keep using that.
+For dashboards, you don’t strictly need extra “cloud data” beyond:
+CMS object (for title/description/engine_config)
+Optionally: query tools with cloud_tags @> ARRAY['creation'] if you want appRow to be dynamic later.
+For now, keep appRow manual in engine_config and treat “auto-pulling from cloud_tags” as v2.
+Add initial Creation Cloud CMS object
+Import the creation-cloud JSON we sketched:
+type: "cloud_dashboard"
+engine: "CloudDashboardEngine"
+engine_config with hero, featuredProducts, appRow, shortcuts, showRecentFiles.
+Confirm it appears in URL Registry as /clouds/creation-cloud.
+Set isIndexed = false until you’re happy with it.
+Update upsell block links
+In your CloudUpsellBlock, change from:
+href={`/clouds/${cloud.slug}`}
+to:
+href={`/clouds/${cloud.slug}-cloud`}
+or whatever slug you actually used (creation-cloud, video-cloud, etc.).
+This is where the Cloud upsell becomes a proper funnel:
+Tool → Cloud dashboard → Product page.
+Check dashboard displays correctly
+Manually hit /clouds/creation-cloud:
+Hero renders
+Featured cards render
+App row chips work (link to tools)
+Shortcuts links work (tools + optional ?preset= query)
+Recent files placeholder shows (or is hidden if false)
+Then hit an existing tool with cloud_tags including "creation" and confirm:
+Upsell appears
+Clicking Creation Cloud → goes to the new dashboard page.
+One small correction / decision point
+You wrote:
+“the appRow shows tools tagged with that cloud”
+Right now, based on what you’ve implemented, appRow is manual config in engine_config. That’s fine and honestly better for v1 (you choose the “hero” tools per cloud).
+Later, if you want:
+You can replace appRow content by querying tools where cloud_tags contains that cloud and show top N.
+Or mix: manual appRow for “featured apps” + a secondary section “More tools in this cloud” pulled from cloud_tags.
+For now, don’t overcomplicate it. Manual appRow in CMS is good enough.
+So yes: your approach is good.
+Do it in that order, and you’ll have:
+Real cloud dashboards
+Clean Adobe-style entry points
+Tool → Cloud → Product funnels actually working end-to-end.
