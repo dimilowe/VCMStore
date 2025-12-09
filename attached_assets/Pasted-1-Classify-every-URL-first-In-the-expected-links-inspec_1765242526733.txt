@@ -1,0 +1,96 @@
+1. Classify every URL first
+In the expected-links / inspector code, for each URL:
+isLegacyTool
+URL starts with /tools/
+No matching entry in cms_objects
+isCmsTool
+CMS entry exists with type = 'tool'
+isCmsArticle
+CMS entry exists with type = 'article' | 'answer' | 'blog' (whatever you use)
+isPillar
+URL matches a pillarSlug in CLUSTER_REGISTRY
+cluster
+Look up the cluster where the slug is in toolSlugs or articleSlugs or equals pillarSlug
+Return those flags in the inspector result.
+2. Compute expected_links by type
+In the inspector / expected-links util:
+function computeExpectedLinks(meta: {
+  isLegacyTool: boolean;
+  isCmsTool: boolean;
+  isCmsArticle: boolean;
+  isPillar: boolean;
+  cluster?: ClusterConfig | null;
+}): number | null {
+  if (meta.isLegacyTool) return null; // Legacy – out of scope
+
+  const cluster = meta.cluster;
+
+  // 1) Cluster tools
+  if (meta.isCmsTool && cluster) {
+    const siblingTools = cluster.toolSlugs.length - 1;
+    const articleCount = cluster.articleSlugs?.length ?? 0;
+    const pillar = 1;
+    return siblingTools + Math.min(articleCount, 3) + pillar;
+  }
+
+  // 2) Cluster articles
+  if (meta.isCmsArticle && cluster) {
+    // Must link to pillar + >=2 tools (+ optional sibling)
+    return 3; // pillar (1) + 2 tools; if they have 4–5 that's even better
+  }
+
+  // 3) Pillars
+  if (meta.isPillar && cluster) {
+    const tools = cluster.toolSlugs.length;
+    const articles = cluster.articleSlugs?.length ?? 0;
+    return tools + Math.min(articles, 3);
+  }
+
+  // 4) Everything else CMS-based (store, generic pages, etc.)
+  if (!meta.isLegacyTool) {
+    return 3; // simple baseline for "has some internal links"
+  }
+
+  return null;
+}
+Now each page has:
+links (actual, from the crawl)
+expected_links (target, or null for legacy)
+3. Set a clear status
+After you compute health score + link counts:
+function computeStatus(row: {
+  isLegacyTool: boolean;
+  score: number;
+  links: number;
+  expected_links: number | null;
+}): "Ready" | "Needs Links" | "Needs Review" | "Legacy" {
+  if (row.isLegacyTool) return "Legacy";
+
+  // If no target, fall back to generic ready rule
+  if (row.expected_links == null) {
+    if (row.score >= 80 && row.links >= 3) return "Ready";
+    return "Needs Review";
+  }
+
+  // Has a target
+  if (row.links < row.expected_links) return "Needs Links";
+  if (row.score < 80) return "Needs Review";
+
+  return "Ready";
+}
+Return expected_links and status in the API response for all CMS URLs (tools, articles, pillars, pages).
+4. UI behaviour
+Ready panel columns:
+Links
+Expected
+Status (Ready / Needs Links / Needs Review / Legacy)
+Workflow:
+Filter Status = Ready → those are safe to toggle indexed
+Ignore Legacy
+For Needs Links, open and add pillar + tool interlinks
+For Needs Review, fix content/score first
+So yes: implement this now.
+This gives you exactly what you’re asking for:
+A universal “is this page properly interlinked?” signal
+Consistent logic across tools, articles, and pillars
+A clean “Ready” list you can just approve and index without guessing.
