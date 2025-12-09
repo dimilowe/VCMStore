@@ -1,30 +1,59 @@
 "use client";
 
+import type { ElementType } from "react";
 import type { CloudDashboardEngineConfig, CMSObject } from "@/lib/types/cms";
 import Link from "next/link";
-import { Sparkles, ArrowRight, Clock, Zap } from "lucide-react";
+import { Sparkles, ArrowRight, Clock, Zap, Palette, Video, PenTool, FolderOpen, DollarSign, Brain, Music, TrendingUp } from "lucide-react";
 
 type CloudDashboardProps = {
   cms: CMSObject & { engine_config: CloudDashboardEngineConfig };
+};
+
+const CLOUD_GRADIENTS: Record<string, string> = {
+  "creation-cloud": "from-pink-500 to-pink-600",
+  "video-cloud": "from-orange-500 to-orange-600",
+  "writing-seo-cloud": "from-blue-500 to-blue-600",
+  "file-data-cloud": "from-gray-500 to-gray-600",
+  "monetization-cloud": "from-yellow-500 to-amber-600",
+  "intelligence-cloud": "from-purple-500 to-purple-600",
+  "music-performance-cloud": "from-green-500 to-green-600",
+  "growth-distribution-cloud": "from-rose-500 to-rose-600",
+};
+
+const CLOUD_ICONS: Record<string, ElementType> = {
+  "creation-cloud": Palette,
+  "video-cloud": Video,
+  "writing-seo-cloud": PenTool,
+  "file-data-cloud": FolderOpen,
+  "monetization-cloud": DollarSign,
+  "intelligence-cloud": Brain,
+  "music-performance-cloud": Music,
+  "growth-distribution-cloud": TrendingUp,
 };
 
 export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
   const { hero, featuredProducts, appRow, shortcuts, showRecentFiles } =
     cms.engine_config;
 
+  const cloudSlug = cms.slug;
+  const gradient = CLOUD_GRADIENTS[cloudSlug] || "from-purple-500 to-purple-600";
+  const IconComponent = CLOUD_ICONS[cloudSlug] || Sparkles;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
-        <section className="rounded-2xl border border-gray-200 p-8 bg-gradient-to-br from-white via-white to-purple-50 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-5 h-5 text-purple-500" />
-            <span className="text-xs font-medium text-purple-600 uppercase tracking-wide">
+        <section className={`rounded-2xl bg-gradient-to-r ${gradient} p-8 text-white shadow-lg`}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <IconComponent className="w-6 h-6" />
+            </div>
+            <span className="px-3 py-1 bg-white/20 rounded-full text-sm font-medium uppercase tracking-wide">
               {cms.data.title}
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{hero.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">{hero.title}</h1>
           {hero.subtitle && (
-            <p className="text-gray-600 mb-6 max-w-xl">
+            <p className="text-white/90 mb-6 max-w-xl text-lg">
               {hero.subtitle}
             </p>
           )}
@@ -32,20 +61,20 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href={`/tools/${hero.primaryToolSlug}`}
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium bg-white text-gray-900 hover:bg-gray-100 transition-colors shadow-sm"
             >
               Start with {hero.mode === "image" ? "an image" : hero.mode === "video" ? "a video" : "text"}
               <ArrowRight className="w-4 h-4" />
             </Link>
             {hero.showModeSwitcher && (
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <button className={`px-3 py-1.5 rounded-full border ${hero.mode === "image" ? "bg-gray-100 border-gray-300" : "border-transparent hover:bg-gray-50"}`}>
+              <div className="flex items-center gap-2 text-xs">
+                <button className={`px-3 py-1.5 rounded-full ${hero.mode === "image" ? "bg-white/30" : "bg-white/10 hover:bg-white/20"}`}>
                   Image
                 </button>
-                <button className={`px-3 py-1.5 rounded-full border ${hero.mode === "video" ? "bg-gray-100 border-gray-300" : "border-transparent hover:bg-gray-50"}`}>
+                <button className={`px-3 py-1.5 rounded-full ${hero.mode === "video" ? "bg-white/30" : "bg-white/10 hover:bg-white/20"}`}>
                   Video
                 </button>
-                <button className={`px-3 py-1.5 rounded-full border ${hero.mode === "text" ? "bg-gray-100 border-gray-300" : "border-transparent hover:bg-gray-50"}`}>
+                <button className={`px-3 py-1.5 rounded-full ${hero.mode === "text" ? "bg-white/30" : "bg-white/10 hover:bg-white/20"}`}>
                   Text
                 </button>
               </div>
