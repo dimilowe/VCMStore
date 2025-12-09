@@ -1,0 +1,287 @@
+I’d just tighten it with a few “don’t forget” items and give you concrete snippets so you can slam this in without second-guessing.
+0. DB: Add cloud_tags column
+Since you’re on raw Postgres and no migrations folder, you’ve got two options: run this once via your DB console (Supabase, Neon, psql, whatever) or wrap it in a one-off script.
+ALTER TABLE cms_objects
+  ADD COLUMN IF NOT EXISTS cloud_tags text[] NOT NULL DEFAULT '{}';
+If some rows end up with NULL (older data, etc.), just COALESCE in your selects:
+SELECT
+  ...,
+  COALESCE(cloud_tags, '{}') AS cloud_tags
+FROM cms_objects
+WHERE slug = $1;
+1. Types: CloudSlug + CMS + ToolForRenderer
+In lib/types/cms.ts (names may differ slightly, adjust paths):
+export type CloudSlug =
+  | "creation"
+  | "video"
+  | "writing_seo"
+  | "file_data"
+  | "monetization"
+  | "intelligence"
+  | "music_performance"
+  | "growth_distribution";
+
+export type CMSObject = {
+  // existing fields...
+  cloud_tags?: CloudSlug[]; // new
+};
+Wherever ToolForRenderer is defined/imported, make sure it carries that field through:
+export type ToolForRenderer = {
+  // existing props...
+  cloud_tags?: CloudSlug[];
+};
+If ToolForRenderer is derived from a DB row → map cloud_tags → CloudSlug[] (or leave as string[] and trust type, but better to keep it tight).
+2. Cloud registry: lib/clouds.ts
+Create lib/clouds.ts:
+import type { CloudSlug } from "./types/cms"; // fix path as needed
+
+export type CloudConfig = {
+  slug: CloudSlug;
+  name: string;
+  shortDescription: string;
+  productSlug: string; // for store/Stripe later
+};
+
+export const CLOUDS: CloudConfig[] = [
+  {
+    slug: "creation",
+    name: "VCM AI Creation Cloud",
+    shortDescription: "AI-powered image, design, and visual creation workflows.",
+    productSlug: "vcm-creation-cloud",
+  },
+  {
+    slug: "video",
+    name: "VCM AI Video Cloud",
+    shortDescription: "Short-form editing, hooks, subtitles, and script analysis.",
+    productSlug: "vcm-video-cloud",
+  },
+    {
+    slug: "writing_seo",
+    name: "VCM AI Writing & SEO Cloud",
+    shortDescription: "SEO articles, clusters, rewriters, and SERP domination.",
+    productSlug: "vcm-writing-seo-cloud",
+  },
+  {
+    slug: "file_data",
+    name: "VCM File & Data Cloud",
+    shortDescription: "Files, PDFs, compression, conversion, and structured data flows.",
+    productSlug: "vcm-file-data-cloud",
+  },
+  {
+    slug: "monetization",
+    name: "VCM Creator Monetization Cloud",
+    shortDescription: "APE, OfferRail, Upsell Exchange, QR Social, and ad rails.",
+    productSlug: "vcm-monetization-cloud",
+  },
+  {
+    slug: "intelligence",
+    name: "VCM AI Intelligence Cloud",
+    shortDescription: "Semantic search, recommendations, signals, and automations.",
+    productSlug: "vcm-intelligence-cloud",
+  },
+  {
+    slug: "music_performance",
+    name: "VCM Music & Performance Cloud",
+    shortDescription: "Stems, Tracetune, filters, and performance tooling.",
+    productSlug: "vcm-music-performance-cloud",
+  },
+  {
+    slug: "growth_distribution",
+    name: "VCM Distribution & Growth Cloud",
+    shortDescription: "Hashtags, comments system, distribution, and funnel rails.",
+    productSlug: "vcm-growth-distribution-cloud",
+  },
+];
+
+export const CLOUD_CONFIG_BY_SLUG: Record<CloudSlug, CloudConfig> =
+  CLOUDS.reduce((acc, cloud) => {
+    acc[cloud.slug] = cloud;
+    return acc;
+  }, {} as Record<CloudSlug, CloudConfig>);
+This keeps all naming/labels/descriptions centralized.
+3. Data access: getCmsToolBySlug.ts
+In lib/cms/getCmsToolBySlug.ts (or whatever file actually hits the DB), update the select and mapping.
+SQL example:
+const result = await query<{
+  // existing cols...
+  cloud_tags: string[] | null;
+}>(`
+  SELECT
+    t.slug,
+    t.title,
+    t.description,
+    -- other fields...
+    COALESCE(t.cloud_tags, '{}') AS cloud_tags
+  FROM cms_objects t
+  WHERE t.slug = $1
+`, [slug]);
+Mapper:
+const row = result.rows[0];
+const tool: ToolForRenderer = {
+  // existing mappings...
+  cloud_tags: (row.cloud_tags ?? []) as CloudSlug[],
+};
+Also check: any “list tools” functions (e.g. admin tables, registries) probably need to include cloud_tags if you want to surface that later.
+4. Admin UI: add Cloud tags to app/admin/tools/page.tsx
+You already located the admin page. You need:
+A set of 8 checkboxes
+Bound to the tool’s cloud_tags
+Saved via whatever API you already use to update CMS objects
+Pattern (simplified):
+// app/admin/tools/page.tsx (or a child component)
+import { CLOUDS } from "@/lib/clouds";
+
+function CloudTagsEditor({
+  value,
+  onChange,
+}: {
+  value: CloudSlug[] | undefined;
+  onChange: (next: CloudSlug[]) => void;
+}) {
+  const tags = value ?? [];
+
+  return (
+    <div className="mt-4 border rounded-md p-3">
+      <h3 className="font-semibold mb-2">Cloud Tags</h3>
+      <p className="text-sm text-muted-foreground mb-3">
+        Assign this tool to one or more VCM Clouds. Tools without tags break the flywheel.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {CLOUDS.map((cloud) => {
+          const checked = tags.includes(cloud.slug);
+          return (
+            <label key={cloud.slug} className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={checked}
+                onChange={() => {
+                  if (checked) {
+                    onChange(tags.filter((t) => t !== cloud.slug));
+                  } else {
+                    onChange([...tags, cloud.slug]);
+                  }
+                }}
+              />
+              <div>
+                <div className="font-medium text-sm">{cloud.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {cloud.shortDescription}
+                </div>
+              </div>
+            </label>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+Then, in your main tool edit form:
+Keep cloud_tags in your local state with the other fields.
+On save, include it in the payload you POST/PUT to your admin API.
+Something like:
+const [cloudTags, setCloudTags] = useState<CloudSlug[]>(tool.cloud_tags ?? []);
+
+// inside form:
+<CloudTagsEditor value={cloudTags} onChange={setCloudTags} />
+
+// when saving:
+await fetch("/api/admin/tools/update", {
+  method: "POST",
+  body: JSON.stringify({
+    ...otherFields,
+    cloud_tags: cloudTags,
+  }),
+});
+Adjust to your actual API shape.
+5. CloudUpsellBlock: components/clouds/CloudUpsellBlock.tsx
+Create:
+// components/clouds/CloudUpsellBlock.tsx
+"use client";
+
+import Link from "next/link";
+import { CLOUD_CONFIG_BY_SLUG } from "@/lib/clouds";
+import type { CloudSlug } from "@/lib/types/cms";
+
+export function CloudUpsellBlock({ cloudSlugs }: { cloudSlugs: CloudSlug[] }) {
+  if (!cloudSlugs || cloudSlugs.length === 0) return null;
+
+  const configs = cloudSlugs
+    .map((slug) => CLOUD_CONFIG_BY_SLUG[slug])
+    .filter(Boolean);
+
+  if (configs.length === 0) return null;
+
+  return (
+    <section className="mt-10 rounded-2xl border p-6 bg-gradient-to-br from-background via-background to-muted">
+      <h2 className="text-xl font-semibold mb-2">
+        Unlock full power with VCM Clouds
+      </h2>
+      <p className="text-sm text-muted-foreground mb-4">
+        This tool is part of the VCM ecosystem. Subscribe to the matching Cloud(s)
+        to unlock AI workflows, batch features, and pro-level automations.
+      </p>
+      <div className="grid gap-4 md:grid-cols-2">
+        {configs.map((cloud) => (
+          <div
+            key={cloud.slug}
+            className="border rounded-xl p-4 flex flex-col justify-between"
+          >
+            <div>
+              <div className="text-sm font-semibold mb-1">{cloud.name}</div>
+              <div className="text-xs text-muted-foreground mb-3">
+                {cloud.shortDescription}
+              </div>
+            </div>
+            <div>
+              <Link
+                href={`/clouds/${cloud.slug}`} // stub route for now
+                className="inline-flex items-center text-xs font-medium underline"
+              >
+                Explore {cloud.name}
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+You can polish styling later; functionally this is enough.
+6. Tool page: use CloudUpsellBlock in ToolPageClient.tsx
+In app/tools/[slug]/ToolPageClient.tsx:
+import { CloudUpsellBlock } from "@/components/clouds/CloudUpsellBlock";
+
+type ToolPageClientProps = {
+  tool: ToolForRenderer;
+};
+
+export function ToolPageClient({ tool }: ToolPageClientProps) {
+  // existing layout
+  return (
+    <div className="...">
+      {/* existing tool UI */}
+
+      {tool.cloud_tags && tool.cloud_tags.length > 0 && (
+        <CloudUpsellBlock cloudSlugs={tool.cloud_tags} />
+      )}
+    </div>
+  );
+}
+That’s the flywheel wiring: tool → cloud tags → upsell.
+7. One more thing: don’t forget other loaders
+You already hit getCmsToolBySlug, but check if there are:
+getAllTools / getCmsToolsList used for admin tables
+Any API like /api/admin/tools returning tools
+Pull cloud_tags into those too so you can later:
+show tags in the admin table
+sort/filter by cloud
+compute Cloud “strength” from the DB if you want
+Short answer:
+Yes, your plan is good.
+If you implement exactly what you described plus the details above, you’ll have:
+cloud tags in DB
+types wired
+admin checkboxes
+a live upsell block on tool pages
+…and the Cloud architecture is no longer theoretical — it’s running in the codebase.

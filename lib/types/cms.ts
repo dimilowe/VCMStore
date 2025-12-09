@@ -1,3 +1,5 @@
+import type { CloudSlug } from '@/lib/clouds';
+
 export type ProductData = {
   stripe_product_id?: string;
   primary_price_id: string | null;
@@ -76,6 +78,7 @@ export type CMSObject = {
   slug: string;
   type: 'product' | 'tool' | 'article' | 'mbb' | 'cluster';
   cluster_slug?: string;
+  cloud_tags?: CloudSlug[];
   data: CMSObjectData;
   word_count: number;
   health: 'thin' | 'ok' | 'strong';
