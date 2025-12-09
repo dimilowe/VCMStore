@@ -1,12 +1,20 @@
 "use client";
 
-import type { ElementType } from "react";
+import { useState, useEffect, type ElementType } from "react";
 import type { CloudDashboardEngineConfig, CMSObject } from "@/lib/types/cms";
 import Link from "next/link";
-import { Sparkles, ArrowRight, Clock, Zap, Palette, Video, PenTool, FolderOpen, DollarSign, Brain, Music, TrendingUp } from "lucide-react";
+import { Sparkles, ArrowRight, Clock, Zap, Palette, Video, PenTool, FolderOpen, DollarSign, Brain, Music, TrendingUp, Wrench } from "lucide-react";
 
 type CloudDashboardProps = {
   cms: CMSObject & { engine_config: CloudDashboardEngineConfig };
+};
+
+type TaggedTool = {
+  slug: string;
+  title: string;
+  description: string;
+  featured: boolean;
+  segment?: string;
 };
 
 const CLOUD_GRADIENTS: Record<string, string> = {
@@ -38,6 +46,26 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
   const cloudSlug = cms.slug;
   const gradient = CLOUD_GRADIENTS[cloudSlug] || "from-purple-500 to-purple-600";
   const IconComponent = CLOUD_ICONS[cloudSlug] || Sparkles;
+
+  const [taggedTools, setTaggedTools] = useState<TaggedTool[]>([]);
+  const [loadingTools, setLoadingTools] = useState(true);
+
+  useEffect(() => {
+    async function fetchTaggedTools() {
+      try {
+        const res = await fetch(`/api/clouds/${cloudSlug}/tools`);
+        if (res.ok) {
+          const data = await res.json();
+          setTaggedTools(data.tools || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tagged tools:", error);
+      } finally {
+        setLoadingTools(false);
+      }
+    }
+    fetchTaggedTools();
+  }, [cloudSlug]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -144,6 +172,33 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
                   className="inline-flex items-center rounded-full px-4 py-2 text-sm border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors"
                 >
                   {app.tool_slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {!loadingTools && taggedTools.length > 0 && (
+          <section>
+            <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-gray-500" />
+              Tools in this cloud
+            </h2>
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {taggedTools.map((tool) => (
+                <Link
+                  key={tool.slug}
+                  href={`/tools/${tool.slug}`}
+                  className="rounded-xl border border-gray-200 p-4 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all group"
+                >
+                  <div className="text-sm font-medium text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">
+                    {tool.title}
+                  </div>
+                  {tool.description && (
+                    <div className="text-xs text-gray-500 line-clamp-2">
+                      {tool.description}
+                    </div>
+                  )}
                 </Link>
               ))}
             </div>
