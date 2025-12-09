@@ -1,0 +1,310 @@
+Yeah, that Adobe-based plan is still exactly what we should use — we just didn’t wire the engine yet.
+You’ve already got:
+Cloud tags ✅
+Upsell blocks ✅
+Cloud products (or at least the structure for them) ✅
+What’s missing is: the /clouds/[cloud] dashboard page powered by a CloudDashboardEngine.
+I’ll give you pasteable pieces you can drop into Replit now:
+1. Add CloudDashboardEngineConfig to your CMS types
+In lib/types/cms.ts (or wherever your engine configs live), add:
+// 1) Engine name
+export type EngineName =
+  | "ZipEngine"
+  | "OutfitEngine"
+  // ...other engines
+  | "CloudDashboardEngine";
+
+// 2) Config shape
+export type CloudDashboardEngineConfig = {
+  hero: {
+    title: string;
+    subtitle?: string;
+    primaryToolSlug: string; // e.g. "image-generator"
+    mode: "image" | "video" | "text";
+    showModeSwitcher: boolean;
+  };
+  featuredProducts: {
+    title: string;
+    description: string;
+    product_slug?: string; // CMS product slug
+    tool_slug?: string;    // optional direct tool launch
+    primaryCta: { label: string; href: string };
+    secondaryCta?: { label: string; href: string };
+    badge?: "Pro" | "New" | "Beta";
+  }[];
+  appRow: {
+    tool_slug: string;
+  }[];
+  shortcuts: {
+    title: string;
+    description: string;
+    icon_tool_slug: string;
+    target_tool_slug: string;
+    preset_key?: string;
+  }[];
+  showRecentFiles: boolean;
+};
+
+// 3) Plug into your union of engine configs
+export type EngineConfig =
+  | ZipEngineConfig
+  | OutfitEngineConfig
+  // ...other configs
+  | CloudDashboardEngineConfig;
+And make sure your CMSObject type allows engine: "CloudDashboardEngine" + engine_config: CloudDashboardEngineConfig.
+2. Add the CloudDashboardEngine renderer
+Create components/engines/CloudDashboardEngine.tsx:
+// components/engines/CloudDashboardEngine.tsx
+"use client";
+
+import type { CloudDashboardEngineConfig } from "@/lib/types/cms";
+import type { CMSObject } from "@/lib/types/cms";
+import Link from "next/link";
+
+type CloudDashboardProps = {
+  cms: CMSObject & { engine_config: CloudDashboardEngineConfig };
+};
+
+export function CloudDashboardEngine({ cms }: CloudDashboardProps) {
+  const { hero, featuredProducts, appRow, shortcuts, showRecentFiles } =
+    cms.engine_config;
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      {/* Hero / Prompt block */}
+      <section className="rounded-2xl border p-6 bg-gradient-to-br from-background via-background to-muted">
+        <h1 className="text-2xl font-semibold mb-1">{hero.title}</h1>
+        {hero.subtitle && (
+          <p className="text-sm text-muted-foreground mb-4">
+            {hero.subtitle}
+          </p>
+        )}
+
+        {/* Very simple “start” CTA for now */}
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href={`/tools/${hero.primaryToolSlug}`}
+            className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium border"
+          >
+            Start with {hero.mode === "image" ? "an image" : hero.mode}
+          </Link>
+          {hero.showModeSwitcher && (
+            <span className="text-xs text-muted-foreground">
+              Mode switching UI can go here later.
+            </span>
+          )}
+        </div>
+      </section>
+
+      {/* Featured products / tools */}
+      {featuredProducts.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold mb-3">Featured</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {featuredProducts.map((item, idx) => (
+              <div
+                key={idx}
+                className="rounded-xl border p-4 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-semibold">{item.title}</span>
+                    {item.badge && (
+                      <span className="text-[10px] uppercase tracking-wide border rounded-full px-2 py-0.5">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {item.description}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={item.primaryCta.href}
+                    className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium border"
+                  >
+                    {item.primaryCta.label}
+                  </Link>
+                  {item.secondaryCta && (
+                    <Link
+                      href={item.secondaryCta.href}
+                      className="inline-flex items-center rounded-full px-3 py-1.5 text-xs text-muted-foreground"
+                    >
+                      {item.secondaryCta.label}
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Apps row */}
+      {appRow.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold mb-3">Apps in this cloud</h2>
+          <div className="flex flex-wrap gap-2">
+            {appRow.map((app) => (
+              <Link
+                key={app.tool_slug}
+                href={`/tools/${app.tool_slug}`}
+                className="inline-flex items-center rounded-full px-3 py-1.5 text-xs border"
+              >
+                {/* For now we just show slug; later you can hydrate with tool title/icon */}
+                {app.tool_slug}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Shortcuts */}
+      {shortcuts.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold mb-3">Shortcuts</h2>
+          <div className="grid gap-3 md:grid-cols-2">
+            {shortcuts.map((shortcut, idx) => (
+              <Link
+                key={idx}
+                href={`/tools/${shortcut.target_tool_slug}${
+                  shortcut.preset_key
+                    ? `?preset=${encodeURIComponent(shortcut.preset_key)}`
+                    : ""
+                }`}
+                className="rounded-xl border p-4 hover:bg-muted transition"
+              >
+                <div className="text-sm font-medium mb-1">
+                  {shortcut.title}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {shortcut.description}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Recent files – stub for now */}
+      {showRecentFiles && (
+        <section>
+          <h2 className="text-sm font-semibold mb-2">Recent files</h2>
+          <p className="text-xs text-muted-foreground">
+            Recent files integration can go here later. For now this is just a
+            placeholder.
+          </p>
+        </section>
+      )}
+    </div>
+  );
+}
+Then register it in your main CMS renderer switch, wherever you decide which engine to render:
+// e.g. components/renderers/CmsRenderer.tsx
+
+import { CloudDashboardEngine } from "@/components/engines/CloudDashboardEngine";
+
+export function CmsRenderer({ cms }: { cms: CMSObject }) {
+  switch (cms.engine) {
+    case "CloudDashboardEngine":
+      return <CloudDashboardEngine cms={cms as any} />;
+
+    // existing engines...
+    // case "ZipEngine": ...
+    // case "OutfitEngine": ...
+
+    default:
+      // fallback
+      return <div>Unknown engine: {cms.engine}</div>;
+  }
+}
+3. Create the Creation Cloud dashboard CMS object
+Now you define the actual page that mimics the Adobe Cloud screen.
+You can either JSON-import this or create it via your admin (if you support raw JSON editing). Example:
+{
+  "slug": "creation-cloud",
+  "type": "cloud_dashboard",
+  "title": "VCM AI Creation Cloud",
+  "description": "Start any visual project from one place.",
+  "cluster_slug": "clouds",
+  "engine": "CloudDashboardEngine",
+  "engine_config": {
+    "hero": {
+      "title": "Create something new",
+      "subtitle": "Describe what you want and we’ll help you build the starting point.",
+      "primaryToolSlug": "image-generator",
+      "mode": "image",
+      "showModeSwitcher": true
+    },
+    "featuredProducts": [
+      {
+        "title": "VCM AI Creation Cloud",
+        "description": "Unlock AI upgrades in every creation tool: resizers, enhancers, carousels and more.",
+        "product_slug": "vcm-creation-cloud",
+        "primaryCta": { "label": "View plans", "href": "/store/vcm-creation-cloud" },
+        "secondaryCta": { "label": "What’s included", "href": "/store/vcm-creation-cloud#includes" },
+        "badge": "Pro"
+      },
+      {
+        "title": "Outfit Engine",
+        "description": "Plan and test outfits with AI, using your own wardrobe photos.",
+        "tool_slug": "outfit-engine",
+        "primaryCta": { "label": "Open", "href": "/tools/outfit-engine" }
+      }
+    ],
+    "appRow": [
+      { "tool_slug": "image-generator" },
+      { "tool_slug": "instagram-post-resizer" },
+      { "tool_slug": "instagram-story-resizer" },
+      { "tool_slug": "background-remover" },
+      { "tool_slug": "thumbnail-coach" }
+    ],
+    "shortcuts": [
+      {
+        "title": "Create an Instagram carousel",
+        "description": "Upload a few photos and generate a full carousel with captions.",
+        "icon_tool_slug": "instagram-post-resizer",
+        "target_tool_slug": "carousel-generator",
+        "preset_key": "instagram-default"
+      },
+      {
+        "title": "Design a YouTube thumbnail",
+        "description": "Start from your video still and our thumbnail presets.",
+        "icon_tool_slug": "thumbnail-coach",
+        "target_tool_slug": "thumbnail-coach",
+        "preset_key": "youtube-default"
+      }
+    ],
+    "showRecentFiles": true
+  },
+  "interlink_parent": "clouds-index",
+  "interlink_siblings": ["video-cloud", "writing-cloud", "file-data-cloud"],
+  "interlink_tools": [
+    "image-generator",
+    "outfit-engine",
+    "instagram-post-resizer",
+    "thumbnail-coach"
+  ],
+  "isIndexed": false
+}
+After you import it:
+It lands in cms_objects
+It should also get a global_urls entry for /clouds/creation-cloud
+You toggle isIndexed in your URL Registry when ready
+Now your upsell block on tools can link to:
+href={`/clouds/creation-cloud`}
+instead of some generic placeholder.
+4. Connect this with the existing Cloud Tag Matrix
+You already have cloud_tags on tools like:
+["creation", "growth_distribution"]
+You can now:
+Use /clouds/creation-cloud as the “home screen” for that cloud.
+Use /store/vcm-creation-cloud as the product / pricing page.
+Use cloud_tags for:
+upsell blocks on tools (already done)
+dynamic “Included tools” list on the store page (later)
+optional dynamic list on the dashboard (v2, instead of hardcoding appRow)
+For now, keep appRow + shortcuts manually curated in the dashboard config. Later we can make them auto-pull from tools that have cloud_tags including "creation".
+So yes: that Adobe screen = one CMS object using CloudDashboardEngine.
+The code above is what you needed to actually plug that idea into your current architecture.
