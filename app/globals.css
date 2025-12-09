@@ -108,6 +108,10 @@
   .app-card-purple {
     background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
   }
+
+  .app-card-green {
+    background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+  }
 }
 
 /* Video embed styles for blog posts */

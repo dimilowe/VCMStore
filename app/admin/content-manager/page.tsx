@@ -979,9 +979,18 @@ function ContentManagerInner() {
                         checked ? "bg-purple-50 border-purple-300" : "bg-gray-50 border-gray-200 hover:bg-gray-100"
                       }`}
                     >
+                      <div className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                        checked ? "bg-purple-600 border-purple-600" : "border-gray-300 bg-white"
+                      }`}>
+                        {checked && (
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
                       <input
                         type="checkbox"
-                        className="mt-1 w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                        className="sr-only"
                         checked={checked}
                         onChange={() => {
                           if (checked) {

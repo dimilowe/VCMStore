@@ -151,7 +151,7 @@ const vcmClouds = [
     description: "Stems & Audio",
     icon: Music,
     href: "/clouds/music-performance-cloud",
-    gradient: "bg-gradient-to-br from-green-500 to-emerald-600"
+    gradient: "app-card-green"
   },
   {
     name: "Growth",
