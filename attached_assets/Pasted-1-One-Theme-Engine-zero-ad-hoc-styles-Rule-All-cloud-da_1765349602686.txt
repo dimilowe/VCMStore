@@ -1,0 +1,124 @@
+1. One Theme Engine, zero ad-hoc styles
+Rule:
+All cloud dashboards MUST pull their styles from a single CLOUD_THEMES map. No exceptions.
+cloudId → CloudTheme object.
+CloudTheme = { heroBg, recentFilesBg, promptBarBg, ... }
+Components only ever do:
+const theme = CLOUD_THEMES[cloudId ?? 'default'];
+
+<div className={cn('...', theme.heroBg)} />
+Banned:
+className="bg-gradient-to-br from-pink-500 to-orange-400" written inline in a cloud dashboard.
+Separate cloudHeroGradients, recentFileGradients, etc.
+If a gradient exists, it lives in CLOUD_THEMES. Period.
+2. Canonical CloudId type, strict slug resolver
+Rule:
+Clouds are identified by a typed enum, not random strings.
+export type CloudId =
+  | 'creation'
+  | 'file-data'
+  | 'distribution-growth'
+  | 'ai-intelligence'
+  // ...
+
+export function resolveCloudId(cmsSlug: string): CloudId | null {
+  const normalized = cmsSlug
+    .replace(/_cloud$/,'')
+    .replace(/-cloud$/,'')
+    .replace(/-suite$/,'');
+  // switch → CloudId
+}
+Every dashboard takes CloudId, not raw CMS slugs.
+Banned:
+Looking up gradients with raw cmsSlug.
+Having both file_data and file-data-cloud keys in different maps.
+3. Tailwind safelist auto-generated from the theme map
+Rule:
+You never manually duplicate gradient strings in tailwind.config.
+You generate them from CLOUD_THEMES:
+// tailwind.config.js
+const { CLOUD_THEMES } = require('./src/data/cloudThemes');
+
+const gradientClasses = Array.from(
+  new Set(
+    Object.values(CLOUD_THEMES)
+      .flatMap(t => [t.heroBg, t.recentFilesBg, t.promptBarBg])
+      .flatMap(cls => cls.split(' ').filter(Boolean))
+  )
+);
+
+module.exports = {
+  // ...
+  safelist: gradientClasses,
+};
+If a gradient exists in the theme config, it is automatically safelisted. No drift.
+4. No hard-coded per-cloud layout differences
+You already got bitten by this with creation-cloud.
+Rule:
+Cloud dashboards are structural clones. The only thing allowed to vary is:
+theme (from CLOUD_THEMES)
+which tools show (from DB/tags)
+copy (title, description)
+Banned:
+if (cloudId === 'creation') render AppRow
+if (cloudId === 'file-data') hide hero
+Hardcoded shortcuts or rows in a specific cloud config.
+If a pattern like “App row” exists, it has to be driven by data (e.g. showAppRow: true in theme/config or apps.length > 0).
+5. Centralized dashboard engine component
+Rule:
+There should be exactly one dashboard layout component, e.g.:
+<CloudDashboard
+  cloudId={cloudId}
+  hero={heroDataFromCMS}
+  tools={toolsFromDB}
+  apps={appsFromDB}
+  recentFiles={recentFiles}
+/>
+No separate FileDataDashboard, AIDashboard, etc.
+All customization is data + theme, not different JSX trees.
+6. UI coding standards (your “front-end constitution”)
+Put this in a ui-rules.md and enforce in review:
+No inline gradients in feature pages. Only theme tokens.
+No magic strings for clouds; always use CloudId.
+Any new “variant” (new color, border, etc.) gets added to CLOUD_THEMES first.
+If a component behavior depends on cloud, prefer config flags over if (cloudId === 'x') branches.
+Removing a cloud or renaming it must update:
+CloudId type
+resolveCloudId
+CLOUD_THEMES
+Any tests that cover them
+If a PR breaks any of these, it doesn’t ship.
+7. Cheap guardrail tests
+You don’t need a full visual regression system; a few unit tests will save you.
+Theme coverage test
+it('has themes for all CloudIds', () => {
+  (ALL_CLOUD_IDS as CloudId[]).forEach(id => {
+    expect(CLOUD_THEMES[id]).toBeDefined();
+  });
+});
+Gradient consistency test
+it('hero and recent files share the same base gradient per cloud', () => {
+  Object.values(CLOUD_THEMES).forEach(theme => {
+    // if you decide they should always match:
+    expect(theme.recentFilesBg.split(' ')[1]).toBe(theme.heroBg.split(' ')[1]);
+  });
+});
+At minimum, tests ensure every cloud has a theme object and nothing falls back to a blank default silently.
+8. Code review checklist for yourself
+Before you merge anything UI-related, answer:
+Did I add any new gradient strings outside CLOUD_THEMES?
+→ If yes, move them into the theme file.
+Did I depend on the raw CMS slug anywhere?
+→ Replace with CloudId + resolveCloudId.
+Did I special-case a single cloud in JSX?
+→ Can this be expressed as config (showAppRow: true) instead?
+Did I touch tailwind.config safelist?
+→ If yes, ask why it isn’t coming from CLOUD_THEMES.
+If you keep this checklist taped to your brain, this class of bug dies for good.
+Bottom line:
+You don’t have a “Tailwind issue”; you have config drift. Kill drift by:
+single CloudId
+single CLOUD_THEMES
+safelist derived from that
+no per-cloud JSX hacks
+Do that, and all 10 clouds will behave like skins on the same engine, which is what you wanted in the first place.
