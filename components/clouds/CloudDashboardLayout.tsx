@@ -24,7 +24,7 @@ export default function CloudDashboardLayout({
   return (
     <main className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-8">
           <section className="flex-1 min-w-0 flex flex-col gap-8">
             {hero}
             {primaryCards}
@@ -34,7 +34,7 @@ export default function CloudDashboardLayout({
             {shortcuts}
           </section>
           {sidebar && (
-            <aside className="w-72 flex-shrink-0 hidden lg:block">
+            <aside className="w-full lg:w-72 flex-shrink-0 lg:border-l lg:border-zinc-200 lg:pl-8">
               {sidebar}
             </aside>
           )}
