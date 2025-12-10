@@ -170,6 +170,7 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
           showPromptBar={true}
           mode={hero.mode || "image"}
           primaryToolSlug={hero.primaryToolSlug}
+          cloudId={cloudSlug}
           primaryCta={{
             label: `Start with ${hero.mode === "image" ? "an image" : hero.mode === "video" ? "a video" : "text"}`,
             href: `/tools/${hero.primaryToolSlug}`,

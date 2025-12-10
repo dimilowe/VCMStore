@@ -1,8 +1,11 @@
 'use client';
 
 import { ElementType, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, Image, Video, Type, ChevronDown } from 'lucide-react';
+import { getToolForPrompt } from '@/lib/getToolForPrompt';
+import type { Mode } from '@/lib/promptRoutingConfig';
 
 interface CloudHeroProps {
   title: string;
@@ -15,15 +18,16 @@ interface CloudHeroProps {
   };
   icon?: ElementType;
   gradient?: string;
-  mode?: 'image' | 'video' | 'text';
+  mode?: Mode;
   showPromptBar?: boolean;
   primaryToolSlug?: string;
+  cloudId?: string;
 }
 
 const MODE_OPTIONS = [
-  { id: 'image', label: 'Image', icon: Image },
-  { id: 'video', label: 'Video', icon: Video },
-  { id: 'text', label: 'Text', icon: Type },
+  { id: 'image' as Mode, label: 'Image', icon: Image },
+  { id: 'video' as Mode, label: 'Video', icon: Video },
+  { id: 'text' as Mode, label: 'Text', icon: Type },
 ] as const;
 
 export default function CloudHero({
@@ -37,13 +41,44 @@ export default function CloudHero({
   mode = 'image',
   showPromptBar = true,
   primaryToolSlug,
+  cloudId,
 }: CloudHeroProps) {
-  const [selectedMode, setSelectedMode] = useState(mode);
+  const router = useRouter();
+  const [selectedMode, setSelectedMode] = useState<Mode>(mode);
   const [promptValue, setPromptValue] = useState('');
   const [modeDropdownOpen, setModeDropdownOpen] = useState(false);
 
   const currentMode = MODE_OPTIONS.find(m => m.id === selectedMode) || MODE_OPTIONS[0];
   const ModeIcon = currentMode.icon;
+
+  function handleGenerate() {
+    if (!promptValue.trim()) {
+      if (primaryToolSlug) {
+        router.push(`/tools/${primaryToolSlug}`);
+      } else if (primaryCta?.href) {
+        router.push(primaryCta.href);
+      }
+      return;
+    }
+
+    let toolSlug = primaryToolSlug || '';
+
+    if (cloudId) {
+      toolSlug = getToolForPrompt(promptValue, selectedMode, cloudId);
+    }
+
+    if (toolSlug) {
+      router.push(`/tools/${toolSlug}?prompt=${encodeURIComponent(promptValue)}`);
+    } else if (primaryCta?.href) {
+      router.push(primaryCta.href);
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      handleGenerate();
+    }
+  }
 
   return (
     <div className="rounded-2xl overflow-hidden relative">
@@ -104,17 +139,18 @@ export default function CloudHero({
                 type="text"
                 value={promptValue}
                 onChange={(e) => setPromptValue(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Describe what you want to create..."
                 className="flex-1 bg-transparent border-none outline-none text-white placeholder-white/60 text-sm px-2"
               />
               
-              <Link
-                href={primaryToolSlug ? `/tools/${primaryToolSlug}?prompt=${encodeURIComponent(promptValue)}` : primaryCta?.href || '#'}
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 text-white hover:from-cyan-500 hover:to-blue-600 transition-all shadow-md"
+              <button
+                onClick={handleGenerate}
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 text-white hover:from-cyan-500 hover:to-blue-600 transition-all shadow-md cursor-pointer"
               >
                 <Sparkles className="w-4 h-4" />
                 Generate
-              </Link>
+              </button>
             </div>
           )}
 
