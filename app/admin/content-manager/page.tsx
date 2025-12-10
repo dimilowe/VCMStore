@@ -13,15 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   Wrench,
   FileText,
-  LayoutGrid,
-  Layers,
   Search,
   ExternalLink,
   ChevronLeft,
   ChevronRight,
   Eye,
   EyeOff,
-  Star,
   CheckCircle,
   AlertTriangle,
   XCircle,
@@ -88,7 +85,7 @@ interface MBB {
   health: "thin" | "ok" | "strong";
 }
 
-type TabType = "tools" | "articles" | "clusters" | "mbbs";
+type TabType = "tools" | "articles";
 
 function ContentManagerInner() {
   const searchParams = useSearchParams();
@@ -408,8 +405,6 @@ function ContentManagerInner() {
           {[
             { id: "tools", label: `Tools (${tools.length})`, icon: Wrench },
             { id: "articles", label: `Articles (${articles.length})`, icon: FileText },
-            { id: "clusters", label: `Clusters (${clusters.length})`, icon: LayoutGrid },
-            { id: "mbbs", label: "MBBs", icon: Layers },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -814,146 +809,6 @@ function ContentManagerInner() {
           </div>
         )}
 
-        {activeTab === "clusters" && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-500">
-                {clusters.length} clusters total
-              </p>
-            </div>
-
-            {isLoading ? (
-              <div className="text-center py-12 text-gray-400">Loading clusters...</div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {clusters.map((cluster) => (
-                  <Card key={cluster.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <CardTitle className="text-lg">{cluster.pillarTitle}</CardTitle>
-                        <Badge variant="outline">{cluster.engineId}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>{cluster.toolCount} tools</span>
-                        <span>{cluster.indexedCount} indexed</span>
-                        <span>{cluster.articleCount} articles</span>
-                      </div>
-                      <div className="mt-3 pt-3 border-t">
-                        <Link href={`/admin/clusters/${cluster.pillarSlug}`}>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Manage Cluster
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "mbbs" && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">{mbbs.length} MBBs total</p>
-            </div>
-            
-            {mbbs.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Layers className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500">No MBBs imported yet</p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    Import MBBs using the Import JSON button
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="bg-white rounded-lg border overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">MBB</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cluster</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Words</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Health</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Indexed</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {mbbs.map((mbb) => (
-                      <tr key={mbb.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3">
-                          <div className="font-medium">{mbb.title}</div>
-                          <div className="text-xs text-gray-400">{mbb.slug}</div>
-                        </td>
-                        <td className="px-4 py-3">
-                          {mbb.mbb_type ? (
-                            <Badge variant="outline">{mbb.mbb_type}</Badge>
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          {mbb.cluster_title || mbb.cluster_slug ? (
-                            <Badge variant="outline" className="max-w-[200px] truncate" title={mbb.cluster_title || mbb.cluster_slug || ""}>
-                              {mbb.cluster_title || mbb.cluster_slug}
-                            </Badge>
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-600">
-                          {mbb.word_count || 0}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Badge
-                            variant="outline"
-                            className={
-                              mbb.health === "strong"
-                                ? "bg-green-50 text-green-700 border-green-200"
-                                : mbb.health === "ok"
-                                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
-                                : "bg-red-50 text-red-700 border-red-200"
-                            }
-                          >
-                            {mbb.health}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => toggleMbbIndexed(mbb)}
-                            className="inline-flex"
-                          >
-                            {mbb.is_indexed ? (
-                              <Eye className="w-5 h-5 text-green-500" />
-                            ) : (
-                              <EyeOff className="w-5 h-5 text-gray-300" />
-                            )}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Link href={`/mbb/${mbb.slug}`} target="_blank">
-                              <Button variant="ghost" size="sm">
-                                <ExternalLink className="w-4 h-4" />
-                              </Button>
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {editingCloudTags && (
