@@ -60,6 +60,7 @@
 }
 
 @layer utilities {
+  /* Gradient text - intentionally applied via explicit .text-gradient class */
   .text-gradient {
     background: linear-gradient(135deg, #f97316 0%, #a855f7 100%);
     -webkit-background-clip: text;
@@ -67,48 +68,22 @@
     background-clip: text;
   }
 
-  /* Reset for tool page content to prevent gradient color inheritance */
+  /* Tool page content reset - prevents any gradient inheritance */
   .tool-page-content {
-    color: #18181b !important;
-    -webkit-text-fill-color: #18181b !important;
-    background: transparent !important;
-    background-clip: border-box !important;
+    color: inherit;
+  }
+
+  /* Kill gradient effects on ALL elements inside tool pages, except explicit .text-gradient */
+  .tool-page-content h1:not(.text-gradient),
+  .tool-page-content h2:not(.text-gradient),
+  .tool-page-content h3:not(.text-gradient),
+  .tool-page-content h4:not(.text-gradient),
+  .tool-page-content label,
+  .tool-page-content p:not(.text-gradient) {
+    background-image: none !important;
     -webkit-background-clip: border-box !important;
-  }
-
-  .tool-page-content h1,
-  .tool-page-content h2,
-  .tool-page-content h3,
-  .tool-page-content h4,
-  .tool-page-content label {
-    color: #18181b !important;
-    -webkit-text-fill-color: #18181b !important;
-    background: transparent !important;
+    -webkit-text-fill-color: inherit !important;
     background-clip: border-box !important;
-    -webkit-background-clip: border-box !important;
-  }
-
-  .tool-page-content p {
-    color: #52525b !important;
-    -webkit-text-fill-color: #52525b !important;
-    background: transparent !important;
-    background-clip: border-box !important;
-    -webkit-background-clip: border-box !important;
-  }
-
-  .dark .tool-page-content,
-  .dark .tool-page-content h1,
-  .dark .tool-page-content h2,
-  .dark .tool-page-content h3,
-  .dark .tool-page-content h4,
-  .dark .tool-page-content label {
-    color: #f4f4f5 !important;
-    -webkit-text-fill-color: #f4f4f5 !important;
-  }
-
-  .dark .tool-page-content p {
-    color: #a1a1aa !important;
-    -webkit-text-fill-color: #a1a1aa !important;
   }
   
   .gradient-border {

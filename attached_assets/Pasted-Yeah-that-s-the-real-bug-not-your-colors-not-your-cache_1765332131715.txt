@@ -1,0 +1,43 @@
+Yeah, that’s the real bug – not your colors, not your cache.
+.text-gradient is almost always implemented as:
+.text-gradient {
+  background-image: linear-gradient(...);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+If that leaks onto any parent, every nested heading looks washed-out/pink, exactly like your screenshot.
+The fix is scope it, not hack individual headings.
+What “scoped CSS reset” should actually mean
+You want one of these two patterns (pick one and tell Replit to do it this way):
+Option A – Restrict gradient to marketing sections only ✅ (cleanest)
+Change your CSS from:
+.text-gradient {
+  /* gradient styles here */
+}
+to something like:
+.marketing-hero .text-gradient,
+.marketing-section .text-gradient {
+  background-image: linear-gradient(...);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+So:
+Marketing heroes still get gradient text.
+Tool pages (Price Engine, other engines) never inherit the gradient unless they explicitly use .text-gradient.
+This is the right long-term fix.
+Option B – Reset inside tool pages
+If you already have a wrapper for tool pages (e.g. .tool-page, .creator-tool-shell, etc.), add:
+.tool-page .text-gradient,
+.tool-page [data-tool-root='true'] {
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  color: inherit !important; /* then use text-zinc-900 / 700 via Tailwind */
+}
+You’re basically saying: “inside tool pages, kill any leftover gradient effects.”
+What you should NOT let them do
+Don’t let them throw random inline styles on headings again.
+Don’t let them add some generic * { background-image: none } nuke.
+Don’t rely on “webview DOM wrappers” as an excuse. The real issue is the gradient class being too global.
+If you want a one-liner to send back:
+Keep .text-gradient but scope it to .marketing-hero / marketing layouts only, or add a .tool-page wrapper reset so engine headings can never inherit the gradient. No inline hex hacks, just fix the selector scope.
+Once that’s in, the Price page should finally look normal everywhere.
