@@ -93,7 +93,6 @@ export default function SeoControlPage() {
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterKind, setFilterKind] = useState("all");
-  const [filterRegistryStatus, setFilterRegistryStatus] = useState("all");
   const [registryPage, setRegistryPage] = useState(1);
   const [registrySort, setRegistrySort] = useState("url-asc");
   const REGISTRY_PER_PAGE = 100;
@@ -312,8 +311,7 @@ export default function SeoControlPage() {
     const matchesSearch = row.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (row.clusterSlug && row.clusterSlug.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesKind = filterKind === "all" || row.kind === filterKind;
-    const matchesStatus = filterRegistryStatus === "all" || row.status === filterRegistryStatus;
-    return matchesSearch && matchesKind && matchesStatus;
+    return matchesSearch && matchesKind;
   });
 
   const sortedEnrichedRegistry = [...filteredEnrichedRegistry].sort((a, b) => {
@@ -684,7 +682,7 @@ export default function SeoControlPage() {
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
-                  placeholder="Search URLs or clusters..."
+                  placeholder="Search URLs or pillars..."
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setRegistryPage(1); }}
                   className="pl-10"
@@ -702,18 +700,6 @@ export default function SeoControlPage() {
                 <option value="cms-product">Products</option>
                 <option value="system">System</option>
                 <option value="legacy">Legacy</option>
-              </select>
-              <select
-                value={filterRegistryStatus}
-                onChange={(e) => { setFilterRegistryStatus(e.target.value); setRegistryPage(1); }}
-                className="border rounded-md px-3 py-2 text-sm"
-              >
-                <option value="all">All Status</option>
-                <option value="Ready">Ready</option>
-                <option value="Needs Links">Needs Links</option>
-                <option value="Needs Review">Needs Review</option>
-                <option value="Legacy">Legacy</option>
-                <option value="System">System</option>
               </select>
               <select
                 value={registrySort}
@@ -757,7 +743,7 @@ export default function SeoControlPage() {
                       <tr>
                         <th className="text-left px-3 py-3 font-medium">URL</th>
                         <th className="text-left px-3 py-3 font-medium">Kind</th>
-                        <th className="text-left px-3 py-3 font-medium">Cluster</th>
+                        <th className="text-left px-3 py-3 font-medium">Pillar</th>
                         <th className="text-left px-3 py-3 font-medium">Engine</th>
                         <th className="text-center px-3 py-3 font-medium">In</th>
                         <th className="text-center px-3 py-3 font-medium">Out</th>
