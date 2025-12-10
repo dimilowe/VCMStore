@@ -64,14 +64,14 @@ export async function GET(request: NextRequest) {
 
     const stats = await query(`
       SELECT 
-        COUNT(DISTINCT s.slug) as total_pages,
+        COUNT(DISTINCT slug) as total_pages,
         AVG(overall_score) as avg_score,
-        COUNT(DISTINCT CASE WHEN overall_score < 60 THEN s.slug END) as critical_count,
-        COUNT(DISTINCT CASE WHEN is_thin_content = true THEN s.slug END) as thin_count,
-        COUNT(DISTINCT CASE WHEN status_code != 200 THEN s.slug END) as broken_count,
-        COUNT(DISTINCT CASE WHEN has_h1 = false THEN s.slug END) as no_h1_count,
-        COUNT(DISTINCT CASE WHEN has_meta_description = false THEN s.slug END) as no_meta_count,
-        COUNT(DISTINCT CASE WHEN has_expected_schema = false THEN s.slug END) as no_schema_count
+        COUNT(DISTINCT CASE WHEN overall_score < 60 THEN slug END) as critical_count,
+        COUNT(DISTINCT CASE WHEN is_thin_content = true THEN slug END) as thin_count,
+        COUNT(DISTINCT CASE WHEN status_code != 200 THEN slug END) as broken_count,
+        COUNT(DISTINCT CASE WHEN has_h1 = false THEN slug END) as no_h1_count,
+        COUNT(DISTINCT CASE WHEN has_meta_description = false THEN slug END) as no_meta_count,
+        COUNT(DISTINCT CASE WHEN has_expected_schema = false THEN slug END) as no_schema_count
       FROM (
         SELECT DISTINCT ON (s.slug) s.*
         FROM seo_health_snapshots s
