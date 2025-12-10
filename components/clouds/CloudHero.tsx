@@ -1,8 +1,8 @@
 'use client';
 
-import { ElementType, ReactNode } from 'react';
+import { ElementType, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Image, Video, Type, ChevronDown } from 'lucide-react';
 
 interface CloudHeroProps {
   title: string;
@@ -15,8 +15,16 @@ interface CloudHeroProps {
   };
   icon?: ElementType;
   gradient?: string;
-  optionalAccent?: ReactNode;
+  mode?: 'image' | 'video' | 'text';
+  showPromptBar?: boolean;
+  primaryToolSlug?: string;
 }
+
+const MODE_OPTIONS = [
+  { id: 'image', label: 'Image', icon: Image },
+  { id: 'video', label: 'Video', icon: Video },
+  { id: 'text', label: 'Text', icon: Type },
+] as const;
 
 export default function CloudHero({
   title,
@@ -26,15 +34,104 @@ export default function CloudHero({
   primaryCta,
   icon: IconComponent = Sparkles,
   gradient = 'from-pink-500 to-orange-400',
+  mode = 'image',
+  showPromptBar = true,
+  primaryToolSlug,
 }: CloudHeroProps) {
+  const [selectedMode, setSelectedMode] = useState(mode);
+  const [promptValue, setPromptValue] = useState('');
+  const [modeDropdownOpen, setModeDropdownOpen] = useState(false);
+
+  const currentMode = MODE_OPTIONS.find(m => m.id === selectedMode) || MODE_OPTIONS[0];
+  const ModeIcon = currentMode.icon;
+
   return (
-    <div className="rounded-2xl overflow-hidden">
+    <div className="rounded-2xl overflow-hidden relative">
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-pink-600/20 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvZz48L3N2Zz4=')] opacity-30 pointer-events-none" />
+      
       <div 
-        className={`bg-gradient-to-r ${gradient} px-8 py-12 text-white relative`}
+        className={`bg-gradient-to-br ${gradient} px-8 py-10 text-white relative`}
       >
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-            <IconComponent className="w-5 h-5" />
+        <div className="relative z-10 text-center max-w-2xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
+            {title}
+          </h1>
+
+          {subtitle && (
+            <p className="text-white/90 text-base max-w-xl mx-auto leading-relaxed mb-6">
+              {subtitle}
+            </p>
+          )}
+
+          {showPromptBar && (
+            <div className="bg-white/10 backdrop-blur-md rounded-full p-1.5 flex items-center gap-2 shadow-lg border border-white/20 mb-6">
+              <div className="relative">
+                <button 
+                  onClick={() => setModeDropdownOpen(!modeDropdownOpen)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium"
+                >
+                  <ModeIcon className="w-4 h-4" />
+                  {currentMode.label}
+                  <ChevronDown className="w-3 h-3 opacity-70" />
+                </button>
+                
+                {modeDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-zinc-200 py-1 min-w-[140px] z-20">
+                    {MODE_OPTIONS.map((option) => {
+                      const OptionIcon = option.icon;
+                      return (
+                        <button
+                          key={option.id}
+                          onClick={() => {
+                            setSelectedMode(option.id);
+                            setModeDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-zinc-50 transition-colors ${
+                            option.id === selectedMode ? 'text-pink-600 font-medium' : 'text-zinc-700'
+                          }`}
+                        >
+                          <OptionIcon className="w-4 h-4" />
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              
+              <input
+                type="text"
+                value={promptValue}
+                onChange={(e) => setPromptValue(e.target.value)}
+                placeholder="Describe what you want to create..."
+                className="flex-1 bg-transparent border-none outline-none text-white placeholder-white/60 text-sm px-2"
+              />
+              
+              <Link
+                href={primaryToolSlug ? `/tools/${primaryToolSlug}?prompt=${encodeURIComponent(promptValue)}` : primaryCta?.href || '#'}
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 text-white hover:from-cyan-500 hover:to-blue-600 transition-all shadow-md"
+              >
+                <Sparkles className="w-4 h-4" />
+                Generate
+              </Link>
+            </div>
+          )}
+
+          {!showPromptBar && primaryCta && (
+            <Link
+              href={primaryCta.href}
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium bg-white text-zinc-900 hover:bg-zinc-100 transition-colors shadow-sm"
+            >
+              {primaryCta.label}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          )}
+        </div>
+
+        <div className="absolute top-4 left-4 flex items-center gap-3">
+          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+            <IconComponent className="w-4 h-4" />
           </div>
           {badge && (
             <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold uppercase tracking-wide backdrop-blur-sm">
@@ -43,28 +140,8 @@ export default function CloudHero({
           )}
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">
-          {title}
-        </h1>
-
-        {subtitle && (
-          <p className="text-white/90 text-lg max-w-xl leading-relaxed mb-6">
-            {subtitle}
-          </p>
-        )}
-
-        {primaryCta && (
-          <Link
-            href={primaryCta.href}
-            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium bg-white text-zinc-900 hover:bg-zinc-100 transition-colors shadow-sm"
-          >
-            {primaryCta.label}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        )}
-
         {proLabel && (
-          <span className="absolute top-6 right-6 inline-flex items-center rounded-full bg-amber-400/90 text-amber-900 text-xs font-bold px-3 py-1 uppercase tracking-wide shadow-sm">
+          <span className="absolute top-4 right-4 inline-flex items-center rounded-full bg-amber-400/90 text-amber-900 text-xs font-bold px-3 py-1 uppercase tracking-wide shadow-sm">
             Pro
           </span>
         )}

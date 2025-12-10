@@ -167,6 +167,9 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
           subtitle={hero.subtitle}
           badge={cms.data.title}
           proLabel={false}
+          showPromptBar={true}
+          mode={hero.mode || "image"}
+          primaryToolSlug={hero.primaryToolSlug}
           primaryCta={{
             label: `Start with ${hero.mode === "image" ? "an image" : hero.mode === "video" ? "a video" : "text"}`,
             href: `/tools/${hero.primaryToolSlug}`,
