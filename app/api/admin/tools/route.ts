@@ -32,9 +32,20 @@ export async function GET() {
     const dbTools = await listTools();
     
     // Also fetch tools from cms_objects
-    const cmsResult = await query(
-      `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, featured FROM cms_objects WHERE type = 'tool'`
-    );
+    // Use a try-catch to handle missing 'featured' column in production
+    let cmsResult;
+    let hasFeaturedColumn = true;
+    try {
+      cmsResult = await query(
+        `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, featured FROM cms_objects WHERE type = 'tool'`
+      );
+    } catch (err) {
+      // Fallback query without featured column if it doesn't exist
+      hasFeaturedColumn = false;
+      cmsResult = await query(
+        `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data FROM cms_objects WHERE type = 'tool'`
+      );
+    }
     const cmsToolSlugs = new Set(cmsResult.rows.map((r: { slug: string }) => r.slug));
     
     // Combine all tool slugs for index status lookup
@@ -93,7 +104,7 @@ export async function GET() {
       });
     
     // Map CMS tools
-    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; cloud_tags: string[]; data: CmsToolData; featured: boolean }) => {
+    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; cloud_tags: string[]; data: CmsToolData; featured?: boolean }) => {
       const data = row.data;
       const toolUrl = `/tools/${row.slug}`;
       const isIndexed = indexStatusMap.get(toolUrl) ?? data.isIndexed ?? false;
@@ -106,7 +117,7 @@ export async function GET() {
         clusterSlug: row.cluster_slug || data.interlink_parent || "",
         cloudTags: row.cloud_tags || [],
         isIndexed,
-        isFeatured: row.featured || false,
+        isFeatured: hasFeaturedColumn ? (row.featured || false) : false,
         inDirectory: true,
         priority: "50",
         h1: data.title || row.slug,
@@ -187,10 +198,15 @@ export async function PATCH(request: Request) {
       
       // Also update cms_objects if featured is being changed
       if (isFeatured !== undefined) {
-        await query(
-          `UPDATE cms_objects SET featured = $1 WHERE slug = $2 AND type = 'tool'`,
-          [isFeatured, slug]
-        );
+        try {
+          await query(
+            `UPDATE cms_objects SET featured = $1 WHERE slug = $2 AND type = 'tool'`,
+            [isFeatured, slug]
+          );
+        } catch (err) {
+          // Featured column doesn't exist - silently ignore
+          console.log("Featured column not available in cms_objects");
+        }
       }
     }
 

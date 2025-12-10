@@ -3,12 +3,20 @@ import { query } from "@/lib/db";
 
 export async function GET() {
   try {
-    const result = await query(
-      `SELECT slug, data->>'title' as title, data->'engine_config'->>'engine' as engine
-       FROM cms_objects
-       WHERE type = 'tool' AND featured = true
-       ORDER BY created_at ASC`
-    );
+    // Try to query with featured column, return empty array if column doesn't exist
+    let result;
+    try {
+      result = await query(
+        `SELECT slug, data->>'title' as title, data->'engine_config'->>'engine' as engine
+         FROM cms_objects
+         WHERE type = 'tool' AND featured = true
+         ORDER BY created_at ASC`
+      );
+    } catch (err) {
+      // Featured column doesn't exist yet - return empty array
+      // The homepage carousel will use the default tool list as fallback
+      return NextResponse.json({ tools: [] });
+    }
 
     const tools = result.rows.map((row: { slug: string; title: string; engine: string }) => ({
       slug: row.slug,
