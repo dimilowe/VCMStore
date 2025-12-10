@@ -20,8 +20,11 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
+  Cloud,
+  X,
 } from "lucide-react";
 import Link from "next/link";
+import { CLOUDS, type CloudSlug } from "@/lib/clouds";
 
 interface UrlEntry {
   id: string;
@@ -52,6 +55,7 @@ interface EnrichedUrlRow {
   linksOutbound: number;
   expectedLinks: number | null;
   seoScore: number | null;
+  cloudTags: CloudSlug[];
 }
 
 interface RegistrySummary {
@@ -103,6 +107,8 @@ export default function SeoControlPage() {
   
   const [isLoading, setIsLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
+  const [editingCloudTags, setEditingCloudTags] = useState<{ url: string; slug: string; tags: CloudSlug[] } | null>(null);
+  const [savingCloudTags, setSavingCloudTags] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -206,6 +212,33 @@ export default function SeoControlPage() {
       }
     } catch (error) {
       console.error("Failed to toggle indexing:", error);
+    }
+  };
+
+  const saveCloudTags = async () => {
+    if (!editingCloudTags) return;
+    setSavingCloudTags(true);
+    try {
+      const res = await fetch("/api/admin/tools/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          slug: editingCloudTags.slug, 
+          field: "cloudTags", 
+          value: editingCloudTags.tags 
+        }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setEnrichedRegistry((prev) =>
+          prev.map((r) => (r.url === editingCloudTags.url ? { ...r, cloudTags: editingCloudTags.tags } : r))
+        );
+        setEditingCloudTags(null);
+      }
+    } catch (error) {
+      console.error("Failed to save cloud tags:", error);
+    } finally {
+      setSavingCloudTags(false);
     }
   };
 
@@ -729,7 +762,7 @@ export default function SeoControlPage() {
                         <th className="text-center px-3 py-3 font-medium">In</th>
                         <th className="text-center px-3 py-3 font-medium">Out</th>
                         <th className="text-center px-3 py-3 font-medium">Expected</th>
-                        <th className="text-center px-3 py-3 font-medium">Status</th>
+                        <th className="text-center px-3 py-3 font-medium">Clouds</th>
                         <th className="text-center px-3 py-3 font-medium">Indexed</th>
                         <th className="text-center px-3 py-3 font-medium">Actions</th>
                       </tr>
@@ -737,9 +770,9 @@ export default function SeoControlPage() {
                     <tbody className="divide-y">
                       {paginatedEnrichedRegistry.map((row) => {
                         const linksMet = row.expectedLinks === null || row.linksOutbound >= row.expectedLinks;
-                        const isLegacyWarning = row.kind === "legacy" && row.isIndexed;
+                        const toolSlug = row.url.startsWith('/tools/') ? row.url.replace('/tools/', '') : null;
                         return (
-                          <tr key={row.id} className={`hover:bg-gray-50 ${isLegacyWarning ? "bg-red-50" : ""}`}>
+                          <tr key={row.id} className="hover:bg-gray-50">
                             <td className="px-3 py-3">
                               <div className="font-medium truncate max-w-[250px]">{row.url}</div>
                             </td>
@@ -774,9 +807,21 @@ export default function SeoControlPage() {
                               </span>
                             </td>
                             <td className="px-3 py-3 text-center">
-                              <span className={`px-2 py-1 rounded text-xs ${getStatusPillStyle(row.status)}`}>
-                                {row.status}
-                              </span>
+                              {toolSlug ? (
+                                <button
+                                  onClick={() => setEditingCloudTags({ url: row.url, slug: toolSlug, tags: row.cloudTags || [] })}
+                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${
+                                    (row.cloudTags?.length || 0) > 0
+                                      ? "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  <Cloud className="w-3 h-3" />
+                                  {(row.cloudTags?.length || 0) > 0 ? row.cloudTags!.length : "0"}
+                                </button>
+                              ) : (
+                                <span className="text-gray-300">—</span>
+                              )}
                             </td>
                             <td className="px-3 py-3 text-center">
                               <button
@@ -788,7 +833,7 @@ export default function SeoControlPage() {
                                        row.isIndexed ? "Click to remove from sitemap" : "Click to add to sitemap"}
                               >
                                 {row.isIndexed ? (
-                                  <Eye className={`w-5 h-5 ${isLegacyWarning ? "text-red-500" : "text-green-500"}`} />
+                                  <Eye className="w-5 h-5 text-green-500" />
                                 ) : (
                                   <EyeOff className={`w-5 h-5 ${row.kind === "legacy" ? "text-red-300" : "text-gray-300"}`} />
                                 )}
@@ -840,6 +885,68 @@ export default function SeoControlPage() {
           </div>
         )}
       </div>
+
+      {editingCloudTags && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Edit Cloud Tags</h3>
+              <button onClick={() => setEditingCloudTags(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-gray-500 mb-4">
+                Assign this tool to one or more Creator Clouds.
+              </p>
+              <div className="space-y-2">
+                {CLOUDS.map((cloud) => {
+                  const checked = editingCloudTags.tags.includes(cloud.slug);
+                  return (
+                    <label
+                      key={cloud.slug}
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        checked ? "border-purple-300 bg-purple-50" : "border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setEditingCloudTags({
+                              ...editingCloudTags,
+                              tags: [...editingCloudTags.tags, cloud.slug]
+                            });
+                          } else {
+                            setEditingCloudTags({
+                              ...editingCloudTags,
+                              tags: editingCloudTags.tags.filter((t) => t !== cloud.slug)
+                            });
+                          }
+                        }}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div className="font-medium">{cloud.name}</div>
+                        <div className="text-xs text-gray-500">{cloud.shortDescription}</div>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 p-4 border-t">
+              <Button variant="outline" onClick={() => setEditingCloudTags(null)}>
+                Cancel
+              </Button>
+              <Button onClick={saveCloudTags} disabled={savingCloudTags}>
+                {savingCloudTags ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

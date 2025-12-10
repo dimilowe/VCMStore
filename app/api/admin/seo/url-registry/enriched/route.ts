@@ -42,6 +42,7 @@ export interface EnrichedUrlRow {
   linksOutbound: number;
   expectedLinks: number | null;
   seoScore: number | null;
+  cloudTags: string[];
 }
 
 const SYSTEM_URLS = new Set([
@@ -117,7 +118,8 @@ export async function GET(request: NextRequest) {
         co.id as cms_id,
         co.type as cms_type,
         co.cluster_slug,
-        co.data->'engine_config'->>'engine' as engine
+        co.data->'engine_config'->>'engine' as engine,
+        co.cloud_tags
       FROM global_urls gu
       LEFT JOIN cms_objects co ON 
         (gu.url LIKE '/tools/%' AND co.slug = SUBSTRING(gu.url FROM 8) AND co.type = 'tool')
@@ -248,7 +250,8 @@ export async function GET(request: NextRequest) {
         linksInbound,
         linksOutbound,
         expectedLinks,
-        seoScore
+        seoScore,
+        cloudTags: row.cloud_tags || []
       });
     }
 
