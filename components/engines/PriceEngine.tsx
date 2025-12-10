@@ -240,7 +240,10 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">
+        <h1 
+          className="text-3xl font-bold mb-2 text-zinc-900 dark:text-zinc-100"
+          style={{ WebkitTextFillColor: 'currentColor' }}
+        >
           {config.title}
         </h1>
         {config.subtitle && (
@@ -253,7 +256,10 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         {config.allowUrlInput && (
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">
+            <label 
+              className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300"
+              style={{ WebkitTextFillColor: 'currentColor' }}
+            >
               {config.urlLabel || 'Product URL'}
             </label>
             <Input
@@ -276,7 +282,10 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
 
         {config.allowNameInput && (
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">
+            <label 
+              className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300"
+              style={{ WebkitTextFillColor: 'currentColor' }}
+            >
               {config.nameLabel || 'Product name'}
             </label>
             <Input
@@ -348,7 +357,10 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
             onClick={() => setShowFaq(!showFaq)}
             className="flex items-center justify-between w-full text-left"
           >
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h3 
+              className="text-lg font-semibold text-zinc-900 dark:text-zinc-100"
+              style={{ WebkitTextFillColor: 'currentColor' }}
+            >
               Frequently Asked Questions
             </h3>
             {showFaq ? (

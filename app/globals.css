@@ -59,6 +59,20 @@
   }
 }
 
+/* Tool page content reset - OUTSIDE @layer for maximum cascade priority */
+/* Kills gradient text effects inherited from upstream DOM */
+.tool-page-content h1:not(.text-gradient),
+.tool-page-content h2:not(.text-gradient),
+.tool-page-content h3:not(.text-gradient),
+.tool-page-content h4:not(.text-gradient),
+.tool-page-content label,
+.tool-page-content p:not(.text-gradient) {
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+  background-clip: border-box !important;
+}
+
 @layer utilities {
   /* Gradient text - intentionally applied via explicit .text-gradient class */
   .text-gradient {
@@ -66,24 +80,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  /* Tool page content reset - prevents any gradient inheritance */
-  .tool-page-content {
-    color: inherit;
-  }
-
-  /* Kill gradient effects on ALL elements inside tool pages, except explicit .text-gradient */
-  .tool-page-content h1:not(.text-gradient),
-  .tool-page-content h2:not(.text-gradient),
-  .tool-page-content h3:not(.text-gradient),
-  .tool-page-content h4:not(.text-gradient),
-  .tool-page-content label,
-  .tool-page-content p:not(.text-gradient) {
-    background-image: none !important;
-    -webkit-background-clip: border-box !important;
-    -webkit-text-fill-color: inherit !important;
-    background-clip: border-box !important;
   }
   
   .gradient-border {
