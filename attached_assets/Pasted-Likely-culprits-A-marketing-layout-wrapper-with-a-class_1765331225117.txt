@@ -1,0 +1,33 @@
+Likely culprits:
+A marketing/layout wrapper with a class like opacity-50, opacity-60, brightness-75, backdrop-brightness, etc.
+A group state like data-dimmed="true" and a class such as group-[data-dimmed=true]:opacity-40 on the inner content.
+A “disabled” / “preview” state (pointer-events-none opacity-40) that was meant for locked tools and is now wrapping everything.
+You want only specific things dimmed (e.g. preview sections), not the entire engine container.
+What to fix (conceptually)
+Find the marketing/wrapper component that wraps PriceEngine and the other tools.
+Remove any opacity / brightness / grayscale on the wrapper that affects all children.
+If dimming is needed for something (e.g. “coming soon” blocks), move that dimming class down to that specific section, not the entire content wrapper.
+Replit Prompt – paste this in so it hunts and fixes it
+Use this exact prompt in Replit AI in your VCM Suite repo:
+I have an issue where all my tools/engines (including the new Price Engine pages like /tools/track-price) are rendering faded/washed out, as if they have reduced opacity.
+Search the codebase for the layout / wrapper that is used for tool pages and marketing pages around tools. It might be something like MarketingWrapper, MarketingLayout, ToolLayout, CreatorToolsLayout, or similar – whatever wraps the engine renderer.
+Look for any classes or styles on that parent that would globally dim content, such as:
+opacity-50, opacity-60, etc.
+brightness-*, grayscale, backdrop-brightness-*
+pointer-events-none opacity-40 combinations
+group-[data-dimmed=true]:opacity-* or similar data-driven dimming on a container
+The goal: the main tool content (the engine renderer area) should NOT be dimmed at all. Only specific sections (e.g. “Pro only preview”, locked sections, etc.) may be dimmed.
+Refactor the layout so that:
+The root wrapper for tools uses full opacity: e.g. remove any opacity-* classes from the main content container.
+If there is a “dimmed” or “preview” state, apply that class only to the specific element that should appear faded (for example, a card that says “Coming soon” or a screenshot mockup), not the entire page or engine container.
+Specifically verify the page at /tools/track-price:
+The form, inputs, and the “Check Price” button should render at full opacity and look like normal interactive elements.
+Only intentionally locked/pro-only areas (if any) should appear dimmed.
+After changes, run the app and confirm that:
+/tools/track-price and /tools/track-prices-on-amazon look normal (not faded).
+Other tool pages still look correct, and any dimming behavior is now scoped and not global.
+Show me the diff of what you changed, especially in the layout/wrapper component and any global styles you touched.
+Once that’s done, reload the page:
+If the input fields and button look normal, but only the upgrade area is dimmed → that’s correct.
+If the whole viewport is still pale, there’s probably another wrapper higher up (global Layout, MarketingShell, etc.) using opacity/brightness – run the same process on that.
+You’re not crazy; this is just one rogue class on a parent nuking all the children.
