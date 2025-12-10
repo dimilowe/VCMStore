@@ -10,6 +10,13 @@
     color: hsl(var(--foreground, 240 10% 3.9%));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* Scoped reset for tool pages - neutralizes gradient text inheritance */
+  /* Must be in @layer base to override utility classes */
+  .tool-page-content,
+  .tool-page-content * {
+    -webkit-text-fill-color: currentColor !important;
+  }
 }
 
 @layer base {
@@ -72,12 +79,6 @@
   .text-gradient * {
     -webkit-text-fill-color: currentColor;
     color: inherit;
-  }
-  
-  /* Scoped reset for tool pages - neutralizes any gradient inheritance */
-  .tool-page-content,
-  .tool-page-content * {
-    -webkit-text-fill-color: currentColor;
   }
   
   .gradient-border {
