@@ -416,7 +416,7 @@ function ContentManagerInner() {
         <div className="flex gap-2 border-b">
           {[
             { id: "tools", label: `Tools (${tools.length})`, icon: Wrench },
-            { id: "articles", label: `Pillars (${articles.length})`, icon: FileText },
+            { id: "articles", label: `Pillars (${pillars.length})`, icon: FileText },
           ].map((tab) => (
             <button
               key={tab.id}

@@ -17,7 +17,7 @@ export async function GET() {
        slug,
        data->>'title' as title
      FROM cms_objects
-     WHERE type IN ('pillar', 'cluster-support')
+     WHERE type = 'pillar'
      ORDER BY data->>'title' ASC`
   );
 
