@@ -8,6 +8,20 @@ const config: Config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
+  safelist: [
+    'from-pink-500', 'to-pink-600', 'to-rose-500',
+    'from-orange-500', 'to-amber-500',
+    'from-blue-500', 'to-blue-600',
+    'from-zinc-500', 'to-zinc-600',
+    'from-amber-500', 'to-yellow-500',
+    'from-purple-500', 'to-violet-600',
+    'from-green-500', 'to-emerald-500',
+    'from-rose-500',
+    'from-sky-500', 'to-indigo-500',
+    'bg-gradient-to-br', 'bg-gradient-to-r',
+    'from-cyan-400', 'to-blue-500',
+    'from-cyan-500', 'to-blue-600',
+  ],
   theme: {
     container: {
       center: true,
