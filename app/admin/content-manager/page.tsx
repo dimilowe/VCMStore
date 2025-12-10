@@ -404,7 +404,7 @@ function ContentManagerInner() {
         <div className="flex gap-2 border-b">
           {[
             { id: "tools", label: `Tools (${tools.length})`, icon: Wrench },
-            { id: "articles", label: `Articles (${articles.length})`, icon: FileText },
+            { id: "articles", label: `Pillars (${articles.length})`, icon: FileText },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -653,7 +653,7 @@ function ContentManagerInner() {
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
-                  placeholder="Search articles..."
+                  placeholder="Search pillars..."
                   value={articleSearchQuery}
                   onChange={(e) => {
                     setArticleSearchQuery(e.target.value);
@@ -691,18 +691,18 @@ function ContentManagerInner() {
             </div>
 
             <div className="text-sm text-gray-500">
-              Showing {paginatedArticles.length} of {filteredArticles.length} articles
+              Showing {paginatedArticles.length} of {filteredArticles.length} pillars
             </div>
 
             {isLoading ? (
-              <div className="text-center py-12 text-gray-400">Loading articles...</div>
+              <div className="text-center py-12 text-gray-400">Loading pillars...</div>
             ) : filteredArticles.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500">No articles yet</p>
+                  <p className="text-gray-500">No pillars yet</p>
                   <p className="text-sm text-gray-400 mt-1">
-                    Import articles via JSON or generate as part of clusters
+                    Import pillars via JSON
                   </p>
                 </CardContent>
               </Card>
@@ -711,7 +711,7 @@ function ContentManagerInner() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      <th className="text-left px-4 py-3 font-medium">Article</th>
+                      <th className="text-left px-4 py-3 font-medium">Pillar</th>
                       <th className="text-left px-4 py-3 font-medium">Cluster</th>
                       <th className="text-center px-4 py-3 font-medium">Words</th>
                       <th className="text-center px-4 py-3 font-medium">Health</th>
