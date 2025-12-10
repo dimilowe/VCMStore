@@ -44,8 +44,8 @@ export async function getCmsCloudBySlug(slug: string): Promise<CloudForRenderer 
       featuredProducts: [],
       appRow: [],
       shortcuts: [],
-      showRecentFiles: true,
       ...row.engine_config,
+      showRecentFiles: true,
     },
   };
 }

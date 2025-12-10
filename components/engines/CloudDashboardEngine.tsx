@@ -215,9 +215,7 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
         ) : null
       }
       sidebar={
-        showRecentFiles ? (
-          <CloudRecentFilesRail files={[]} title="Recent files" />
-        ) : null
+        <CloudRecentFilesRail files={[]} title="Recent files" />
       }
     />
   );
