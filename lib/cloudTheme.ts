@@ -20,25 +20,25 @@ export type CloudTheme = {
   tabs: { id: string; label: string }[];
 };
 
+export const ALL_CLOUD_IDS: CloudId[] = [
+  "creation",
+  "video",
+  "writing-seo",
+  "file-data",
+  "monetization",
+  "intelligence",
+  "music-performance",
+  "growth-distribution",
+  "shopping",
+  "advertising",
+];
+
 export function resolveCloudId(cmsSlug: string): CloudId | null {
   const normalized = cmsSlug
     .replace(/_/g, "-")
     .replace(/-cloud$/, "");
   
-  const validIds: CloudId[] = [
-    "creation",
-    "video",
-    "writing-seo",
-    "file-data",
-    "monetization",
-    "intelligence",
-    "music-performance",
-    "growth-distribution",
-    "shopping",
-    "advertising",
-  ];
-  
-  return validIds.includes(normalized as CloudId) ? (normalized as CloudId) : null;
+  return ALL_CLOUD_IDS.includes(normalized as CloudId) ? (normalized as CloudId) : null;
 }
 
 export const CLOUD_THEMES: Record<CloudId, CloudTheme> = {
