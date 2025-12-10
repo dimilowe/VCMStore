@@ -114,14 +114,13 @@ export async function GET(request: NextRequest) {
         gu.url,
         gu.type as global_type,
         gu.is_indexed,
-        gu.last_health_score,
-        gu.manual_review_passed,
         co.id as cms_id,
         co.type as cms_type,
         co.cluster_slug,
         co.data->'engine_config'->>'engine' as engine
       FROM global_urls gu
-      LEFT JOIN cms_objects co ON gu.cms_slug = co.slug
+      LEFT JOIN cms_objects co ON 
+        (gu.url LIKE '/tools/%' AND co.slug = SUBSTRING(gu.url FROM 8) AND co.type = 'tool')
       ORDER BY gu.url
     `);
 
@@ -149,7 +148,7 @@ export async function GET(request: NextRequest) {
       const snapshot = snapshotMap.get(url);
       const linksInbound = snapshot?.linksIn || 0;
       const linksOutbound = snapshot?.linksOut || 0;
-      const seoScore = snapshot?.score || row.last_health_score || null;
+      const seoScore = snapshot?.score || null;
 
       const isSystem = SYSTEM_URLS.has(url) || url.startsWith('/admin');
       
@@ -232,7 +231,7 @@ export async function GET(request: NextRequest) {
           healthScore: seoScore,
           actualLinks: linksOutbound,
           expectedLinks,
-          manualReviewPassed: row.manual_review_passed === true
+          manualReviewPassed: false
         });
       }
 
