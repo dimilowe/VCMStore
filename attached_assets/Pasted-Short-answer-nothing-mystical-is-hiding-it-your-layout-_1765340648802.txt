@@ -1,0 +1,50 @@
+Short answer: nothing “mystical” is hiding it — your layout is.
+From that CSS dump I can see two key things:
+1. Your main container is a single-column flex, not a 2-column layout
+Relevant bits:
+display: flex;
+flex-direction: column;
+column-gap: 32px;
+width: 1216px;
+height: 781px;
+flex-direction: column means everything inside this container stacks vertically. There is no second column defined for a sidebar.
+So if the Recent Files sidebar component is:
+a sibling inside this flex container → it will appear below the tools grid, not on the right (you’d only see it if you scroll down).
+in a different wrapper entirely → this container is hogging the full width, so it will look like “there is no sidebar”.
+If you want main content + sidebar side-by-side:
+the parent needs flex-direction: row or a CSS grid layout (display: grid; grid-template-columns: 2fr 1fr; etc.).
+the sidebar needs a non-zero width / flex-basis.
+Right now you’ve basically told the browser: “one big column, nothing to the right”.
+2. Your borders are literally set to 0px
+All of these:
+border-bottom-width: 0px;
+border-left-width: 0px;
+border-right-width: 0px;
+border-top-width: 0px;
+border-bottom-style: solid;
+border-bottom-color: rgb(228, 228, 231);
+...
+This is why any separators you expect (between main area and sidebar, or between sections) are invisible:
+you only set the color, not the width.
+In Tailwind terms, you’ve effectively got border-border without border, border-l, etc.
+If you want a visible divider:
+Add border-l / border-t / border to the element, or
+In raw CSS, set border-left-width: 1px; (or whatever side you want).
+What this means in practice
+The “visibility issues” are coming from:
+Layout: Parent container is a single column (flex-direction: column), so nothing can sit on the right.
+Borders: All border widths are zero, so any supposed visual separation doesn’t render.
+Concrete fix:
+Change the main content wrapper to something like:
+<div className="flex gap-8 lg:flex-row flex-col">
+  <main className="flex-1">{/* tools grid */}</main>
+  <aside className="w-full lg:w-80 lg:border-l border-zinc-200">
+    {/* RecentFilesSidebar */}
+  </aside>
+</div>
+or a grid:
+<div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+  <main>{/* tools */}</main>
+  <aside className="border-l border-zinc-200">{/* Recent files */}</aside>
+</div>
+Once you do that (and make sure the component actually renders for this cloud), the sidebar will show up properly and the divider will be visible.
