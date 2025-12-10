@@ -1,0 +1,128 @@
+Short version:
+Your “cloud dashboards” are not actually all running off one clean config yet. You have at least two separate layers of styling logic, and File/Data is falling through to the default (white) in one or more of them.
+That’s why:
+Distribution cloud → full pink hero + pink recent-files
+AI Intelligence cloud → full purple hero + purple recent-files
+File/Data cloud → white hero + white recent-files, only the card + tabs look right
+Replit saying “fixed, gradients work across all clouds” is only true for the bit of code they touched (probably the hero gradient lookup). The rest of the layout is still using a different theme mapping / fallback.
+What’s actually happening
+From what you’ve described + the screenshots, you’ve got something roughly like this under the hood:
+A dashboard component/engine that takes a cloudSlug (e.g. distribution-growth-cloud, ai-intelligence-cloud, file-data-cloud).
+Multiple style maps, something like:
+cloudHeroGradients[cloudSlug]
+cloudRecentFileGradients[cloudSlug]
+maybe cloudPromptBarGradients[cloudSlug] or similar
+Tailwind JIT + safelist that only preserves classes that can be seen in static code or the safelist.
+Where the bugs are likely hiding:
+1. Slug mismatch in one of the maps
+You already found this once: file_data vs file-data-cloud.
+Chances are high you now have something like:
+const CLOUD_HERO_STYLES = {
+  'file-data-cloud': 'bg-gradient-to-br from-zinc-50 to-zinc-200',
+  // ...
+};
+
+const CLOUD_RECENT_STYLES = {
+  'file_data': 'bg-gradient-to-br from-zinc-50 to-zinc-200', // wrong
+  // or: no file-data entry at all here
+};
+So:
+Hero lookup might be fixed or halfway fixed.
+Recent-files panel + maybe page background are still using an incomplete map and falling back to plain white.
+Same story could exist for the prompt bar or the big hero wrapper.
+2. Not all gradient classes are in the safelist
+You safelisted some gradient classes, but if File/Data is the only one using the zinc/gray variant and that class string isn’t 100% identical to what’s in the safelist, Tailwind will happily purge it and leave you with white.
+E.g.:
+In config you safelisted bg-gradient-to-br from-zinc-50 to-zinc-200
+But the hero uses bg-gradient-to-b from-zinc-50 to-zinc-200 or from-zinc-100 to-zinc-200
+→ Tailwind sees those as different and nukes them.
+Why it feels insane: “Aren’t they all using the same engine?”
+Right now they’re half-using the same engine:
+Layout grid, card, tabs = shared.
+Theme (colors/gradients) is duplicated in 2–3 places instead of one canonical config.
+So in your head: “only difference is color”.
+In the code: “color is defined in three different maps + a slug normalizer, and one of them is wrong.”
+That’s why some clouds look perfect and others are broken even though “they’re all the same dashboard.”
+How to actually fix this cleanly (and stop reliving this)
+Do this once and be done:
+1. Define a single canonical CloudId
+// types/clouds.ts
+export type CloudId =
+  | 'creation'
+  | 'file-data'
+  | 'distribution-growth'
+  | 'ai-intelligence'
+  | 'music-performance'
+  // ...rest
+Make everything use this internal CloudId, not raw CMS slugs.
+Have a tiny resolver:
+export function resolveCloudId(cmsSlug: string): CloudId | null {
+  const normalized = cmsSlug.replace(/_cloud$/,'').replace(/-cloud$/,'');
+  switch (normalized) {
+    case 'file-data': return 'file-data';
+    case 'distribution-growth': return 'distribution-growth';
+    // ...
+    default: return null;
+  }
+}
+You already half-did this; lock it down and stop letting random strings through.
+2. One theme config object, not three
+type CloudTheme = {
+  heroBg: string;
+  recentFilesBg: string;
+  promptBarBg: string;
+  promptBarBorder?: string;
+};
+
+export const CLOUD_THEMES: Record<CloudId, CloudTheme> = {
+  'file-data': {
+    heroBg: 'bg-gradient-to-br from-zinc-50 to-zinc-200',
+    recentFilesBg: 'bg-gradient-to-br from-zinc-50 to-zinc-200',
+    promptBarBg: 'bg-white/80',
+  },
+  'distribution-growth': {
+    heroBg: 'bg-gradient-to-br from-pink-500 to-orange-400',
+    recentFilesBg: 'bg-gradient-to-br from-pink-500 to-orange-400',
+    promptBarBg: 'bg-white/10 border border-white/20',
+  },
+  'ai-intelligence': {
+    heroBg: 'bg-gradient-to-br from-violet-400 to-purple-500',
+    recentFilesBg: 'bg-gradient-to-br from-violet-400 to-purple-500',
+    promptBarBg: 'bg-white/10 border border-white/20',
+  },
+  // ...
+};
+Dashboard uses ONLY this:
+const cloudId = resolveCloudId(cmsSlug);
+const theme = cloudId ? CLOUD_THEMES[cloudId] : DEFAULT_THEME;
+
+<div className={cn('rounded-3xl p-8', theme.heroBg)}>...</div>
+<div className={cn('rounded-3xl p-6', theme.recentFilesBg)}>...</div>
+<div className={cn('rounded-full', theme.promptBarBg)}>...</div>
+No separate cloudHeroGradients, recentFileGradients, etc. One source of truth.
+3. Safelist straight from the theme config
+Instead of manually duplicating strings in tailwind.config, generate your safelist from the same constants:
+// tailwind.config.js
+const { CLOUD_THEMES } = require('./path/to/cloudThemes');
+
+const gradientClasses = Array.from(
+  new Set(
+    Object.values(CLOUD_THEMES)
+      .flatMap(theme => [theme.heroBg, theme.recentFilesBg, theme.promptBarBg])
+      .flatMap(cls => cls.split(' ').filter(Boolean))
+  )
+);
+
+module.exports = {
+  // ...
+  safelist: gradientClasses,
+};
+Now you physically can’t have “theme says X, safelist has Y” drift.
+Why File/Data is specifically broken right now
+Given everything so far, the likely combo is:
+File/Data’s slug went from file_data → file-data-cloud.
+Hero gradient map was updated/normalized by Replit.
+Recent-files + maybe another wrapper are still using an old key or missing entry, so they fall back to plain white.
+The zinc gradient classes might also not match the safelist exactly.
+So File/Data is exposing the drift that exists across your theme code; the other clouds just happen to “hit” the right key/class combo.
+If you centralize theme config + safelist the way I just outlined, this entire class of bugs disappears. You’ll change a color in one object and all ten clouds update identically, which is what you thought you already had.
