@@ -1,0 +1,262 @@
+Here you go — paste this whole thing into Replit as your coding agent prompt:
+You are an expert TypeScript/Next.js engineer working inside my existing VCM Suite codebase.
+
+STACK / CONSTRAINTS (IMPORTANT – READ FIRST)
+- Next.js App Router
+- TypeScript
+- Postgres (Neon)
+- Existing CMS system using a `cms_objects` table for tools and content
+- There is already a URL Registry table for URLs + link counts
+- There are “legacy” hardcoded tools, and NEW tools created as CMS objects
+- DO NOT delete or break existing functionality
+- DO NOT rename existing columns or tables
+- Extend and integrate with the current system instead of rewriting it
+- If any type / file / table I reference already exists, REUSE it and extend it safely
+
+GOAL
+
+Implement an **Auto Interlink Engine** for CMS-based tool pages so that:
+
+1. Every CMS tool page automatically gets **inbound links** from:
+   - Global Tools Directory page
+   - Footer tools list
+   - Its Cloud dashboard tools list
+   - Its Parent Hub (category page)
+   - Sibling tools (other tools in same category)
+   - (Optionally) manual article pages that reference it
+
+2. Every CMS tool page automatically has strong **outbound links** to:
+   - Its Parent Hub page
+   - 4–6 sibling tools (same category)
+   - 3 related tools (similar capabilities/keywords, can be different category)
+   - Its Cloud overview page
+
+3. Once this is implemented, when I generate a new tool via CMS (with a prompt that writes a cms_object of type "tool"), it should automatically:
+   - Appear in the tools index
+   - Appear in footer tools
+   - Appear in its Cloud’s tools list
+   - Have a parent hub
+   - Have siblings/related tools wired
+   - Render those links on the tool page UI
+
+I DO NOT want AI-generated articles for SEO anymore. Only tool pages are programmatic. Articles are manual. The interlink engine is ONLY for tools (type = "tool").
+
+---------------------------------------------------
+STEP 1 – CONFIRM / EXTEND CMS TOOL SHAPE
+---------------------------------------------------
+
+1. Locate the CMS model for tools. This is most likely:
+   - A `cms_objects` table with a `type` column (e.g., 'tool', 'article', etc.)
+   - A TypeScript type or interface like `CmsObject` or similar.
+
+2. WITHOUT breaking anything, extend the **tool** shape so that each tool cms_object can store:
+
+   - `cloud_id: string`                // which cloud/dashboard it belongs to, e.g. "creator-tools", "fashion", etc.
+   - `category: string`                // simple category like "images" | "video" | "audio" | "writing" | "files" | etc.
+   - `capabilities: string[]`          // array of tags like ["compress", "resize", "convert"]
+   - `keywords: string[]`              // array of keyword strings, e.g. ["zip files", "compress files", "file size reducer"]
+
+   - `interlink_parent: string | null` // slug/URL of the category hub page for this tool
+   - `interlink_siblings: string[]`    // array of sibling tool slugs
+   - `interlink_tools: string[]`       // array of related tool slugs (non-siblings)
+
+3. If some of these fields already exist under slightly different names, ADAPT to that reality:
+   - Don’t duplicate columns
+   - Use what’s already there and map to the same concept
+
+4. Create any necessary DB migration(s) to add missing columns to `cms_objects` in Postgres, using the existing migration system (Prisma/Drizzle/SQL scripts). Keep migrations additive and safe.
+
+---------------------------------------------------
+STEP 2 – DEFINE PARENT HUB CONVENTION
+---------------------------------------------------
+
+We will treat parent hubs as category pages under a cloud:
+
+- Parent hub URL pattern:
+  `/clouds/[cloudId]/[category]`
+
+Examples:
+- `/clouds/creator-tools/images`
+- `/clouds/creator-tools/video`
+- `/clouds/fashion/images`
+
+1. Create (or confirm existence of) a route under `app/clouds/[cloudId]/[category]/page.tsx` that acts as the **category hub** for tools.
+
+2. This Parent Hub page should:
+   - Read `cloudId` and `category` from the URL.
+   - Query `cms_objects` where `type = 'tool'`, `cloud_id = cloudId`, and `category = category`.
+   - Render:
+     - A title like “Image Tools” based on the category
+     - A short description (can be static or simple mapping for now)
+     - A grid/list of all tools in that category with links to their tool pages.
+   - No fancy styling needed beyond matching the existing design system.
+
+Keep the logic minimal and safe, but fully functional.
+
+---------------------------------------------------
+STEP 3 – IMPLEMENT AUTO INTERLINK ENGINE
+---------------------------------------------------
+
+Create a new reusable server-side function:
+
+File: `lib/interlink/autoLinkTool.ts` (or similar path under `lib/`)
+
+Purpose: Given a tool’s cms_object `id`, compute and store its parent, siblings, and related tools.
+
+Implementation details:
+
+1. Fetch the tool by id:
+   - Ensure `type === 'tool'`.
+   - If not found or not a tool, return gracefully.
+
+2. Compute **Parent Hub**:
+   - Using `tool.cloud_id` and `tool.category`, compute:
+     - `parentSlug = /clouds/${tool.cloud_id}/${tool.category}`
+   - This will be stored as `interlink_parent`.
+
+3. Compute **Siblings**:
+   - Query `cms_objects` where:
+     - `type = 'tool'`
+     - `cloud_id = tool.cloud_id`
+     - `category = tool.category`
+     - `id != tool.id`
+   - Order by `created_at DESC` (or similar)
+   - Take up to 10, then slice to the first 4–6 for siblings.
+   - Store their `slug` values in `interlink_siblings`.
+
+4. Compute **Related Tools**:
+   - Query for other tools (type = 'tool', id != tool.id) that share either:
+     - overlapping `capabilities`
+     - OR overlapping `keywords`
+   - Use an array-overlap condition appropriate to the ORM (e.g., Postgres `&&` for text[] if available).
+   - Order by `created_at DESC` (or another reasonable ordering)
+   - Take up to 10, then slice to first 3.
+   - Store their `slug` values in `interlink_tools`.
+
+5. Update the current tool row with:
+   - `interlink_parent`
+   - `interlink_siblings`
+   - `interlink_tools`
+
+6. Make sure this function is **idempotent** and safe:
+   - It should be safe to call multiple times
+   - It should handle cases where there are no siblings yet (empty arrays)
+
+---------------------------------------------------
+STEP 4 – HOOK AUTO INTERLINK INTO TOOL CREATION / UPDATE
+---------------------------------------------------
+
+Wherever CMS tools are created or updated (admin panel or API), ensure `autoLinkTool` is called.
+
+Typical place:
+- An API route like `app/api/admin/cms/tools/create/route.ts`
+- Or a generic CMS upsert endpoint
+
+Modify the relevant handler:
+
+- After successfully creating/updating a `cms_objects` row where `type = 'tool'`, call:
+
+  ```ts
+  await autoLinkTool(tool.id);
+Make sure to:
+First create/update the tool row with its cloud_id, category, capabilities, keywords filled in.
+Then call autoLinkTool so interlink fields are populated based on the rest of the dataset.
+This ensures every new tool generated via prompt will get its interlink fields set automatically.
+STEP 5 – MAKE NAVIGATION CMS-DRIVEN (INBOUND LINKS)
+We must ensure inbound links are coming from:
+Global Tools Directory (/tools page)
+Footer tools list
+Cloud dashboards
+5.1 Tools Directory
+Locate or create the Tools Directory page:
+Route: likely app/tools/page.tsx
+Modify it so that it:
+Fetches all cms_objects where type = 'tool'.
+Groups them by category (and/or cloud).
+Renders them as a list/grid, with <Link href={tool.slug}> etc.
+All tools from CMS should appear; stop relying on any legacy hardcoded arrays. If legacy tools still exist, keep them, but add CMS tools on top at minimum.
+5.2 Footer Tools List
+Locate the main Footer component, likely under components/Footer.tsx or similar.
+Update it so that it:
+Queries a subset of tools from CMS (e.g., latest 8–12 tools, or curated via a simple heuristic).
+Renders them as footer links using their slug and title.
+The goal: every CMS tool has at least some inbound links from the footer and/or tools directory, not just legacy tools.
+5.3 Cloud Dashboards
+Each Cloud dashboard (e.g., /clouds/[cloudId]) should:
+Query cms_objects where type = 'tool' and cloud_id = cloudId.
+Render those tools in the dashboard under “Tools in this cloud” or similar.
+If there is existing hardcoded tool lists per cloud, replace or augment them with CMS-based tools.
+STEP 6 – OUTBOUND LINKS ON TOOL PAGE
+Update the Tool Page layout to actually render the outbound links based on the interlink fields.
+Find the component responsible for rendering one tool page.
+This might be under app/tools/[slug]/page.tsx or a shared renderer component.
+After fetching the tool cms_object, look up:
+interlink_parent → fetch its CMS record if it exists (for title) or just build a simple label from category.
+interlink_siblings → fetch sibling tool records by slug.
+interlink_tools → fetch related tool records by slug.
+Cloud overview page URL for this tool: /clouds/${tool.cloud_id}.
+Render sections similar to:
+A small breadcrumb / “Back to [Category] hub” link using interlink_parent.
+A “More tools in this category” section listing siblings.
+A “You might also like” section listing related tools.
+Optionally a “Back to [Cloud] overview” link or card.
+Example layout sketch (TypeScript/TSX):
+// PSEUDO-CODE – ADAPT TO EXISTING LAYOUT
+
+function ToolPage({ tool }: { tool: CmsTool }) {
+  const parentHub = parentHubRecordOrNull;
+  const siblingTools = siblingRecords;
+  const relatedTools = relatedRecords;
+
+  return (
+    <ToolLayout>
+      {/* existing tool UI here */}
+
+      {parentHub && (
+        <nav className="mt-8 text-sm">
+          <Link href={parentHub.slug}>
+            ← Back to {parentHub.title || "Category Hub"}
+          </Link>
+        </nav>
+      )}
+
+      {siblingTools.length > 0 && (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">
+            More tools in this category
+          </h2>
+          <ul className="mt-4 grid gap-4 md:grid-cols-3">
+            {siblingTools.map((s) => (
+              <li key={s.slug}>
+                <Link href={s.slug}>{s.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {relatedTools.length > 0 && (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">You might also like</h2>
+          <ul className="mt-4 grid gap-4 md:grid-cols-3">
+            {relatedTools.map((r) => (
+              <li key={r.slug}>
+                <Link href={r.slug}>{r.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Optional cloud overview link */}
+      {tool.cloud_id && (
+        <section className="mt-12">
+          <Link href={`/clouds/${tool.cloud_id}`} className="text-sm underline">
+            ← Back to {tool.cloud_id} cloud
+          </Link>
+        </section>
+      )}
+    </ToolLayout>
+  );
+}
+Adapt this to match the existing design system and components.

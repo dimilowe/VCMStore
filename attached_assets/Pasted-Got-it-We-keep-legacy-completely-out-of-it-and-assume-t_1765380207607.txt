@@ -1,0 +1,159 @@
+Got it. We keep legacy completely out of it and assume the only tools that matter are CMS-based (cms_objects with type = 'tool'). No touching toolsRegistry, no merging.
+Here’s the cleaned-up Replit prompt that does exactly that:
+You are a senior TypeScript/Next.js engineer working inside my existing VCM Suite codebase.
+
+CONTEXT / STACK
+- Next.js App Router
+- TypeScript
+- Postgres (Neon)
+- There is a CMS with a `cms_objects` table and a `CMSObjectData` type.
+- Tool pages are (or will be) CMS-based; I am phasing out legacy tools and do NOT want to involve `toolsRegistry` or any legacy config for this change.
+- There is an existing “Explore More Free Creator Tools” section at the bottom of some tool pages which currently uses a hardcoded list and is responsible for strong internal linking between old tools.
+
+OBJECTIVE
+
+Refactor that “Explore More Free Creator Tools” section into a **CMS-driven block** that:
+
+1. Loads its list of tools **only from CMS** (`cms_objects` where `type = 'tool'`).
+2. Excludes the current tool from the list.
+3. Is rendered at the bottom of **every CMS tool page**.
+4. Does NOT read from, depend on, or even import any legacy `toolsRegistry` or hardcoded arrays.
+
+No new routes, no new DB columns, no auto-interlink engine. Just a CMS-driven block.
+
+---------------------------------------------------
+STEP 1 – FIND THE EXISTING BLOCK
+---------------------------------------------------
+
+1. Search the codebase for the heading text:
+
+   - "Explore More Free Creator Tools"
+
+2. Identify the component/file where this section is rendered. It’s currently a block with:
+   - A heading (“Explore More Free Creator Tools”)
+   - A line of copy about VCM Suite
+   - A bunch of pill-style links like “Calorie Deficit Calculator”, “Outfit Ideas”, “AI Logo Generator”, etc.
+   - A “Join VCM OS Waitlist” button.
+
+You will keep the layout and visual style, but move it into a reusable component and change the data source to CMS.
+
+---------------------------------------------------
+STEP 2 – CREATE A SHARED COMPONENT: FreeToolsBlock
+---------------------------------------------------
+
+1. Create a new file:
+
+   `components/FreeToolsBlock.tsx`
+
+2. Implement it as an **async server component** that takes the current tool’s slug:
+
+   ```tsx
+   import Link from "next/link";
+   import { getAllCmsTools } from "@/lib/tools"; // you'll create this helper
+
+   interface FreeToolsBlockProps {
+     currentSlug: string; // full slug like "/tools/ai-thumbnail-coach"
+   }
+
+   export async function FreeToolsBlock({ currentSlug }: FreeToolsBlockProps) {
+     const tools = await getAllCmsTools();
+
+     // Exclude current tool
+     const otherTools = tools.filter((t) => t.slug !== currentSlug);
+
+     if (!otherTools.length) return null;
+
+     // Optional: cap the list so it doesn't get insane as tool count grows
+     const limited = otherTools.slice(0, 48);
+
+     return (
+       <section
+         className="mt-12 rounded-3xl px-6 py-8 sm:px-10 sm:py-10"
+         // reuse the same gradient / background classes from the existing block
+       >
+         <h2 className="text-center text-xl font-semibold sm:text-2xl mb-2">
+           Explore More Free Creator Tools
+         </h2>
+         <p className="text-center text-sm text-muted-foreground mb-6 max-w-2xl mx-auto">
+           VCM Suite offers a complete ecosystem of free tools for content creators and entrepreneurs.
+         </p>
+
+         <div className="flex flex-wrap gap-3 justify-center">
+           {limited.map((tool) => (
+             <Link
+               key={tool.slug}
+               href={tool.slug}
+               className="inline-flex items-center rounded-full bg-white/80 px-3 py-1 text-sm shadow-sm hover:bg-white"
+             >
+               {tool.title}
+             </Link>
+           ))}
+         </div>
+
+         {/* Reuse the existing "Join VCM OS Waitlist" button markup from the old block */}
+       </section>
+     );
+   }
+Copy the styling (gradient background, spacing, pill classes, waitlist button) from the existing block into this component so it looks identical.
+STEP 3 – CMS HELPER: getAllCmsTools()
+Create or update a helper in lib/tools.ts (or an equivalent shared lib file):
+// lib/tools.ts
+import { db } from "@/lib/db";
+
+export type CmsToolSummary = {
+  slug: string;
+  title: string;
+};
+
+export async function getAllCmsTools(): Promise<CmsToolSummary[]> {
+  const rows = await db.cms_objects.findMany({
+    where: {
+      type: "tool",
+      // If you have a monetization flag and only want free tools,
+      // add the appropriate condition here (e.g. is_paid: false).
+    },
+    select: {
+      slug: true,
+      title: true,
+    },
+    orderBy: {
+      created_at: "asc",
+    },
+  });
+
+  return rows.map((r) => ({
+    slug: r.slug,
+    title: r.title,
+  }));
+}
+Important: Do NOT import or read from any legacy toolsRegistry or static lists. This helper must be CMS-only and the single source of truth for the FreeToolsBlock.
+STEP 4 – MOUNT FreeToolsBlock ON EVERY CMS TOOL PAGE
+Find the route that renders CMS tool detail pages, e.g.:
+app/tools/[slug]/page.tsx
+or a shared CMS renderer that handles type = "tool".
+After you load the CMS object for the current tool, compute its full slug string if needed (e.g. "/tools/" + params.slug), then render the block at the bottom of the page:
+import { FreeToolsBlock } from "@/components/FreeToolsBlock";
+
+export default async function ToolPage({ params }: { params: { slug: string } }) {
+  const fullSlug = `/tools/${params.slug}`;
+
+  const tool = await getCmsToolBySlug(fullSlug); // adapt to your existing loader
+
+  if (!tool || tool.type !== "tool") {
+    // existing not-found handling
+  }
+
+  return (
+    <ToolLayout>
+      {/* existing tool UI, hero, FAQ, etc. */}
+
+      {/* New CMS-driven internal linking block */}
+      <FreeToolsBlock currentSlug={tool.slug} />
+    </ToolLayout>
+  );
+}
+Make sure currentSlug you pass matches the slug field stored in cms_objects (if you store slugs with /tools/... then pass that).
+If some legacy tool pages still exist as separate routes, you can either:
+temporarily leave them alone, OR
+if they already fetch a CMS object, you can also mount <FreeToolsBlock> there with the same currentSlug logic.
+The key rule: the block’s tool list must always come from CMS, never from legacy registries.
