@@ -12,7 +12,7 @@ export async function FreeToolsBlock({ currentSlug }: FreeToolsBlockProps) {
 
   if (!otherTools.length) return null;
 
-  const limited = otherTools.slice(0, 48);
+  const limited = otherTools.slice(0, 20);
 
   return (
     <section className="mt-16 gradient-border rounded-2xl p-8 text-center bg-white max-w-4xl mx-auto">
