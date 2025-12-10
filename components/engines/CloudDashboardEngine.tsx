@@ -215,7 +215,7 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
         ) : null
       }
       sidebar={
-        <CloudRecentFilesRail files={[]} title="Recent files" />
+        <CloudRecentFilesRail files={[]} title="Recent files" gradient={gradient} />
       }
     />
   );

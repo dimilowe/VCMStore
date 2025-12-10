@@ -17,6 +17,7 @@ export interface RecentFile {
 interface CloudRecentFilesRailProps {
   files: RecentFile[];
   title?: string;
+  gradient?: string;
 }
 
 const FILE_TYPE_ICONS: Record<string, typeof FileText> = {
@@ -35,41 +36,72 @@ const FILE_TYPE_COLORS: Record<string, string> = {
 
 export default function CloudRecentFilesRail({ 
   files, 
-  title = 'Recent files' 
+  title = 'Recent files',
+  gradient
 }: CloudRecentFilesRailProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
+  const hasGradient = !!gradient;
+  
   return (
-    <div className="bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm h-fit sticky top-8">
+    <div className={`rounded-2xl p-5 h-fit sticky top-8 ${
+      hasGradient 
+        ? `bg-gradient-to-br ${gradient} shadow-lg` 
+        : 'bg-white border border-zinc-200 shadow-sm'
+    }`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-semibold text-zinc-900">
+        <h2 className={`text-base font-semibold ${hasGradient ? 'text-white drop-shadow-sm' : 'text-zinc-900'}`}>
           {title}
         </h2>
         <div className="flex items-center gap-1">
           <button 
             onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50'}`}
+            className={`p-1.5 rounded-lg transition-colors ${
+              hasGradient
+                ? viewMode === 'grid' 
+                  ? 'bg-white/20 text-white' 
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                : viewMode === 'grid' 
+                  ? 'bg-zinc-100 text-zinc-900' 
+                  : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50'
+            }`}
           >
             <Grid className="w-4 h-4" />
           </button>
           <button 
             onClick={() => setViewMode('list')}
-            className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50'}`}
+            className={`p-1.5 rounded-lg transition-colors ${
+              hasGradient
+                ? viewMode === 'list' 
+                  ? 'bg-white/20 text-white' 
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                : viewMode === 'list' 
+                  ? 'bg-zinc-100 text-zinc-900' 
+                  : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50'
+            }`}
           >
             <List className="w-4 h-4" />
           </button>
-          <button className="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600 transition-colors ml-1">
+          <button className={`p-1.5 rounded-lg transition-colors ml-1 ${
+            hasGradient
+              ? 'text-white/70 hover:text-white hover:bg-white/10'
+              : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100'
+          }`}>
             <Plus className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {files.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-200 p-6 text-center">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-zinc-100 flex items-center justify-center">
-            <Clock className="w-6 h-6 text-zinc-400" />
+        <div className={`rounded-xl border border-dashed p-6 text-center ${
+          hasGradient ? 'border-white/30 bg-white/10' : 'border-zinc-200'
+        }`}>
+          <div className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center ${
+            hasGradient ? 'bg-white/20' : 'bg-zinc-100'
+          }`}>
+            <Clock className={`w-6 h-6 ${hasGradient ? 'text-white/80' : 'text-zinc-400'}`} />
           </div>
-          <p className="text-sm text-zinc-500">
+          <p className={`text-sm ${hasGradient ? 'text-white/80' : 'text-zinc-500'}`}>
             Your recent files will appear here once you start using the tools.
           </p>
         </div>
@@ -83,7 +115,11 @@ export default function CloudRecentFilesRail({
               <Link
                 key={file.id}
                 href={file.href}
-                className="group rounded-xl overflow-hidden border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all"
+                className={`group rounded-xl overflow-hidden transition-all hover:shadow-md ${
+                  hasGradient 
+                    ? 'bg-white/10 hover:bg-white/20 border border-white/20' 
+                    : 'border border-zinc-200 hover:border-zinc-300'
+                }`}
               >
                 <div className="aspect-square relative">
                   {file.thumbnailUrl ? (
@@ -105,10 +141,14 @@ export default function CloudRecentFilesRail({
                   )}
                 </div>
                 <div className="p-2">
-                  <p className="text-xs font-medium text-zinc-900 truncate group-hover:text-pink-600 transition-colors">
+                  <p className={`text-xs font-medium truncate transition-colors ${
+                    hasGradient 
+                      ? 'text-white group-hover:text-white/90' 
+                      : 'text-zinc-900 group-hover:text-pink-600'
+                  }`}>
                     {file.name}
                   </p>
-                  <p className="text-[10px] text-zinc-500 uppercase">
+                  <p className={`text-[10px] uppercase ${hasGradient ? 'text-white/60' : 'text-zinc-500'}`}>
                     {file.type}
                   </p>
                 </div>
@@ -126,7 +166,11 @@ export default function CloudRecentFilesRail({
               <Link
                 key={file.id}
                 href={file.href}
-                className="flex items-center gap-3 p-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 transition-all group"
+                className={`flex items-center gap-3 p-2.5 rounded-xl transition-all group ${
+                  hasGradient 
+                    ? 'bg-white/10 hover:bg-white/20 border border-white/20' 
+                    : 'border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300'
+                }`}
               >
                 {file.thumbnailUrl ? (
                   <img 
@@ -140,14 +184,18 @@ export default function CloudRecentFilesRail({
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-zinc-900 truncate group-hover:text-pink-600 transition-colors">
+                  <p className={`text-sm font-medium truncate transition-colors ${
+                    hasGradient 
+                      ? 'text-white group-hover:text-white/90' 
+                      : 'text-zinc-900 group-hover:text-pink-600'
+                  }`}>
                     {file.name}
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-zinc-500">
+                  <div className={`flex items-center gap-2 text-xs ${hasGradient ? 'text-white/60' : 'text-zinc-500'}`}>
                     <span className="uppercase">{file.type}</span>
                     {file.timestamp && (
                       <>
-                        <span className="text-zinc-300">·</span>
+                        <span className={hasGradient ? 'text-white/40' : 'text-zinc-300'}>·</span>
                         <span>{file.timestamp}</span>
                       </>
                     )}
