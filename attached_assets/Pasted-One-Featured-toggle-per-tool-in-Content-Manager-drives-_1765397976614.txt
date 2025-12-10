@@ -1,0 +1,97 @@
+One “Featured” toggle per tool in Content Manager → drives both:
+Free Creator Tools homepage section
+Resources ▸ Creator Tools dropdown
+Here’s how I’d wire it, step-by-step, without overcomplicating anything.
+1. Add a featured flag to your CMS objects
+In your DB (where cms_objects / tools live), add a boolean:
+ALTER TABLE cms_objects
+ADD COLUMN featured boolean NOT NULL DEFAULT false;
+If you’re on Prisma, that’s:
+// schema.prisma
+model CmsObject {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  kind      String
+  title     String
+  // ...other fields...
+
+  featured  Boolean @default(false)   // <— NEW
+}
+Run the migration.
+2. Expose featured in the admin API
+Wherever you fetch tools for the Content Manager (something like /api/admin/tools):
+// Example
+const tools = await db.cmsObject.findMany({
+  where: { kind: "tool" },
+  select: {
+    id: true,
+    slug: true,
+    title: true,
+    engine: true,
+    pillar: true,
+    clouds: true,
+    indexed: true,
+    featured: true, // <— add this
+  },
+});
+And add a simple update endpoint:
+// POST /api/admin/tools/feature
+// body: { id: string, featured: boolean }
+
+await db.cmsObject.update({
+  where: { id },
+  data: { featured },
+});
+Nothing fancy.
+3. Add a “Featured” toggle column in Content Manager
+On the page in your first screenshot (Tool / Engine / Pillar / Clouds / Links / Indexed / Actions):
+Add a header:
+<th>Featured</th>
+For each row, render a toggle bound to tool.featured:
+<td>
+  <Switch
+    checked={tool.featured}
+    onCheckedChange={(value) => {
+      void updateFeatured(tool.id, value);
+    }}
+  />
+</td>
+Where updateFeatured calls the admin API:
+async function updateFeatured(id: string, featured: boolean) {
+  await fetch("/api/admin/tools/feature", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, featured }),
+  });
+}
+Now you have ONE toggle that marks a tool as featured.
+4. Drive both UI surfaces from that same flag
+a) Free Creator Tools homepage section
+Where you currently build this grid:
+const tools = await db.cmsObject.findMany({
+  where: {
+    kind: "tool",
+    featured: true,           // <— only featured
+    // optionally: indexed: true
+  },
+  orderBy: { title: "asc" },  // or manual order later
+});
+Render from that instead of a hard-coded list.
+b) Resources ▸ Creator Tools dropdown
+Same idea. Wherever you build that dropdown list:
+const featuredTools = await db.cmsObject.findMany({
+  where: {
+    kind: "tool",
+    featured: true,
+  },
+  orderBy: { title: "asc" },
+});
+If you’re grouping them by category (AI Tools, SEO & Marketing, etc.), you just filter by both featured: true and category: "ai-tools" etc.
+5. Behavior summary
+After this:
+You go to VCM Admin → Content
+Flip a single “Featured” toggle for a tool
+That tool instantly appears or disappears from:
+Free Creator Tools homepage grid
+Resources ▸ Creator Tools dropdown
+No more manually editing two separate configs.
