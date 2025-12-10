@@ -130,11 +130,11 @@ export default function CloudHero({
         </div>
 
         <div className="absolute top-4 left-4 flex items-center gap-3">
-          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-sm">
             <IconComponent className="w-4 h-4" />
           </div>
           {badge && (
-            <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold uppercase tracking-wide backdrop-blur-sm">
+            <span className="px-3 py-1.5 bg-zinc-800/80 rounded-lg text-xs font-semibold uppercase tracking-wide backdrop-blur-md shadow-md border border-white/10">
               {badge}
             </span>
           )}
