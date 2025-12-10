@@ -60,6 +60,12 @@ interface ClusterSummary {
   articleCount: number;
 }
 
+interface Pillar {
+  id: number;
+  slug: string;
+  title: string;
+}
+
 interface Article {
   id: string;
   slug: string;
@@ -93,6 +99,7 @@ function ContentManagerInner() {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [tools, setTools] = useState<ToolSkin[]>([]);
   const [clusters, setClusters] = useState<ClusterSummary[]>([]);
+  const [pillars, setPillars] = useState<Pillar[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [mbbs, setMbbs] = useState<MBB[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,9 +126,10 @@ function ContentManagerInner() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [toolsRes, clustersRes, articlesRes, mbbsRes] = await Promise.all([
+      const [toolsRes, clustersRes, pillarsRes, articlesRes, mbbsRes] = await Promise.all([
         fetch("/api/admin/tools", { credentials: "include" }),
         fetch("/api/admin/tools/clusters", { credentials: "include" }),
+        fetch("/api/admin/pillars", { credentials: "include" }),
         fetch("/api/admin/articles", { credentials: "include" }),
         fetch("/api/admin/mbbs", { credentials: "include" }),
       ]);
@@ -133,6 +141,10 @@ function ContentManagerInner() {
       if (clustersRes.ok) {
         const data = await clustersRes.json();
         setClusters(data.clusters || []);
+      }
+      if (pillarsRes.ok) {
+        const data = await pillarsRes.json();
+        setPillars(data.pillars || []);
       }
       if (articlesRes.ok) {
         const data = await articlesRes.json();
@@ -472,10 +484,10 @@ function ContentManagerInner() {
                 }}
                 className="border rounded-md px-3 py-2 text-sm"
               >
-                <option value="all">All Clusters</option>
+                <option value="all">All Pillars</option>
                 <option value="unassigned">Unassigned Only</option>
-                {clusters.map((cluster) => (
-                  <option key={cluster.pillarSlug} value={cluster.pillarSlug}>{cluster.pillarTitle}</option>
+                {pillars.map((pillar) => (
+                  <option key={pillar.slug} value={pillar.slug}>{pillar.title}</option>
                 ))}
               </select>
             </div>
@@ -490,10 +502,10 @@ function ContentManagerInner() {
                   onChange={(e) => setBulkCluster(e.target.value)}
                   className="border rounded-md px-3 py-1.5 text-sm"
                 >
-                  <option value="">Select cluster...</option>
-                  <option value="__remove__">— Remove from cluster —</option>
-                  {clusters.map((cluster) => (
-                    <option key={cluster.pillarSlug} value={cluster.pillarSlug}>{cluster.pillarTitle}</option>
+                  <option value="">Select pillar...</option>
+                  <option value="__remove__">— Remove from pillar —</option>
+                  {pillars.map((pillar) => (
+                    <option key={pillar.slug} value={pillar.slug}>{pillar.title}</option>
                   ))}
                 </select>
                 <Button
@@ -502,7 +514,7 @@ function ContentManagerInner() {
                   size="sm"
                   className="bg-orange-500 hover:bg-orange-600"
                 >
-                  Assign to Cluster
+                  Assign to Pillar
                 </Button>
                 <Button
                   variant="ghost"
@@ -535,7 +547,7 @@ function ContentManagerInner() {
                       </th>
                       <th className="text-left px-4 py-3 font-medium">Tool</th>
                       <th className="text-left px-4 py-3 font-medium">Engine</th>
-                      <th className="text-left px-4 py-3 font-medium">Cluster</th>
+                      <th className="text-left px-4 py-3 font-medium">Pillar</th>
                       <th className="text-center px-4 py-3 font-medium">Clouds</th>
                       <th className="text-center px-4 py-3 font-medium">Links</th>
                       <th className="text-center px-4 py-3 font-medium">Indexed</th>
@@ -567,9 +579,9 @@ function ContentManagerInner() {
                             className="text-sm border rounded px-2 py-1 w-full max-w-[200px] bg-white"
                           >
                             <option value="">— None —</option>
-                            {clusters.map((cluster) => (
-                              <option key={cluster.pillarSlug} value={cluster.pillarSlug}>
-                                {cluster.pillarTitle}
+                            {pillars.map((pillar) => (
+                              <option key={pillar.slug} value={pillar.slug}>
+                                {pillar.title}
                               </option>
                             ))}
                           </select>

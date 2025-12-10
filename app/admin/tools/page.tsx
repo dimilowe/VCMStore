@@ -61,6 +61,12 @@ interface ClusterSummary {
   articleCount: number;
 }
 
+interface Pillar {
+  id: number;
+  slug: string;
+  title: string;
+}
+
 type TabType = "tools" | "clusters";
 
 export default function AdminToolsPage() {
@@ -71,6 +77,7 @@ export default function AdminToolsPage() {
 
   const [tools, setTools] = useState<ToolSkin[]>([]);
   const [clusters, setClusters] = useState<ClusterSummary[]>([]);
+  const [pillars, setPillars] = useState<Pillar[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
@@ -92,6 +99,7 @@ export default function AdminToolsPage() {
     if (isAuthenticated) {
       loadTools();
       loadClusters();
+      loadPillars();
     }
   }, [isAuthenticated]);
 
@@ -147,6 +155,17 @@ export default function AdminToolsPage() {
       setClusters(data.clusters || []);
     } catch (error) {
       console.error("Failed to load clusters:", error);
+    }
+  };
+
+  const loadPillars = async () => {
+    try {
+      const res = await fetch("/api/admin/pillars", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to load pillars");
+      const data = await res.json();
+      setPillars(data.pillars || []);
+    } catch (error) {
+      console.error("Failed to load pillars:", error);
     }
   };
 
@@ -242,7 +261,6 @@ export default function AdminToolsPage() {
   };
 
   const uniqueEngines = [...new Set(tools.map((t) => t.engineType))];
-  const uniqueClusters = [...new Set(tools.map((t) => t.clusterSlug).filter(Boolean))];
   const uniqueSegments = [...new Set(tools.map((t) => t.segment))];
 
   const filteredTools = tools.filter((tool) => {
@@ -416,10 +434,10 @@ export default function AdminToolsPage() {
                     setCurrentPage(1);
                   }}
                 >
-                  <option value="all">All Clusters</option>
-                  {uniqueClusters.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
+                  <option value="all">All Pillars</option>
+                  {pillars.map((p) => (
+                    <option key={p.slug} value={p.slug}>
+                      {p.title}
                     </option>
                   ))}
                 </select>

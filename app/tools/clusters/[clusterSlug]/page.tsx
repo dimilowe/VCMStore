@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { CLUSTER_REGISTRY, getClusterById } from "@/data/clusterRegistry";
 import { toolsRegistry, CATEGORY_INFO } from "@/data/toolsRegistry";
 import { getToolSkinBySlug } from "@/data/engineKeywordMatrix";
+import { query } from "@/lib/db";
 
 interface PageProps {
   params: Promise<{ clusterSlug: string }>;
@@ -254,9 +255,31 @@ export default async function ClusterPillarPage({ params }: PageProps) {
     notFound();
   }
 
-  const tools = cluster.toolSlugs
+  const registryTools = cluster.toolSlugs
     .map(slug => getToolData(slug))
     .filter((t): t is NonNullable<ReturnType<typeof getToolData>> => t !== null);
+
+  const cmsToolsResult = await query(
+    `SELECT 
+       slug,
+       data->>'name' as name,
+       data->>'description' as description
+     FROM cms_objects
+     WHERE type = 'tool' AND cluster_slug = $1`,
+    [clusterSlug]
+  );
+
+  const cmsTools = cmsToolsResult.rows.map((row) => ({
+    slug: row.slug,
+    name: row.name || row.slug,
+    description: row.description || "",
+    category: "tools" as const,
+  }));
+
+  const registrySlugs = new Set(registryTools.map(t => t.slug));
+  const uniqueCmsTools = cmsTools.filter(t => !registrySlugs.has(t.slug));
+  
+  const tools = [...registryTools, ...uniqueCmsTools];
 
   const referenceData = CLUSTER_REFERENCE_DATA[clusterSlug];
 
