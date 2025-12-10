@@ -56,6 +56,24 @@ The following files and directories are structurally critical and must never be 
 **Allowed**: Adding new endpoints.
 **Forbidden**: Modifying entitlement logic or existing OS calls.
 
+#### 6. VCM Renderer (ABSOLUTE LOCKED ZONE)
+- `components/renderer/**`
+- `lib/vcmRenderer/**`
+- `lib/vcm-renderer/**`
+- Any file containing: `Renderer`, `renderEngine`, `VCMRenderer`, `resolveConfig`, `resolveCmsObject`
+
+**Rules**:
+- No modifications
+- No refactors
+- No optimizations
+- No style changes
+- No imports added or removed
+- No touching the rendering pipeline or layout system
+
+**Allowed action**: Agent may read these files to understand behavior, but never write to them.
+
+**Reason**: The renderer is the universal engine powering hundreds of tools; it is infrastructure, not feature code.
+
 ### THEME CONSTRAINT (GLOBAL RULE)
 
 **LIGHT-THEME ONLY — DO NOT USE DARK MODE**
