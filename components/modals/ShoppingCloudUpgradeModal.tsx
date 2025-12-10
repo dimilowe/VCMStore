@@ -76,22 +76,22 @@ export default function ShoppingCloudUpgradeModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full shadow-xl">
+      <div className="bg-white rounded-2xl max-w-md w-full shadow-xl">
         <div className="relative p-6">
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"
           >
             <X className="w-5 h-5" />
           </button>
 
           {hasJoined ? (
             <div className="text-center py-4">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <Sparkles className="w-8 h-8 text-green-600 dark:text-green-400" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-green-600" />
               </div>
               <h2 className="text-xl font-semibold mb-2">You&apos;re on the list!</h2>
-              <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+              <p className="text-zinc-600 mb-6">
                 We&apos;ll email you when Shopping Cloud Pro is live.
               </p>
               <Button onClick={handleClose} className="w-full">
@@ -110,11 +110,11 @@ export default function ShoppingCloudUpgradeModal({
                 </div>
               </div>
 
-              <p className="text-zinc-600 dark:text-zinc-400 mb-4">
+              <p className="text-zinc-600 mb-4">
                 This feature is part of Shopping Cloud Pro.
               </p>
 
-              <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-4 mb-6">
+              <div className="bg-zinc-50 rounded-xl p-4 mb-6">
                 <p className="text-sm font-medium mb-3">Shopping Cloud Pro gives you:</p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3 text-sm">
@@ -132,7 +132,7 @@ export default function ShoppingCloudUpgradeModal({
                 </ul>
               </div>
 
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4 text-center">
+              <p className="text-sm text-zinc-500 mb-4 text-center">
                 We&apos;re rolling out Shopping Cloud soon. Want early access?
               </p>
 
