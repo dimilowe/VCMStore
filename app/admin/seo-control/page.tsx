@@ -17,7 +17,6 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
-  Zap,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -75,35 +74,13 @@ interface SeoSnapshot {
   page_type: string;
 }
 
-interface ReadyPage {
-  id: string;
-  url: string;
-  type: string;
-  page_type?: string;
-  last_health_score: number | null;
-  is_ready_to_index: boolean;
-  word_count: number | null;
-  internal_links: number;
-  expected_links: number | null;
-  issues: string[];
-  status: 'Ready' | 'Needs Links' | 'Needs Review' | 'Legacy';
-  clusterId: string | null;
-  classification: {
-    isLegacyTool: boolean;
-    isCmsTool: boolean;
-    isCmsArticle: boolean;
-    isPillar: boolean;
-    isOtherCms: boolean;
-  };
-}
 
-type TabType = "overview" | "health" | "ready" | "registry";
+type TabType = "overview" | "health" | "registry";
 
 export default function SeoControlPage() {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [urls, setUrls] = useState<UrlEntry[]>([]);
   const [snapshots, setSnapshots] = useState<SeoSnapshot[]>([]);
-  const [readyPages, setReadyPages] = useState<ReadyPage[]>([]);
   const [expectedLinks, setExpectedLinks] = useState<Record<string, number>>({});
   const [legacyTools, setLegacyTools] = useState<string[]>([]);
   const [enrichedRegistry, setEnrichedRegistry] = useState<EnrichedUrlRow[]>([]);
@@ -123,15 +100,9 @@ export default function SeoControlPage() {
   const [healthPage, setHealthPage] = useState(1);
   const HEALTH_PER_PAGE = 50;
   
-  // Ready to Index tab state
-  const [readySearch, setReadySearch] = useState("");
-  const [readyStatusFilter, setReadyStatusFilter] = useState("all");
-  const [readyPage, setReadyPage] = useState(1);
-  const READY_PER_PAGE = 50;
   
   const [isLoading, setIsLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
-  const [isInspecting, setIsInspecting] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -140,10 +111,9 @@ export default function SeoControlPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [urlsRes, snapshotsRes, readyRes, expectedRes, enrichedRes] = await Promise.all([
+      const [urlsRes, snapshotsRes, expectedRes, enrichedRes] = await Promise.all([
         fetch("/api/global-urls", { credentials: "include" }),
         fetch("/api/admin/seo/snapshots", { credentials: "include" }),
-        fetch("/api/admin/seo/unindexed-pages", { credentials: "include" }),
         fetch("/api/admin/seo/expected-links", { credentials: "include" }),
         fetch("/api/admin/seo/url-registry/enriched", { credentials: "include" }),
       ]);
@@ -155,10 +125,6 @@ export default function SeoControlPage() {
       if (snapshotsRes.ok) {
         const data = await snapshotsRes.json();
         setSnapshots(data.snapshots || []);
-      }
-      if (readyRes.ok) {
-        const data = await readyRes.json();
-        setReadyPages(data.pages || []);
       }
       if (expectedRes.ok) {
         const data = await expectedRes.json();
@@ -194,22 +160,6 @@ export default function SeoControlPage() {
     }
   };
 
-  const handleInspect = async () => {
-    setIsInspecting(true);
-    try {
-      const res = await fetch("/api/admin/seo/ready-inspector", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (res.ok) {
-        await loadData();
-      }
-    } catch (error) {
-      console.error("Inspect failed:", error);
-    } finally {
-      setIsInspecting(false);
-    }
-  };
 
   const toggleIndexing = async (urlEntry: UrlEntry) => {
     try {
@@ -296,10 +246,6 @@ export default function SeoControlPage() {
 
   const indexedCount = urls.filter((u) => u.is_indexed).length;
   const healthyCount = snapshots.filter((s) => s.overall_score >= 80).length;
-  const readyCount = readyPages.filter((p) => p.status === "Ready").length;
-  const needsLinksCount = readyPages.filter((p) => p.status === "Needs Links").length;
-  const needsReviewCount = readyPages.filter((p) => p.status === "Needs Review").length;
-  const legacyCount = readyPages.filter((p) => p.status === "Legacy").length;
   const criticalCount = snapshots.filter((s) => s.overall_score < 50).length;
 
   const filteredUrls = urls.filter((url) => {
@@ -328,24 +274,6 @@ export default function SeoControlPage() {
     healthPage * HEALTH_PER_PAGE
   );
   
-  // Filter readyPages for Ready to Index tab
-  const filteredReadyPages = readyPages.filter((page) => {
-    const cleanUrl = page.url.replace("http://localhost:5000", "");
-    const matchesSearch = cleanUrl.toLowerCase().includes(readySearch.toLowerCase());
-    
-    const matchesStatus = 
-      readyStatusFilter === "all" ||
-      (readyStatusFilter === "ready" && page.status === "Ready") ||
-      (readyStatusFilter === "needs-links" && page.status === "Needs Links") ||
-      (readyStatusFilter === "needs-review" && page.status === "Needs Review") ||
-      (readyStatusFilter === "legacy" && page.status === "Legacy");
-    return matchesSearch && matchesStatus;
-  });
-  const totalReadyPages = Math.ceil(filteredReadyPages.length / READY_PER_PAGE);
-  const paginatedReadyPages = filteredReadyPages.slice(
-    (readyPage - 1) * READY_PER_PAGE,
-    readyPage * READY_PER_PAGE
-  );
 
   const filteredEnrichedRegistry = enrichedRegistry.filter((row) => {
     const matchesSearch = row.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -419,7 +347,6 @@ export default function SeoControlPage() {
           {[
             { id: "overview", label: "Overview", icon: Activity },
             { id: "health", label: "SEO Health", icon: Activity },
-            { id: "ready", label: "Ready to Index", icon: Zap },
             { id: "registry", label: "URL Registry", icon: Globe },
           ].map((tab) => (
             <button
@@ -439,7 +366,7 @@ export default function SeoControlPage() {
 
         {activeTab === "overview" && (
           <div className="space-y-6">
-            <div className="grid md:grid-cols-4 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-500">Total URLs</CardTitle>
@@ -458,14 +385,6 @@ export default function SeoControlPage() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Ready to Index</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-blue-600">{readyCount}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-gray-500">Critical Issues</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -474,7 +393,7 @@ export default function SeoControlPage() {
               </Card>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("health")}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -490,26 +409,6 @@ export default function SeoControlPage() {
                     <span className="text-sm text-gray-500">{snapshots.length} pages scanned</span>
                     <Badge variant={healthyCount > 0 ? "default" : "secondary"}>
                       {healthyCount} healthy
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab("ready")}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-green-500" />
-                    Ready to Index
-                  </CardTitle>
-                  <CardDescription>
-                    Pages that pass quality checks
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{readyPages.length} pages checked</span>
-                    <Badge variant="default" className="bg-green-500">
-                      {readyCount} ready
                     </Badge>
                   </div>
                 </CardContent>
@@ -545,11 +444,6 @@ export default function SeoControlPage() {
                   <div className="flex-1 p-4 rounded-lg bg-gray-50 text-center">
                     <div className="text-2xl font-bold mb-1">{snapshots.length}</div>
                     <div className="text-sm text-gray-500">Pages Scanned</div>
-                  </div>
-                  <div className="text-gray-300">→</div>
-                  <div className="flex-1 p-4 rounded-lg bg-blue-50 text-center">
-                    <div className="text-2xl font-bold text-blue-600 mb-1">{readyCount}</div>
-                    <div className="text-sm text-gray-500">Ready to Index</div>
                   </div>
                   <div className="text-gray-300">→</div>
                   <div className="flex-1 p-4 rounded-lg bg-green-50 text-center">
@@ -712,205 +606,6 @@ export default function SeoControlPage() {
                     size="sm"
                     onClick={() => setHealthPage((p) => Math.min(totalHealthPages, p + 1))}
                     disabled={healthPage === totalHealthPages}
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "ready" && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-3 items-center">
-              <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="Search URLs..."
-                  value={readySearch}
-                  onChange={(e) => { setReadySearch(e.target.value); setReadyPage(1); }}
-                  className="pl-10"
-                />
-              </div>
-              <select
-                value={readyStatusFilter}
-                onChange={(e) => { setReadyStatusFilter(e.target.value); setReadyPage(1); }}
-                className="border rounded-md px-3 py-2 text-sm"
-              >
-                <option value="all">All Statuses</option>
-                <option value="ready">Ready</option>
-                <option value="needs-links">Needs Links</option>
-                <option value="needs-review">Needs Review</option>
-                <option value="legacy">Legacy</option>
-              </select>
-              <Button
-                onClick={handleInspect}
-                disabled={isInspecting}
-                className="bg-orange-500 hover:bg-orange-600"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isInspecting ? "animate-spin" : ""}`} />
-                {isInspecting ? "Inspecting..." : "Run Inspection"}
-              </Button>
-            </div>
-
-            <div className="flex flex-wrap gap-4 text-sm">
-              <span className="text-green-600 font-medium">{readyCount} Ready</span>
-              <span className="text-blue-600 font-medium">{needsLinksCount} Needs Links</span>
-              <span className="text-yellow-600 font-medium">{needsReviewCount} Needs Review</span>
-              <span className="text-gray-500">{legacyCount} Legacy</span>
-              <span className="text-gray-400 ml-auto">{readyPages.length} total pages</span>
-            </div>
-
-            {isLoading ? (
-              <div className="text-center py-12 text-gray-400">Loading...</div>
-            ) : readyPages.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Zap className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500">No pages inspected yet</p>
-                  <Button
-                    onClick={handleInspect}
-                    className="mt-4 bg-orange-500 hover:bg-orange-600"
-                  >
-                    Run First Inspection
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="border rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="text-left px-4 py-3 font-medium">URL</th>
-                      <th className="text-left px-4 py-3 font-medium">Type</th>
-                      <th className="text-center px-4 py-3 font-medium">Score</th>
-                      <th className="text-center px-4 py-3 font-medium">Words</th>
-                      <th className="text-center px-4 py-3 font-medium">In</th>
-                      <th className="text-center px-4 py-3 font-medium">Out</th>
-                      <th className="text-center px-4 py-3 font-medium">Expected</th>
-                      <th className="text-center px-4 py-3 font-medium">Status</th>
-                      <th className="text-center px-4 py-3 font-medium">Indexed</th>
-                      <th className="text-center px-4 py-3 font-medium"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {paginatedReadyPages.map((page) => {
-                      const urlEntry = urls.find((u) => u.url === page.url);
-                      const isIndexed = urlEntry?.is_indexed ?? false;
-                      const score = page.last_health_score ?? 0;
-                      const wordCount = page.word_count ?? 0;
-                      const cleanUrl = page.url.replace("http://localhost:5000", "");
-                      
-                      const statusColors: Record<string, string> = {
-                        Ready: "bg-green-100 text-green-700",
-                        "Needs Links": "bg-blue-100 text-blue-700",
-                        "Needs Review": "bg-yellow-100 text-yellow-700",
-                        Legacy: "bg-gray-100 text-gray-500",
-                      };
-                      const statusColor = statusColors[page.status] || "bg-gray-100 text-gray-600";
-                      
-                      const linksMetStatus = page.expected_links !== null 
-                        ? page.internal_links >= page.expected_links 
-                        : page.internal_links >= 3;
-                      
-                      return (
-                        <tr key={page.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3">
-                            <div className="font-medium truncate max-w-xs" title={cleanUrl}>
-                              {cleanUrl}
-                            </div>
-                            {page.clusterId && (
-                              <div className="text-xs text-gray-400 mt-0.5">
-                                Cluster: {page.clusterId}
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="text-xs text-gray-500">{page.type || "static"}</span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`font-medium ${
-                              score >= 80 ? "text-green-600" :
-                              score >= 60 ? "text-yellow-600" : "text-red-600"
-                            }`}>
-                              {score || '-'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-center text-gray-600">
-                            {wordCount || '-'}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`font-medium ${(page as any).internal_links_in > 0 ? "text-gray-600" : "text-gray-300"}`}>
-                              {(page as any).internal_links_in > 0 ? (page as any).internal_links_in : "—"}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`font-medium ${linksMetStatus ? "text-green-600" : "text-orange-600"}`}>
-                              {page.internal_links}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {page.status === "Legacy" ? (
-                              <span className="text-gray-400">-</span>
-                            ) : page.expected_links !== null ? (
-                              <span className="text-blue-600 font-medium">{page.expected_links}</span>
-                            ) : (
-                              <span className="text-gray-400">3</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`px-2 py-1 text-xs rounded ${statusColor}`}>
-                              {page.status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <button
-                              onClick={() => urlEntry && toggleIndexing(urlEntry)}
-                              className="inline-flex hover:opacity-70 transition-opacity cursor-pointer"
-                              title={isIndexed ? "Click to remove from sitemap" : "Click to add to sitemap"}
-                            >
-                              {isIndexed ? (
-                                <Eye className="w-5 h-5 text-green-500" />
-                              ) : (
-                                <EyeOff className="w-5 h-5 text-gray-400 hover:text-green-400" />
-                              )}
-                            </button>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {totalReadyPages > 1 && (
-              <div className="flex items-center justify-between pt-4">
-                <span className="text-sm text-gray-500">
-                  Page {readyPage} of {totalReadyPages}
-                </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setReadyPage((p) => Math.max(1, p - 1))}
-                    disabled={readyPage === 1}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setReadyPage((p) => Math.min(totalReadyPages, p + 1))}
-                    disabled={readyPage === totalReadyPages}
                   >
                     Next
                     <ChevronRight className="w-4 h-4" />
