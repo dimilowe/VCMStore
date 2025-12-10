@@ -17,7 +17,6 @@ import {
   Tag,
   AlertCircle
 } from 'lucide-react';
-import ExploreMoreTools from '@/components/ExploreMoreTools';
 import PostResultUpsell from '@/components/PostResultUpsell';
 import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { OutfitEngineConfig, getOutfitPresetBySlug } from '@/engines/outfit/config';
@@ -426,8 +425,6 @@ export default function OutfitEngine({ tool }: OutfitEngineProps) {
             Always verify details before purchasing. VCM Suite is not affiliated with listed merchants.
           </p>
         </div>
-
-        <ExploreMoreTools currentTool={`/tools/${config.slug}`} />
       </div>
     </div>
   );

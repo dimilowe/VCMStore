@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { getPricePresetBySlug, PriceEngineConfig, PriceEngineCTA } from '@/engines/price-engine/config';
 import ShoppingCloudUpgradeModal from '@/components/modals/ShoppingCloudUpgradeModal';
-import ExploreMoreTools from '@/components/ExploreMoreTools';
 
 interface PriceEngineProps {
   tool: ToolForRenderer;
@@ -373,8 +372,6 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
           )}
         </div>
       )}
-
-      <ExploreMoreTools currentTool={tool.slug} />
 
       <ShoppingCloudUpgradeModal
         isOpen={modalOpen}
