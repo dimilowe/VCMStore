@@ -1,0 +1,304 @@
+Below is a copy-paste Replit prompt that tells the agent exactly what to build: the Price Engine, plus the two tools:
+/track-price
+/track-prices-on-amazon
+…and wires in CTAs, upgrade modal, and analytics.
+🔧 Replit Prompt #1 — Build Price Engine + 2 Tools + Upgrade Modal
+Paste everything below into Replit AI in the VCM Suite / vcmstore.shop repo:
+You are working in my VCM Suite / vcmstore.shop codebase (Next.js + TypeScript + Postgres + CMS + “engines” + VCM Renderer).
+Goal
+Implement a new Price Engine and two Shopping Cloud tools:
+/track-price – generic price tracker
+/track-prices-on-amazon – Amazon price tracker
+These must plug into the existing engine / config / VCM Renderer system, follow the same patterns as the existing engines (e.g. Zip engine, Outfit engine, etc.), and include upgrade CTAs + a Shopping Cloud modal + analytics events.
+1. Add Price Engine Types + Registration
+Find where engine types are defined (some file like engines/index.ts or similar where Zip/Outfit/etc are registered).
+Add a new PriceEngineConfig type and engineType.
+Create (or edit) a file like engines/price-engine/types.ts:
+export type PriceEngineMode = 'generic' | 'amazon' | 'shein' | 'aliexpress' | 'zara';
+
+export interface PriceEngineCTA {
+  id: 'track-price-drops' | 'find-cheaper-alternatives' | 'add-to-closet' | 'generate-outfits';
+  label: string;
+  description?: string;
+  requiresPlan: 'shopping-cloud-pro';
+}
+
+export interface PriceEngineConfig {
+  engineType: 'price-engine';
+
+  title: string;
+  subtitle?: string;
+
+  mode: PriceEngineMode;
+  allowUrlInput: boolean;
+  allowNameInput: boolean;
+
+  urlLabel?: string;
+  urlPlaceholder?: string;
+  nameLabel?: string;
+  namePlaceholder?: string;
+
+  showFakePriceHistory: boolean;
+  showCurrentPriceBlock: boolean;
+  showRetailerBadge: boolean;
+
+  ctas: PriceEngineCTA[];
+
+  cloudTag: 'shopping';
+  featureFlagKey?: string;
+}
+Ensure PriceEngineConfig is exported and hooked into whatever global EngineConfig union you already have (where Zip/Outfit configs live).
+Example: if there is a type AnyEngineConfig = ZipEngineConfig | OutfitEngineConfig | ..., add PriceEngineConfig there too.
+2. Implement the Price Engine Renderer
+Create a React component for the engine, similar to how Zip or Outfit engines are rendered.
+Add a file like engines/price-engine/PriceEngine.tsx:
+Requirements:
+Props: something like { config: PriceEngineConfig } plus the usual engine props you use (e.g. maybe slug, cmsObject, onSubmit, etc.). Follow the pattern from other engines.
+UI layout:
+Top section:
+<h1> from config.title
+optional subtitle
+Form with:
+URL input if config.allowUrlInput
+Name input if config.allowNameInput
+Submit button ("Check Price")
+On submit:
+For now, don’t call any external APIs; just:
+Show a “Result” card under the form.
+The card should:
+Show product title (use the user input as the title for now).
+If showRetailerBadge and mode === 'amazon', show a small “Amazon” badge; otherwise, a generic “Online store” badge.
+If showCurrentPriceBlock is true, show a fake current price like $79 – $99 (can be random or static).
+If showFakePriceHistory is true, render a simple fake price history chart or sparkline. You can reuse whatever charting lib is already in the project; if none is easily available, just show a simple horizontal “price history” placeholder block with 3–5 dots or bars and labels like “Last 30 days”.
+CTA block:
+Below the result card, render each config.ctas entry as a button:
+Use the button component already used for other “Upgrade” CTAs (look at e.g. any AI-gated tools or Pro features).
+Each button should:
+Display cta.label
+Display cta.description as small text under or beside the label.
+Show a lock icon if you have one for gated features.
+When a CTA button is clicked:
+Fire an analytics event:
+Use the existing analytics utility in the project (e.g. trackEvent or similar, search for how other tools log events).
+Event name: "price_tool_cta_clicked"
+Properties: { toolSlug, ctaId: cta.id, mode: config.mode }
+Open an Upgrade modal (see section 3).
+Plug PriceEngine renderer into the main engine switch:
+Wherever you currently switch on engineType to render different engines, add a case for 'price-engine' and render PriceEngine.
+3. Shopping Cloud Upgrade Modal
+Reuse your existing modal implementation (there should already be a modal for prompting Pro upgrades / login).
+Create a generic Shopping Cloud Pro modal component if one doesn’t exist yet, e.g. components/modals/ShoppingCloudUpgradeModal.tsx.
+Behaviour:
+Props: isOpen, onClose, and optional sourceToolSlug, sourceCTAId.
+Content:
+Title: Unlock Shopping Cloud Pro
+Body text:
+This feature is part of Shopping Cloud Pro.
+Shopping Cloud Pro gives you:
+– Automatic price-drop alerts for saved items
+– Cheaper alternatives and dupes across top retailers
+– A virtual closet and AI outfit ideas using your saved pieces
+We’re rolling out Shopping Cloud soon. Want early access?
+Buttons:
+Primary button: Join Waitlist
+When clicked:
+If user is logged in, capture them in a “Shopping Cloud waitlist” mechanism (e.g. insert a row or update a profile flag). Use whatever existing pattern you have for feature waitlists. If you don’t have one, at minimum log an analytics event:
+event: "shopping_cloud_waitlist_joined"
+properties: { sourceToolSlug, sourceCTAId }
+Show a small success message: "You’re on the list. We’ll email you when Shopping Cloud Pro is live."
+Close modal.
+If user is not logged in:
+Either open your existing auth/login modal or redirect to your login page. Also log the same event.
+Secondary button: Cancel → just onClose()
+Integrate this modal into PriceEngine:
+PriceEngine should manage selectedCTA + isModalOpen state.
+When a CTA button is clicked:
+Set selectedCTA to that CTA
+Open modal
+Fire the price_tool_cta_clicked analytics event.
+4. Analytics Events
+Use the existing analytics tracking utility (whatever you use for other tools).
+Add the following events:
+On form submit in PriceEngine:
+Event name: "price_tool_submitted"
+Properties:
+{
+  toolSlug,             // cms slug for this page
+  mode: config.mode,
+  hasUrl: Boolean(urlInput),
+  hasName: Boolean(nameInput)
+}
+On CTA click (as above):
+Event name: "price_tool_cta_clicked"
+Properties:
+{
+  toolSlug,
+  mode: config.mode,
+  ctaId: cta.id
+}
+On waitlist join (in the modal):
+Event name: "shopping_cloud_waitlist_joined"
+Properties:
+{
+  sourceToolSlug,
+  sourceCTAId
+}
+Follow your existing analytics conventions for naming and property shape.
+5. Engine Configs for the Two Tools
+Create a config file like engines/price-engine/configs.ts or follow the existing pattern for engine configs (similar to how Zip/Outfit configs are stored).
+Add two exported configs:
+import { PriceEngineConfig } from './types';
+
+export const trackPriceConfig: PriceEngineConfig = {
+  engineType: 'price-engine',
+  title: 'Track Price of Any Product',
+  subtitle: 'Paste a link or type the product name to see price info and set up alerts.',
+
+  mode: 'generic',
+  allowUrlInput: true,
+  allowNameInput: true,
+  urlLabel: 'Product URL',
+  urlPlaceholder: 'Paste a product link from any store...',
+  nameLabel: 'Product name',
+  namePlaceholder: 'e.g. “red satin slip dress size M”',
+
+  showFakePriceHistory: true,
+  showCurrentPriceBlock: true,
+  showRetailerBadge: true,
+
+  ctas: [
+    {
+      id: 'track-price-drops',
+      label: 'Track Price Drops Automatically (AI)',
+      description: 'Get notified when this item gets cheaper.',
+      requiresPlan: 'shopping-cloud-pro',
+    },
+    {
+      id: 'find-cheaper-alternatives',
+      label: 'Find 10 Cheaper Alternatives',
+      description: 'See similar items at lower prices from top retailers.',
+      requiresPlan: 'shopping-cloud-pro',
+    },
+    {
+      id: 'add-to-closet',
+      label: 'Save to Virtual Closet',
+      description: 'Save this item and build outfits around it.',
+      requiresPlan: 'shopping-cloud-pro',
+    },
+  ],
+
+  cloudTag: 'shopping',
+};
+
+export const trackPricesOnAmazonConfig: PriceEngineConfig = {
+  engineType: 'price-engine',
+  title: 'Track Prices on Amazon',
+  subtitle: 'Paste an Amazon link or search by product name to monitor price changes.',
+
+  mode: 'amazon',
+  allowUrlInput: true,
+  allowNameInput: true,
+  urlLabel: 'Amazon Product URL',
+  urlPlaceholder: 'https://www.amazon.com/...',
+  nameLabel: 'Amazon product name',
+  namePlaceholder: 'e.g. “Levi’s 511 men’s jeans”',
+
+  showFakePriceHistory: true,
+  showCurrentPriceBlock: true,
+  showRetailerBadge: true,
+
+  ctas: [
+    {
+      id: 'track-price-drops',
+      label: 'Track Amazon Price Drops',
+      description: 'Get alerts when this product gets cheaper.',
+      requiresPlan: 'shopping-cloud-pro',
+    },
+    {
+      id: 'find-cheaper-alternatives',
+      label: 'Find Cheaper Amazon Alternatives',
+      description: 'See similar items at a lower price.',
+      requiresPlan: 'shopping-cloud-pro',
+    },
+    {
+      id: 'generate-outfits',
+      label: 'Generate 5 Outfits Using This Item',
+      description: 'Combine this with other pieces for full looks.',
+      requiresPlan: 'shopping-cloud-pro',
+    },
+  ],
+
+  cloudTag: 'shopping',
+};
+Ensure these configs are hooked into whatever engine-config registry the CMS uses (e.g. a function that resolves engine_config from the DB into concrete TS types).
+6. CMS Objects / DB Seeding for the 2 Tools
+Look at how existing tools like youtube-thumbnail-analyzer or instagram-story-resizer are stored in cms_objects.
+Create a migration or seed script (follow the existing pattern) that upserts two cms_objects rows:
+slug = 'track-price'
+slug = 'track-prices-on-amazon'
+Both of type 'tool'.
+Example payload (adapt to your existing JSON schema):
+-- Pseudo-SQL, adjust to your actual migration style and JSON structure
+INSERT INTO cms_objects (slug, type, cluster_slug, data)
+VALUES
+(
+  'track-price',
+  'tool',
+  'price-tracking-tools',
+  jsonb_build_object(
+    'title', 'Track Price – Free Online Price Tracker',
+    'short_description', 'Track the price of any product online and see basic price info. Upgrade to Shopping Cloud Pro to get automatic alerts, cheaper alternatives, and wardrobe tools.',
+    'engine_type', 'price-engine',
+    'engine_config_key', 'trackPriceConfig',
+    'clouds', jsonb_build_array('shopping'),
+    'tags', jsonb_build_array('price tracking', 'shopping', 'deals'),
+    'seo', jsonb_build_object(
+      'meta_title', 'Track Price of Any Product Online – Free Price Tracker Tool',
+      'meta_description', 'Paste any product link and track its price online. Use this free price tracker and upgrade to get automatic price-drop alerts and cheaper alternatives.',
+      'canonical_url', '/track-price'
+    ),
+    'isIndexed', true
+  )
+)
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO cms_objects (slug, type, cluster_slug, data)
+VALUES
+(
+  'track-prices-on-amazon',
+  'tool',
+  'amazon-price-tracker-tools',
+  jsonb_build_object(
+    'title', 'Track Prices on Amazon – Amazon Price Tracker Tool',
+    'short_description', 'Monitor Amazon product prices and see basic price info. Upgrade to Shopping Cloud Pro to get automatic alerts, cheaper dupes, and AI outfit ideas.',
+    'engine_type', 'price-engine',
+    'engine_config_key', 'trackPricesOnAmazonConfig',
+    'clouds', jsonb_build_array('shopping'),
+    'tags', jsonb_build_array('amazon', 'price tracker', 'shopping'),
+    'seo', jsonb_build_object(
+      'meta_title', 'Track Prices on Amazon – Free Amazon Price Tracker',
+      'meta_description', 'Paste any Amazon link and track prices over time. Use this free Amazon price tracker and upgrade to unlock alerts, dupes, and AI outfit ideas.',
+      'canonical_url', '/track-prices-on-amazon'
+    ),
+    'isIndexed', true
+  )
+)
+ON CONFLICT (slug) DO NOTHING;
+If your cms_objects schema differs, inspect an existing tool row and mirror the structure exactly, just swapping the slug, title, SEO, engine_type, and engine_config reference.
+7. Routing / Pages
+You should already have a generic dynamic page that reads cms_objects.slug and renders via VCM Renderer.
+Confirm that visiting /track-price and /track-prices-on-amazon will:
+Fetch the cms_object
+Detect engine_type: 'price-engine'
+Pass engine_config into the new PriceEngine renderer.
+If any explicit routing or whitelist is used, add those slugs there.
+8. Final Checks
+Run typecheck and tests.
+Hit /track-price and /track-prices-on-amazon locally:
+Form renders correctly.
+Submitting shows result card + fake price info.
+CTA buttons appear and open the Shopping Cloud modal.
+Analytics calls fire using your existing tracking utility (can log to console in dev).
+Ensure both tools are tagged to Shopping Cloud in the CMS so they show up correctly in your Cloud dashboards.
+End of prompt.
+Implement everything above.

@@ -1,0 +1,75 @@
+1. Add Price Engine Types + Registration
+Find where engine types are defined (some file like engines/index.ts or similar where Zip/Outfit/etc are registered).
+Add a new PriceEngineConfig type and engineType.
+Create (or edit) a file like engines/price-engine/types.ts:
+export type PriceEngineMode = 'generic' | 'amazon' | 'shein' | 'aliexpress' | 'zara';
+
+export interface PriceEngineCTA {
+  id: 'track-price-drops' | 'find-cheaper-alternatives' | 'add-to-closet' | 'generate-outfits';
+  label: string;
+  description?: string;
+  requiresPlan: 'shopping-cloud-pro';
+}
+
+export interface PriceEngineConfig {
+  engineType: 'price-engine';
+
+  title: string;
+  subtitle?: string;
+
+  mode: PriceEngineMode;
+  allowUrlInput: boolean;
+  allowNameInput: boolean;
+
+  urlLabel?: string;
+  urlPlaceholder?: string;
+  nameLabel?: string;
+  namePlaceholder?: string;
+
+  showFakePriceHistory: boolean;
+  showCurrentPriceBlock: boolean;
+  showRetailerBadge: boolean;
+
+  ctas: PriceEngineCTA[];
+
+  cloudTag: 'shopping';
+  featureFlagKey?: string;
+}
+Ensure PriceEngineConfig is exported and hooked into whatever global EngineConfig union you already have (where Zip/Outfit configs live).
+Example: if there is a type AnyEngineConfig = ZipEngineConfig | OutfitEngineConfig | ..., add PriceEngineConfig there too.
+2. Implement the Price Engine Renderer
+Create a React component for the engine, similar to how Zip or Outfit engines are rendered.
+Add a file like engines/price-engine/PriceEngine.tsx:
+Requirements:
+Props: something like { config: PriceEngineConfig } plus the usual engine props you use (e.g. maybe slug, cmsObject, onSubmit, etc.). Follow the pattern from other engines.
+UI layout:
+Top section:
+<h1> from config.title
+optional subtitle
+Form with:
+URL input if config.allowUrlInput
+Name input if config.allowNameInput
+Submit button ("Check Price")
+On submit:
+For now, don’t call any external APIs; just:
+Show a “Result” card under the form.
+The card should:
+Show product title (use the user input as the title for now).
+If showRetailerBadge and mode === 'amazon', show a small “Amazon” badge; otherwise, a generic “Online store” badge.
+If showCurrentPriceBlock is true, show a fake current price like $79 – $99 (can be random or static).
+If showFakePriceHistory is true, render a simple fake price history chart or sparkline. You can reuse whatever charting lib is already in the project; if none is easily available, just show a simple horizontal “price history” placeholder block with 3–5 dots or bars and labels like “Last 30 days”.
+CTA block:
+Below the result card, render each config.ctas entry as a button:
+Use the button component already used for other “Upgrade” CTAs (look at e.g. any AI-gated tools or Pro features).
+Each button should:
+Display cta.label
+Display cta.description as small text under or beside the label.
+Show a lock icon if you have one for gated features.
+When a CTA button is clicked:
+Fire an analytics event:
+Use the existing analytics utility in the project (e.g. trackEvent or similar, search for how other tools log events).
+Event name: "price_tool_cta_clicked"
+Properties: { toolSlug, ctaId: cta.id, mode: config.mode }
+Open an Upgrade modal (see section 3).
+Plug PriceEngine renderer into the main engine switch:
+Wherever you currently switch on engineType to render different engines, add a case for 'price-engine' and render PriceEngine.
