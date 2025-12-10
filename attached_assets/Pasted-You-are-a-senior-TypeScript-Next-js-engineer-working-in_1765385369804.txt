@@ -1,0 +1,140 @@
+You are a senior TypeScript/Next.js engineer working inside my existing VCM Suite codebase.
+
+CONSTRAINTS (DO NOT VIOLATE)
+- Next.js App Router + TypeScript
+- Postgres CMS already exists (cms_objects, etc.)
+- Tools are already stored and rendered via the existing CMS system.
+- There is a "Tools" tab and a "Pillars" tab in VCM Admin.
+- I do NOT want any database schema changes or migrations for this task.
+- I do NOT want any new “cluster engine” logic. Clusters are dead. Pillars replace them.
+- The existing field that currently stores a “cluster” identifier on tools must stay, but will now hold a **pillar slug** instead.
+
+GOAL (WHAT I WANT WHEN YOU’RE DONE)
+
+1. In the **VCM Admin → Content → Tools** table:
+   - The "Cluster" column and dropdown should become **"Pillar"**.
+   - The dropdown options must be populated from my **Pillar pages** (the same items shown in the Pillars tab), NOT from any old cluster presets.
+   - Selecting a Pillar stores that Pillar’s slug (or id, if that’s how it’s wired) into the **existing cluster field** for that tool. In code, we are effectively treating `tool.cluster` as `tool.pillarSlug`.
+
+2. On each **Pillar page** (the SEO article/pillar page that the article engine creates):
+   - At the bottom (or in a sensible section), show a "Tools in this Pillar" section.
+   - That section must list all tools whose `cluster` field equals the current pillar’s slug.
+   - Each tool should be rendered as a simple card or link grid that navigates to the tool page.
+
+3. No other behavior should change. Tools continue to render exactly as they do now. Pillars continue to render their content exactly as they do now, just with a new tools section.
+
+---------------------------------------------------
+STEP 1 – FIND HOW PILLARS ARE LOADED IN ADMIN
+---------------------------------------------------
+
+1. Locate the admin code for the **Pillars** tab in VCM Admin → Content.
+   - Find whichever function / hook / helper is used to load the list of pillars for that view.
+   - Example names (guessing): `getPillars`, `getAllPillars`, `usePillars`, etc.
+   - Use THAT same data source as the canonical “pillar list” for this task. Do NOT invent a new table or type.
+
+2. From that helper you must be able to get, at minimum, for each pillar:
+   - `id`
+   - `title`
+   - `slug` (the URL path or slug used to render the pillar page)
+
+If there is no explicit helper, create a small one that wraps the existing query used by the Pillars tab. It must not change schema, only reuse existing data.
+
+---------------------------------------------------
+STEP 2 – REWIRE THE TOOLS TABLE DROPDOWN TO USE PILLARS
+---------------------------------------------------
+
+1. Find the component that renders the **Tools** table in VCM Admin.
+   - It currently shows columns like Tool, Engine, Cluster, Clouds, Links, Indexed, Actions.
+   - There is a dropdown in the “Cluster” column for each tool.
+
+2. Replace the existing “cluster options” source with the **pillar list** from Step 1:
+   - Import the helper from Step 1 (e.g. `getAllPillars()`).
+   - Load pillars once for the Tools admin view.
+
+3. Change the UI:
+   - Column label text: change “Cluster” → **“Pillar”**.
+   - Dropdown label/placeholder in the select: `— Pillar —` or `— None —`.
+
+4. Change the dropdown options:
+   - Remove any references to old cluster presets / enums / registries.
+   - Use the pillar list instead:
+
+   ```tsx
+   // PSEUDO-CODE – adapt to actual code
+   <select value={tool.cluster ?? ""} onChange={...}>
+     <option value="">— None —</option>
+     {pillars.map((pillar) => (
+       <option key={pillar.id} value={pillar.slug}>
+         {pillar.title}
+       </option>
+     ))}
+   </select>
+The important point: the value you store in tool.cluster is now pillar.slug. We are not adding a new field; we are repurposing the existing one.
+Ensure the save/update logic for a tool:
+Still writes to the same field (whatever it’s called in the DB / type, currently representing “cluster”).
+No migration; you are just changing what values go in there.
+STEP 3 – “TOOLS IN THIS PILLAR” SECTION ON PILLAR PAGES
+Locate the route and component that renders a single Pillar page.
+This is the page shown for each pillar/article when you click it from the newsletter/blog/pillars section.
+It likely lives under something like app/articles/[slug]/page.tsx or similar. Use whatever route actually backs the Pillars tab.
+After you resolve the current pillar from params:
+Get its slug (the one used for URLs).
+Query the CMS for tools that belong to this pillar by matching the cluster field to the pillar slug:
+// PSEUDO – adapt to your ORM / helper
+const toolsInPillar = await db.cms_objects.findMany({
+  where: {
+    type: "tool",
+    cluster: pillar.slug, // cluster now represents pillarSlug
+  },
+  select: {
+    slug: true,
+    title: true,
+    // pull any other fields you want for display
+  },
+});
+Render a section ONLY if there are tools:
+{toolsInPillar.length > 0 && (
+  <section className="mt-12 border-t pt-8">
+    <h2 className="text-xl font-semibold mb-4">
+      Tools in this pillar
+    </h2>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {toolsInPillar.map((tool) => (
+        <Link key={tool.slug} href={tool.slug}>
+          <div className="rounded-xl border p-4 hover:shadow-sm">
+            <div className="font-medium">{tool.title}</div>
+            {/* Optionally show a short description if available */}
+          </div>
+        </Link>
+      ))}
+    </div>
+  </section>
+)}
+Use the existing design system (cards, typography, spacing) so it fits the rest of the page.
+Do NOT introduce Tailwind classes that conflict with the current layout; keep it consistent.
+Do not touch how the rest of the pillar content is rendered. You’re only appending a tools section at the bottom (or near-bottom).
+STEP 4 – CLEAN-UP / LABELS
+In any UI where the word “Cluster” is currently shown in the Tools context, change the label to “Pillar”.
+This includes:
+Table headers in the Tools admin screen
+Filters/dropdowns that list “All Clusters” → should become “All Pillars” and use the pillar list.
+Do NOT rename the DB column or types. Only rename user-facing labels and swap the data source under the dropdowns/filters.
+STEP 5 – VERIFY
+In VCM Admin → Content → Pillars:
+Create 2–3 pillar pages if none exist yet (via the article engine, as usual).
+In VCM Admin → Content → Tools:
+Confirm the column is now labeled “Pillar”.
+Open the dropdown for a tool; you should see your Pillar titles, not old cluster names.
+Assign different pillars to a few tools and save.
+Reload the page and confirm the selected pillar persists per tool (stored in the cluster field internally).
+Visit a Pillar page in the frontend:
+Confirm that the “Tools in this Pillar” section appears.
+Confirm that it lists the tools you just assigned to that pillar.
+Click those tool links and confirm they navigate correctly.
+Visit a Pillar with no tools assigned:
+Confirm that no empty tools section is rendered.
+Do not change anything else. The only changes in this task are:
+Cluster dropdown → driven by Pillars and relabeled as Pillar.
+Cluster field on tools now treated as pillarSlug.
+Pillar pages render a “Tools in this Pillar” section based on that mapping.
+Implement all of the above, then show the final code changes file-by-file.
