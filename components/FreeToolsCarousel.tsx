@@ -33,6 +33,29 @@ const defaultTools = [
   { slug: "youtube-title-split-test", title: "YouTube Title Split-Test", engine: "youtube-tool" },
 ];
 
+const toolIcons: Record<string, { icon: React.ComponentType<{ className?: string }>; bg: string }> = {
+  "zip-file-creator": { icon: FileArchive, bg: "bg-sky-500" },
+  "prediction-center": { icon: TrendingUp, bg: "bg-purple-500" },
+  "calorie-deficit-calculator": { icon: Flame, bg: "bg-green-500" },
+  "ai-thumbnail-coach": { icon: Sparkles, bg: "bg-indigo-500" },
+  "gif-compressor": { icon: FileArchive, bg: "bg-sky-500" },
+  "gif-maker": { icon: FileArchive, bg: "bg-sky-500" },
+  "heic-to-jpg": { icon: FileArchive, bg: "bg-sky-500" },
+  "image-compressor": { icon: Images, bg: "bg-teal-500" },
+  "online-notepad": { icon: StickyNote, bg: "bg-amber-500" },
+  "word-counter": { icon: Type, bg: "bg-gray-500" },
+  "logo-generator": { icon: Palette, bg: "bg-pink-500" },
+  "keyword-finder": { icon: Search, bg: "bg-emerald-500" },
+  "reach-grabber-tool": { icon: Target, bg: "bg-orange-500" },
+  "ai-humanizer-free": { icon: Sparkles, bg: "bg-indigo-500" },
+  "producer-tag-generator": { icon: Music, bg: "bg-green-500" },
+  "ad-copy-analyzer": { icon: Sparkles, bg: "bg-indigo-500" },
+  "summarizer": { icon: FileText, bg: "bg-blue-500" },
+  "emoji-combos": { icon: Smile, bg: "bg-yellow-500" },
+  "horoscope-of-the-day": { icon: Star, bg: "bg-violet-500" },
+  "youtube-title-split-test": { icon: Youtube, bg: "bg-red-500" },
+};
+
 const engineIcons: Record<string, { icon: React.ComponentType<{ className?: string }>; bg: string }> = {
   "platform-resizer": { icon: FileImage, bg: "bg-purple-500" },
   "ai-analysis": { icon: Sparkles, bg: "bg-indigo-500" },
@@ -50,8 +73,8 @@ const engineIcons: Record<string, { icon: React.ComponentType<{ className?: stri
   "default": { icon: Wrench, bg: "bg-orange-500" },
 };
 
-function getIconForEngine(engine: string) {
-  return engineIcons[engine] || engineIcons["default"];
+function getIconForTool(slug: string, engine: string) {
+  return toolIcons[slug] || engineIcons[engine] || engineIcons["default"];
 }
 
 const ITEMS_PER_PAGE = 24;
@@ -150,7 +173,7 @@ export default function FreeToolsCarousel() {
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 transition-opacity duration-300"
         >
           {currentTools.map((tool) => {
-            const { icon: Icon, bg } = getIconForEngine(tool.engine);
+            const { icon: Icon, bg } = getIconForTool(tool.slug, tool.engine);
             return (
               <Link 
                 key={tool.slug} 
