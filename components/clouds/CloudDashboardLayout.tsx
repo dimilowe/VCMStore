@@ -7,6 +7,8 @@ interface CloudDashboardLayoutProps {
   primaryCards?: ReactNode;
   tabs?: ReactNode;
   featured: ReactNode;
+  appRow?: ReactNode;
+  shortcuts?: ReactNode;
   sidebar?: ReactNode;
 }
 
@@ -15,6 +17,8 @@ export default function CloudDashboardLayout({
   primaryCards,
   tabs,
   featured,
+  appRow,
+  shortcuts,
   sidebar,
 }: CloudDashboardLayoutProps) {
   return (
@@ -24,8 +28,10 @@ export default function CloudDashboardLayout({
           <section className="flex-1 min-w-0 flex flex-col gap-8">
             {hero}
             {primaryCards}
+            {appRow}
             {tabs}
             {featured}
+            {shortcuts}
           </section>
           {sidebar && (
             <aside className="w-72 flex-shrink-0 hidden lg:block">

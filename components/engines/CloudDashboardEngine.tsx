@@ -9,6 +9,8 @@ import CloudPrimaryCards, { PrimaryCardData } from "@/components/clouds/CloudPri
 import CloudCategoryTabs, { CategoryTab } from "@/components/clouds/CloudCategoryTabs";
 import CloudFeaturedTools, { FeaturedTool } from "@/components/clouds/CloudFeaturedTools";
 import CloudRecentFilesRail from "@/components/clouds/CloudRecentFilesRail";
+import CloudAppRow from "@/components/clouds/CloudAppRow";
+import CloudShortcuts from "@/components/clouds/CloudShortcuts";
 
 type CloudDashboardProps = {
   cms: CMSObject & { engine_config: CloudDashboardEngineConfig };
@@ -112,7 +114,7 @@ const CLOUD_TABS: Record<string, CategoryTab[]> = {
 };
 
 export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
-  const { hero, featuredProducts, showRecentFiles } = cms.engine_config;
+  const { hero, featuredProducts, appRow, shortcuts, showRecentFiles } = cms.engine_config;
 
   const cloudSlug = cms.slug;
   const gradient = CLOUD_GRADIENTS[cloudSlug] || "from-purple-500 to-purple-600";
@@ -198,6 +200,16 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
         ) : (
           <CloudFeaturedTools tools={featuredToolsList} title="" />
         )
+      }
+      appRow={
+        appRow && appRow.length > 0 ? (
+          <CloudAppRow apps={appRow} />
+        ) : null
+      }
+      shortcuts={
+        shortcuts && shortcuts.length > 0 ? (
+          <CloudShortcuts shortcuts={shortcuts} />
+        ) : null
       }
       sidebar={
         showRecentFiles ? (
