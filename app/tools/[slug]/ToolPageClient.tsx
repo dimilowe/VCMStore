@@ -5,7 +5,7 @@ import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { getEngineLoader, EngineComponentProps } from '@/lib/engineRegistry';
 import ToolComingSoon from '@/components/engines/ToolComingSoon';
 import { CloudUpsellBlock } from '@/components/clouds/CloudUpsellBlock';
-import { hasAccess, cloudSlugToId } from '@/lib/cloudEntitlements';
+import { hasAccess, cloudSlugToId } from '@/lib/cloudEntitlements.client';
 import type { CloudEntitlement } from '@/lib/types/cloudEntitlements';
 
 interface ToolPageClientProps {

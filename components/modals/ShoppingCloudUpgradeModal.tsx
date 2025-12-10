@@ -46,6 +46,20 @@ export default function ShoppingCloudUpgradeModal({
         throw new Error(data.error || 'Failed to join waitlist');
       }
 
+      try {
+        await fetch('/api/analytics/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'shopping_cloud_waitlist_joined',
+            properties: {
+              sourceToolSlug,
+              sourceCTAId,
+            },
+          }),
+        });
+      } catch {}
+
       setHasJoined(true);
     } catch (err: any) {
       setError(err.message);
