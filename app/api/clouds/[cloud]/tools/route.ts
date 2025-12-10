@@ -7,7 +7,7 @@ export async function GET(
 ) {
   const { cloud } = await params;
   
-  const cloudSlug = cloud.replace(/-cloud$/, "");
+  const cloudSlug = cloud.replace(/-cloud$/, "").replace(/-/g, "_");
   
   try {
     const result = await query(
