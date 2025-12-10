@@ -116,7 +116,12 @@ const CLOUD_TABS: Record<string, CategoryTab[]> = {
 export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
   const { hero, featuredProducts, appRow, shortcuts, showRecentFiles } = cms.engine_config;
 
-  const cloudSlug = cms.slug;
+  // Normalize slug: convert underscores to hyphens and ensure -cloud suffix for map lookups
+  const rawSlug = cms.slug;
+  const cloudSlug = rawSlug.includes("_") 
+    ? rawSlug.replace(/_/g, "-") + "-cloud"
+    : rawSlug.endsWith("-cloud") ? rawSlug : rawSlug + "-cloud";
+  
   const gradient = CLOUD_GRADIENTS[cloudSlug] || "from-purple-500 to-purple-600";
   const IconComponent = CLOUD_ICONS[cloudSlug] || Sparkles;
   const tabs = CLOUD_TABS[cloudSlug] || [{ id: "featured", label: "Featured" }];
@@ -201,9 +206,9 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
               />
             ))}
           </div>
-        ) : (
+        ) : featuredToolsList.length > 0 ? (
           <CloudFeaturedTools tools={featuredToolsList} title="" />
-        )
+        ) : null
       }
       appRow={
         appRow && appRow.length > 0 ? (
