@@ -18,3 +18,17 @@ export async function getAllCmsTools(): Promise<CmsToolSummary[]> {
     title: row.title || row.slug,
   }));
 }
+
+export async function getFeaturedTools(): Promise<CmsToolSummary[]> {
+  const result = await query(
+    `SELECT slug, data->>'title' as title
+     FROM cms_objects
+     WHERE type = 'tool' AND featured = true
+     ORDER BY created_at ASC`
+  );
+
+  return result.rows.map((row) => ({
+    slug: row.slug,
+    title: row.title || row.slug,
+  }));
+}

@@ -1,62 +1,91 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, MessageCircleQuestion, Rocket, Flame, ShoppingBag, FilePen, LayoutGrid, Youtube, FileImage, Type, Palette, Search, Target, Sparkles, Music, Megaphone, Link2, FileText, GitBranch, Smile, Star, Heart, StickyNote, X, TrendingUp, Users, Images, RotateCcw, Instagram, Twitter, Linkedin, Video, FileArchive } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, X, Wrench, FileImage, FileText, MessageCircleQuestion, Sparkles, Target, Palette, Type, Music, Youtube, LayoutGrid, Flame, FileArchive, TrendingUp, Rocket, ShoppingBag, Heart, FilePen, RotateCcw, Smile, Star, Users, Images, Instagram, Twitter, Linkedin, Video, Zap, StickyNote, Link as LinkIcon } from "lucide-react";
 
-const freeTools = [
-  { name: "ZIP File Creator", icon: FileArchive, href: "/tools/zip-file-creator", iconBg: "bg-orange-500" },
-  { name: "Prediction Center", icon: TrendingUp, href: "/tools/prediction-center", iconBg: "bg-purple-500" },
-  { name: "VCM Answers", icon: MessageCircleQuestion, href: "/answers", iconBg: "bg-blue-400" },
-  { name: "Ideas Hub", icon: Rocket, href: "/ideas", iconBg: "bg-amber-400" },
-  { name: "Calorie Deficit Calculator", icon: Flame, href: "/tools/calorie-deficit-calculator", iconBg: "bg-green-500" },
-  { name: "Outfit Ideas", icon: ShoppingBag, href: "/tools/outfit-ideas", iconBg: "bg-pink-500" },
-  { name: "Self-Love Affirmations", icon: Heart, href: "/tools/affirmation-about-self-love", iconBg: "bg-pink-400" },
-  { name: "PDF Editor", icon: FilePen, href: "/tools/pdf-editor", iconBg: "bg-red-500" },
-  { name: "Resource Box", icon: LayoutGrid, href: "/tools/resource-box", iconBg: "bg-teal-500" },
-  { name: "Thumbnail Coach", icon: Youtube, href: "/tools/ai-thumbnail-coach", iconBg: "bg-red-500" },
-  { name: "GIF Compressor", icon: FileImage, href: "/tools/gif-compressor", iconBg: "bg-violet-500" },
-  { name: "GIF Maker", icon: FileImage, href: "/tools/gif-maker", iconBg: "bg-fuchsia-500" },
-  { name: "HEIC to JPG", icon: FileImage, href: "/tools/heic-to-jpg", iconBg: "bg-rose-500" },
-  { name: "Image Compressor", icon: FileImage, href: "/tools/image-compressor", iconBg: "bg-sky-500" },
-  { name: "Online Notepad", icon: StickyNote, href: "/tools/online-notepad", iconBg: "bg-amber-500" },
-  { name: "Word Counter", icon: Type, href: "/tools/word-counter", iconBg: "bg-gray-500" },
-  { name: "Logo Generator", icon: Palette, href: "/tools/logo-generator", iconBg: "bg-pink-500" },
-  { name: "Keyword Finder", icon: Search, href: "/tools/keyword-finder", iconBg: "bg-blue-500" },
-  { name: "Reach Grabber", icon: Target, href: "/tools/reach-grabber-tool", iconBg: "bg-orange-500" },
-  { name: "AI Humanizer", icon: Sparkles, href: "/tools/ai-humanizer-free", iconBg: "bg-indigo-500" },
-  { name: "Producer Tag", icon: Music, href: "/tools/producer-tag-generator", iconBg: "bg-green-500" },
-  { name: "Ad Copy Analyzer", icon: Megaphone, href: "/tools/ad-copy-analyzer", iconBg: "bg-cyan-500" },
-  { name: "Internal Link Audit", icon: Link2, href: "/tools/internal-link-seo-audit", iconBg: "bg-emerald-500" },
-  { name: "AI Summarizer", icon: FileText, href: "/tools/summarizer", iconBg: "bg-yellow-500" },
-  { name: "Visualization", icon: GitBranch, href: "/tools/visualization", iconBg: "bg-amber-500" },
-  { name: "Emoji Combos", icon: Smile, href: "/tools/emoji-combos", iconBg: "bg-yellow-400" },
-  { name: "Daily Horoscope", icon: Star, href: "/tools/horoscope-of-the-day", iconBg: "bg-purple-400" },
-  { name: "Name Combiner", icon: Users, href: "/tools/name-combiner", iconBg: "bg-cyan-500" },
-  { name: "Photo Gallery Maker", icon: Images, href: "/tools/photo-gallery-maker", iconBg: "bg-indigo-500" },
-  { name: "YouTube Title Split-Test", icon: RotateCcw, href: "/tools/youtube-title-split-test", iconBg: "bg-red-500" },
-  { name: "Image Size Guide", icon: Images, href: "/tools/social-media-image-sizes", iconBg: "bg-orange-500" },
-  { name: "YouTube Thumbnail Resizer", icon: Youtube, href: "/tools/youtube-thumbnail-resizer", iconBg: "bg-red-500" },
-  { name: "Instagram Post Resizer", icon: Instagram, href: "/tools/instagram-post-resizer", iconBg: "bg-pink-500" },
-  { name: "Instagram Story Resizer", icon: Instagram, href: "/tools/instagram-story-resizer", iconBg: "bg-purple-500" },
-  { name: "TikTok Cover Resizer", icon: Video, href: "/tools/tiktok-video-resizer", iconBg: "bg-gray-900" },
-  { name: "Twitter Header Resizer", icon: Twitter, href: "/tools/twitter-header-resizer", iconBg: "bg-sky-400" },
-  { name: "LinkedIn Banner Resizer", icon: Linkedin, href: "/tools/linkedin-banner-resizer", iconBg: "bg-blue-600" },
+interface FeaturedTool {
+  slug: string;
+  title: string;
+  engine: string;
+}
+
+const defaultTools = [
+  { slug: "zip-file-creator", title: "ZIP File Creator", engine: "file-utility" },
+  { slug: "prediction-center", title: "Prediction Center", engine: "community" },
+  { slug: "calorie-deficit-calculator", title: "Calorie Deficit Calculator", engine: "calorie-calculator" },
+  { slug: "ai-thumbnail-coach", title: "Thumbnail Coach", engine: "ai-analysis" },
+  { slug: "gif-compressor", title: "GIF Compressor", engine: "file-utility" },
+  { slug: "gif-maker", title: "GIF Maker", engine: "file-utility" },
+  { slug: "heic-to-jpg", title: "HEIC to JPG", engine: "file-utility" },
+  { slug: "image-compressor", title: "Image Compressor", engine: "file-utility" },
+  { slug: "online-notepad", title: "Online Notepad", engine: "file-utility" },
+  { slug: "word-counter", title: "Word Counter", engine: "word-counter" },
+  { slug: "logo-generator", title: "Logo Generator", engine: "logo-generator" },
+  { slug: "keyword-finder", title: "Keyword Finder", engine: "ai-analysis" },
+  { slug: "reach-grabber-tool", title: "Reach Grabber", engine: "reach-grabber" },
+  { slug: "ai-humanizer-free", title: "AI Humanizer", engine: "ai-analysis" },
+  { slug: "producer-tag-generator", title: "Producer Tag", engine: "producer-tag" },
+  { slug: "ad-copy-analyzer", title: "Ad Copy Analyzer", engine: "ai-analysis" },
+  { slug: "summarizer", title: "AI Summarizer", engine: "ai-analysis" },
+  { slug: "emoji-combos", title: "Emoji Combos", engine: "community" },
+  { slug: "horoscope-of-the-day", title: "Daily Horoscope", engine: "ai-generate" },
+  { slug: "youtube-title-split-test", title: "YouTube Title Split-Test", engine: "youtube-tool" },
 ];
+
+const engineIcons: Record<string, { icon: React.ComponentType<{ className?: string }>; bg: string }> = {
+  "platform-resizer": { icon: FileImage, bg: "bg-purple-500" },
+  "ai-analysis": { icon: Sparkles, bg: "bg-indigo-500" },
+  "ai-generate": { icon: Star, bg: "bg-violet-500" },
+  "file-utility": { icon: FileArchive, bg: "bg-sky-500" },
+  "calorie-calculator": { icon: Flame, bg: "bg-green-500" },
+  "outfit-engine": { icon: ShoppingBag, bg: "bg-pink-500" },
+  "community": { icon: TrendingUp, bg: "bg-purple-500" },
+  "word-counter": { icon: Type, bg: "bg-gray-500" },
+  "logo-generator": { icon: Palette, bg: "bg-pink-500" },
+  "producer-tag": { icon: Music, bg: "bg-green-500" },
+  "youtube-tool": { icon: Youtube, bg: "bg-red-500" },
+  "resource-box": { icon: LayoutGrid, bg: "bg-teal-500" },
+  "reach-grabber": { icon: Target, bg: "bg-orange-500" },
+  "default": { icon: Wrench, bg: "bg-orange-500" },
+};
+
+function getIconForEngine(engine: string) {
+  return engineIcons[engine] || engineIcons["default"];
+}
 
 const ITEMS_PER_PAGE = 24;
 
 export default function FreeToolsCarousel() {
+  const [tools, setTools] = useState<FeaturedTool[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   
+  useEffect(() => {
+    async function loadTools() {
+      try {
+        const res = await fetch("/api/featured-tools");
+        const data = await res.json();
+        const featuredTools = data.tools || [];
+        setTools(featuredTools.length > 0 ? featuredTools : defaultTools);
+      } catch (error) {
+        console.error("Failed to load featured tools:", error);
+        setTools(defaultTools);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadTools();
+  }, []);
+
   const filteredTools = useMemo(() => {
-    if (!searchQuery.trim()) return freeTools;
+    if (!searchQuery.trim()) return tools;
     const query = searchQuery.toLowerCase();
-    return freeTools.filter(tool => 
-      tool.name.toLowerCase().includes(query)
+    return tools.filter(tool => 
+      tool.title.toLowerCase().includes(query)
     );
-  }, [searchQuery]);
+  }, [searchQuery, tools]);
   
   const totalPages = Math.ceil(filteredTools.length / ITEMS_PER_PAGE);
   const startIndex = currentPage * ITEMS_PER_PAGE;
@@ -74,6 +103,16 @@ export default function FreeToolsCarousel() {
     setSearchQuery("");
     setCurrentPage(0);
   };
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full mx-auto" />
+        <p className="text-gray-500 mt-4">Loading tools...</p>
+      </div>
+    );
+  }
+
   
   return (
     <div className="relative">
@@ -110,18 +149,21 @@ export default function FreeToolsCarousel() {
         <div 
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 transition-opacity duration-300"
         >
-          {currentTools.map((tool) => (
-            <Link 
-              key={tool.name} 
-              href={tool.href}
-              className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all text-center group"
-            >
-              <div className={`w-14 h-14 md:w-16 md:h-16 ${tool.iconBg} rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110`}>
-                <tool.icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
-              </div>
-              <span className="text-sm md:text-base font-medium text-gray-800 line-clamp-2">{tool.name}</span>
-            </Link>
-          ))}
+          {currentTools.map((tool) => {
+            const { icon: Icon, bg } = getIconForEngine(tool.engine);
+            return (
+              <Link 
+                key={tool.slug} 
+                href={`/tools/${tool.slug}`}
+                className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200 hover:border-orange-400 hover:shadow-lg transition-all text-center group"
+              >
+                <div className={`w-14 h-14 md:w-16 md:h-16 ${bg} rounded-xl flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110`}>
+                  <Icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
+                </div>
+                <span className="text-sm md:text-base font-medium text-gray-800 line-clamp-2">{tool.title}</span>
+              </Link>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-12">

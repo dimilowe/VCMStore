@@ -33,7 +33,7 @@ export async function GET() {
     
     // Also fetch tools from cms_objects
     const cmsResult = await query(
-      `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data FROM cms_objects WHERE type = 'tool'`
+      `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, featured FROM cms_objects WHERE type = 'tool'`
     );
     const cmsToolSlugs = new Set(cmsResult.rows.map((r: { slug: string }) => r.slug));
     
@@ -93,7 +93,7 @@ export async function GET() {
       });
     
     // Map CMS tools
-    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; cloud_tags: string[]; data: CmsToolData }) => {
+    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; cloud_tags: string[]; data: CmsToolData; featured: boolean }) => {
       const data = row.data;
       const toolUrl = `/tools/${row.slug}`;
       const isIndexed = indexStatusMap.get(toolUrl) ?? data.isIndexed ?? false;
@@ -106,7 +106,7 @@ export async function GET() {
         clusterSlug: row.cluster_slug || data.interlink_parent || "",
         cloudTags: row.cloud_tags || [],
         isIndexed,
-        isFeatured: false,
+        isFeatured: row.featured || false,
         inDirectory: true,
         priority: "50",
         h1: data.title || row.slug,
@@ -182,9 +182,15 @@ export async function PATCH(request: Request) {
     if (status !== undefined) updates.status = status;
 
     if (Object.keys(updates).length > 0) {
+      // Try to update in legacy tools first
       const updated = await updateTool(slug, updates);
-      if (!updated) {
-        return NextResponse.json({ error: "Tool not found" }, { status: 404 });
+      
+      // Also update cms_objects if featured is being changed
+      if (isFeatured !== undefined) {
+        await query(
+          `UPDATE cms_objects SET featured = $1 WHERE slug = $2 AND type = 'tool'`,
+          [isFeatured, slug]
+        );
       }
     }
 

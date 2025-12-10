@@ -25,6 +25,7 @@ import {
   Upload,
   Cloud,
   X,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { CLOUDS, type CloudSlug } from "@/lib/clouds";
@@ -176,6 +177,24 @@ function ContentManagerInner() {
       }
     } catch (error) {
       console.error("Failed to update tool:", error);
+    }
+  };
+
+  const toggleToolFeatured = async (slug: string, currentValue: boolean) => {
+    try {
+      const res = await fetch("/api/admin/tools", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, isFeatured: !currentValue }),
+        credentials: "include",
+      });
+      if (res.ok) {
+        setTools((prev) =>
+          prev.map((t) => (t.slug === slug ? { ...t, isFeatured: !currentValue } : t))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update tool featured status:", error);
     }
   };
 
@@ -564,6 +583,7 @@ function ContentManagerInner() {
                       <th className="text-left px-4 py-3 font-medium">Pillar</th>
                       <th className="text-center px-4 py-3 font-medium">Clouds</th>
                       <th className="text-center px-4 py-3 font-medium">Links</th>
+                      <th className="text-center px-4 py-3 font-medium">Featured</th>
                       <th className="text-center px-4 py-3 font-medium">Indexed</th>
                       <th className="text-center px-4 py-3 font-medium">Actions</th>
                     </tr>
@@ -616,6 +636,19 @@ function ContentManagerInner() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           {getLinkStatusIcon(tool.linkStatus.status)}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => toggleToolFeatured(tool.slug, tool.isFeatured)}
+                            className="inline-flex"
+                            title={tool.isFeatured ? "Remove from Featured" : "Add to Featured"}
+                          >
+                            {tool.isFeatured ? (
+                              <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                            ) : (
+                              <Star className="w-5 h-5 text-gray-300" />
+                            )}
+                          </button>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <button
