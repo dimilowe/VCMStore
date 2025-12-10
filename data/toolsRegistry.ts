@@ -39,7 +39,8 @@ export type EngineType =
   | "community"
   | "static"
   | "standalone"
-  | "outfit";
+  | "outfit"
+  | "price-engine";
 
 export type InputType = "image" | "text" | "url" | "file" | "number" | "selection" | "none" | "multi";
 export type OutputType = "image" | "text" | "file" | "download" | "analysis" | "display" | "interactive";

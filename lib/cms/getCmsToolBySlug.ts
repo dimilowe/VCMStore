@@ -78,6 +78,7 @@ export const ENGINE_TO_CATEGORY: Record<string, { label: string; key: string }> 
   'static': { label: 'Utilities', key: 'utilities' },
   'standalone': { label: 'Creator Tools', key: 'creator' },
   'outfit': { label: 'AI Tools', key: 'ai' },
+  'price-engine': { label: 'Shopping Tools', key: 'shopping' },
 };
 
 export async function getCmsToolBySlug(

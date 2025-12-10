@@ -14,6 +14,7 @@ export const ENGINE_COMPONENTS: Record<string, () => Promise<{ default: Componen
   'platform-resizer': () => import('@/components/engines/PlatformResizerEngine'),
   'zip': () => import('@/components/engines/ZipEngine'),
   'outfit': () => import('@/components/engines/OutfitEngine'),
+  'price-engine': () => import('@/components/engines/PriceEngine'),
 };
 
 export function getEngineLoader(engine: string | null): (() => Promise<{ default: ComponentType<EngineComponentProps> }>) | null {

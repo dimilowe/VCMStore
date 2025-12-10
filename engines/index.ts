@@ -142,6 +142,16 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     presetsFile: "engines/outfit/config.ts",
     apiRoutes: ["/api/tools/outfit-analyzer"],
     capabilities: ["analyze", "recommend", "shop"]
+  },
+  "price-engine": {
+    id: "price-engine",
+    name: "Price Tracker Engine",
+    description: "Track and monitor product prices across retailers",
+    inputTypes: ["url", "text"],
+    outputTypes: ["analysis", "display"],
+    sharedComponent: "components/engines/PriceEngine.tsx",
+    presetsFile: "engines/price-engine/config.ts",
+    capabilities: ["track", "monitor", "compare", "alert"]
   }
 };
 
