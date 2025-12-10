@@ -198,7 +198,7 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
       }
       featured={
         loadingTools ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
