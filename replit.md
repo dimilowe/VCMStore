@@ -1085,3 +1085,7 @@ None specified yet.
 - Create admin panel for product management
 - Add product search and filtering
 - Implement SEO optimization with metadata
+
+---
+
+**For system design, architectural rules, and single-source-of-truth definitions, see ARCHITECTURE.md.**
