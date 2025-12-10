@@ -8,6 +8,138 @@ VCM Suite is a creator-focused online campus built with Next.js 14, TypeScript, 
 - Convert visitors to VCM OS ecosystem at **vcmos.io**
 - Homepage features prominent "Open VCM OS" CTA button linking to vcmos.io
 
+---
+
+## VCM Code Modification Protocol
+
+This section defines exactly what an AI agent or contributor is allowed to modify inside the VCM Suite codebase. These rules exist to protect architecture, prevent regressions, and enforce consistency across engines, clouds, tools, and CMS-driven pages.
+
+### FORBIDDEN ZONES (DO NOT MODIFY)
+
+The following files and directories are structurally critical and must never be modified unless the Founder explicitly approves the change.
+
+#### 1. Global Styling & Design System
+- `app/globals.css`
+- Any global `@layer base` or `@layer utilities` definitions
+- Global CSS tokens, color maps, theme variables
+
+**Reason**: These define the entire design system. Any change cascades across thousands of pages.
+
+#### 2. Core Database & Server Infrastructure
+- `lib/db.ts`
+- Prisma schema files (unless explicit approval is given)
+- Any shared DB connection logic
+
+**Reason**: These are sensitive, shared across clouds & tools. Breaking them breaks everything.
+
+#### 3. Core Engine Registry
+- `lib/engineRegistry.ts`
+- `data/toolsRegistry.ts`
+
+**Allowed**: Append-only new engine registrations or new tool entries.
+**Forbidden**: Refactoring, removing entries, renaming engine keys, or altering existing registry structure.
+
+**Reason**: This registry is the backbone of the Engine → Config → Renderer system.
+
+#### 4. Layouts & Top-Level Routing
+- `app/layout.tsx`
+- Cloud layouts (`app/(clouds)/**/layout.tsx`)
+- Marketing layouts
+
+**Reason**: Breaking a layout collapses the entire rendering stack.
+
+#### 5. Authentication, Entitlements & OS Interfaces
+- `lib/cloudEntitlements.ts`
+- `app/api/user/entitlements/**`
+- Any internal OS mirror interfaces
+
+**Allowed**: Adding new endpoints.
+**Forbidden**: Modifying entitlement logic or existing OS calls.
+
+### THEME CONSTRAINT (GLOBAL RULE)
+
+**LIGHT-THEME ONLY — DO NOT USE DARK MODE**
+
+The codebase is currently light-theme only.
+
+**Forbidden**:
+- Do not use Tailwind `dark:` variants anywhere in: Engines, Tools, Layouts, Marketing wrappers, Shared components
+
+**Reason**: No dark palette has been designed yet. Any `dark:` class silently overrides text colors and causes washed-out UI.
+
+Only add `dark:` classes if the Founder explicitly requests dark-mode implementation.
+
+### ALLOWED ZONES (SAFE TO MODIFY)
+
+You may freely edit these areas as long as you follow the existing architecture patterns.
+
+#### 1. Engine Configurations
+- `engines/**/config.ts`
+- Add new presets, modify labels, adjust CTA content.
+
+**Rule**: Do not change the shape of an existing config schema.
+
+#### 2. Engine Components
+- `components/engines/**/*.tsx`
+
+**Allowed**:
+- Update UI inside the engine
+- Add UI elements
+- Add controlled client-side logic
+- Add feature-gated UI based on entitlements
+
+**Forbidden**:
+- Importing server code (must use `.client.ts` variants)
+- Adding inline CSS except for debugging or temporary patches
+
+#### 3. CMS Tool Definitions
+- Create new CMS tool entries
+- Update SEO metadata
+- Update config references
+- Add cloud tags
+
+**Rule**: Do not change existing slugs.
+
+#### 4. API Routes (New Ones Only)
+- You may create new API endpoints under `app/api/**` following existing patterns.
+
+**Forbidden**: Modifying existing API endpoints unless explicitly instructed.
+
+#### 5. Client-Side Utilities
+- `lib/cloudEntitlements.client.ts`
+- `lib/parseQuery.ts`
+- Other client-only helpers
+
+**Rule**: These must remain client-safe. No DB imports.
+
+### DEBUGGING STANDARD (REQUIRED)
+
+When diagnosing UI issues, the contributor must:
+1. Inspect the element in DevTools
+2. Open Computed panel
+3. Check: `color`, `opacity`, `filter`, `-webkit-text-fill-color`
+4. Paste the Computed output + screenshot into the chat before proposing a fix
+
+**Reason**: Prevents blind CSS edits and ensures exact diagnosis.
+
+### SAFETY RULES FOR AGENTS
+
+**Agents MUST**:
+- Follow the Engine → Config → Renderer architecture
+- Use Tailwind classes (no inline styles unless explicitly asked)
+- Keep logic decoupled (client/server separation)
+- Ask before modifying anything in Forbidden Zones
+
+**Agents MUST NOT**:
+- Introduce dark mode classes
+- Add new global CSS
+- Change layouts
+- Edit registries except append-only
+- Modify entitlements or DB layers
+- Introduce inline styling as permanent fixes
+
+---
+
 ## Architecture
 
 ### Tech Stack
