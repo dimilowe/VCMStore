@@ -74,7 +74,7 @@ export default function ToolPageClient({ tool, hasEngine }: ToolPageClientProps)
   }
 
   return (
-    <div className="!text-zinc-900 dark:!text-zinc-100">
+    <div className="tool-page-content">
       <EngineComponent 
         tool={tool} 
         canUsePro={canUsePro || false}

@@ -66,6 +66,25 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Reset for tool page content to prevent gradient color inheritance */
+  .tool-page-content {
+    color: hsl(var(--foreground));
+    -webkit-text-fill-color: initial;
+    background: none;
+    background-clip: unset;
+  }
+
+  .tool-page-content h1,
+  .tool-page-content h2,
+  .tool-page-content h3,
+  .tool-page-content h4,
+  .tool-page-content label,
+  .tool-page-content p {
+    -webkit-text-fill-color: initial;
+    background: none;
+    background-clip: unset;
+  }
   
   .gradient-border {
     position: relative;
