@@ -12,6 +12,8 @@ import {
   LogOut,
   Package,
   FileText,
+  Menu,
+  X,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -38,6 +40,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [password, setPassword] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -126,10 +129,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4 md:gap-8">
+              <button
+                className="md:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
               <Link href="/admin" className="flex items-center gap-2 font-bold text-lg">
                 <Package className="w-5 h-5 text-orange-500" />
-                <span>VCM Admin</span>
+                <span className="hidden sm:inline">VCM Admin</span>
               </Link>
               <nav className="hidden md:flex items-center gap-1">
                 {NAV_ITEMS.map((item) => {
@@ -152,26 +162,72 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 })}
               </nav>
             </div>
-            <div className="flex items-center gap-4">
-              <Link href="/admin/products">
+            <div className="flex items-center gap-2 md:gap-4">
+              <Link href="/admin/products" className="hidden sm:block">
                 <Button variant="outline" size="sm">
                   <Package className="w-4 h-4 mr-2" />
                   Products
                 </Button>
               </Link>
-              <Link href="/admin/blog">
+              <Link href="/admin/blog" className="hidden sm:block">
                 <Button variant="outline" size="sm">
                   <FileText className="w-4 h-4 mr-2" />
                   Blog
                 </Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                <LogOut className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">Logout</span>
               </Button>
             </div>
           </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t bg-white">
+            <div className="px-4 py-3 space-y-1">
+              {NAV_ITEMS.map((item) => {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive
+                        ? "bg-orange-500 text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <div>
+                      <div>{item.label}</div>
+                      <div className={`text-xs ${isActive ? "text-orange-100" : "text-gray-500"}`}>
+                        {item.description}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+              <hr className="my-2" />
+              <Link
+                href="/admin/products"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+              >
+                <Package className="w-5 h-5" />
+                Products
+              </Link>
+              <Link
+                href="/admin/blog"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+              >
+                <FileText className="w-5 h-5" />
+                Blog
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
