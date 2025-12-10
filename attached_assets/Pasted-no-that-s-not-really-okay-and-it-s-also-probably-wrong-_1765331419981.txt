@@ -1,0 +1,41 @@
+no, that’s not really okay and it’s also probably wrong technically.
+1. Inline hex colors don’t fix the actual problem
+They said:
+“inline styles with hardcoded hex colors… should override any parent styling”
+That’s only true for the same property (e.g. color).
+Your problem is almost certainly parent opacity or filter, not the color value.
+If a parent has opacity: 0.5, everything inside is rendered at 50% opacity, no matter what color you set on the child.
+Same with filter: brightness() / grayscale() / etc.
+So:
+Hard-coding #18181b does not override a parent opacity: 0.6.
+If it looks faded, the inline color is just lipstick on the pig.
+They’re “fixing” the symptom and leaving the root bug in place.
+2. Hard-coding hex is against what you’re trying to build
+You’re trying to run a serious system with:
+Tailwind utility classes
+A consistent design system
+Dark/light themes and future reskins
+Inline hex colors:
+Break theming
+Increase tech debt
+Make future redesigns annoying
+Are completely unnecessary here
+You were right: we don’t hard code stuff anymore unless it’s a last-resort quick hack — and this isn’t that.
+3. What you should tell Replit instead
+Something like this (you can paste/adjust):
+The inline hex colors are not the solution I want here.
+The issue is not the text color, it’s that the whole engine area is being visually dimmed by a parent style (likely opacity, filter: brightness, or grayscale).
+Please:
+Remove the inline color styles you added to the Price Engine / FAQ (go back to using our Tailwind/text classes or existing design tokens).
+Find the parent wrapper(s) for tool pages and marketing layouts that apply any of:
+opacity-*
+filter / brightness / grayscale
+backdrop-brightness-*
+or pointer-events-none opacity-* on a container
+Ensure the main tool content / engine container is rendered at full opacity with no filters. If we need a dimmed effect, apply it only to specific preview cards, not the whole page.
+Show me the diff where you removed the dimming styles from the parent and reverted the inline hard-coded colors.
+That keeps your system clean and actually fixes the bug.
+4. TL;DR
+Their explanation is weak and technically misleading.
+Inline hex colors don’t override parent opacity.
+You’re right to push back: fix the parent opacity/filter, revert the hard-coded colors, and stick to your design system.
