@@ -83,12 +83,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "ID required" }, { status: 400 });
     }
 
-    await query(
-      `UPDATE global_urls 
-       SET title = $1, type = $2, is_indexed = $3, canonical = $4, notes = $5, updated_at = NOW()
-       WHERE id = $6`,
-      [title, type, is_indexed, canonical, notes, id]
-    );
+    if (is_indexed !== undefined && title === undefined && type === undefined) {
+      await query(
+        `UPDATE global_urls SET is_indexed = $1, updated_at = NOW() WHERE id = $2`,
+        [is_indexed, id]
+      );
+    } else {
+      await query(
+        `UPDATE global_urls 
+         SET title = $1, type = $2, is_indexed = $3, canonical = $4, notes = $5, updated_at = NOW()
+         WHERE id = $6`,
+        [title, type, is_indexed, canonical, notes, id]
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
