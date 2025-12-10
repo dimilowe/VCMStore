@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Cloud,
   X,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { CLOUDS, type CloudSlug } from "@/lib/clouds";
@@ -238,6 +239,39 @@ export default function SeoControlPage() {
       console.error("Failed to save cloud tags:", error);
     } finally {
       setSavingCloudTags(false);
+    }
+  };
+
+  const deleteUrl = async (row: EnrichedUrlRow) => {
+    if (!confirm(`Are you sure you want to delete "${row.url}" from the URL registry?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/global-urls?id=${row.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setEnrichedRegistry((prev) => prev.filter((r) => r.id !== row.id));
+        setUrls((prev) => prev.filter((u) => u.id !== row.id));
+        if (registrySummary) {
+          setRegistrySummary({
+            ...registrySummary,
+            total: registrySummary.total - 1,
+            indexed: row.isIndexed ? registrySummary.indexed - 1 : registrySummary.indexed,
+            byKind: {
+              ...registrySummary.byKind,
+              [row.kind]: (registrySummary.byKind[row.kind] || 1) - 1,
+            },
+            byStatus: {
+              ...registrySummary.byStatus,
+              [row.status]: (registrySummary.byStatus[row.status] || 1) - 1,
+            },
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to delete URL:", error);
     }
   };
 
@@ -826,11 +860,22 @@ export default function SeoControlPage() {
                               </button>
                             </td>
                             <td className="px-3 py-3 text-center">
-                              <a href={row.url} target="_blank" rel="noopener noreferrer">
-                                <Button variant="ghost" size="sm">
-                                  <ExternalLink className="w-4 h-4" />
+                              <div className="flex items-center justify-center gap-1">
+                                <a href={row.url} target="_blank" rel="noopener noreferrer">
+                                  <Button variant="ghost" size="sm">
+                                    <ExternalLink className="w-4 h-4" />
+                                  </Button>
+                                </a>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => deleteUrl(row)}
+                                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  title="Delete URL from registry"
+                                >
+                                  <Trash2 className="w-4 h-4" />
                                 </Button>
-                              </a>
+                              </div>
                             </td>
                           </tr>
                         );
