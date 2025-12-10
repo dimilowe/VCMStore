@@ -1,0 +1,67 @@
+ChatGPT said:
+Got it — this is a UI styling issue, not data or layout.
+Your orange card is visible because it has a solid background.
+The cards on the left and right are “invisible” because:
+✅ 1. Their background is set to transparent or bg-gradient-to-* but your new white dashboard background washes them out.
+In the new Adobe-white cloud style, any card that uses:
+transparent backgrounds
+soft gradients with low contrast
+or white-to-transparent fades
+…will appear totally invisible against a pure white page.
+✅ 2. The shadow is probably too faint or missing
+Your Tailwind tokens (shadow-sm, shadow-md, etc.) may not be rendering strongly, making them blend into the white.
+⚠️ 3. The CSS dump you sent confirms this
+You have this pattern:
+--card: 0 0% 100%;
+--card-foreground: 240 10% 3.9%;
+That means your card background defaults to pure white.
+Combine that with a white page → invisible cards.
+
+✔️ FIX: You want solid white cards with visible shadows and NO gradient overlays
+This is the correct Tailwind card style for your new UI:
+<div className="rounded-xl bg-white shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-zinc-100 p-4">
+  {/* card content */}
+</div>
+Or if using shadcn Card:
+<Card className="bg-white border border-zinc-200 shadow-sm">
+  <CardContent>
+    ...
+  </CardContent>
+</Card>
+The important parts:
+bg-white
+border-zinc-100 or 200
+shadow-sm or custom subtle shadow
+NO gradient background
+NO transparent overlay
+✔️ FIX: Remove gradients from the card components
+Find where Replit added something like:
+className="bg-gradient-to-br from-orange-400/20 to-transparent"
+or:
+style={{ background: "linear-gradient(...)" }}
+Remove it entirely.
+✔️ FIX: Ensure inactive cards still have a visible wrapper
+Some clouds use “ghost cards” for empty states or locked tools.
+These were coded like this:
+<div className="rounded-xl p-4 bg-gradient-to-br from-transparent to-transparent">
+On your new layout → invisible.
+Replace with:
+
+<div className="rounded-xl p-4 bg-white border border-zinc-200 shadow-sm">
+✔️ FIX: Your screenshot shows the cards exist — they’re just blending into the pure white background.
+See these faint edges?
+The card still renders
+It’s just white on white
+Exactly what happens when a designer switches to a white-first dashboard but leaves cards transparent.
+✔️ EXACT FIX I RECOMMEND YOU TELL REPLIT TO APPLY:
+Universal Tool Card Style
+Apply globally to ALL tool cards:
+className="bg-white border border-zinc-200 shadow-sm rounded-xl overflow-hidden"
+Remove all gradient classes
+Search for these patterns and delete them:
+bg-gradient-to-
+from-
+to-
+via-
+opacity-
+backdrop-

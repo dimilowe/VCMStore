@@ -19,12 +19,12 @@ interface CloudFeaturedToolsProps {
 }
 
 const PLACEHOLDER_GRADIENTS = [
-  'from-pink-400 via-purple-400 to-blue-400',
-  'from-orange-400 via-pink-400 to-purple-400',
-  'from-cyan-400 via-blue-400 to-purple-400',
-  'from-green-400 via-cyan-400 to-blue-400',
-  'from-yellow-400 via-orange-400 to-pink-400',
-  'from-indigo-400 via-purple-400 to-pink-400',
+  'from-orange-400 to-rose-500',
+  'from-pink-500 to-purple-500',
+  'from-cyan-400 to-blue-500',
+  'from-green-400 to-teal-500',
+  'from-amber-400 to-orange-500',
+  'from-indigo-400 to-purple-500',
 ];
 
 export default function CloudFeaturedTools({ 
@@ -40,7 +40,7 @@ export default function CloudFeaturedTools({
           {title}
         </h2>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tools.map((tool, idx) => {
           const gradient = tool.gradient || PLACEHOLDER_GRADIENTS[idx % PLACEHOLDER_GRADIENTS.length];
           
@@ -48,7 +48,7 @@ export default function CloudFeaturedTools({
             <Link
               key={tool.slug}
               href={`/tools/${tool.slug}`}
-              className="group relative rounded-2xl overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1"
+              className="group relative rounded-2xl overflow-hidden bg-white border border-zinc-200 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1"
             >
               <div className={`h-40 bg-gradient-to-br ${gradient} relative overflow-hidden`}>
                 {tool.thumbnailUrl ? (
@@ -59,13 +59,13 @@ export default function CloudFeaturedTools({
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <Sparkles className="w-8 h-8 text-white" />
+                    <div className="w-16 h-16 rounded-2xl bg-white/30 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                      <Sparkles className="w-7 h-7 text-white drop-shadow-md" />
                     </div>
                   </div>
                 )}
                 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                 
                 {tool.isPro && (
                   <span className="absolute top-3 right-3 inline-flex items-center rounded-full bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wide shadow-sm">
@@ -79,18 +79,18 @@ export default function CloudFeaturedTools({
                     {tool.appLabel}
                   </span>
                 )}
-              </div>
-              
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-sm font-bold text-white group-hover:underline decoration-2 underline-offset-2 flex items-center gap-1 drop-shadow-md">
-                  {tool.title}
-                  <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </h3>
-                {tool.description && (
-                  <p className="text-xs text-white line-clamp-1 mt-0.5 drop-shadow-md">
-                    {tool.description}
-                  </p>
-                )}
+                
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-sm font-bold text-white group-hover:underline decoration-2 underline-offset-2 flex items-center gap-1 drop-shadow-lg">
+                    {tool.title}
+                    <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </h3>
+                  {tool.description && (
+                    <p className="text-xs text-white/90 line-clamp-1 mt-0.5 drop-shadow-md">
+                      {tool.description}
+                    </p>
+                  )}
+                </div>
               </div>
             </Link>
           );
