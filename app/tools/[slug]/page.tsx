@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { getCmsToolBySlug } from '@/lib/cms/getCmsToolBySlug';
 import { isEngineSupported } from '@/lib/engineRegistry';
 import ToolPageClient from './ToolPageClient';
+import { FreeToolsBlock } from '@/components/FreeToolsBlock';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -42,5 +43,12 @@ export default async function ToolPage({ params }: PageProps) {
 
   const hasEngine = isEngineSupported(tool.engine);
 
-  return <ToolPageClient tool={tool} hasEngine={hasEngine} />;
+  return (
+    <>
+      <ToolPageClient tool={tool} hasEngine={hasEngine} />
+      <div className="px-4 pb-12">
+        <FreeToolsBlock currentSlug={tool.slug} />
+      </div>
+    </>
+  );
 }

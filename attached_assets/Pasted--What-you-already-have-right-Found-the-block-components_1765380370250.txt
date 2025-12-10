@@ -1,0 +1,81 @@
+✅ What you already have right
+Found the block: components/ExploreMoreTools.tsx
+Hardcoded 22 tools
+Takes currentTool prop → already knows how to exclude current page
+Nice styling + VCM OS waitlist CTA
+Know the renderer: app/tools/[slug]/ToolPageClient.tsx is the client component.
+Know where to mount it: app/tools/[slug]/page.tsx is the place to add the server-side block (after ToolPageClient).
+That’s all correct.
+🔧 What you should actually implement
+1. Add getAllCmsTools() helper
+In something like lib/tools.ts:
+import { db } from "@/lib/db";
+
+export type CmsToolSummary = {
+  slug: string;
+  title: string;
+};
+
+export async function getAllCmsTools(): Promise<CmsToolSummary[]> {
+  const rows = await db.cms_objects.findMany({
+    where: { type: "tool" },
+    select: { slug: true, title: true },
+    orderBy: { created_at: "asc" },
+  });
+
+  return rows.map((r) => ({
+    slug: r.slug,
+    title: r.title,
+  }));
+}
+No legacy registry, no mixing.
+2. Convert ExploreMoreTools.tsx to use CMS
+Make it an async server component.
+Replace the hardcoded array with await getAllCmsTools().
+Use its existing currentTool prop to filter out the current slug.
+Rough shape:
+// components/ExploreMoreTools.tsx
+import Link from "next/link";
+import { getAllCmsTools } from "@/lib/tools";
+
+export async function ExploreMoreTools({ currentTool }: { currentTool: string }) {
+  const tools = await getAllCmsTools();
+  const otherTools = tools.filter(t => t.slug !== currentTool);
+  if (!otherTools.length) return null;
+
+  const limited = otherTools.slice(0, 48); // optional cap
+
+  // keep your existing gradient / pills / waitlist CTA
+  return (
+    <section>...map(limited)...</section>
+  );
+}
+Keep all the existing styling and CTA, just swap the data source.
+3. Mount it in app/tools/[slug]/page.tsx
+Because ToolPageClient is a client component, you were right to put the block in page.tsx, not inside the client file.
+Something like:
+// app/tools/[slug]/page.tsx
+import { ExploreMoreTools } from "@/components/ExploreMoreTools";
+import ToolPageClient from "./ToolPageClient";
+import { getCmsToolBySlug } from "@/lib/cms"; // whatever you already use
+
+export default async function ToolPage({ params }: { params: { slug: string } }) {
+  const fullSlug = `/tools/${params.slug}`; // match how you store it in cms_objects
+  const tool = await getCmsToolBySlug(fullSlug);
+
+  if (!tool || tool.type !== "tool") {
+    // existing notFound()
+  }
+
+  return (
+    <>
+      <ToolPageClient tool={tool} />
+      <ExploreMoreTools currentTool={tool.slug} />
+    </>
+  );
+}
+Key thing: currentTool should match the slug stored in CMS (if CMS stores /tools/xyz, pass that; if it stores just xyz, adjust accordingly).
+⚠ Tiny things to watch out for
+Don’t re-import any old hardcoded tool arrays in the new version.
+Make sure ExploreMoreTools is not marked "use client" anymore; it needs to stay server-side to await getAllCmsTools().
+If you have hundreds of tools later, consider capping or grouping, bu
