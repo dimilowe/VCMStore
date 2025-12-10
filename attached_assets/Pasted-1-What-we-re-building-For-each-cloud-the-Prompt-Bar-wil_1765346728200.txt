@@ -1,0 +1,219 @@
+1. What we’re building
+For each cloud, the Prompt Bar will:
+Take: prompt, mode, cloudId
+Decide: which tool slug to open
+Redirect to: /tools/[slug]?prompt=...
+Rules:
+If the prompt contains certain keywords → send them to a specific tool.
+If nothing matches → fall back to a mode default (Image/Video/Text).
+If still nothing → fall back to the cloud’s primary tool.
+All of this is done entirely on the client, no API calls, no AI.
+2. Define a routing config (central brain, no hardcoding in JSX)
+Create something like promptRoutingConfig.ts:
+// types are optional but recommended
+type Mode = "image" | "video" | "text";
+
+type KeywordRule = {
+  keywords: string[];         // any of these words/phrases → this tool
+  toolSlug: string;
+  modes?: Mode[];             // optional: limit to certain modes
+};
+
+type CloudRoutingConfig = {
+  cloudId: string;            // e.g. "creation-cloud"
+  primaryTool: string;        // global fallback
+  modeDefaults: Partial<Record<Mode, string>>;
+  keywordRules: KeywordRule[];
+};
+
+export const PROMPT_ROUTING_CONFIG: CloudRoutingConfig[] = [
+  {
+    cloudId: "creation-cloud",
+    primaryTool: "outfit-generator", // or whatever your main tool is
+    modeDefaults: {
+      image: "image-generator",
+      video: "video-storyboard",
+      text: "caption-writer",
+    },
+    keywordRules: [
+      {
+        keywords: ["thumbnail", "youtube thumbnail", "yt thumb"],
+        toolSlug: "youtube-thumbnail-generator",
+        modes: ["image"],
+      },
+      {
+        keywords: ["background remover", "remove background", "cut out"],
+        toolSlug: "background-remover",
+        modes: ["image"],
+      },
+      {
+        keywords: ["outfit", "look", "fit pic", "style this"],
+        toolSlug: "outfit-generator",
+        modes: ["image"],
+      },
+      {
+        keywords: ["carousel", "carousel post", "slider"],
+        toolSlug: "carousel-designer",
+        modes: ["image", "text"],
+      },
+      {
+        keywords: ["caption", "title", "hook", "description"],
+        toolSlug: "caption-writer",
+        modes: ["text"],
+      },
+      {
+        keywords: ["storyboard", "script", "shots", "scenes"],
+        toolSlug: "video-storyboard",
+        modes: ["video", "text"],
+      },
+      // add more as needed
+    ],
+  },
+
+  // you can add other clouds later:
+  // {
+  //   cloudId: "video-cloud",
+  //   primaryTool: "...",
+  //   modeDefaults: { ... },
+  //   keywordRules: [ ... ],
+  // }
+];
+This is your only allowed place for “hardcoding” behavior.
+No random one-off logic in React components.
+3. The smart router function (pure, deterministic, no API)
+Create getToolForPrompt.ts:
+import { PROMPT_ROUTING_CONFIG } from "./promptRoutingConfig";
+
+type Mode = "image" | "video" | "text";
+
+export function getToolForPrompt(
+  prompt: string,
+  mode: Mode,
+  cloudId: string
+): string {
+  const normalizedPrompt = prompt.toLowerCase().trim();
+
+  const cloudConfig = PROMPT_ROUTING_CONFIG.find(
+    (c) => c.cloudId === cloudId
+  );
+
+  // If we somehow don't have config, just bail to a sane default
+  if (!cloudConfig) {
+    return "/tools"; // or some generic fallback
+  }
+
+  // 1) Keyword-based routing
+  for (const rule of cloudConfig.keywordRules) {
+    // If rule has mode restrictions, enforce them
+    if (rule.modes && !rule.modes.includes(mode)) continue;
+
+    // Check if any keyword appears in the prompt
+    const matches = rule.keywords.some((keyword) =>
+      normalizedPrompt.includes(keyword.toLowerCase())
+    );
+
+    if (matches) {
+      return rule.toolSlug;
+    }
+  }
+
+  // 2) Mode default fallback (e.g. Image → image-generator)
+  const modeDefault = cloudConfig.modeDefaults[mode];
+  if (modeDefault) {
+    return modeDefault;
+  }
+
+  // 3) Absolute fallback → cloud primary tool
+  return cloudConfig.primaryTool;
+}
+This function is pure, predictable, and easy to test.
+4. Wire it into the Prompt Bar component
+In your Prompt Bar (whatever file that is: CloudPromptBar.tsx or similar):
+"use client";
+
+import { useRouter } from "next/navigation";
+import { getToolForPrompt } from "@/lib/getToolForPrompt";
+
+type Mode = "image" | "video" | "text";
+
+interface PromptBarProps {
+  cloudId: string;
+  initialMode?: Mode;
+  primaryToolSlug: string; // optional if you use it as fallback
+}
+
+export function PromptBar({ cloudId, initialMode = "image" }: PromptBarProps) {
+  const router = useRouter();
+  const [prompt, setPrompt] = useState("");
+  const [mode, setMode] = useState<Mode>(initialMode);
+
+  function handleGenerate() {
+    if (!prompt.trim()) return;
+
+    const toolSlug = getToolForPrompt(prompt, mode, cloudId);
+
+    router.push(`/tools/${toolSlug}?prompt=${encodeURIComponent(prompt)}`);
+  }
+
+  return (
+    <div className="flex gap-2 items-center">
+      {/* Mode dropdown */}
+      <select
+        value={mode}
+        onChange={(e) => setMode(e.target.value as Mode)}
+        className="border rounded-md px-2 py-1 text-sm"
+      >
+        <option value="image">Image</option>
+        <option value="video">Video</option>
+        <option value="text">Text</option>
+      </select>
+
+      {/* Prompt input */}
+      <input
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        className="flex-1 border rounded-md px-3 py-2 text-sm"
+        placeholder="Describe what you want to create..."
+      />
+
+      {/* Generate button */}
+      <button
+        onClick={handleGenerate}
+        className="px-4 py-2 rounded-md bg-orange-500 text-white text-sm font-medium"
+      >
+        Generate
+      </button>
+    </div>
+  );
+}
+Now the behavior is:
+User chooses mode
+Types prompt
+Clicks Generate
+getToolForPrompt picks the best tool → we navigate there with the prompt
+No API calls. No AI. Just config + logic.
+5. Guardrails so this doesn’t turn into chaos later
+To avoid the kind of “Creation Cloud has special hardcoded stuff” problem:
+All routing lives in PROMPT_ROUTING_CONFIG
+No custom router logic per cloud page.
+No layout logic in DB
+DB can know which tools belong to which cloud via tags,
+but routing logic stays in code as config.
+Write a dead simple test (optional but smart):
+it("all clouds have a primary tool and no rogue routing fields", () => {
+  for (const c of PROMPT_ROUTING_CONFIG) {
+    expect(c.primaryTool).toBeDefined();
+    // no appRow/shortcuts BS, etc.
+    expect((c as any).appRow).toBeUndefined();
+  }
+});
+Even this level is enough for you.
+6. UX-wise, what this gives you
+The Prompt Bar actually does something intelligent now.
+The mode dropdown actually matters.
+You didn’t add any infra complexity.
+You can evolve this later into AI-based routing — just swap out getToolForPrompt internals.
+If you want the next step after this, I’d do:
+Lightweight suggestions below the input:
+“Looks like you want: [Thumbnail Generator] [Outfit Generator]”
+using the same routing config.
