@@ -84,12 +84,23 @@ Controls user access to pro/AI features based on cloud subscription tier:
 - **Database**: `cloud_entitlements` table with unique constraint on (user_id, cloud_id)
 - **Types**: `lib/types/cloudEntitlements.ts` defines CloudId, EntitlementTier, CloudEntitlement
 - **Helpers**: `lib/cloudEntitlements.ts` provides hasAccess(), getCloudEntitlementsForUser(), grantCloudEntitlement()
+- **Client helpers**: `lib/cloudEntitlements.client.ts` provides client-safe hasAccess(), cloudSlugToId() for use in 'use client' components
 - **Offer mapping**: `lib/offers.ts` contains CLOUD_OFFER_MAP linking offer_keys to cloud entitlements
 - **API**: `/api/user/entitlements` endpoint (session-protected) returns current user's entitlements
 - **Tool integration**: ToolPageClient fetches entitlements and passes canUsePro/canUseBasic to engine components
 - **Tiers**: free → basic → pro → enterprise (hierarchical access)
 - **Statuses**: active, trial (both grant access), past_due, canceled
 - **Sources**: stripe, manual_grant, bundle, promotion
+
+### Price Engine (Shopping Cloud)
+First engine gated behind cloud entitlements, for price tracking tools:
+- **Engine**: `components/engines/PriceEngine.tsx` renders price tracking interface
+- **Config**: `engines/price-engine/config.ts` defines PriceEngineConfig with mode, input labels, CTAs
+- **Presets**: trackPriceConfig (generic), trackPricesOnAmazonConfig (Amazon-specific)
+- **Tools**: `/tools/track-price`, `/tools/track-prices-on-amazon`
+- **Modal**: `components/modals/ShoppingCloudUpgradeModal.tsx` for waitlist signup
+- **Waitlist API**: `/api/waitlist/shopping-cloud` creates waitlist_signups entries
+- **Analytics**: price_tool_submitted, price_tool_cta_clicked, shopping_cloud_waitlist_joined events
 
 ## Project Structure
 
