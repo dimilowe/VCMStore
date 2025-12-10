@@ -373,6 +373,20 @@ function ContentManagerInner() {
     articlePage * ITEMS_PER_PAGE
   );
 
+  const filteredPillars = pillars.filter((pillar) => {
+    const matchesSearch =
+      articleSearchQuery === "" ||
+      pillar.title.toLowerCase().includes(articleSearchQuery.toLowerCase()) ||
+      pillar.slug.toLowerCase().includes(articleSearchQuery.toLowerCase());
+    return matchesSearch;
+  });
+
+  const totalPillarPages = Math.ceil(filteredPillars.length / ITEMS_PER_PAGE);
+  const paginatedPillars = filteredPillars.slice(
+    (articlePage - 1) * ITEMS_PER_PAGE,
+    articlePage * ITEMS_PER_PAGE
+  );
+
   const getLinkStatusIcon = (status: string) => {
     switch (status) {
       case "ready":
@@ -674,41 +688,15 @@ function ContentManagerInner() {
                   className="pl-10"
                 />
               </div>
-              <select
-                value={articleFilterCluster}
-                onChange={(e) => {
-                  setArticleFilterCluster(e.target.value);
-                  setArticlePage(1);
-                }}
-                className="border rounded-md px-3 py-2 text-sm"
-              >
-                <option value="all">All Clusters</option>
-                {clusters.map((cluster) => (
-                  <option key={cluster.pillarSlug} value={cluster.pillarSlug}>{cluster.pillarTitle}</option>
-                ))}
-              </select>
-              <select
-                value={articleFilterHealth}
-                onChange={(e) => {
-                  setArticleFilterHealth(e.target.value);
-                  setArticlePage(1);
-                }}
-                className="border rounded-md px-3 py-2 text-sm"
-              >
-                <option value="all">All Health</option>
-                <option value="strong">Strong</option>
-                <option value="ok">OK</option>
-                <option value="thin">Thin</option>
-              </select>
             </div>
 
             <div className="text-sm text-gray-500">
-              Showing {paginatedArticles.length} of {filteredArticles.length} pillars
+              Showing {paginatedPillars.length} of {filteredPillars.length} pillars
             </div>
 
             {isLoading ? (
               <div className="text-center py-12 text-gray-400">Loading pillars...</div>
-            ) : filteredArticles.length === 0 ? (
+            ) : filteredPillars.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
@@ -724,65 +712,27 @@ function ContentManagerInner() {
                   <thead className="bg-gray-50 border-b">
                     <tr>
                       <th className="text-left px-4 py-3 font-medium">Pillar</th>
-                      <th className="text-left px-4 py-3 font-medium">Cluster</th>
-                      <th className="text-center px-4 py-3 font-medium">Words</th>
-                      <th className="text-center px-4 py-3 font-medium">Health</th>
-                      <th className="text-center px-4 py-3 font-medium">Indexed</th>
+                      <th className="text-left px-4 py-3 font-medium">Slug</th>
                       <th className="text-center px-4 py-3 font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {paginatedArticles.map((article) => (
-                      <tr key={article.id} className="hover:bg-gray-50">
+                    {paginatedPillars.map((pillar) => (
+                      <tr key={pillar.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
-                          <div className="font-medium">{article.title}</div>
-                          <div className="text-xs text-gray-400">{article.slug}</div>
+                          <div className="font-medium">{pillar.title}</div>
                         </td>
                         <td className="px-4 py-3">
-                          {article.cluster_title || article.cluster_slug ? (
-                            <Badge variant="outline" className="max-w-[200px] truncate" title={article.cluster_title || article.cluster_slug || ""}>
-                              {article.cluster_title || article.cluster_slug}
-                            </Badge>
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-600">
-                          {article.word_count || 0}
+                          <span className="text-xs text-gray-500 font-mono">{pillar.slug}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <Badge
-                            className={
-                              article.health === "strong"
-                                ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                : article.health === "ok"
-                                ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                                : "bg-red-100 text-red-800 hover:bg-red-100"
-                            }
+                          <Link
+                            href={`/tools/clusters/${pillar.slug}`}
+                            target="_blank"
+                            className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-700"
                           >
-                            {article.health}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => toggleArticleIndexed(article)}
-                            className="inline-flex"
-                          >
-                            {article.is_indexed ? (
-                              <Eye className="w-5 h-5 text-green-500" />
-                            ) : (
-                              <EyeOff className="w-5 h-5 text-gray-300" />
-                            )}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Link href={`/articles/${article.slug}`} target="_blank">
-                              <Button variant="ghost" size="sm">
-                                <ExternalLink className="w-4 h-4" />
-                              </Button>
-                            </Link>
-                          </div>
+                            <ExternalLink className="w-4 h-4" />
+                          </Link>
                         </td>
                       </tr>
                     ))}
@@ -791,10 +741,10 @@ function ContentManagerInner() {
               </div>
             )}
 
-            {totalArticlePages > 1 && (
+            {totalPillarPages > 1 && (
               <div className="flex items-center justify-between pt-4">
                 <span className="text-sm text-gray-500">
-                  Page {articlePage} of {totalArticlePages}
+                  Page {articlePage} of {totalPillarPages}
                 </span>
                 <div className="flex gap-2">
                   <Button
@@ -809,8 +759,8 @@ function ContentManagerInner() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setArticlePage((p) => Math.min(totalArticlePages, p + 1))}
-                    disabled={articlePage === totalArticlePages}
+                    onClick={() => setArticlePage((p) => Math.min(totalPillarPages, p + 1))}
+                    disabled={articlePage === totalPillarPages}
                   >
                     Next
                     <ChevronRight className="w-4 h-4" />
