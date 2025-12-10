@@ -1,0 +1,87 @@
+1. Auto-generate the Tailwind safelist (no human allowed)
+Right now this is still a human error point.
+Goal: safelist is derived from CLOUD_THEMES, never edited by hand.
+Rough approach:
+Add a tiny Node script (e.g. scripts/generate-safelist.js) that:
+imports CLOUD_THEMES
+collects all class strings like theme.heroBg, theme.recentFilesBg, etc.
+splits on spaces, de-dupes, writes a JSON or JS file that exports SAFELIST.
+In tailwind.config.cjs:
+const { SAFELIST } = require('./.generated/cloudSafelist');
+
+module.exports = {
+  // ...
+  safelist: SAFELIST,
+};
+Now if someone adds a new gradient to CLOUD_THEMES, it automatically gets safelisted. Zero mental overhead.
+2. Unit tests for the themes (cheap but powerful)
+You want tests that scream the second config drifts.
+a) Coverage: every CloudId has a theme
+import { CLOUD_THEMES, ALL_CLOUD_IDS } from '@/lib/cloudTheme';
+
+it('has theme entries for every CloudId', () => {
+  ALL_CLOUD_IDS.forEach(id => {
+    expect(CLOUD_THEMES[id]).toBeDefined();
+  });
+});
+b) Resolver sanity: CMS slugs map correctly
+import { resolveCloudId } from '@/lib/cloudTheme';
+
+it('resolves CMS slugs to CloudId correctly', () => {
+  expect(resolveCloudId('file-data-cloud')).toBe('file-data');
+  expect(resolveCloudId('file_data')).toBe('file-data');
+  expect(resolveCloudId('ai_intelligence_cloud')).toBe('ai-intelligence');
+});
+c) No missing gradient tokens
+If you want to enforce “hero and recent files always themed”:
+Object.values(CLOUD_THEMES).forEach(theme => {
+  expect(theme.heroBg).toBeTruthy();
+  expect(theme.recentFilesBg).toBeTruthy();
+});
+These take ~15 minutes and prevent hours of “why is this white again”.
+3. Lock the coding rules in code (lint / helpers)
+Right now they’re in your head. Bake them in.
+a) Helper for gradient classes
+Instead of sprinkling plain strings, expose helpers:
+export function gradient(cls: keyof CloudTheme) {
+  return (theme: CloudTheme) => theme[cls];
+}
+Then in components:
+<div className={cn('rounded-2xl', theme.heroBg)} />
+Rule for yourself: No literal bg-gradient-to-* anywhere outside the theme file. If you see one, you’re breaking your own architecture.
+If you want to get fancy you can add an ESLint rule later to flag gradient classnames outside cloudTheme.ts.
+4. Wire the remaining themeable bits
+You already have:
+heroBg
+recentFilesBg
+tabs / icons (in config)
+dashboard engine using them
+Anything still “magic”?
+Prompt bar background:
+If it’s truly global, fine.
+If different clouds will ever want different glass levels/accents, put promptBarBg in the theme now so you don’t have to refactor later.
+Hover / active styles for tabs:
+At minimum, store the accent color per cloud (accentBg, accentSoftBg) so you can keep style tweaks per cloud without rewiring a dozen components.
+The point: all visual differences should be expressible as theme fields. No component should care which cloud it’s on beyond cloudId.
+5. Add a “Cloud Gallery” dev page
+This is the fastest visual regression check.
+Create an internal route like /dev/cloud-gallery that:
+ALL_CLOUD_IDS.map(id => (
+  <section key={id} className="mb-10 border p-4">
+    <h2>{id}</h2>
+    <CloudDashboardEngine cloudId={id} mockData />
+  </section>
+));
+Throw mock tools in; you just want to see:
+Every hero has its gradient.
+Every sidebar has its gradient.
+No blank white weirdness.
+Run this once after theme changes and you’ll catch any broken config instantly.
+6. Document the rules once, then stop thinking about them
+You’re basically done with architecture; now it’s just making it idiot-proof (including future-you at 3 a.m.).
+Drop this into docs/ui-rules.md or dev-notes.md:
+All clouds use CloudDashboardEngine.
+Visual differences live ONLY in CLOUD_THEMES.
+Never write bg-gradient-to-* outside cloudTheme.ts.
+Any new cloud = add CloudId, theme object, resolver, run tests.
+That’s it.
