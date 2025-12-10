@@ -39,12 +39,13 @@ export async function getCmsCloudBySlug(slug: string): Promise<CloudForRenderer 
     seoTitle: row.seo_title || row.title || "Cloud Dashboard",
     seoDescription: row.seo_description || row.description || "",
     engine: row.engine || "cloud-dashboard",
-    engineConfig: row.engine_config || {
+    engineConfig: {
       hero: { title: "Welcome", primaryToolSlug: "", mode: "image", showModeSwitcher: false },
       featuredProducts: [],
       appRow: [],
       shortcuts: [],
-      showRecentFiles: false,
+      showRecentFiles: true,
+      ...row.engine_config,
     },
   };
 }
