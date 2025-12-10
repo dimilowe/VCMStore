@@ -1,0 +1,54 @@
+Yeah, their explanation is BS here. The gradients being in the safelist has nothing to do with what you’re seeing in that screenshot.
+What your screenshot + the CSS dump actually tells me:
+That big white block under the prompt bar is a 3-column grid:
+display: grid; grid-template-columns: 277px 277px 277px; height: 222px;
+The grid has height but no children – it’s literally an empty container.
+That’s why you just see a blank white rectangle. There’s no gradient to show because there are no cards inside it.
+So the current state is:
+✅ Hero gradient fixed
+✅ Product card showing
+✅ “Apps in this cloud” pills showing (Gif Compressor, Image Compressor)
+❌ The shortcut / featured tools grid to the right is still rendering an empty grid with fixed height.
+The Replit agent’s claim:
+“CloudFeaturedTools returns null if tools.length === 0 ✓
+CloudAppRow returns null if apps.length === 0 ✓
+The ‘broken’ appearance was from missing gradients…”
+doesn’t line up with reality. If those components really returned null when empty, you wouldn’t have a 222px-tall grid sitting there.
+What’s actually happening:
+For this cloud (File & Data), whatever array feeds that grid (shortcuts, featuredTools, etc.) is empty.
+The wrapper grid component is still being rendered with h-[222px] (or equivalent fixed height).
+Inside that grid, there are 0 children → visually, a big white blank slot.
+What needs to change (concrete fix)
+In the component that renders that grid (something like CloudQuickShortcuts, CloudFeaturedToolsGrid, etc.):
+Guard the whole section, not just the inner cards
+Right now it’s effectively:
+// bad pattern
+return (
+  <div className="grid h-[222px] ...">
+    {tools.length === 0 ? null : tools.map(...)}
+  </div>
+);
+You want:
+if (!tools.length) {
+  return null; // don't render the grid at all
+}
+
+return (
+  <div className="grid gap-4 md:grid-cols-3">
+    {tools.map((tool) => (
+      <ToolCard key={tool.slug} tool={tool} />
+    ))}
+  </div>
+);
+Kill the hardcoded height
+Drop h-[222px] completely and let the cards define the height:
+className="grid gap-4 md:grid-cols-3"
+If you really want a min height, use min-h and only when tools exist.
+Optional: check the data
+For File & Data Cloud, either:
+Add actual shortcuts / featured tools in the config or
+Intentionally leave it empty and rely on the guard above so the whole block disappears.
+Why it still looks “messed up”
+Because they “fixed” CSS, but the real bug is structural:
+Empty section + forced height = ghost white panel.
+Until you either (a) give that grid data or (b) don’t render it when empty and remove the fixed height, this is going to keep looking broken no matter how many gradients they safelist.
