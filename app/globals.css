@@ -10,13 +10,6 @@
     color: hsl(var(--foreground, 240 10% 3.9%));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
-  /* Scoped reset for tool pages - neutralizes gradient text inheritance */
-  /* Must be in @layer base to override utility classes */
-  .tool-page-content,
-  .tool-page-content * {
-    -webkit-text-fill-color: currentColor !important;
-  }
 }
 
 @layer base {
@@ -67,17 +60,29 @@
 }
 
 @layer utilities {
-  /* Gradient text - intentionally applied via explicit .text-gradient class */
+  /* CSS custom property guard for text fill - prevents Lightning CSS from stripping */
+  :root {
+    --text-fill-color: currentColor;
+  }
+  
+  /* Tool pages use normal text fill */
+  .tool-page-content {
+    --text-fill-color: currentColor;
+  }
+  
+  /* Gradient text - only activates where explicitly applied */
   .text-gradient {
+    --text-fill-color: transparent;
     background: linear-gradient(135deg, #f97316 0%, #a855f7 100%);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: var(--text-fill-color);
     background-clip: text;
   }
   
   /* Prevent gradient text from leaking to children */
   .text-gradient * {
-    -webkit-text-fill-color: currentColor;
+    --text-fill-color: currentColor;
+    -webkit-text-fill-color: var(--text-fill-color);
     color: inherit;
   }
   
