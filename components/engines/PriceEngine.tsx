@@ -238,9 +238,9 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
   const faqs = config.faqs || [];
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto text-zinc-900 dark:text-zinc-100">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+        <h1 className="text-3xl font-bold mb-2">
           {config.title}
         </h1>
         {config.subtitle && (
