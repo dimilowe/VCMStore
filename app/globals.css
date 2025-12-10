@@ -60,30 +60,11 @@
 }
 
 @layer utilities {
-  /* CSS custom property guard for text fill - prevents Lightning CSS from stripping */
-  :root {
-    --text-fill-color: currentColor;
-  }
-  
-  /* Tool pages use normal text fill */
-  .tool-page-content {
-    --text-fill-color: currentColor;
-  }
-  
-  /* Gradient text - only activates where explicitly applied */
   .text-gradient {
-    --text-fill-color: transparent;
     background: linear-gradient(135deg, #f97316 0%, #a855f7 100%);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: var(--text-fill-color);
+    -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-  
-  /* Prevent gradient text from leaking to children */
-  .text-gradient * {
-    --text-fill-color: currentColor;
-    -webkit-text-fill-color: var(--text-fill-color);
-    color: inherit;
   }
   
   .gradient-border {

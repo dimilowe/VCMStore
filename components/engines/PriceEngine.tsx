@@ -38,9 +38,9 @@ function PriceHistorySparkline({ data }: { data: number[] }) {
   }).join(' ');
 
   return (
-    <div className="bg-zinc-50 rounded-lg p-4">
+    <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-4">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-zinc-600">Price History (Last 30 days)</span>
+        <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Price History (Last 30 days)</span>
         <TrendingDown className="w-4 h-4 text-green-500" />
       </div>
       <svg width={width} height={height} className="w-full" viewBox={`0 0 ${width} ${height}`}>
@@ -83,11 +83,11 @@ function PriceHistorySparkline({ data }: { data: number[] }) {
 
 function RetailerBadge({ mode, retailer }: { mode: string; retailer: string }) {
   const badges: Record<string, { bg: string; text: string; label: string }> = {
-    amazon: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Amazon' },
+    amazon: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', label: 'Amazon' },
     shein: { bg: 'bg-black', text: 'text-white', label: 'SHEIN' },
-    aliexpress: { bg: 'bg-red-100', text: 'text-red-700', label: 'AliExpress' },
-    zara: { bg: 'bg-zinc-900', text: 'text-white', label: 'ZARA' },
-    generic: { bg: 'bg-zinc-100', text: 'text-zinc-700', label: retailer },
+    aliexpress: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'AliExpress' },
+    zara: { bg: 'bg-zinc-900 dark:bg-zinc-700', text: 'text-white', label: 'ZARA' },
+    generic: { bg: 'bg-zinc-100 dark:bg-zinc-800', text: 'text-zinc-700 dark:text-zinc-300', label: retailer },
   };
 
   const badge = badges[mode] || badges.generic;
@@ -116,27 +116,27 @@ function CTAButton({
       onClick={onClick}
       className={`w-full text-left p-4 rounded-xl border transition-all ${
         isLocked
-          ? 'border-zinc-200 hover:border-pink-300 hover:bg-pink-50/50'
-          : 'border-pink-200 bg-pink-50'
+          ? 'border-zinc-200 dark:border-zinc-700 hover:border-pink-300 dark:hover:border-pink-700 hover:bg-pink-50/50 dark:hover:bg-pink-900/10'
+          : 'border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-900/20'
       }`}
     >
       <div className="flex items-start gap-3">
         {isLocked && (
-          <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
             <Lock className="w-4 h-4 text-zinc-400" />
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-zinc-900">{cta.label}</span>
+            <span className="font-medium text-zinc-900 dark:text-zinc-100">{cta.label}</span>
             {isLocked && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-pink-100 text-pink-600">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400">
                 Pro
               </span>
             )}
           </div>
           {cta.description && (
-            <p className="text-sm text-zinc-500 mt-0.5">{cta.description}</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">{cta.description}</p>
           )}
         </div>
         <ExternalLink className="w-4 h-4 text-zinc-400 flex-shrink-0 mt-1" />
@@ -240,11 +240,11 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-zinc-900">
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
           {config.title}
         </h1>
         {config.subtitle && (
-          <p className="text-lg text-zinc-600">
+          <p className="text-lg text-zinc-600 dark:text-zinc-400">
             {config.subtitle}
           </p>
         )}
@@ -253,7 +253,7 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         {config.allowUrlInput && (
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-zinc-700">
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
               {config.urlLabel || 'Product URL'}
             </label>
             <Input
@@ -268,15 +268,15 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
 
         {config.allowUrlInput && config.allowNameInput && (
           <div className="flex items-center gap-3 text-sm text-zinc-400">
-            <div className="flex-1 h-px bg-zinc-200" />
+            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-700" />
             <span>or</span>
-            <div className="flex-1 h-px bg-zinc-200" />
+            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-700" />
           </div>
         )}
 
         {config.allowNameInput && (
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-zinc-700">
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
               {config.nameLabel || 'Product name'}
             </label>
             <Input
@@ -300,9 +300,9 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
 
       {result && (
         <div className="space-y-6 mb-8">
-          <div className="bg-white border border-zinc-200 rounded-xl p-6">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6">
             <div className="flex items-start justify-between gap-4 mb-4">
-              <h2 className="text-xl font-semibold text-zinc-900">
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
                 {result.productTitle}
               </h2>
               {config.showRetailerBadge && (
@@ -312,8 +312,8 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
 
             {config.showCurrentPriceBlock && (
               <div className="mb-4">
-                <span className="text-sm text-zinc-500">Current Price Range</span>
-                <p className="text-3xl font-bold text-zinc-900">
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">Current Price Range</span>
+                <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                   {result.priceRange}
                 </p>
               </div>
@@ -326,7 +326,7 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
 
           {config.ctas.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-zinc-600 uppercase tracking-wide">
+              <h3 className="text-sm font-medium text-zinc-600 dark:text-zinc-400 uppercase tracking-wide">
                 Upgrade to unlock
               </h3>
               {config.ctas.map((cta) => (
@@ -343,12 +343,12 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
       )}
 
       {faqs.length > 0 && (
-        <div className="border-t border-zinc-200 pt-8 mt-8">
+        <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8 mt-8">
           <button
             onClick={() => setShowFaq(!showFaq)}
             className="flex items-center justify-between w-full text-left"
           >
-            <h3 className="text-lg font-semibold text-zinc-900">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
               Frequently Asked Questions
             </h3>
             {showFaq ? (
@@ -361,10 +361,10 @@ export default function PriceEngine({ tool, canUsePro, entitlementsLoading }: Pr
             <div className="mt-4 space-y-4">
               {faqs.map((faq, index) => (
                 <div key={index}>
-                  <h4 className="font-medium text-zinc-900 mb-1">
+                  <h4 className="font-medium text-zinc-900 dark:text-zinc-100 mb-1">
                     {faq.q}
                   </h4>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
                     {faq.a}
                   </p>
                 </div>

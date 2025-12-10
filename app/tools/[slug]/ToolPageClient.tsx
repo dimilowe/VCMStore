@@ -74,7 +74,7 @@ export default function ToolPageClient({ tool, hasEngine }: ToolPageClientProps)
   }
 
   return (
-    <div className="tool-page-content">
+    <>
       <EngineComponent 
         tool={tool} 
         canUsePro={canUsePro || false}
@@ -86,6 +86,6 @@ export default function ToolPageClient({ tool, hasEngine }: ToolPageClientProps)
           <CloudUpsellBlock cloudSlugs={tool.cloudTags} />
         </div>
       )}
-    </div>
+    </>
   );
 }
