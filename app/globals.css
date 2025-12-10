@@ -69,21 +69,46 @@
 
   /* Reset for tool page content to prevent gradient color inheritance */
   .tool-page-content {
-    color: hsl(var(--foreground));
-    -webkit-text-fill-color: initial;
-    background: none;
-    background-clip: unset;
+    color: #18181b !important;
+    -webkit-text-fill-color: #18181b !important;
+    background: transparent !important;
+    background-clip: border-box !important;
+    -webkit-background-clip: border-box !important;
   }
 
   .tool-page-content h1,
   .tool-page-content h2,
   .tool-page-content h3,
   .tool-page-content h4,
-  .tool-page-content label,
+  .tool-page-content label {
+    color: #18181b !important;
+    -webkit-text-fill-color: #18181b !important;
+    background: transparent !important;
+    background-clip: border-box !important;
+    -webkit-background-clip: border-box !important;
+  }
+
   .tool-page-content p {
-    -webkit-text-fill-color: initial;
-    background: none;
-    background-clip: unset;
+    color: #52525b !important;
+    -webkit-text-fill-color: #52525b !important;
+    background: transparent !important;
+    background-clip: border-box !important;
+    -webkit-background-clip: border-box !important;
+  }
+
+  .dark .tool-page-content,
+  .dark .tool-page-content h1,
+  .dark .tool-page-content h2,
+  .dark .tool-page-content h3,
+  .dark .tool-page-content h4,
+  .dark .tool-page-content label {
+    color: #f4f4f5 !important;
+    -webkit-text-fill-color: #f4f4f5 !important;
+  }
+
+  .dark .tool-page-content p {
+    color: #a1a1aa !important;
+    -webkit-text-fill-color: #a1a1aa !important;
   }
   
   .gradient-border {
