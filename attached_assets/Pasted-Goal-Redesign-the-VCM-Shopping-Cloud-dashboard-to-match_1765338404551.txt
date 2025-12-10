@@ -1,0 +1,203 @@
+Goal: Redesign the VCM Shopping Cloud dashboard to match an Adobe Creative Cloud–style layout, but in a white/light theme, without touching any forbidden core files. This is a purely visual/layout refactor – all existing logic, entitlements, and routing must remain intact.
+
+High-level target
+
+I want the Shopping Cloud home page to look like a white-themed version of the Adobe Cloud home:
+
+- Large hero banner at the top (big headline + subheadline)
+- Under the hero, a row of 3 primary “app” cards (for the main Shopping Cloud tools)
+- Below that, a row of category filter tabs (Featured, AI Tools, Style Tools, Boards, etc.)
+- Below the tabs, a grid of featured tools
+- On the right side, a “Recent files” sidebar similar to Adobe’s Recent Files rail
+- Overall: white background, soft gray panels, rounded corners, subtle shadows, clean Apple/Adobe aesthetic
+
+VERY IMPORTANT – Editing Rules / Allowed Zones
+
+Follow these rules strictly. Do NOT violate them.
+
+Forbidden (ABSOLUTE LOCKED ZONES – READ ONLY, NO WRITES)
+- components/renderer/**
+- lib/vcmRenderer/**
+- lib/vcm-renderer/**
+- Any file containing ANY of these identifiers: Renderer, renderEngine, VCMRenderer, resolveConfig, resolveCmsObject
+- app/globals.css
+- lib/db.ts
+- engine registries: lib/engineRegistry.ts, data/toolsRegistry.ts
+- Any CMS resolver / low-level routing code
+
+The codebase is currently light-theme only.
+- Do NOT use any Tailwind `dark:` variants anywhere.
+- Do NOT introduce global theme switches or new color modes.
+
+Allowed (YOU MAY EDIT / CREATE)
+- app/clouds/** (Shopping Cloud page and its immediate layout)
+- components/clouds/**
+- components/cards/**
+- components/ui/** (if such generic UI components exist)
+- Any new components you create under components/clouds/ or components/cards/ that are used ONLY for layout/visual purposes
+
+No global CSS changes:
+- All styling must be done with Tailwind utility classes in JSX/TSX.
+- Do NOT edit app/globals.css or Tailwind config.
+
+Functional constraints
+
+- DO NOT change any business logic, entitlements, or API calls.
+- DO NOT change any engine configs or CMS data contracts.
+- You can refactor JSX structure and Tailwind classes, and create new presentational components, but the underlying data (which tools are shown, recent files, etc.) must remain the same.
+- All existing links, tool slugs, and click behavior must continue to work.
+
+Layout to implement for the Shopping Cloud page
+
+1) Identify the Shopping Cloud page
+- Find the current page component that renders the Shopping Cloud: likely something like `app/clouds/shopping-cloud/page.tsx` or similar.
+- Confirm this is the file currently rendering the “VCM Shopping Cloud” hero and the list of tools.
+- This will be the main entry point you refactor.
+
+2) Create a composed layout
+
+Refactor the Shopping Cloud page to use a high-level layout like:
+
+- A full-width main container with white background.
+- Inside, a two-column layout:
+  - Left: main content (hero + sections)
+  - Right: Recent Files sidebar
+
+Rough structure (you will translate this into real TSX):
+
+<main className="min-h-screen bg-white">
+  <div className="max-w-6xl mx-auto flex gap-8 px-6 py-10">
+    <section className="flex-1 flex flex-col gap-10">
+      <ShoppingCloudHero />
+      <ShoppingCloudPrimaryCards />
+      <ShoppingCloudCategoryTabs />
+      <ShoppingCloudFeaturedTools />
+    </section>
+    <aside className="w-80 hidden lg:block">
+      <ShoppingCloudRecentFiles />  // reuse existing data logic, new UI
+    </aside>
+  </div>
+</main>
+
+Create the needed components under components/clouds/:
+
+- components/clouds/ShoppingCloudHero.tsx
+- components/clouds/ShoppingCloudPrimaryCards.tsx
+- components/clouds/ShoppingCloudCategoryTabs.tsx
+- components/clouds/ShoppingCloudFeaturedTools.tsx
+- components/clouds/ShoppingCloudRecentFiles.tsx (wrap existing recent files logic in a nicer UI)
+
+If some of these already exist, refactor them instead of creating duplicates. Keep imports clean.
+
+3) Hero Section – white Adobe style
+
+Implement a hero similar to Adobe’s but on white:
+
+- Full-width section with soft gradient from white to zinc-50
+- Headline: “VCM Shopping Cloud”
+- Subheadline: brief pitch about outfit generators, styling boards, and shoppable tools
+- Optional small pill tag “PRO” near the title
+- Use Tailwind classes like:
+
+  - Container: `bg-gradient-to-b from-white to-zinc-50 rounded-b-3xl border-b border-zinc-200 px-6 py-10`
+  - Title: `text-4xl font-bold text-zinc-900 tracking-tight`
+  - Subheadline: `text-lg text-zinc-600 max-w-xl mt-3`
+
+Do NOT use dark mode variants.
+
+4) Primary Cards Row – 3 Adobe-like app cards
+
+Under the hero, add a row of 3 main cards for key Shopping Cloud tools (e.g. outfit finder, track price, Amazon tracker).
+
+- 1 row, responsive:
+  - `grid grid-cols-1 md:grid-cols-3 gap-6`
+- Card styling:
+
+  - `bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition`
+  - Title: `text-xl font-semibold text-zinc-900 mb-2`
+  - Description: `text-sm text-zinc-600 mb-4 leading-relaxed`
+  - Buttons row: `flex gap-3`
+    - “Open tool” button: neutral border button (`border border-zinc-300 text-zinc-800 bg-white`)
+    - “View plans” button: gradient (`bg-gradient-to-r from-pink-500 to-orange-400 text-white`)
+
+Make sure each card links to the correct tool slug (reuse existing tool metadata – don’t hardcode raw URLs if there is already a registry or CMS object to derive from).
+
+5) Category Tabs Row
+
+Add a horizontal tab row similar to Adobe’s category bar:
+
+- Example labels: “Featured”, “AI Tools”, “Style Tools”, “Boards”
+- Styling:
+
+  - Container: `flex gap-3 mt-8 overflow-x-auto pb-1`
+  - Tab button (non-active): `px-4 py-2 text-sm rounded-full border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-100`
+  - Active tab: `bg-zinc-900 text-white border-zinc-900` or use the gradient as accent
+
+For now, it’s fine if these are cosmetic only (no need to implement full filtering yet) **as long as you don’t break any existing logic**. If there is already filtering logic, wire tabs into that; otherwise they can be static UI.
+
+6) Featured Tools Grid
+
+Refactor the existing tool list into a clean grid:
+
+- Layout: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8`
+- Each tool card should:
+
+  - Be a `Link` to the tool’s page
+  - Use card styling similar to:
+
+    - Container: `bg-zinc-50 border border-zinc-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition h-full flex flex-col`
+    - Top “image” or gradient block: `h-32 rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-200 mb-4`
+    - Tool title: `text-lg font-semibold text-zinc-900 mb-1`
+    - Tool description: `text-sm text-zinc-600 flex-1`
+    - Optional: small badge for “Pro feature” if the tool requires Shopping Cloud Pro (but do NOT change the entitlement logic)
+
+Do NOT alter how tools are fetched or determined; only change the JSX layout and classes around them.
+
+7) Recent Files Sidebar
+
+Wrap the existing recent files logic in a nicer visual shell on the right side:
+
+- A panel with:
+
+  - Container: `bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm h-full flex flex-col`
+  - Title: `text-lg font-semibold text-zinc-900 mb-4`
+  - List: scrollable section with `flex flex-col gap-3 overflow-y-auto max-h-[600px]`
+
+- Each recent file row:
+
+  - `flex gap-3 items-center p-3 rounded-xl border border-zinc-200 hover:bg-zinc-50 transition`
+  - Thumbnail square (if available) or file-type badge
+  - File name: `text-sm font-semibold text-zinc-900`
+  - Subtext: `text-xs text-zinc-500`
+
+Use the existing recent files data source; do NOT introduce new persistence or change how memory/entitlements are handled. Free users should still see files they created, consistent with current behavior.
+
+8) Responsiveness
+
+Ensure:
+
+- On mobile (smaller screens):
+
+  - Sidebar hides (`hidden lg:block`)
+  - Content becomes a single column
+  - Cards and grid stack nicely
+
+- On desktop:
+
+  - Two-column layout shows as described.
+
+9) Clean up & verification
+
+- NO `dark:` Tailwind classes anywhere in any newly edited components.
+- NO changes to forbidden files (renderer, globals.css, engine registries, db, cms resolver).
+- Run TypeScript check / build to ensure no type or import errors.
+- Confirm that:
+  - Shopping Cloud page loads with the new layout
+  - All existing tools still open correctly
+  - Recent files still function as before
+  - No entitlements or logic behavior changed
+
+Finally, summarize:
+
+- List all files you created or modified.
+- For each file, briefly describe what changed (UI-only) and confirm no core renderer/engine/CMS logic was touched.

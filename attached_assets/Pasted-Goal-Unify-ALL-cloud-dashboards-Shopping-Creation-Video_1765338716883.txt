@@ -1,0 +1,332 @@
+Goal: Unify ALL cloud dashboards (Shopping, Creation, Video, Writing, File/Data, Intelligence, Music, Growth/Distribution, etc.) under a single, beautiful white-theme Adobe-style layout, while strictly respecting the existing architecture and Editing Rules.
+
+This is a PURELY VISUAL + LAYOUT refactor:
+- Do NOT change business logic, renderer logic, CMS contracts, or entitlements.
+- Do NOT change which tools belong to which cloud.
+- Only change how the dashboards LOOK and how their sections are laid out.
+
+GLOBAL EDITING RULES (DO NOT VIOLATE)
+
+Forbidden (ABSOLUTELY READ-ONLY)
+- components/renderer/**
+- lib/vcmRenderer/**
+- lib/vcm-renderer/**
+- Any file containing ANY of these identifiers:
+  - Renderer
+  - renderEngine
+  - VCMRenderer
+  - resolveConfig
+  - resolveCmsObject
+- app/globals.css
+- lib/db.ts
+- Engine registries: lib/engineRegistry.ts, data/toolsRegistry.ts
+- Any low-level CMS resolver or routing code
+
+The codebase is LIGHT-THEME ONLY:
+- Do NOT use `dark:` Tailwind variants anywhere.
+- Do NOT introduce new theme toggles or dark mode.
+
+Allowed (YOU MAY EDIT / CREATE)
+- app/clouds/** (all cloud dashboard pages)
+- components/clouds/**
+- components/cards/**
+- components/ui/** (for generic presentational components)
+- Any NEW presentational components living under components/clouds/ or components/cards/
+
+Styling constraints:
+- All styling must be done with Tailwind classes in TSX.
+- No edits to app/globals.css or Tailwind config.
+
+====================================================
+PHASE 1 – Create a SHARED Cloud Dashboard Layout System
+====================================================
+
+1) Discover all Cloud dashboard entrypoints
+
+- Inspect app/clouds/** and identify each cloud dashboard page.
+  Examples (names may differ; detect what exists in this repo):
+  - app/clouds/shopping/page.tsx or app/clouds/shopping-cloud/page.tsx
+  - app/clouds/creation/page.tsx
+  - app/clouds/video/page.tsx
+  - app/clouds/writing/page.tsx
+  - app/clouds/file-data/page.tsx
+  - app/clouds/intelligence/page.tsx
+  - app/clouds/music/page.tsx
+  - app/clouds/growth/page.tsx
+- For each cloud page, note:
+  - Cloud slug (string)
+  - Current hero title/description
+  - How it currently fetches tools for that cloud (CMS query, cloud_tag filter, etc.)
+  - Whether it already shows “Recent files”
+
+Do NOT change any fetching logic – only how we render the results.
+
+
+2) Create shared layout components
+
+Under components/clouds/, create a small layout system. Suggestion:
+
+- components/clouds/CloudDashboardLayout.tsx
+- components/clouds/CloudHero.tsx
+- components/clouds/CloudPrimaryCards.tsx
+- components/clouds/CloudCategoryTabs.tsx
+- components/clouds/CloudFeaturedTools.tsx
+- components/clouds/CloudRecentFilesRail.tsx
+
+Each of these must be PURELY presentational. They receive props and render UI, no business logic.
+
+Base structure for the layout:
+
+<main className="min-h-screen bg-white">
+  <div className="max-w-6xl mx-auto flex gap-8 px-6 py-10">
+    <section className="flex-1 flex flex-col gap-10">
+      {/* hero, primary cards, tabs, featured tools */}
+    </section>
+    <aside className="w-80 hidden lg:block">
+      {/* recent files rail */}
+    </aside>
+  </div>
+</main>
+
+You can wrap this in CloudDashboardLayout and let each cloud page pass its specific child components in as props or as children.
+
+====================================================
+PHASE 2 – Implement the Adobe-style WHITE layout in shared components
+====================================================
+
+Important: The visual language must be the same for ALL clouds, only text/content changes.
+
+3) CloudHero.tsx – white Adobe hero
+
+Props to accept:
+- title: string
+- subtitle: string
+- proLabel?: string (e.g. "PRO" chip)
+- optionalAccent?: ReactNode (for small icon/badge)
+
+Visual spec:
+- Container:
+  - `bg-gradient-to-b from-white to-zinc-50 rounded-b-3xl border-b border-zinc-200 px-6 py-10`
+- Title:
+  - `text-4xl font-bold text-zinc-900 tracking-tight`
+- Subtitle:
+  - `text-lg text-zinc-600 max-w-xl mt-3`
+- Optional PRO chip:
+  - `inline-flex items-center rounded-full bg-pink-100 text-pink-700 text-xs font-semibold px-2 py-0.5 ml-2`
+
+No dark: variants.
+
+4) CloudPrimaryCards.tsx – 2–3 main cards per cloud
+
+Props:
+- cards: Array<{
+    title: string
+    description: string
+    primaryLabel: string   // e.g. "Open tool"
+    secondaryLabel?: string // e.g. "View plans"
+    primaryHref: string    // tool slug/URL
+    secondaryHref?: string // cloud pricing or plans page
+    accent?: "gradient" | "outline" | etc. (optional)
+  }>
+
+Layout:
+- `grid grid-cols-1 md:grid-cols-3 gap-6`
+
+Card styling:
+- Outer:
+  - `bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition h-full flex flex-col`
+- Title:
+  - `text-xl font-semibold text-zinc-900 mb-2`
+- Description:
+  - `text-sm text-zinc-600 mb-4 leading-relaxed flex-1`
+- Buttons container:
+  - `flex gap-3`
+- Primary button:
+  - `px-4 py-2 rounded-lg text-sm font-medium text-white bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500`
+- Secondary button:
+  - `px-4 py-2 rounded-lg text-sm font-medium border border-zinc-300 text-zinc-800 bg-white hover:bg-zinc-100`
+
+Cloud-specific pages will pass different card configs (e.g., outfit tools for Shopping Cloud, thumbnail analyzer / channel tools for Growth Cloud, etc.) but the component remains the same.
+
+5) CloudCategoryTabs.tsx – filter row
+
+Props:
+- tabs: string[]
+- activeTab: string
+- onTabChange?: (tab: string) => void
+
+For now, it’s acceptable if tabs are purely cosmetic and activeTab is fixed, as long as no existing logic is broken. If some clouds already have categories, wire into that.
+
+Styling:
+- Container: `flex gap-3 mt-8 overflow-x-auto pb-1`
+- Base tab:
+  - `px-4 py-2 text-sm rounded-full border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-100 whitespace-nowrap`
+- Active tab (if used):
+  - `bg-zinc-900 text-white border-zinc-900` OR use a gradient if you want a more branded look.
+
+6) CloudFeaturedTools.tsx – tool grid
+
+Props:
+- tools: Array<{
+    slug: string
+    title: string
+    description: string
+    isPro?: boolean
+  }>
+
+The array should be fed from existing logic in each cloud page (e.g., query by cloud tag). Do NOT change how tools are selected – only how they are rendered.
+
+Layout:
+- `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8`
+
+Card:
+- Outer:
+  - `bg-zinc-50 border border-zinc-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition h-full flex flex-col`
+- “Image” block:
+  - `h-32 rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-200 mb-4`
+- Title:
+  - `text-lg font-semibold text-zinc-900 mb-1`
+- Description:
+  - `text-sm text-zinc-600 flex-1`
+- Pro badge (if isPro):
+  - `inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-[11px] font-semibold px-2 py-0.5 mt-3 self-start`
+
+Wrap the whole card in a `Link` to the tool path.
+
+7) CloudRecentFilesRail.tsx – unified right sidebar
+
+Wrap whatever logic you already have for recent files in a consistent UI.
+
+Props:
+- files: Array<{
+    id: string
+    name: string
+    type: string
+    thumbnailUrl?: string
+    href: string
+  }>
+
+Layout:
+- Outer:
+  - `bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm h-full flex flex-col`
+- Title:
+  - `text-lg font-semibold text-zinc-900 mb-4`
+- List:
+  - `flex flex-col gap-3 overflow-y-auto max-h-[600px]`
+
+Row:
+- Container:
+  - `flex gap-3 items-center p-3 rounded-xl border border-zinc-200 hover:bg-zinc-50 transition cursor-pointer`
+- Thumbnail:
+  - If thumbnailUrl:
+    - `w-10 h-10 rounded-md object-cover`
+  - Else:
+    - `w-10 h-10 rounded-md bg-zinc-100 flex items-center justify-center text-xs text-zinc-600`
+- Text:
+  - Name: `text-sm font-semibold text-zinc-900 truncate`
+  - Type: `text-xs text-zinc-500`
+
+Ensure clicking a row navigates to the correct file/tool view, using existing routing.
+
+====================================================
+PHASE 3 – Apply the shared layout to EVERY cloud dashboard
+====================================================
+
+8) Refactor Shopping Cloud page FIRST (canonical implementation)
+
+- In the Shopping Cloud page component (e.g. app/clouds/shopping-cloud/page.tsx):
+  - Import CloudDashboardLayout and all the shared components.
+  - Create Shopping-specific configs:
+
+    - heroTitle = "VCM Shopping Cloud"
+    - heroSubtitle = "Unlock outfit generators, styling boards, lookbooks, and shoppable content tools."
+    - primaryCards = [
+        { title, description, primaryLabel: "Open tool", secondaryLabel: "View plans", primaryHref: "/tools/...", secondaryHref: "/clouds/shopping-cloud/plans" },
+        ...
+      ]
+    - tabs = ["Featured", "Style tools", "AI tools", "Boards"]
+    - tools = whatever array is already being used to render Shopping Cloud tools (reuse existing logic)
+    - recentFiles = whatever source currently powers recent files for this cloud (reuse existing logic)
+
+- Use the layout like:
+
+  <CloudDashboardLayout
+    hero={
+      <CloudHero title={heroTitle} subtitle={heroSubtitle} proLabel="PRO" />
+    }
+    primaryCards={<CloudPrimaryCards cards={primaryCards} />}
+    tabs={<CloudCategoryTabs tabs={tabs} activeTab={tabs[0]} />}
+    featured={<CloudFeaturedTools tools={tools} />}
+    recent={<CloudRecentFilesRail files={recentFiles} />}
+  />
+
+(or use children / composition if you prefer – the key is same shape across clouds.)
+
+- Confirm Shopping Cloud visually matches the white Adobe-style design and still works.
+
+9) Refactor ALL other cloud dashboards to reuse the same layout
+
+For EACH cloud page under app/clouds/**:
+
+- Import and use the same shared components.
+- Provide only cloud-specific config:
+
+  - Creation Cloud:
+    - Hero title: "VCM Creation Cloud"
+    - Subtitle: about idea capture, outlines, scripts, etc.
+    - Primary cards: main creation tools.
+    - Tabs: e.g. ["Featured", "Writing", "Ideas", "Workflows"]
+  - Video Cloud:
+    - Title: "VCM Video Cloud"
+    - Subtitle: about scripts, thumbnails, hooks, etc.
+    - Primary cards: thumbnail analyzer, script tools, etc.
+    - Tabs: like ["Featured", "Short-form", "Long-form", "Hooks"]
+  - And so on for each existing cloud.
+
+- DO NOT change the core logic that determines which tools appear.
+  - Wherever the page previously did something like “get tools where cloud tag includes 'video'”, keep that logic, then pass the resulting array into <CloudFeaturedTools />.
+
+- If a cloud does NOT currently have a Recent Files rail, you can:
+  - Either wire it to the same recent-files source used by other clouds (if applicable), or
+  - Render CloudRecentFilesRail with an empty array and a placeholder message (“You’ll see your recent files here once you start using the tools.”)
+
+10) Responsiveness & UX sanity check
+
+- On mobile:
+  - Sidebar should hide (`hidden lg:block` on the aside).
+  - Layout should collapse to a single column with hero -> primary cards -> tabs -> featured grid.
+- On desktop:
+  - Two-column layout should be visible.
+- Confirm:
+  - All cloud dashboards share the SAME visual structure and styles.
+  - Each cloud only differs by text content, cards config, and the tools it shows.
+
+====================================================
+PHASE 4 – Verification and Summary
+====================================================
+
+11) Verification checklist
+
+Before finishing:
+
+- No forbidden files changed:
+  - components/renderer/**
+  - lib/vcmRenderer/**
+  - lib/vcm-renderer/**
+  - any file that defines the renderer pipeline or CMS object resolution
+  - app/globals.css
+  - lib/db.ts
+  - engine registries
+- No Tailwind `dark:` classes in any newly edited/created components.
+- TypeScript compiles.
+- All cloud dashboards load without runtime errors.
+- Tools and recent files behave exactly as before (only the UI changed).
+
+12) Final summary output
+
+In your final message, list:
+
+- All files created.
+- All files modified.
+- For each one, a 1–2 sentence description of what changed, explicitly stating that changes are UI/layout only and that no renderer/engine/CMS/db logic was touched.
+
