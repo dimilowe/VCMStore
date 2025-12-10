@@ -70,7 +70,7 @@ const toolIcons: Record<string, { icon: React.ComponentType<{ className?: string
   "linkedin-hashtags-analyzer": { icon: Linkedin, bg: "bg-cyan-500" },
   "linkedin-hook-analyzer": { icon: Linkedin, bg: "bg-teal-500" },
   "tiktok-cta-analyzer": { icon: Video, bg: "bg-gray-500" },
-  "tiktok-caption-analyzer": { icon: Video, bg: "bg-slate-500" },
+  "tiktok-caption-analyzer": { icon: Video, bg: "bg-violet-500" },
   "tiktok-hashtags-analyzer": { icon: Video, bg: "bg-pink-500" },
   "tiktok-hook-analyzer": { icon: Video, bg: "bg-cyan-500" },
   "tiktok-thumbnail-analyzer": { icon: Video, bg: "bg-red-500" },
