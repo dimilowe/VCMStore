@@ -265,7 +265,7 @@ export default async function ClusterPillarPage({ params }: PageProps) {
        data->>'name' as name,
        data->>'description' as description
      FROM cms_objects
-     WHERE type = 'tool' AND cluster_slug = $1`,
+     WHERE type = 'tool' AND (pillar_slug = $1 OR cluster_slug = $1)`,
     [clusterSlug]
   );
 
