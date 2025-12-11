@@ -89,7 +89,7 @@ export async function GET() {
           name: tool.name,
           engineType: tool.engine || "legacy",
           segment,
-          clusterSlug: tool.cluster || "",
+          clusterSlug: tool.pillarSlug || tool.cluster || "",
           isIndexed,
           isFeatured: tool.featured,
           inDirectory: tool.inDirectory,

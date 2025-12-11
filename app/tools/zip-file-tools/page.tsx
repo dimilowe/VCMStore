@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { FileArchive, FolderArchive, Lock, Download, CheckCircle, ArrowRight, Shield, Zap } from "lucide-react";
+import { FileArchive, CheckCircle, ArrowRight, Shield, Zap, Download, Wrench } from "lucide-react";
+import { query } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Free ZIP File Tools - Compress, Create & Protect Files Online",
@@ -11,56 +14,16 @@ export const metadata: Metadata = {
   },
 };
 
-const zipTools = [
-  {
-    slug: "zip-file-compression",
-    name: "ZIP File Compression",
-    description: "Compress files into smaller ZIP archives",
-    icon: FileArchive,
-    benefit: "Reduce file sizes by up to 80%"
-  },
-  {
-    slug: "zip-file-folder",
-    name: "ZIP Folder",
-    description: "Archive entire folders into a single ZIP",
-    icon: FolderArchive,
-    benefit: "Bundle multiple files for easy sharing"
-  },
-  {
-    slug: "zip-file-in-linux",
-    name: "ZIP File in Linux",
-    description: "Linux-compatible ZIP file creation",
-    icon: FileArchive,
-    benefit: "Cross-platform compatibility"
-  },
-  {
-    slug: "zip-file-linux",
-    name: "ZIP File Linux",
-    description: "Create ZIP files for Linux systems",
-    icon: FileArchive,
-    benefit: "Works with all Linux distributions"
-  },
-  {
-    slug: "zip-file-make",
-    name: "Make ZIP File",
-    description: "Create ZIP archives from any files",
-    icon: FileArchive,
-    benefit: "Simple drag-and-drop ZIP creation"
-  },
-  {
-    slug: "zip-file-on-linux",
-    name: "ZIP File on Linux",
-    description: "Online ZIP tool for Linux users",
-    icon: FileArchive,
-    benefit: "No command line required"
-  },
-  {
-    slug: "zip-file-password-protection",
-    name: "Password Protect ZIP",
-    description: "Add password protection to ZIP files",
-    icon: Lock,
-    benefit: "Secure sensitive files with encryption"
-  }
+const PILLAR_SLUG = "zip-file-tools";
+
+const fallbackTools = [
+  { slug: "zip-file-compression", name: "ZIP File Compression", description: "Compress files into smaller ZIP archives" },
+  { slug: "zip-file-folder", name: "ZIP Folder", description: "Archive entire folders into a single ZIP" },
+  { slug: "zip-file-in-linux", name: "ZIP File in Linux", description: "Linux-compatible ZIP file creation" },
+  { slug: "zip-file-linux", name: "ZIP File Linux", description: "Create ZIP files for Linux systems" },
+  { slug: "zip-file-make", name: "Make ZIP File", description: "Create ZIP archives from any files" },
+  { slug: "zip-file-on-linux", name: "ZIP File on Linux", description: "Online ZIP tool for Linux users" },
+  { slug: "zip-file-password-protection", name: "Password Protect ZIP", description: "Add password protection to ZIP files" },
 ];
 
 const proTips = [
@@ -94,22 +57,97 @@ const faqs = [
   }
 ];
 
-export default function ZipFileToolsPage() {
+async function getLinkedTools() {
+  try {
+    const result = await query(
+      `SELECT slug, name, description 
+       FROM tools 
+       WHERE pillar_slug = $1
+       ORDER BY priority ASC, name ASC`,
+      [PILLAR_SLUG]
+    );
+    
+    if (result.rows.length > 0) {
+      return result.rows.map((row: { slug: string; name: string; description: string | null }) => ({
+        slug: row.slug,
+        name: row.name,
+        description: row.description || "",
+      }));
+    }
+    return fallbackTools;
+  } catch (error) {
+    console.error("Error fetching pillar tools:", error);
+    return fallbackTools;
+  }
+}
+
+export default async function ZipFileToolsPage() {
+  const tools = await getLinkedTools();
+
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <span className="inline-block px-4 py-1 bg-orange-100 text-orange-600 text-sm font-medium rounded-full mb-4">
-            Free Online Tools
+        <Link 
+          href="/tools" 
+          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-500 mb-6"
+        >
+          <ArrowRight className="w-4 h-4 rotate-180" />
+          Back to Tools Explorer
+        </Link>
+
+        <div className="mb-8">
+          <span className="inline-block px-3 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-full uppercase tracking-wide mb-3">
+            Tool Collection
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            ZIP File Tools
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Free ZIP File Tools: Compress, Create & Protect
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Compress, create, and protect ZIP archives online. No software to download, 
-            works on any device, completely free.
+          <p className="text-lg text-gray-600 max-w-3xl">
+            Online tools to create, compress, and password-protect ZIP files without software.
           </p>
         </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8">
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+            <Wrench className="w-4 h-4" />
+            <span>Table of Contents</span>
+          </div>
+          <Link href="#tools" className="flex items-center gap-2 text-gray-700 hover:text-orange-500">
+            <Wrench className="w-4 h-4 text-orange-500" />
+            Tools in This Collection
+          </Link>
+        </div>
+
+        <section id="tools" className="mb-12">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Wrench className="w-5 h-5 text-orange-500" />
+            Tools in This Collection ({tools.length})
+          </h2>
+          
+          {tools.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {tools.map((tool) => (
+                <Link
+                  key={tool.slug}
+                  href={`/tools/${tool.slug}`}
+                  className="bg-white border border-gray-200 rounded-xl p-5 hover:border-orange-300 hover:shadow-md transition-all group"
+                >
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3 group-hover:bg-orange-200 transition-colors">
+                    <FileArchive className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-orange-600 transition-colors">
+                    {tool.name}
+                  </h3>
+                  <p className="text-sm text-gray-600">{tool.description}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
+              <p className="text-gray-500">No tools have been assigned to this collection yet.</p>
+            </div>
+          )}
+        </section>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
@@ -136,61 +174,6 @@ export default function ZipFileToolsPage() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 mb-12 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Reference</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Tool</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Description</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Best For</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {zipTools.map((tool) => (
-                  <tr key={tool.slug} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium text-gray-900">{tool.name}</td>
-                    <td className="py-3 px-4 text-gray-600">{tool.description}</td>
-                    <td className="py-3 px-4 text-gray-600">{tool.benefit}</td>
-                    <td className="py-3 px-4">
-                      <Link 
-                        href={`/tools/${tool.slug}`}
-                        className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium"
-                      >
-                        Use Tool <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {zipTools.map((tool) => {
-            const IconComponent = tool.icon;
-            return (
-              <Link
-                key={tool.slug}
-                href={`/tools/${tool.slug}`}
-                className="bg-white border border-gray-200 rounded-xl p-6 hover:border-orange-300 hover:shadow-md transition-all group"
-              >
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-orange-200 transition-colors">
-                  <IconComponent className="w-6 h-6 text-orange-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
-                  {tool.name}
-                </h3>
-                <p className="text-gray-600 text-sm mb-3">{tool.description}</p>
-                <p className="text-xs text-orange-600 font-medium">{tool.benefit}</p>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-12 shadow-sm">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Pro Tips for ZIP Files</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {proTips.map((tip, index) => (
@@ -203,24 +186,17 @@ export default function ZipFileToolsPage() {
         </div>
 
         <section className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-8 text-white text-center mb-12">
-          <h2 className="text-2xl font-bold mb-3">Ready to Create a ZIP File?</h2>
+          <h2 className="text-2xl font-bold mb-3">Build Your Creator Business</h2>
           <p className="text-orange-100 mb-6 max-w-2xl mx-auto">
-            Choose the tool that fits your needs. All tools are free, fast, and secure.
+            Join VCM OS to access premium creator tools, resources, and a community of ambitious creators.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              href="/tools/zip-file-compression"
-              className="px-6 py-3 bg-white text-orange-600 rounded-lg font-medium hover:bg-orange-50 transition-colors"
-            >
-              Start Compressing
-            </Link>
-            <Link
-              href="/tools/zip-file-password-protection"
-              className="px-6 py-3 bg-white/20 hover:bg-white/30 rounded-lg font-medium transition-colors"
-            >
-              Password Protect
-            </Link>
-          </div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-orange-600 rounded-lg font-medium hover:bg-orange-50 transition-colors"
+          >
+            Open VCM OS
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </section>
 
         <section className="mb-12">
@@ -243,8 +219,8 @@ export default function ZipFileToolsPage() {
               "@type": "ItemList",
               name: "ZIP File Tools",
               description: "Free online tools to compress, create, and protect ZIP files",
-              numberOfItems: zipTools.length,
-              itemListElement: zipTools.map((tool, index) => ({
+              numberOfItems: tools.length,
+              itemListElement: tools.map((tool, index) => ({
                 "@type": "ListItem",
                 position: index + 1,
                 item: {

@@ -63,10 +63,10 @@ export async function POST(request: NextRequest) {
         isFeatured: "featured",
         inDirectory: "inDirectory",
         segment: "segment",
-        clusterSlug: "cluster_slug",
+        clusterSlug: "pillarSlug",
       };
-      const dbField = fieldMap[field] || field;
-      await updateTool(slug, { [dbField]: value });
+      const updateKey = fieldMap[field] || field;
+      await updateTool(slug, { [updateKey]: value });
     }
 
     return NextResponse.json({ success: true, slug, field, value });
