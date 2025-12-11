@@ -516,6 +516,23 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
 ```
 
 ## Recent Changes
+- 2025-12-11: **Internal Linking Architecture** - Complete SEO internal linking to prevent orphaned pillar pages
+  - Created ToolBreadcrumb component (components/tools/ToolBreadcrumb.tsx):
+    - Shows "Tools > [Pillar] > [Tool Name]" when tool has a pillar assigned
+    - Shows "Tools > [Tool Name]" for tools without a pillar
+    - Links to /tools, pillar page, and current tool
+  - Added Tool Collections section to /tools page (components/tools/PillarCollections.tsx):
+    - Displays indexed pillar cards with title, description, and CTA
+    - Links to /tools/[pillar-slug] pillar pages
+  - Created pillar helper functions (lib/cms/getPillarBySlug.ts):
+    - getPillarBySlug(): Get single pillar info
+    - getAllIndexedPillars(): Get all indexed pillars
+    - getRelatedPillars(): Get other pillars for cross-linking
+  - Added Related Collections section to pillar pages:
+    - Shows other indexed pillars with links
+    - Excludes current pillar from list
+  - Complete linking graph: /tools ↔ pillars ↔ tools creates non-orphaned architecture
+  - API endpoint: /api/pillars returns all pillar slugs and titles
 - 2025-12-09: **Type-Based SEO Ready Rules** - Intelligent readiness evaluation based on page type and cluster architecture
   - Created lib/seo/urlClassifier.ts as central classification utility:
     - Configurable thresholds: MIN_READY_SCORE=80, BASELINE_INTERNAL_LINKS=3
