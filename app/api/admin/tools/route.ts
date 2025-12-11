@@ -37,13 +37,13 @@ export async function GET() {
     let hasFeaturedColumn = true;
     try {
       cmsResult = await query(
-        `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, featured FROM cms_objects WHERE type = 'tool'`
+        `SELECT slug, cluster_slug, pillar_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, featured FROM cms_objects WHERE type = 'tool'`
       );
     } catch (err) {
       // Fallback query without featured column if it doesn't exist
       hasFeaturedColumn = false;
       cmsResult = await query(
-        `SELECT slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data FROM cms_objects WHERE type = 'tool'`
+        `SELECT slug, cluster_slug, pillar_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data FROM cms_objects WHERE type = 'tool'`
       );
     }
     const cmsToolSlugs = new Set(cmsResult.rows.map((r: { slug: string }) => r.slug));
@@ -104,7 +104,7 @@ export async function GET() {
       });
     
     // Map CMS tools
-    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; cloud_tags: string[]; data: CmsToolData; featured?: boolean }) => {
+    const cmsTools = cmsResult.rows.map((row: { slug: string; cluster_slug: string | null; pillar_slug: string | null; cloud_tags: string[]; data: CmsToolData; featured?: boolean }) => {
       const data = row.data;
       const toolUrl = `/tools/${row.slug}`;
       const isIndexed = indexStatusMap.get(toolUrl) ?? data.isIndexed ?? false;
@@ -114,7 +114,7 @@ export async function GET() {
         name: data.title || row.slug,
         engineType: data.engine_config?.engine || "unknown",
         segment: "utility",
-        clusterSlug: row.cluster_slug || data.interlink_parent || "",
+        clusterSlug: row.pillar_slug || row.cluster_slug || data.interlink_parent || "",
         cloudTags: row.cloud_tags || [],
         isIndexed,
         isFeatured: hasFeaturedColumn ? (row.featured || false) : false,
