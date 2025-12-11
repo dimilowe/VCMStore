@@ -8,7 +8,7 @@
     "dev": "next dev -H 0.0.0.0 -p 5000",
     "prebuild": "npm run prepare:safelist",
     "build": "next build",
-    "start": "next start -H 0.0.0.0",
+    "start": "next start -H 0.0.0.0 -p 5000",
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest"
