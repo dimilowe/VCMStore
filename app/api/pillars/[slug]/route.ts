@@ -21,14 +21,25 @@ export async function GET(
     const pillarData = pillarRow.data || {};
 
     const toolsResult = await query(
-      `SELECT slug, name, description 
-       FROM tools 
-       WHERE pillar_slug = $1
-       ORDER BY priority ASC, name ASC`,
+      `SELECT slug, name, description, priority FROM (
+        SELECT slug, name, description, priority
+        FROM tools 
+        WHERE pillar_slug = $1
+        
+        UNION ALL
+        
+        SELECT slug, 
+               COALESCE(data->>'title', data->'seo'->>'title', slug) as name,
+               COALESCE(data->>'description', data->'seo'->>'description', '') as description,
+               0 as priority
+        FROM cms_objects 
+        WHERE type = 'tool' AND pillar_slug = $1
+      ) combined
+      ORDER BY priority ASC, name ASC`,
       [slug]
     );
 
-    const tools = toolsResult.rows.map((row: { slug: string; name: string; description: string | null }) => ({
+    const tools = toolsResult.rows.map((row: { slug: string; name: string; description: string | null; priority?: number }) => ({
       slug: row.slug,
       name: row.name,
       description: row.description || "",
