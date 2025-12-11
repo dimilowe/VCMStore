@@ -1,0 +1,64 @@
+**You added the correct PG variables… but ONLY in the “App Secrets” tab.
+Replit Deploy does NOT use these.**
+Replit has two different environments:
+✅ 1. App Secrets
+Used for:
+Running the app in the Replit workspace
+Local Preview
+Console
+NOT used for deployments
+This is what you’re looking at in your screenshot.
+❗ 2. Deployment Environment (Production Secrets)
+Used only when you press Publish / Deploy
+Completely separate store of variables
+MUST contain:
+DATABASE_URL
+PGHOST
+PGPORT
+PGUSER
+PGPASSWORD
+PGDATABASE
+Right now, your deployment environment is empty, which is why the build cannot connect to the database even though everything is configured correctly.
+This explains:
+Dev works
+SQL migrations worked
+Agent says column exists
+Build still fails
+And the error says “Missing or incomplete PostgreSQL connection secrets”
+This is 100% consistent with Deployment Secrets being empty.
+🔥 How to fix it (do this and the build will succeed)
+Step 1 — Open Deploy Settings
+In Replit:
+Top bar → Publishing tab
+Look for "Deployment Settings" or "Environment Variables" under the deployment configuration
+You will see a second environment variable editor separate from App Secrets
+Step 2 — Add the same PG vars (copy them manually)
+Add these EXACT values:
+Name	Value
+DATABASE_URL	postgresql://neondb_owner:npg_k0UGOl5Mnrpz@ep-green-field-a41na2i0-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+PGHOST	ep-green-field-a41na2i0-pooler.us-east-1.aws.neon.tech
+PGPORT	5432
+PGUSER	neondb_owner
+PGPASSWORD	npg_k0UGOl5Mnrpz
+PGDATABASE	neondb
+Step 3 — Save / Apply
+There will usually be:
+A “Save changes”
+Or “Update environment”
+Or “Apply to deployment”
+Step 4 — Republish
+Now the deployment build will:
+Load the correct Neon credentials
+Connect to the DB
+See pillar_slug
+Build successfully
+🧠 Why this happened
+Replit introduced a new deployment system:
+Running your app uses App Secrets
+Deploying your app uses Deployment Secrets
+They do NOT sync automatically
+This is why your dev environment worked but production didn’t
+This is exactly the failure mode you see:
+“column pillar_slug does not exist”
+because the build is querying a blank internal DB, not your Neon DB.
+⭐ Once you put the PG vars into the deployment environment, the error will disappear instantly.
