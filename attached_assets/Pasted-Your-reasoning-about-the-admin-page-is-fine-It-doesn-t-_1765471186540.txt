@@ -1,0 +1,35 @@
+Your reasoning about the admin page is fine.
+It doesn’t fix why the public pillar page still shows (0) tools.
+1. What your change actually fixes
+You said:
+The content-manager page uses tool.clusterSlug for the dropdown value at line 611. I've already updated the API to return pillar_slug in the clusterSlug field.
+Given that:
+/app/admin/content-manager/page.tsx pulls tools from /api/admin/tools
+That page only cares that it gets a clusterSlug string to populate the Pillar dropdown
+Then mapping pillar_slug → clusterSlug in /api/admin/tools is totally fine. That will:
+Make the dropdown show the right pillar
+Let you assign / filter by pillar correctly in the admin
+So yes, for the admin UI, that mapping is “good”.
+2. Why the live pillar page is still empty
+Different code path.
+The public page:
+Free ZIP File Tools: Compress, Create & Protect
+is not driven by /api/admin/tools. It’s almost certainly using something like:
+/api/pillars/[slug]
+or a CMS loader that reads from cms_objects directly
+That code is looking for tools where cms_objects.pillar_slug = 'zip-file-tools' (or whatever the slug is).
+Right now you have:
+tools table: pillar_slug set ✅
+cms_objects: pillar_slug missing / null ❌
+Updating /api/admin/tools doesn’t change cms_objects, so the pillar page still sees 0 tools.
+3. What still needs to happen
+You need one of these:
+Backfill pillar_slug into cms_objects for each tool assigned to that pillar
+For each ZIP tool’s CMS object, add:
+"pillar_slug": "zip-file-tools"
+Then republish.
+Or, change the pillar API to UNION or JOIN in the tools table using pillar_slug and return those tools alongside cms_objects.
+Long-term: when you change the pillar in Content Manager, also write that to cms_objects so CMS stays the source of truth.
+TL;DR
+✅ Your note about content-manager using /api/admin/tools and mapping pillar_slug → clusterSlug is correct and safe.
+❌ That alone will not make the pillar page show tools, because the pillar page is reading from cms_objects, where pillar_slug is still empty.
