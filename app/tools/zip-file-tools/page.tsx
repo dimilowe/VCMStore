@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { FileArchive, CheckCircle, ArrowRight, Shield, Zap, Download, Wrench } from "lucide-react";
+import { FileArchive, CheckCircle, ArrowRight, Shield, Zap, Download, Wrench, FolderOpen } from "lucide-react";
 import { query } from "@/lib/db";
+import { getRelatedPillars } from "@/lib/cms/getPillarBySlug";
 
 export const dynamic = "force-dynamic";
 
@@ -101,7 +102,10 @@ async function getLinkedTools() {
 }
 
 export default async function ZipFileToolsPage() {
-  const tools = await getLinkedTools();
+  const [tools, relatedPillars] = await Promise.all([
+    getLinkedTools(),
+    getRelatedPillars(PILLAR_SLUG)
+  ]);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -217,6 +221,34 @@ export default async function ZipFileToolsPage() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </section>
+
+        {relatedPillars.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
+              <FolderOpen className="w-5 h-5 text-orange-500" />
+              Related Collections
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedPillars.map((pillar) => (
+                <Link
+                  key={pillar.slug}
+                  href={`/tools/${pillar.slug}`}
+                  className="group bg-white rounded-xl p-5 border border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200"
+                >
+                  <h3 className="font-semibold text-gray-900 group-hover:text-orange-500 transition-colors mb-2">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+                    {pillar.description}
+                  </p>
+                  <span className="text-sm text-orange-500 font-medium flex items-center gap-1">
+                    View tools <ArrowRight className="w-4 h-4" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>

@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getCmsToolBySlug } from '@/lib/cms/getCmsToolBySlug';
+import { getPillarBySlug } from '@/lib/cms/getPillarBySlug';
 import { isEngineSupported } from '@/lib/engineRegistry';
 import ToolPageClient from './ToolPageClient';
 import { FreeToolsBlock } from '@/components/FreeToolsBlock';
+import { ToolBreadcrumb } from '@/components/tools/ToolBreadcrumb';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -42,9 +44,17 @@ export default async function ToolPage({ params }: PageProps) {
   }
 
   const hasEngine = isEngineSupported(tool.engine);
+  
+  const pillar = tool.clusterSlug ? await getPillarBySlug(tool.clusterSlug) : null;
 
   return (
     <>
+      <div className="max-w-4xl mx-auto px-4 pt-6">
+        <ToolBreadcrumb 
+          toolName={tool.name} 
+          pillar={pillar ? { slug: pillar.slug, title: pillar.title } : null} 
+        />
+      </div>
       <ToolPageClient tool={tool} hasEngine={hasEngine} />
       <div className="px-4 pb-12">
         <FreeToolsBlock currentSlug={tool.slug} />

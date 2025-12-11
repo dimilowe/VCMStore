@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import ToolsDirectoryClient from "./ToolsDirectoryClient";
 import { toolsRegistry, CATEGORY_INFO, CATEGORY_ORDER } from "@/data/toolsRegistry";
+import { getAllIndexedPillars } from "@/lib/cms/getPillarBySlug";
+import { PillarCollections } from "@/components/tools/PillarCollections";
 
 export const metadata: Metadata = {
   title: "VCM Tools Explorer — 50+ Free Creator Tools",
@@ -65,9 +67,10 @@ function generateSchemaMarkup() {
   return schema;
 }
 
-export default function ToolsPage() {
+export default async function ToolsPage() {
   const schema = generateSchemaMarkup();
   const toolCount = toolsRegistry.length;
+  const pillars = await getAllIndexedPillars();
   
   return (
     <>
@@ -86,6 +89,10 @@ export default function ToolsPage() {
               A curated library of powerful utilities for creators, businesses, and everyday workflows.
             </p>
           </div>
+
+          {pillars.length > 0 && (
+            <PillarCollections pillars={pillars} />
+          )}
 
           <ToolsDirectoryClient />
         </div>
