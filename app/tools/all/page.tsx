@@ -4,6 +4,8 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getAllCmsTools, ENGINE_TO_CATEGORY } from "@/lib/cms/getCmsToolBySlug";
 import { toolsRegistry, CATEGORY_INFO } from "@/data/toolsRegistry";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "All Tools A-Z — VCM Suite Tools Directory",
   description: "Browse the complete list of 100+ free online tools. Alphabetically sorted for easy discovery. Find any tool by name.",
