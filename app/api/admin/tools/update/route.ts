@@ -60,13 +60,21 @@ export async function POST(request: NextRequest) {
       );
     } else if (field === "clusterSlug") {
       // Update pillar_slug in both tables - pillar_slug is the canonical source of truth for pillar membership
+      // updateTool returns null if tool doesn't exist in tools table (CMS-only tools)
       const toolResult = await updateTool(slug, { pillarSlug: value });
+      const toolsTableUpdated = toolResult !== null;
       
-      // Also update pillar_slug in cms_objects if the tool exists there
-      await query(
+      // Update pillar_slug in cms_objects (this is the primary source for CMS tools)
+      const cmsResult = await query(
         `UPDATE cms_objects SET pillar_slug = $1, updated_at = NOW() WHERE slug = $2 AND type = 'tool'`,
         [value || null, slug]
       );
+      const cmsUpdated = (cmsResult.rowCount ?? 0) > 0;
+      
+      // If neither table was updated, the tool doesn't exist anywhere
+      if (!toolsTableUpdated && !cmsUpdated) {
+        return NextResponse.json({ error: "Tool not found" }, { status: 404 });
+      }
     } else {
       const fieldMap: Record<string, string> = {
         isFeatured: "featured",
