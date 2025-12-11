@@ -59,12 +59,12 @@ export async function POST(request: NextRequest) {
         [tags, slug, defaultData]
       );
     } else if (field === "clusterSlug") {
-      // Update pillar_slug - check both tools table and cms_objects
+      // Update pillar_slug in both tables - pillar_slug is the canonical source of truth for pillar membership
       const toolResult = await updateTool(slug, { pillarSlug: value });
       
-      // Also update cms_objects if the tool exists there
+      // Also update pillar_slug in cms_objects if the tool exists there
       await query(
-        `UPDATE cms_objects SET cluster_slug = $1, updated_at = NOW() WHERE slug = $2 AND type = 'tool'`,
+        `UPDATE cms_objects SET pillar_slug = $1, updated_at = NOW() WHERE slug = $2 AND type = 'tool'`,
         [value || null, slug]
       );
     } else {

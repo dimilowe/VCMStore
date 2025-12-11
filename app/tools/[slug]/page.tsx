@@ -45,7 +45,7 @@ export default async function ToolPage({ params }: PageProps) {
 
   const hasEngine = isEngineSupported(tool.engine);
   
-  const pillar = tool.clusterSlug ? await getPillarBySlug(tool.clusterSlug) : null;
+  const pillar = tool.pillarSlug ? await getPillarBySlug(tool.pillarSlug) : null;
 
   return (
     <>

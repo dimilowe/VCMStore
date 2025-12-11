@@ -72,7 +72,7 @@ async function getLinkedTools() {
       query(
         `SELECT slug, data->>'title' as name, data->>'description' as description
          FROM cms_objects 
-         WHERE type = 'tool' AND cluster_slug = $1
+         WHERE type = 'tool' AND pillar_slug = $1
          ORDER BY slug ASC`,
         [PILLAR_SLUG]
       )

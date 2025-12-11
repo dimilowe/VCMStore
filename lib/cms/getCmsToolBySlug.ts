@@ -53,6 +53,7 @@ export interface ToolForRenderer {
   preset?: string;
   mode?: string;
   isIndexed: boolean;
+  pillarSlug?: string | null;
   clusterSlug?: string | null;
   cloudTags?: CloudSlug[];
   seo?: ToolSeoConfig;
@@ -86,7 +87,7 @@ export async function getCmsToolBySlug(
   options?: { includeDrafts?: boolean }
 ): Promise<ToolForRenderer | null> {
   const result = await query(
-    `SELECT id, slug, type, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, word_count, health, created_at, updated_at
+    `SELECT id, slug, type, pillar_slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, word_count, health, created_at, updated_at
      FROM cms_objects
      WHERE type = 'tool' AND slug = $1
      LIMIT 1`,
@@ -114,6 +115,7 @@ export async function getCmsToolBySlug(
     preset: data.engine_config?.preset,
     mode: data.engine_config?.mode,
     isIndexed,
+    pillarSlug: row.pillar_slug,
     clusterSlug: row.cluster_slug,
     cloudTags: (row.cloud_tags ?? []) as CloudSlug[],
     seo: data.seo,
@@ -128,7 +130,7 @@ export async function getAllCmsTools(
   options?: { includeDrafts?: boolean }
 ): Promise<ToolForRenderer[]> {
   let sql = `
-    SELECT id, slug, type, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, word_count, health, created_at, updated_at
+    SELECT id, slug, type, pillar_slug, cluster_slug, COALESCE(cloud_tags, '{}') AS cloud_tags, data, word_count, health, created_at, updated_at
     FROM cms_objects
     WHERE type = 'tool'
   `;
@@ -151,6 +153,7 @@ export async function getAllCmsTools(
       preset: data.engine_config?.preset,
       mode: data.engine_config?.mode,
       isIndexed: data.isIndexed ?? false,
+      pillarSlug: row.pillar_slug,
       clusterSlug: row.cluster_slug,
       cloudTags: (row.cloud_tags ?? []) as CloudSlug[],
       seo: data.seo,
