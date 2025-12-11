@@ -59,20 +59,39 @@ const faqs = [
 
 async function getLinkedTools() {
   try {
-    const result = await query(
-      `SELECT slug, name, description 
-       FROM tools 
-       WHERE pillar_slug = $1
-       ORDER BY priority ASC, name ASC`,
-      [PILLAR_SLUG]
-    );
+    // Query from both tools table and cms_objects
+    const [toolsResult, cmsResult] = await Promise.all([
+      query(
+        `SELECT slug, name, description 
+         FROM tools 
+         WHERE pillar_slug = $1
+         ORDER BY priority ASC, name ASC`,
+        [PILLAR_SLUG]
+      ),
+      query(
+        `SELECT slug, data->>'title' as name, data->>'description' as description
+         FROM cms_objects 
+         WHERE type = 'tool' AND cluster_slug = $1
+         ORDER BY slug ASC`,
+        [PILLAR_SLUG]
+      )
+    ]);
     
-    if (result.rows.length > 0) {
-      return result.rows.map((row: { slug: string; name: string; description: string | null }) => ({
+    const allTools = [
+      ...toolsResult.rows.map((row: { slug: string; name: string; description: string | null }) => ({
         slug: row.slug,
         name: row.name,
         description: row.description || "",
-      }));
+      })),
+      ...cmsResult.rows.map((row: { slug: string; name: string; description: string | null }) => ({
+        slug: row.slug,
+        name: row.name || row.slug,
+        description: row.description || "",
+      }))
+    ];
+    
+    if (allTools.length > 0) {
+      return allTools;
     }
     return fallbackTools;
   } catch (error) {

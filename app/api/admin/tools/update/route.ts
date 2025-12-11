@@ -58,12 +58,20 @@ export async function POST(request: NextRequest) {
          ON CONFLICT (slug) DO UPDATE SET cloud_tags = $1, updated_at = NOW()`,
         [tags, slug, defaultData]
       );
+    } else if (field === "clusterSlug") {
+      // Update pillar_slug - check both tools table and cms_objects
+      const toolResult = await updateTool(slug, { pillarSlug: value });
+      
+      // Also update cms_objects if the tool exists there
+      await query(
+        `UPDATE cms_objects SET cluster_slug = $1, updated_at = NOW() WHERE slug = $2 AND type = 'tool'`,
+        [value || null, slug]
+      );
     } else {
       const fieldMap: Record<string, string> = {
         isFeatured: "featured",
         inDirectory: "inDirectory",
         segment: "segment",
-        clusterSlug: "pillarSlug",
       };
       const updateKey = fieldMap[field] || field;
       await updateTool(slug, { [updateKey]: value });
