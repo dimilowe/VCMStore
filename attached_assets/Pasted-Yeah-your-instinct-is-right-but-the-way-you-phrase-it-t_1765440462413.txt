@@ -1,0 +1,61 @@
+Yeah, your instinct is right, but the way you phrase it to Replit matters a lot.
+You don’t just want to “change the column name”; you want to standardize the meaning of pillar membership across both tables and make one field the canonical source of truth.
+Right now you have:
+tools table
+pillar_slug → used for pillar membership (legacy tools)
+cms_objects table
+cluster_slug → currently abused as “pillar membership” for CMS tools
+That’s a semantic mess. Fix is:
+What you should tell Replit to do
+1. Standardize on pillar_slug for pillar membership
+Decision:
+pillar_slug = “this tool belongs to pillar X”
+cluster_slug (if you keep it) = SEO cluster / topical grouping (different concept)
+So:
+tools.pillar_slug → keep as is
+cms_objects.pillar_slug → add + use for pillar membership
+cms_objects.cluster_slug → stop using it for pillar membership
+2. Migration steps (what they should actually implement)
+Ask them to:
+Add pillar_slug to cms_objects (if it doesn’t exist yet)
+ALTER TABLE cms_objects ADD COLUMN pillar_slug TEXT;
+Backfill from current misuse of cluster_slug
+For tool-type CMS objects where cluster_slug is currently acting as pillar:
+UPDATE cms_objects
+SET pillar_slug = cluster_slug
+WHERE type = 'tool' AND cluster_slug IS NOT NULL;
+Update the admin update API
+When you assign a tool to a pillar in Content Manager, it should:
+Write pillar_slug in tools
+Write pillar_slug in cms_objects (for CMS tools)
+Stop writing pillarSlug into cluster_slug anywhere.
+Update pillar page queries
+In app/tools/[pillar]/page.tsx (or your zip-file-tools page):
+// CMS tools
+WHERE type = 'tool' AND pillar_slug = $pillarSlug
+
+// Legacy tools
+WHERE pillar_slug = $pillarSlug
+Remove any cluster_slug = $pillarSlug logic from the pillar membership lookup.
+Update any shared helpers / endpoints
+/api/pillars/[slug]/tools should:
+Query both tables using pillar_slug
+getPillarBySlug and any “tools by pillar” helper should use pillar_slug only.
+Leave cluster_slug for real cluster use later (optional)
+If you still want cluster-level SEO later, keep cluster_slug but stop binding it to pillar membership logic.
+Hide it from the pillar assignment UI for now so you don’t confuse things.
+Your summary vs what to send
+What you wrote:
+Change column name for consistency
+Update data lookups to use new name
+Update admin tools to use new name
+Update page data to use new name
+Check links still work correctly
+Directionally fine, but too vague. They could literally try to rename cluster_slug → pillar_slug and cause chaos.
+What you actually want is:
+Standardize pillar membership on pillar_slug across both tools and cms_objects.
+Add pillar_slug to cms_objects (if missing).
+Backfill it from existing cluster_slug where we’ve been using that as pillar.
+Admin API should write pillarSlug → tools.pillar_slug and cms_objects.pillar_slug only.
+Pillar pages and /api/pillars/[slug]/tools must query by pillar_slug in both tables.
+cluster_slug stays available for future cluster logic but is no longer used for pillar membership.
