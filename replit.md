@@ -533,6 +533,11 @@ Every tool in `toolsRegistry.ts` includes a **semantic layer** enabling automate
     - Excludes current pillar from list
   - Complete linking graph: /tools ↔ pillars ↔ tools creates non-orphaned architecture
   - API endpoint: /api/pillars returns all pillar slugs and titles
+  - **Standardized pillar_slug as canonical source of truth**:
+    - Added pillar_slug column to cms_objects table
+    - Backfilled from cluster_slug for 27 existing CMS tools
+    - Admin API writes to pillar_slug in both tools and cms_objects tables
+    - cluster_slug remains available for future SEO cluster use (separate concept)
 - 2025-12-09: **Type-Based SEO Ready Rules** - Intelligent readiness evaluation based on page type and cluster architecture
   - Created lib/seo/urlClassifier.ts as central classification utility:
     - Configurable thresholds: MIN_READY_SCORE=80, BASELINE_INTERNAL_LINKS=3
