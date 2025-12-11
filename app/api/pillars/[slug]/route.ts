@@ -21,29 +21,45 @@ export async function GET(
     const pillarData = pillarRow.data || {};
 
     const toolsResult = await query(
-      `SELECT slug, name, description, priority FROM (
-        SELECT slug, name, description, priority
-        FROM tools 
-        WHERE pillar_slug = $1
-        
-        UNION ALL
-        
-        SELECT slug, 
-               COALESCE(data->>'title', data->'seo'->>'title', slug) as name,
-               COALESCE(data->>'description', data->'seo'->>'description', '') as description,
-               0 as priority
-        FROM cms_objects 
+      `WITH merged AS (
+        SELECT
+          slug,
+          COALESCE(data->>'title', data->'seo'->>'title', slug) as name,
+          COALESCE(data->>'description', data->'seo'->>'description', '') as description,
+          pillar_slug,
+          1 AS source_priority,
+          0 AS display_priority
+        FROM cms_objects
         WHERE type = 'tool' AND pillar_slug = $1
-      ) combined
-      ORDER BY priority ASC, name ASC`,
+
+        UNION ALL
+
+        SELECT
+          slug,
+          name,
+          description,
+          pillar_slug,
+          2 AS source_priority,
+          COALESCE(priority, 999) AS display_priority
+        FROM tools
+        WHERE pillar_slug = $1
+      )
+      SELECT DISTINCT ON (slug) slug, name, description, pillar_slug, source_priority, display_priority
+      FROM merged
+      ORDER BY slug, source_priority, display_priority, name`,
       [slug]
     );
 
-    const tools = toolsResult.rows.map((row: { slug: string; name: string; description: string | null; priority?: number }) => ({
-      slug: row.slug,
-      name: row.name,
-      description: row.description || "",
-    }));
+    const tools = toolsResult.rows
+      .sort((a: { display_priority: number; name: string }, b: { display_priority: number; name: string }) => {
+        if (a.display_priority !== b.display_priority) return a.display_priority - b.display_priority;
+        return a.name.localeCompare(b.name);
+      })
+      .map((row: { slug: string; name: string; description: string | null }) => ({
+        slug: row.slug,
+        name: row.name,
+        description: row.description || "",
+      }));
 
     return NextResponse.json({
       pillar: {
