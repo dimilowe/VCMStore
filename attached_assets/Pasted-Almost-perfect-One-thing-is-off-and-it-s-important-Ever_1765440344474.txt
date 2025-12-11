@@ -1,0 +1,48 @@
+Almost perfect. One thing is off, and it’s important.
+Everything here is structurally correct except this line:
+"Tools in This Collection" section shows all tools assigned to that pillar via cluster_slug
+That should not be using cluster_slug if your recent fix mapped pillar assignments to pillar_slug.
+Earlier, you said this was fixed:
+admin update API was incorrectly mapping pillarSlug to the cluster_slug database column instead of pillar_slug. Fixed the field mapping so assignments now save correctly.
+So your source of truth now is:
+tools.pillar_slug (or equivalent) = pillar assignment
+If the pillar page is still querying via cluster_slug, you’ve just recreated the same mismatch in a different place.
+What’s correct vs what to fix
+✅ Correct and good:
+Tool → Pillar breadcrumbs
+ToolBreadcrumb.tsx using pillar_slug to pull the pillar and render:
+Tools > [Pillar Title] > [Tool Name]
+/tools → pillars
+PillarCollections.tsx pulling cms_objects where type='pillar' and is_indexed = true
+Cards with title, description, and /tools/[pillar-slug] CTA
+Pillar → related pillars
+Related Collections pulling other type='pillar' AND is_indexed = true AND slug != current
+Helper + API
+getPillarBySlug.ts and /api/pillars/route.ts for dropdowns & queries
+All of that is exactly what you want for a clean internal graph.
+❌ Needs correction:
+Pillar → Tools query key
+Right now you’ve written:
+pillar pages query tools assigned to that pillar via cluster_slug
+That should instead be:
+WHERE pillar_slug = current_pillar_slug
+or
+join via a proper pillar_tools mapping table
+If you leave it on cluster_slug, you’re:
+Ignoring the actual pillar assignments you just fixed in the admin
+Making the Content Manager lie again (UI says “this tool is in this pillar,” DB query doesn’t match)
+What you should do
+In the pillar page query:
+// WRONG (what you implied)
+WHERE cluster_slug = $currentPillarSlug
+
+// RIGHT
+WHERE pillar_slug = $currentPillarSlug
+AND is_indexed = true    -- if you have this flag
+Once that’s true, your statement becomes 100% correct:
+The linking graph /tools ↔ pillars ↔ tools now creates a complete internal linking structure, preventing orphaned pillar pages and strengthening SEO through proper topical architecture.
+So:
+Conceptual architecture: correct
+File structure: correct
+Internal linking strategy: correct
+Only fix: stop using cluster_slug for pillar membership and standardize on pillar_slug for pillar relationships.
