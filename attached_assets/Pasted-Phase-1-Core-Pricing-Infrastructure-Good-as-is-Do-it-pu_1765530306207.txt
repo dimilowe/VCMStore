@@ -1,0 +1,170 @@
+Phase 1 – Core Pricing Infrastructure ✅
+Good as-is. Do it purely in code, no DB changes yet.
+Create pricing folder & types
+lib/pricing/types.ts:
+export type UserTier = 'free' | 'starter' | 'basic' | 'pro';
+
+export type CloudBundleType =
+  | 'none'
+  | 'twoClouds'
+  | 'threeClouds'
+  | 'allClouds';
+Offers registry
+lib/pricing/offersRegistry.ts:
+import type { CloudBundleType } from './types';
+
+export const OFFERS_REGISTRY = {
+  starter: {
+    id: 'price_vcm_starter_monthly', // placeholder
+    label: 'Starter',
+    monthly: 9.99,
+  },
+  basic: {
+    id: 'price_vcm_basic_monthly',
+    label: 'Basic',
+    monthly: 29,
+  },
+  pro: {
+    id: 'price_vcm_pro_monthly',
+    label: 'Pro',
+    monthly: 59,
+  },
+  bundles: {
+    twoClouds: {
+      id: 'price_vcm_pro_two_clouds',
+      label: 'Pro – 2 Clouds',
+      monthly: 99,
+    },
+    threeClouds: {
+      id: 'price_vcm_pro_three_clouds',
+      label: 'Pro – 3 Clouds',
+      monthly: 120,
+    },
+    allClouds: {
+      id: 'price_vcm_pro_all_clouds',
+      label: 'Pro – All Clouds',
+      monthly: 199,
+    },
+  },
+} as const;
+
+export type OfferKey = keyof typeof OFFERS_REGISTRY;
+Cloud entitlements
+lib/pricing/cloudEntitlements.ts – as we wrote earlier (free/starter/basic/pro with exports/memory/ai/workflows/etc.).
+Tier resolution + permissions
+For now, pretend every user is free until Phase 2:
+lib/pricing/getUserTier.ts:
+import type { UserTier } from './types';
+
+type AnyUser = { subscription_tier?: string | null } | null | undefined;
+
+export function resolveUserTier(user: AnyUser): UserTier {
+  if (!user) return 'free';
+
+  switch (user.subscription_tier) {
+    case 'starter':
+    case 'basic':
+    case 'pro':
+      return user.subscription_tier;
+    default:
+      return 'free';
+  }
+}
+Then lib/pricing/permissions.ts with helpers (canUseAI, canExportFullRes, shouldWatermarkExports, etc.).
+Result: you can ship Phase 1 without breaking anything; all helpers just treat everyone as free until the DB is updated.
+Phase 2 – Database & User Model ✅ (just do it carefully)
+You’re right: you need a source of truth on the user.
+Migration
+Add subscription_tier to your users table:
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS subscription_tier text DEFAULT 'free';
+If you’re using Drizzle/Prisma/etc., mirror this in the schema file.
+User type update
+Wherever your User / Profile interface lives:
+export type SubscriptionTier = 'free' | 'starter' | 'basic' | 'pro';
+
+export interface User {
+  // existing fields...
+  subscription_tier: SubscriptionTier;
+}
+Default behavior
+All existing users → subscription_tier = 'free'
+New signups → default free in DB
+No behavior changes yet. Frontend still sees everyone as free.
+Phase 3 – Gating & Enforcement ✅ (this is where you can break stuff if you’re sloppy)
+Your sequence is right, but keep everything centralized:
+Export policy
+Create lib/export/applyExportPolicy.ts:
+import { canExportFullRes, shouldWatermarkExports } from '@/lib/pricing/permissions';
+
+type ExportPayload = {
+  buffer: Buffer;
+  mimeType: string;
+  filename: string;
+};
+
+export function applyExportPolicy(user: any, payload: ExportPayload): ExportPayload | null {
+  const fullRes = canExportFullRes(user);
+  const watermark = shouldWatermarkExports(user);
+
+  if (!fullRes && !watermark) {
+    // no export rights at all
+    return null;
+  }
+
+  let out = payload;
+
+  if (watermark) {
+    // TODO: hook in your watermarking
+    // out = addWatermark(out);
+  }
+
+  return out;
+}
+Then in every download/export API handler, do:
+const user = await getCurrentUser();
+const finalPayload = applyExportPolicy(user, payload);
+if (!finalPayload) return new Response(JSON.stringify({ error: 'Upgrade to export.' }), { status: 403 });
+AI gating
+Before any OpenAI/model call:
+import { canUseAI } from '@/lib/pricing/permissions';
+
+const user = await getCurrentUser();
+if (!canUseAI(user)) {
+  return new Response(JSON.stringify({ error: 'Upgrade to Pro to use AI tools.' }), { status: 403 });
+}
+Heavy tools
+Add isHeavy / heavyMode flags to engine config, not random code.
+Gate with canUseHeavyTools / canUseMultiStepHeavyTools.
+Workflow limits
+Add workflow_runs table if it doesn’t exist.
+For each run:
+Count runs for user_id + today.
+If starter and count >= 3 → block.
+If basic/pro and workflowLimit === 'unlimited' → let it run.
+All of this lives behind permission helpers + one logging table.
+Phase 4 – UI Integration ✅
+Your plan is fine; key rules:
+UpgradeModal
+Reads from OFFERS_REGISTRY (no hard-coded numbers).
+Uses existing theme tokens (no gradient hacks).
+Locked tool states
+ToolCard gets props like requiresAi, requiresHeavy, requiresWorkflow, etc.
+It checks current tier via resolveUserTier(user) and shows:
+clickable card → upgrade modal, when user can’t access.
+Stripe helpers
+You already have Stripe installed, so:
+Add startTierCheckout(tier: 'starter' | 'basic' | 'pro') and startBundleCheckout(...) as thin wrappers that:
+Look up offer.id from OFFERS_REGISTRY
+Hit /api/checkout with that price ID
+Later, your webhook will set subscription_tier in the DB based on the Stripe price.
+Brutally honest answer
+Yes, your phase structure is correct.
+The only way to screw this up is:
+Hard-coding plan names or prices in random components.
+Implementing export / AI / workflow rules in each tool instead of one shared layer.
+Stick to:
+OFFERS_REGISTRY = pricing truth
+CLOUD_ENTITLEMENTS = capability truth
+resolveUserTier + permissions = gatekeeping truth
+You do that, and changing “watermarked”, prices, AI limits, etc. later becomes flipping a config value, not a refactor.

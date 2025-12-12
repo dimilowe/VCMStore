@@ -1,18 +1,20 @@
 import { query } from './db';
 import bcrypt from 'bcryptjs';
+import type { SubscriptionTier } from './pricing/types';
 
 export interface User {
   id: string;
   email: string;
   created_at: Date;
   is_admin?: boolean;
+  subscription_tier: SubscriptionTier;
 }
 
 export async function createUser(email: string, password: string): Promise<User> {
   const passwordHash = await bcrypt.hash(password, 10);
   
   const result = await query(
-    'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, created_at',
+    'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, created_at, subscription_tier',
     [email, passwordHash]
   );
   
@@ -23,12 +25,17 @@ export async function createUser(email: string, password: string): Promise<User>
     [user.id, email.split('@')[0]]
   );
   
-  return user;
+  return {
+    id: user.id,
+    email: user.email,
+    created_at: user.created_at,
+    subscription_tier: user.subscription_tier || 'free',
+  };
 }
 
 export async function verifyPassword(email: string, password: string): Promise<User | null> {
   const result = await query(
-    'SELECT id, email, password_hash, created_at, is_admin FROM users WHERE email = $1',
+    'SELECT id, email, password_hash, created_at, is_admin, subscription_tier FROM users WHERE email = $1',
     [email]
   );
   
@@ -48,21 +55,28 @@ export async function verifyPassword(email: string, password: string): Promise<U
     email: user.email,
     created_at: user.created_at,
     is_admin: user.is_admin,
+    subscription_tier: user.subscription_tier || 'free',
   };
 }
 
 export async function findOrCreateUserByEmail(email: string): Promise<User> {
   const result = await query(
-    'SELECT id, email, created_at FROM users WHERE email = $1',
+    'SELECT id, email, created_at, subscription_tier FROM users WHERE email = $1',
     [email]
   );
   
   if (result.rows.length > 0) {
-    return result.rows[0];
+    const user = result.rows[0];
+    return {
+      id: user.id,
+      email: user.email,
+      created_at: user.created_at,
+      subscription_tier: user.subscription_tier || 'free',
+    };
   }
   
   const newUserResult = await query(
-    'INSERT INTO users (email) VALUES ($1) RETURNING id, email, created_at',
+    'INSERT INTO users (email) VALUES ($1) RETURNING id, email, created_at, subscription_tier',
     [email]
   );
   
@@ -73,5 +87,10 @@ export async function findOrCreateUserByEmail(email: string): Promise<User> {
     [user.id, email.split('@')[0]]
   );
   
-  return user;
+  return {
+    id: user.id,
+    email: user.email,
+    created_at: user.created_at,
+    subscription_tier: user.subscription_tier || 'free',
+  };
 }
