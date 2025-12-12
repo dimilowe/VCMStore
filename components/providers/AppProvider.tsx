@@ -1,50 +1,47 @@
 'use client';
 
-import { UpgradeProvider, useUpgradeContext } from '@/context/UpgradeContext';
+import { useUIStore } from '@/lib/state/uiStore';
 import { AuthModal } from '@/components/auth-modal';
 import UpgradeModal from '@/components/modals/UpgradeModal';
 import type { UserTier } from '@/lib/pricing/types';
 
-function ModalManager() {
+interface AppProviderProps {
+  children: React.ReactNode;
+  currentTier?: UserTier;
+}
+
+export function AppProvider({ children, currentTier = 'free' }: AppProviderProps) {
   const {
-    showAuthModal,
-    showUpgradeModal,
+    isAuthModalOpen,
+    isUpgradeModalOpen,
     upgradeFeature,
-    upgradeTier,
-    currentTier,
+    upgradeRequiredTier,
     closeAuthModal,
     closeUpgradeModal,
-    onAuthSuccess,
-  } = useUpgradeContext();
+  } = useUIStore();
+
+  const handleAuthSuccess = (userId: string) => {
+    closeAuthModal();
+    window.location.reload();
+  };
+
+  const mappedFeature = upgradeFeature === 'export' ? 'exports' : upgradeFeature;
 
   return (
     <>
+      {children}
       <AuthModal
-        isOpen={showAuthModal}
+        isOpen={isAuthModalOpen}
         onClose={closeAuthModal}
-        onSuccess={onAuthSuccess}
+        onSuccess={handleAuthSuccess}
       />
       <UpgradeModal
-        isOpen={showUpgradeModal}
+        isOpen={isUpgradeModalOpen}
         onClose={closeUpgradeModal}
         currentTier={currentTier}
-        requiredFeature={upgradeFeature}
-        targetTier={upgradeTier}
+        requiredFeature={mappedFeature as 'ai' | 'heavyTools' | 'workflows' | 'exports' | 'memory' | undefined}
+        targetTier={upgradeRequiredTier || 'starter'}
       />
     </>
-  );
-}
-
-interface AppProviderProps {
-  children: React.ReactNode;
-  initialTier?: UserTier;
-}
-
-export function AppProvider({ children, initialTier = 'free' }: AppProviderProps) {
-  return (
-    <UpgradeProvider initialTier={initialTier}>
-      {children}
-      <ModalManager />
-    </UpgradeProvider>
   );
 }

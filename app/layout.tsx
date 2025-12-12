@@ -6,6 +6,8 @@ import { Navbar } from "@/components/navbar";
 import { CartProvider } from "@/contexts/CartContext";
 import FloatingToolsButton from "@/components/FloatingToolsButton";
 import { AppProvider } from "@/components/providers/AppProvider";
+import { getCurrentUserWithTier } from "@/lib/pricing/getCurrentUserWithTier";
+import type { UserTier } from "@/lib/pricing/types";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,11 +19,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUserWithTier();
+  const currentTier: UserTier = user?.subscription_tier || 'free';
+
   return (
     <html lang="en">
       <head>
@@ -50,7 +55,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <CartProvider>
-          <AppProvider>
+          <AppProvider currentTier={currentTier}>
             <Navbar />
             <main className="min-h-screen">
               {children}

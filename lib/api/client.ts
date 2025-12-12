@@ -1,127 +1,117 @@
 'use client';
 
-export type APIErrorType = 'AUTH_REQUIRED' | 'UPGRADE_REQUIRED' | 'GENERIC';
+import { useUIStore } from '@/lib/state/uiStore';
 
-export interface APIError {
-  type: APIErrorType;
-  message: string;
-  feature?: string;
-  requiredTier?: string;
+export class APIError extends Error {
   status: number;
-}
+  code?: string;
+  payload?: unknown;
 
-export interface APIResponse<T> {
-  ok: true;
-  data: T;
-}
-
-export interface APIErrorResponse {
-  ok: false;
-  error: APIError;
-}
-
-export type APIResult<T> = APIResponse<T> | APIErrorResponse;
-
-let authRequiredHandler: (() => void) | null = null;
-let upgradeRequiredHandler: ((feature: string, requiredTier: string) => void) | null = null;
-
-export function setAuthRequiredHandler(handler: () => void) {
-  authRequiredHandler = handler;
-}
-
-export function setUpgradeRequiredHandler(handler: (feature: string, requiredTier: string) => void) {
-  upgradeRequiredHandler = handler;
-}
-
-export async function apiClient<T>(
-  url: string,
-  options?: RequestInit & { skipErrorHandling?: boolean }
-): Promise<APIResult<T>> {
-  const { skipErrorHandling, ...fetchOptions } = options || {};
-
-  try {
-    const response = await fetch(url, {
-      ...fetchOptions,
-      headers: {
-        'Content-Type': 'application/json',
-        ...fetchOptions?.headers,
-      },
-    });
-
-    if (response.ok) {
-      const contentType = response.headers.get('content-type');
-      if (contentType?.includes('application/json')) {
-        const data = await response.json();
-        return { ok: true, data };
-      }
-      return { ok: true, data: response as unknown as T };
-    }
-
-    const errorData = await response.json().catch(() => ({}));
-
-    if (response.status === 401 && errorData.error === 'AUTH_REQUIRED') {
-      if (!skipErrorHandling && authRequiredHandler) {
-        authRequiredHandler();
-      }
-      return {
-        ok: false,
-        error: {
-          type: 'AUTH_REQUIRED',
-          message: errorData.message || 'Please log in to continue.',
-          status: 401,
-        },
-      };
-    }
-
-    if (response.status === 403 && errorData.error === 'UPGRADE_REQUIRED') {
-      const feature = errorData.feature || 'feature';
-      const requiredTier = errorData.requiredTier || 'starter';
-      
-      if (!skipErrorHandling && upgradeRequiredHandler) {
-        upgradeRequiredHandler(feature, requiredTier);
-      }
-      return {
-        ok: false,
-        error: {
-          type: 'UPGRADE_REQUIRED',
-          message: errorData.message || 'Upgrade required to access this feature.',
-          feature,
-          requiredTier,
-          status: 403,
-        },
-      };
-    }
-
-    return {
-      ok: false,
-      error: {
-        type: 'GENERIC',
-        message: errorData.error || errorData.message || 'Something went wrong',
-        status: response.status,
-      },
-    };
-  } catch (err) {
-    return {
-      ok: false,
-      error: {
-        type: 'GENERIC',
-        message: err instanceof Error ? err.message : 'Network error',
-        status: 0,
-      },
-    };
+  constructor(message: string, status: number, code?: string, payload?: unknown) {
+    super(message);
+    this.status = status;
+    this.code = code;
+    this.payload = payload;
   }
 }
 
-export async function apiPost<T>(url: string, body: unknown, options?: RequestInit): Promise<APIResult<T>> {
-  return apiClient<T>(url, {
+export async function apiFetch<T = unknown>(
+  input: RequestInfo,
+  init?: RequestInit
+): Promise<T> {
+  const res = await fetch(input, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.headers || {}),
+    },
+  });
+
+  const isJson =
+    res.headers.get('Content-Type')?.includes('application/json') ?? false;
+
+  let data: unknown = null;
+  if (isJson) {
+    try {
+      data = await res.json();
+    } catch {
+      // ignore JSON parse failure
+    }
+  }
+
+  if (res.ok) {
+    return data as T;
+  }
+
+  const errorData = data as Record<string, unknown> | null;
+  const code = errorData?.error as string | undefined;
+
+  if (res.status === 401 && code === 'AUTH_REQUIRED') {
+    if (typeof window !== 'undefined') {
+      const { openAuthModal } = useUIStore.getState();
+      openAuthModal();
+    }
+
+    throw new APIError(
+      (errorData?.message as string) || 'Authentication required',
+      res.status,
+      code,
+      data
+    );
+  }
+
+  if (res.status === 403 && code === 'UPGRADE_REQUIRED') {
+    const feature = (errorData?.feature ?? null) as
+      | 'export'
+      | 'exports'
+      | 'heavyTools'
+      | 'ai'
+      | 'workflows'
+      | null;
+    const requiredTier = (errorData?.requiredTier ?? null) as
+      | 'starter'
+      | 'basic'
+      | 'pro'
+      | null;
+
+    if (typeof window !== 'undefined') {
+      const { openUpgradeModal } = useUIStore.getState();
+      openUpgradeModal(feature, requiredTier);
+    }
+
+    throw new APIError(
+      (errorData?.message as string) || 'Upgrade required',
+      res.status,
+      code,
+      data
+    );
+  }
+
+  throw new APIError(
+    (errorData?.message as string) || (errorData?.error as string) || 'Request failed',
+    res.status,
+    code,
+    data
+  );
+}
+
+export async function apiPost<T = unknown>(
+  url: string,
+  body: unknown,
+  options?: RequestInit
+): Promise<T> {
+  return apiFetch<T>(url, {
     method: 'POST',
     body: JSON.stringify(body),
     ...options,
   });
 }
 
-export async function apiGet<T>(url: string, options?: RequestInit): Promise<APIResult<T>> {
-  return apiClient<T>(url, {
+export async function apiGet<T = unknown>(
+  url: string,
+  options?: RequestInit
+): Promise<T> {
+  return apiFetch<T>(url, {
     method: 'GET',
     ...options,
   });

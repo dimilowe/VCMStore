@@ -1,0 +1,212 @@
+Yeah, let’s do it. This is one of those “do it once, win forever” pieces.
+I’ll give you a clean pattern you can drop in:
+A global API wrapper that:
+Catches AUTH_REQUIRED → opens login/auth
+Catches UPGRADE_REQUIRED → opens UpgradeModal with correct tier
+No tier logic in random components
+Same behavior for all tools, exports, heavy tools, AI, etc.
+I’ll assume:
+You’re using Next.js App Router
+You have some kind of global UI store (Zustand / context) or can add a small one
+UpgradeModal already exists and can be opened via state
+You can adjust imports/names to fit your exact setup.
+1. Create a global UI store for auth + upgrade
+If you already have one, just adapt. If not, create:
+lib/state/uiStore.ts:
+import { create } from 'zustand';
+
+type UpgradeFeature = 'export' | 'heavyTool' | 'ai' | 'workflow' | null;
+type Tier = 'starter' | 'basic' | 'pro' | null;
+
+interface UIState {
+  isAuthModalOpen: boolean;
+  isUpgradeModalOpen: boolean;
+  upgradeFeature: UpgradeFeature;
+  upgradeRequiredTier: Tier;
+
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
+
+  openUpgradeModal: (feature: UpgradeFeature, tier: Tier) => void;
+  closeUpgradeModal: () => void;
+}
+
+export const useUIStore = create<UIState>((set) => ({
+  isAuthModalOpen: false,
+  isUpgradeModalOpen: false,
+  upgradeFeature: null,
+  upgradeRequiredTier: null,
+
+  openAuthModal: () => set({ isAuthModalOpen: true }),
+  closeAuthModal: () => set({ isAuthModalOpen: false }),
+
+  openUpgradeModal: (feature, tier) =>
+    set({
+      isUpgradeModalOpen: true,
+      upgradeFeature: feature,
+      upgradeRequiredTier: tier,
+    }),
+
+  closeUpgradeModal: () =>
+    set({
+      isUpgradeModalOpen: false,
+      upgradeFeature: null,
+      upgradeRequiredTier: null,
+    }),
+}));
+Then wire UpgradeModal + auth modal to this store.
+2. Create a typed API wrapper: apiFetch
+lib/api/client.ts:
+import { useUIStore } from '@/lib/state/uiStore';
+
+// Custom error so you can still handle errors where needed
+export class APIError extends Error {
+  status: number;
+  code?: string;
+  payload?: any;
+
+  constructor(message: string, status: number, code?: string, payload?: any) {
+    super(message);
+    this.status = status;
+    this.code = code;
+    this.payload = payload;
+  }
+}
+
+// This is the actual wrapper you’ll call from components/hooks
+export async function apiFetch<T = any>(
+  input: RequestInfo,
+  init?: RequestInit
+): Promise<T> {
+  const res = await fetch(input, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.headers || {}),
+    },
+  });
+
+  // Non-JSON responses (rare), just throw
+  const isJson =
+    res.headers.get('Content-Type')?.includes('application/json') ?? false;
+
+  let data: any = null;
+  if (isJson) {
+    try {
+      data = await res.json();
+    } catch {
+      // ignore JSON parse failure
+    }
+  }
+
+  // Happy path
+  if (res.ok) {
+    return data as T;
+  }
+
+  // Handle standardized errors from backend
+  const code = data?.error as string | undefined;
+
+  if (res.status === 401 && code === 'AUTH_REQUIRED') {
+    // Use the store directly – this is client-side only
+    if (typeof window !== 'undefined') {
+      const { openAuthModal } = useUIStore.getState();
+      openAuthModal();
+    }
+
+    throw new APIError(
+      data?.message || 'Authentication required',
+      res.status,
+      code,
+      data
+    );
+  }
+
+  if (res.status === 403 && code === 'UPGRADE_REQUIRED') {
+    const feature = (data?.feature ??
+      null) as 'export' | 'heavyTool' | 'ai' | 'workflow' | null;
+    const requiredTier = (data?.requiredTier ??
+      null) as 'starter' | 'basic' | 'pro' | null;
+
+    if (typeof window !== 'undefined') {
+      const { openUpgradeModal } = useUIStore.getState();
+      openUpgradeModal(feature, requiredTier);
+    }
+
+    throw new APIError(
+      data?.message || 'Upgrade required',
+      res.status,
+      code,
+      data
+    );
+  }
+
+  // Fallback – non-monetization errors
+  throw new APIError(
+    data?.message || 'Request failed',
+    res.status,
+    code,
+    data
+  );
+}
+Key points:
+apiFetch:
+Automatically opens auth modal on AUTH_REQUIRED
+Automatically opens UpgradeModal on UPGRADE_REQUIRED
+Still throws an error so calling code can decide what to do (toast, etc.)
+No UI logic in endpoints. Backend just returns:
+401 + { error: 'AUTH_REQUIRED', message: '...' }
+403 + { error: 'UPGRADE_REQUIRED', feature, requiredTier }
+You already set that up in your export + heavy tool gating.
+3. Hook up UpgradeModal to the store
+Wherever your UpgradeModal lives (e.g. a layout-level component):
+import { useUIStore } from '@/lib/state/uiStore';
+import { UpgradeModal } from '@/components/pricing/UpgradeModal';
+
+export function GlobalUpgradeModalHost() {
+  const {
+    isUpgradeModalOpen,
+    upgradeFeature,
+    upgradeRequiredTier,
+    closeUpgradeModal,
+  } = useUIStore();
+
+  return (
+    <UpgradeModal
+      open={isUpgradeModalOpen}
+      onOpenChange={(open) => {
+        if (!open) closeUpgradeModal();
+      }}
+      feature={upgradeFeature}
+      requiredTier={upgradeRequiredTier}
+    />
+  );
+}
+Same idea for your auth modal.
+Then include GlobalUpgradeModalHost (and auth host) in your root layout so they’re always mounted.
+4. Start using apiFetch instead of raw fetch
+Anywhere you call your APIs from the client:
+Before:
+const res = await fetch('/api/image-download/123');
+if (!res.ok) { /* handle */ }
+After:
+import { apiFetch } from '@/lib/api/client';
+
+const data = await apiFetch('/api/image-download/123');
+// If user is not logged in → auth modal pops
+// If user is under-tier → UpgradeModal pops
+This is now universal:
+Exports
+Heavy tools
+AI endpoints
+Future paid features
+All follow the same pattern.
+5. What this gives you in practice
+One place to:
+Change error handling
+Change how UpgradeModal behaves
+Swap login behavior
+Backend just worries about:
+status codes
+{ error, feature, requiredTier } fields
+Frontend never needs random “oh, if status is 403 and path contains /gif-download then show upgrade” nonsense.
