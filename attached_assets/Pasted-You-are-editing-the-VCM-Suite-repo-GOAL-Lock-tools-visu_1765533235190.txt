@@ -1,0 +1,279 @@
+You are editing the VCM Suite repo.
+
+GOAL: Lock tools visually in the cloud dashboards based on the user’s tier and tool metadata (heavyMode + AI), and trigger the existing UpgradeModal when a locked tool is clicked.
+
+Constraints:
+- DO NOT hard-code tier rules in random components.
+- All logic must flow from:
+  - userTier (free | starter | basic | pro)
+  - engine config (heavyMode, AI flags)
+  - existing UpgradeModal + Zustand uiStore
+- Backend gating is already implemented (401/403 with AUTH_REQUIRED / UPGRADE_REQUIRED). This task is purely about frontend UX in dashboards.
+
+Context you must assume:
+- RootLayout already fetches the user + actual subscription_tier and passes it into AppProvider.
+- AppProvider already renders auth and upgrade modals using a Zustand store in lib/state/uiStore.ts.
+- API client (lib/api/client.ts) already opens modals on 401/403.
+- ENGINE_REGISTRY / EngineConfig is where tools are defined, including heavyMode and any AI flags.
+
+────────────────────────
+1) Create a client-side tool lock helper
+────────────────────────
+
+Create a new file:
+
+- lib/tools/getToolLockState.ts
+
+Content:
+
+```ts
+'use client';
+
+import type { UserTier } from '@/lib/pricing/types';
+
+export type HeavyMode = 'none' | 'single' | 'multi';
+
+export type ToolFeature = 'heavyTool' | 'ai' | null;
+
+export type ToolLockState = {
+  locked: boolean;
+  feature: ToolFeature;
+  requiredTier: UserTier | null;
+};
+
+// Minimal shape dashboards will pass
+export type ToolAccessMeta = {
+  heavyMode?: HeavyMode;
+  hasAi?: boolean;
+};
+
+/**
+ * Computes whether a tool should appear locked in the UI for a given user tier.
+ * This MUST mirror backend rules:
+ * - AI tools → Pro only
+ * - Single heavy → Starter+
+ * - Multi heavy → Basic+
+ */
+export function getToolLockState(
+  userTier: UserTier,
+  meta: ToolAccessMeta
+): ToolLockState {
+  const heavyMode: HeavyMode = meta.heavyMode ?? 'none';
+  const hasAi = !!meta.hasAi;
+
+  // 1) AI tools — Pro only
+  if (hasAi && userTier !== 'pro') {
+    return {
+      locked: true,
+      feature: 'ai',
+      requiredTier: 'pro',
+    };
+  }
+
+  // 2) Heavy tools
+  // single  → Starter+
+  if (heavyMode === 'single') {
+    if (userTier === 'free') {
+      return {
+        locked: true,
+        feature: 'heavyTool',
+        requiredTier: 'starter',
+      };
+    }
+  }
+
+  // multi   → Basic+
+  if (heavyMode === 'multi') {
+    if (userTier === 'free' || userTier === 'starter') {
+      return {
+        locked: true,
+        feature: 'heavyTool',
+        requiredTier: 'basic',
+      };
+    }
+  }
+
+  return {
+    locked: false,
+    feature: null,
+    requiredTier: null,
+  };
+}
+NOTE:
+If your AI tools have a different flag than hasAi, adapt this mapping later (see Step 2).
+────────────────────────
+2) Make sure dashboard tool data includes heavyMode + hasAi
+────────────────────────
+Find the logic that builds the tool list for each cloud/dashboard. Likely candidates:
+
+components/cloud/CloudDashboard.tsx
+app/clouds/[cloud]/page.tsx
+any “getToolsForCloud” helper
+Where you currently map ENGINE_REGISTRY (or similar) into a list of tools for display, extend the mapped object to include:
+heavyMode: engine.heavyMode ?? 'none'
+hasAi: boolean flag from engine config indicating AI usage (e.g. engine.usesAi, engine.type === 'ai', etc.)
+Example (pseudo):
+const tools = enginesForCloud.map((engine) => ({
+  slug: engine.slug,
+  name: engine.name,
+  description: engine.description,
+  href: `/tools/${engine.slug}`,
+  heavyMode: engine.heavyMode ?? 'none',
+  hasAi: !!engine.usesAi, // adapt to your real field
+}));
+Use real field names from your EngineConfig rather than inventing new ones if possible.
+────────────────────────
+3) Pass userTier + access meta into the ToolCard component
+────────────────────────
+
+Locate the component that renders each tool card in the dashboard. It might be something like:
+
+components/tools/ToolCard.tsx
+components/cloud/CloudToolCard.tsx
+You need to:
+Ensure it can run client-side ('use client' on the file or via a client wrapper).
+Accept props for:
+userTier: UserTier
+heavyMode?: 'none' | 'single' | 'multi'
+hasAi?: boolean
+Example props extension:
+type ToolCardProps = {
+  slug: string;
+  name: string;
+  description?: string;
+  href: string;
+  userTier: UserTier;
+  heavyMode?: 'none' | 'single' | 'multi';
+  hasAi?: boolean;
+};
+In the dashboard rendering code, pass these props down:
+{tools.map((tool) => (
+  <ToolCard
+    key={tool.slug}
+    slug={tool.slug}
+    name={tool.name}
+    description={tool.description}
+    href={tool.href}
+    userTier={userTier}        // already available via AppProvider / layout
+    heavyMode={tool.heavyMode}
+    hasAi={tool.hasAi}
+  />
+))}
+If userTier is not yet accessible in the dashboard, expose it via a hook or context from AppProvider (do NOT refetch user tier client-side; use the existing server-provided value).
+────────────────────────
+4) Add lock overlay + UpgradeModal trigger in ToolCard
+────────────────────────
+
+In the ToolCard component:
+
+Import the Zustand store and lock helper:
+'use client';
+
+import { useUIStore } from '@/lib/state/uiStore';
+import { getToolLockState } from '@/lib/tools/getToolLockState';
+import type { UserTier } from '@/lib/pricing/types';
+Compute lock state and override onClick behavior when locked:
+export function ToolCard(props: ToolCardProps) {
+  const { slug, name, description, href, userTier, heavyMode, hasAi } = props;
+
+  const { openUpgradeModal } = useUIStore();
+  const lockState = getToolLockState(userTier, { heavyMode, hasAi });
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (lockState.locked) {
+      e.preventDefault();
+      openUpgradeModal(lockState.feature, lockState.requiredTier);
+      return;
+    }
+    // Otherwise normal navigation – likely handled by <Link> or the anchor itself.
+  };
+
+  return (
+    <a
+      href={href}
+      onClick={handleClick}
+      className="relative block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm hover:shadow-md transition"
+    >
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold">{name}</h3>
+
+          {lockState.locked && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-neutral-700">
+              {/* Simple inline lock icon; use lucide if already available */}
+              <svg
+                className="h-3 w-3"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M7 11V8a5 5 0 0 1 10 0v3"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <rect
+                  x="5"
+                  y="11"
+                  width="14"
+                  height="10"
+                  rx="2"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  fill="none"
+                />
+              </svg>
+              <span>
+                {lockState.requiredTier === 'starter' && 'Starter required'}
+                {lockState.requiredTier === 'basic' && 'Basic required'}
+                {lockState.requiredTier === 'pro' && 'Pro required'}
+              </span>
+            </span>
+          )}
+        </div>
+
+        {description && (
+          <p className="text-xs text-neutral-500 line-clamp-2">{description}</p>
+        )}
+      </div>
+
+      {lockState.locked && (
+        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-white/60" />
+      )}
+    </a>
+  );
+}
+Important:
+Keep styling consistent with the existing design (reuse existing classes if ToolCard already has them; above is an example layout).
+Do NOT put tier logic directly in the JSX; rely entirely on getToolLockState.
+────────────────────────
+5) Sanity tests
+────────────────────────
+After implementing:
+
+As an unauthenticated user:
+Dashboard loads.
+Tools with heavyMode !== 'none' or hasAi = true show a lock badge.
+Clicking a locked tool should trigger the auth → upgrade flow:
+If it hits the backend directly, API returns 401, auth modal opens via global apiFetch wrapper.
+As a user with subscription_tier = 'free':
+Simple tools look normal.
+Single heavy tools show “Starter required”.
+Multi heavy tools show “Basic required”.
+AI tools show “Pro required”.
+Clicking a locked card opens UpgradeModal with feature + requiredTier.
+As subscription_tier = 'starter':
+Single heavy tools → unlocked.
+Multi heavy tools → locked (Basic).
+AI tools → locked (Pro).
+As subscription_tier = 'pro':
+All tools appear unlocked; no overlay, no lock icon.
+Ensure NO hard-coded tier checks or prices are introduced in components.
+All tier decisions must flow from:
+ENGINE_REGISTRY (heavyMode, hasAi)
+userTier
+getToolLockState helper
+UpgradeModal via Zustand store.
+Finally, ensure TypeScript and the app build cleanly.
