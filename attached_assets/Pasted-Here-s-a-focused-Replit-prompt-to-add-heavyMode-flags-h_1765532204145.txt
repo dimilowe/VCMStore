@@ -1,0 +1,206 @@
+Here’s a focused Replit prompt to add heavyMode flags + heavy tool gating without wrecking the architecture. Paste this into Replit on the VCM Suite repo:
+You are editing the VCM Suite repo.
+
+GOAL: Add heavyMode flags to tool/engine configs and enforce heavy tool gating using the existing monetization infrastructure (tiers, entitlements, permissions), WITHOUT hard-coding tiers or scattering logic.
+
+Context (already implemented):
+- User tiers: free, starter, basic, pro via UserTier.
+- CLOUD_ENTITLEMENTS exists with capabilities (memory, AI, heavyTools, workflows, etc.).
+- Permissions helpers exist in lib/pricing/permissions.ts (e.g. canUseAI, canExportFullRes, etc.).
+- Export gating is already wired via applyExportPolicy().
+- subscription_tier column exists on users and resolveUserTier() is used.
+
+You must:
+1) Add a heavyMode flag at the ENGINE / TOOL CONFIG LEVEL.
+2) Identify which tools are “heavy” and tag them.
+3) Add backend gating for heavy tools based on permissions from CLOUD_ENTITLEMENTS.
+4) Keep everything centralized: no per-tool tier checks, no hard-coded strings.
+
+────────────────────────
+1) Extend engine/config types with heavyMode
+────────────────────────
+
+Find the central engine/config type definitions for tools. This will be somewhere like:
+
+- lib/engineRegistry.ts
+- lib/engines/* or similar
+- types like ToolConfig, EngineConfig, etc.
+
+Update the main tool/engine config type(s) to include a heavyMode field:
+
+```ts
+type HeavyMode = 'none' | 'single' | 'multi';
+
+export interface ToolConfig {
+  // existing fields...
+  heavyMode?: HeavyMode; // optional, default to 'none' when omitted
+}
+If there’s a specific EngineConfig type used in engineRegistry, add heavyMode there instead/also. The goal: every tool has a config field heavyMode, not random logic.
+For clarity, treat modes as:
+'none' → simple tool, no gating beyond existing AI/export rules
+'single' → single-step heavy operation (e.g., one big transform, large computation)
+'multi' → multi-step or batch heavy tools (multi-file, pipelines, chained operations, etc.)
+────────────────────────
+2) Identify heavy tools & tag them in config
+────────────────────────
+Search the codebase for tools that are clearly “heavy”:
+Patterns / keywords to look for:
+batch processing
+multi-file / multi-upload
+pipeline / workflow
+“process many at once”
+zip creation / archive generation
+any tool that transforms many items in a single request (images, gifs, audio, etc.)
+anything marked as “advanced”, “pipeline”, “multi-step”, etc. in the engine registry.
+For each of these tools in your engine registry or config files:
+Set heavyMode = 'single' for “one big heavy operation” tools.
+Set heavyMode = 'multi' for “multi-step / batch / pipeline” tools.
+Examples (pseudo):
+// Simple resizer tool
+{
+  slug: 'image-resizer',
+  // ...
+  heavyMode: 'none',
+}
+
+// Batch converter
+{
+  slug: 'batch-image-converter',
+  // ...
+  heavyMode: 'multi',
+}
+
+// Single heavy AI pipeline
+{
+  slug: 'thumbnail-generator',
+  // ...
+  heavyMode: 'single',
+}
+Where you’re unsure, leave heavyMode as 'none' and optionally add a TODO comment instead of guessing. Do NOT mark everything heavy just to be safe.
+────────────────────────
+3) Ensure permissions helpers exist for heavy tools
+────────────────────────
+Open lib/pricing/permissions.ts.
+If they don’t already exist, add:
+import { resolveUserTier } from './getUserTier';
+import { getEntitlementsForTier } from './cloudEntitlements';
+import type { UserTier } from './types';
+
+type UserLike = any;
+
+export function canUseHeavyTools(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  const entitlements = getEntitlementsForTier(tier);
+  return entitlements.heavyTools !== false;
+}
+
+export function canUseMultiStepHeavyTools(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  const entitlements = getEntitlementsForTier(tier);
+  return entitlements.heavyTools === 'multi-step' || entitlements.heavyTools === 'full';
+}
+Important:
+heavyTools entitlement values are defined in CLOUD_ENTITLEMENTS (e.g., false, 'single-step', 'multi-step', 'full').
+Do NOT look at subscription_tier directly in endpoints; only use resolveUserTier + entitlements.
+────────────────────────
+4) Add backend gating for heavy tools in invocation APIs
+────────────────────────
+Find the central API(s) where tools are invoked. Look for:
+/api/tools/* routes
+handlers that accept a tool slug or engine id and then run a tool
+internal functions like runTool, executeEngine, handleToolRequest, etc.
+You want the place in code where the tool/engine config is loaded and the tool is about to run.
+In that handler, after loading config, add something like:
+import { canUseHeavyTools, canUseMultiStepHeavyTools } from '@/lib/pricing/permissions';
+import { resolveUserTier } from '@/lib/pricing/getUserTier';
+
+// inside the request handler:
+const user = await getCurrentUserWithTier(); // same helper used in AI export gating
+const tier = resolveUserTier(user);
+const heavyMode = toolConfig.heavyMode ?? 'none';
+
+if (heavyMode === 'single') {
+  if (!canUseHeavyTools(user)) {
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: 'AUTH_REQUIRED',
+          message: 'Log in to use this advanced tool.',
+        }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: 'UPGRADE_REQUIRED',
+        feature: 'heavyTool',
+        requiredTier: 'starter', // single-step heavy tools at Starter+
+      }),
+      { status: 403, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+}
+
+if (heavyMode === 'multi') {
+  if (!canUseMultiStepHeavyTools(user)) {
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: 'AUTH_REQUIRED',
+          message: 'Log in to use this advanced tool.',
+        }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: 'UPGRADE_REQUIRED',
+        feature: 'heavyTool',
+        requiredTier: 'basic', // multi-step heavy tools at Basic+
+      }),
+      { status: 403, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+}
+Key rules:
+Use the SAME auth utility as the AI endpoints and export gating (e.g. getCurrentUserWithTier).
+Do NOT hard-code checks like if (user.subscription_tier === 'pro') anywhere.
+Always express gating via heavyMode + permission helpers.
+Keep error shape consistent:
+AUTH_REQUIRED → 401
+UPGRADE_REQUIRED + feature + requiredTier → 403
+Apply this gating pattern in the central tool-execution path so it automatically applies to all heavy tools. Avoid duplicating this logic across many routes.
+────────────────────────
+5) (Optional but recommended) Expose heavyMode to UI layer
+────────────────────────
+In the code that builds UI models for tools (e.g. tool lists for cloud dashboards), include heavyMode from the config so the frontend can:
+Show a lock icon on heavy tools for users below Starter/Basic.
+Open UpgradeModal when they click a locked heavy tool.
+But for this change, focus on the backend gating first. Frontend integration can come later.
+────────────────────────
+6) Sanity checks
+────────────────────────
+After implementation:
+As an unauthenticated user:
+Call a simple tool (heavyMode 'none') → should work as before.
+Call a single heavy tool (heavyMode 'single') → should return 401 AUTH_REQUIRED.
+Call a multi heavy tool (heavyMode 'multi') → should return 401 AUTH_REQUIRED.
+As a logged-in user with subscription_tier = 'free':
+Simple tools (heavyMode 'none') → still work.
+Single heavy tools → 403 UPGRADE_REQUIRED, requiredTier 'starter'.
+Multi heavy tools → 403 UPGRADE_REQUIRED, requiredTier 'basic'.
+As subscription_tier = 'starter':
+Single heavy tools → allowed.
+Multi heavy tools → 403 UPGRADE_REQUIRED, requiredTier 'basic'.
+As subscription_tier = 'basic' or 'pro':
+All heavy tools → allowed (consistent with CLOUD_ENTITLEMENTS).
+Ensure:
+No endpoint runs heavy tools without checking heavyMode + permissions.
+No tier logic leaks into components or endpoints; everything flows through:
+heavyMode on config
+resolveUserTier
+CLOUD_ENTITLEMENTS
+permissions helpers.
+Finally, run TypeScript and build checks to confirm everything compiles.
