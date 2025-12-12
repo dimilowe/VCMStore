@@ -1,0 +1,505 @@
+Here’s the Replit prompt — copy/paste this straight into your Replit AI and run it on the VCM Suite repo:
+You are editing the VCM Suite repo.
+
+GOAL: Turn on monetization for VCM Suite using a single-source-of-truth pricing + entitlements system, without breaking the existing engine/theme architecture and without UI drift.
+
+We ALREADY decided the pricing/tiers. Implement EXACTLY this:
+
+TIERS (monthly only):
+- FREE
+- STARTER — $9.99/mo
+- BASIC — $29/mo
+- PRO — $59/mo
+
+BUNDLES (Pro add-ons only):
+- 2 Clouds → $99/mo
+- 3 Clouds → $120/mo
+- All 8 Clouds → $199/mo
+
+Tier capabilities:
+
+FREE:
+- exports: watermarked / low-res only
+- memory: none
+- workflows: none
+- heavyTools: none
+- ai: false
+- workflowLimit: 0
+
+STARTER:
+- exports: fullres, no watermark
+- memory: "limited" (recent history only)
+- heavyTools: "single-step" only
+- workflows: "limited"
+- workflowLimit: 3/day
+- ai: false
+
+BASIC:
+- exports: fullres
+- memory: "full"
+- heavyTools: "multi-step"
+- workflows: "full"
+- workflowLimit: "unlimited"
+- ai: false
+
+PRO:
+- exports: fullres
+- memory: "full"
+- heavyTools: "full"
+- workflows: "full"
+- workflowLimit: "unlimited"
+- ai: true
+
+The important principle:
+- All monetization rules MUST live in a central registry (single source of truth) and be read by tools, clouds, and the renderer.
+- DO NOT hard-code per-tier logic inside random components or tools.
+
+Follow these steps carefully:
+
+────────────────────────────────
+1) DEFINE TYPES FOR TIERS & BUNDLES
+────────────────────────────────
+
+Create or update a shared types file, ideally:
+
+- `lib/pricing/types.ts` (if it doesn’t exist, create it)
+
+Add:
+
+```ts
+export type UserTier = 'free' | 'starter' | 'basic' | 'pro';
+
+export type CloudBundleType =
+  | 'none'
+  | 'twoClouds'
+  | 'threeClouds'
+  | 'allClouds';
+If a User type already exists (e.g. in lib/auth), DO NOT break it.
+Instead, create a helper interface that maps DB tier (like subscriptionTier or similar) to UserTier.
+────────────────────────────────
+2) OFFERS_REGISTRY – SINGLE SOURCE OF TRUTH FOR PRICES
+────────────────────────────────
+Create:
+lib/pricing/offersRegistry.ts
+Content:
+import { CloudBundleType } from './types';
+
+export const OFFERS_REGISTRY = {
+  starter: {
+    id: 'vcm_starter_monthly',
+    label: 'Starter',
+    monthly: 9.99,
+  },
+  basic: {
+    id: 'vcm_basic_monthly',
+    label: 'Basic',
+    monthly: 29,
+  },
+  pro: {
+    id: 'vcm_pro_monthly',
+    label: 'Pro',
+    monthly: 59,
+  },
+  bundles: {
+    twoClouds: {
+      id: 'vcm_pro_two_clouds_monthly',
+      label: 'Pro – 2 Clouds',
+      monthly: 99,
+    },
+    threeClouds: {
+      id: 'vcm_pro_three_clouds_monthly',
+      label: 'Pro – 3 Clouds',
+      monthly: 120,
+    },
+    allClouds: {
+      id: 'vcm_pro_all_clouds_monthly',
+      label: 'Pro – All Clouds',
+      monthly: 199,
+    },
+  },
+} as const;
+
+export type OfferKey = keyof typeof OFFERS_REGISTRY;
+
+export function getOfferByTier(tier: 'starter' | 'basic' | 'pro') {
+  return OFFERS_REGISTRY[tier];
+}
+
+export function getBundleOffer(bundle: Exclude<CloudBundleType, 'none'>) {
+  return OFFERS_REGISTRY.bundles[bundle];
+}
+Notes:
+id fields are Stripe price IDs placeholders. Do NOT integrate Stripe yet unless we already have a shared Stripe helper.
+All UI that shows prices should read from this registry, NOT hard-coded values.
+────────────────────────────────
+3) CLOUD_ENTITLEMENTS – CENTRAL ACCESS RULES
+────────────────────────────────
+Create:
+lib/pricing/cloudEntitlements.ts
+Content:
+import type { UserTier } from './types';
+
+type MemoryEntitlement = false | 'limited' | 'full';
+type HeavyToolsEntitlement = false | 'single-step' | 'multi-step' | 'full';
+type WorkflowsEntitlement = false | 'limited' | 'full';
+type ExportsEntitlement = 'watermarked' | 'fullres';
+
+type CloudEntitlementConfig = {
+  memory: MemoryEntitlement;
+  ai: boolean;
+  heavyTools: HeavyToolsEntitlement;
+  workflows: WorkflowsEntitlement;
+  workflowLimit: number | 'unlimited';
+  exports: ExportsEntitlement;
+};
+
+export const CLOUD_ENTITLEMENTS: Record<UserTier, CloudEntitlementConfig> = {
+  free: {
+    memory: false,
+    ai: false,
+    heavyTools: false,
+    workflows: false,
+    workflowLimit: 0,
+    exports: 'watermarked',
+  },
+  starter: {
+    memory: 'limited',
+    ai: false,
+    heavyTools: 'single-step',
+    workflows: 'limited',
+    workflowLimit: 3,
+    exports: 'fullres',
+  },
+  basic: {
+    memory: 'full',
+    ai: false,
+    heavyTools: 'multi-step',
+    workflows: 'full',
+    workflowLimit: 'unlimited',
+    exports: 'fullres',
+  },
+  pro: {
+    memory: 'full',
+    ai: true,
+    heavyTools: 'full',
+    workflows: 'full',
+    workflowLimit: 'unlimited',
+    exports: 'fullres',
+  },
+};
+
+export function getEntitlementsForTier(tier: UserTier): CloudEntitlementConfig {
+  return CLOUD_ENTITLEMENTS[tier] ?? CLOUD_ENTITLEMENTS.free;
+}
+────────────────────────────────
+4) USER TIER RESOLUTION – SINGLE FUNCTION
+────────────────────────────────
+Find wherever we currently resolve “subscription” / “plan” / “tier”.
+Likely in:
+auth utils
+profile loading
+middleware
+Create:
+lib/pricing/getUserTier.ts
+Content:
+import type { UserTier } from './types';
+
+// Adjust this import to match the actual user/profile type location
+// If there's a `Profile` or `User` type, use it instead of `any`.
+type AnyUser = any;
+
+export function resolveUserTier(user: AnyUser | null | undefined): UserTier {
+  if (!user) return 'free';
+
+  // If your DB/profile has a subscription tier field, map it here.
+  // Example fields to look for:
+  // - user.subscriptionTier
+  // - user.plan
+  // - user.tier
+  // - user.cloud_tier
+  const rawTier =
+    user?.subscriptionTier ??
+    user?.tier ??
+    user?.plan ??
+    'free';
+
+  switch (rawTier) {
+    case 'starter':
+    case 'basic':
+    case 'pro':
+      return rawTier;
+    default:
+      return 'free';
+  }
+}
+Update any existing tier-resolution logic to use resolveUserTier instead of ad-hoc strings.
+────────────────────────────────
+5) ENTITLEMENT HELPERS – CENTRAL PERMISSION CHECKS
+────────────────────────────────
+Create:
+lib/pricing/permissions.ts
+Content:
+import { resolveUserTier } from './getUserTier';
+import { getEntitlementsForTier } from './cloudEntitlements';
+import type { AnyUser } from './getUserTier'; // adjust import if needed
+
+// If AnyUser is not exported, define a local alias:
+type UserLike = any;
+
+export function canUseAI(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  return getEntitlementsForTier(tier).ai;
+}
+
+export function canUseHeavyTools(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  const heavy = getEntitlementsForTier(tier).heavyTools;
+  return heavy !== false;
+}
+
+export function canUseMultiStepHeavyTools(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  const heavy = getEntitlementsForTier(tier).heavyTools;
+  return heavy === 'multi-step' || heavy === 'full';
+}
+
+export function getWorkflowLimit(user: UserLike): number | 'unlimited' {
+  const tier = resolveUserTier(user);
+  return getEntitlementsForTier(tier).workflowLimit;
+}
+
+export function canUseWorkflows(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  const w = getEntitlementsForTier(tier).workflows;
+  return w !== false;
+}
+
+export function canExportFullRes(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  return getEntitlementsForTier(tier).exports === 'fullres';
+}
+
+export function shouldWatermarkExports(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  return getEntitlementsForTier(tier).exports === 'watermarked';
+}
+
+export function hasAnyMemory(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  const mem = getEntitlementsForTier(tier).memory;
+  return mem !== false;
+}
+
+export function hasFullMemory(user: UserLike): boolean {
+  const tier = resolveUserTier(user);
+  return getEntitlementsForTier(tier).memory === 'full';
+}
+All tools, workflows, exports, and AI functions should rely on these helpers.
+────────────────────────────────
+6) EXPORT PIPELINE – ENFORCE WATERMARK / BLOCKING IN ONE PLACE
+────────────────────────────────
+Find the central export utilities. Look for files like:
+lib/export/*
+lib/files/export*
+or any function that:
+produces downloadable files
+converts buffers to downloadable responses
+handles image/video output
+Goal:
+Route all export behavior through ONE shared policy gate.
+Create or update:
+lib/export/applyExportPolicy.ts:
+import type { AnyUser } from '../pricing/getUserTier';
+import { canExportFullRes, shouldWatermarkExports } from '../pricing/permissions';
+
+type ExportPayload = {
+  buffer: Buffer;
+  mimeType: string;
+  filename: string;
+  // add other fields as needed
+};
+
+export function applyExportPolicy(user: AnyUser, payload: ExportPayload): ExportPayload | null {
+  const fullRes = canExportFullRes(user);
+  const watermark = shouldWatermarkExports(user);
+
+  if (!fullRes && !watermark) {
+    // free tier w/ no export rights – block download
+    return null;
+  }
+
+  let out = payload;
+
+  if (watermark) {
+    // IMPORTANT: if a watermarking function exists, call it here.
+    // e.g. out = addWatermarkToPayload(out);
+    // If not available yet, leave a TODO with a clean hook.
+  }
+
+  return out;
+}
+Then:
+Wherever we currently build the final export for a tool, ensure we call applyExportPolicy(user, payload) before returning the file.
+If applyExportPolicy returns null, respond with an error/JSON telling the frontend to show an “Upgrade to export” modal.
+DO NOT implement per-tool export logic. Everything flows through this helper.
+────────────────────────────────
+7) AI TOOL GATING – CENTRALIZED
+────────────────────────────────
+Find all AI tool endpoints / functions. Look for:
+/api/ai/*
+lib/ai/*
+Tools that call OpenAI or similar model APIs.
+Before any AI call, inject:
+import { canUseAI } from '@/lib/pricing/permissions';
+
+// inside the handler:
+const user = await getCurrentUser(); // adjust to your auth system
+if (!canUseAI(user)) {
+  return new Response(
+    JSON.stringify({ error: 'Upgrade to Pro to use AI features.' }),
+    { status: 403 }
+  );
+}
+DO NOT spread per-tier logic; always use canUseAI.
+Optional:
+For free tier “AI preview” (watermarked or sample), implement a dedicated “preview-only” route if needed later. For now, strict gating is fine.
+────────────────────────────────
+8) WORKFLOW BUILDER GATING
+────────────────────────────────
+Find the workflow builder engine/components:
+likely something like lib/workflows/* or components/workflows/*
+We need to enforce:
+FREE: no workflows
+STARTER: workflows allowed but limited to 3/day; heavy tools single-step only
+BASIC: full workflows, unlimited workflowLimit, multi-step heavy tools
+PRO: full + AI workflows
+Implementation outline:
+a) In the workflow creation or execution handler, import:
+import { canUseWorkflows, getWorkflowLimit } from '@/lib/pricing/permissions';
+b) Before executing a workflow:
+Check canUseWorkflows(user)
+If false → return 403 with “Upgrade to Starter to use workflows.”
+c) Enforce daily limit:
+Add a simple counter table or use an existing logging table, e.g. workflow_runs with columns:
+id
+user_id
+created_at
+workflow_id (optional)
+When executing a workflow:
+Count how many runs today for this user.
+If tier is starter and count >= 3 → block and prompt upgrade.
+If basic or pro and workflowLimit === 'unlimited', skip count (or just log).
+Edge:
+If such a table already exists, reuse it.
+If not, add a minimal one via the existing migration system.
+────────────────────────────────
+9) HEAVY TOOLS GATING
+────────────────────────────────
+We defined “heavy tools” as multi-step / batch / multi-file / multi-cloud tools.
+Implementation pattern:
+For any tool flagged as “heavy”, ensure:
+Its engine or config has a field like isHeavy: boolean or heavyMode: 'single' | 'multi'.
+For the cloud dashboards and tool invocation endpoints:
+If isHeavy or heavyMode === 'multi', check canUseHeavyTools and canUseMultiStepHeavyTools.
+In the tool invocation API:
+import { canUseHeavyTools, canUseMultiStepHeavyTools } from '@/lib/pricing/permissions';
+
+if (toolConfig.isHeavy) {
+  if (toolConfig.heavyMode === 'single') {
+    if (!canUseHeavyTools(user)) {
+      return new Response(JSON.stringify({ error: 'Upgrade to Starter to use heavy tools.' }), { status: 403 });
+    }
+  } else {
+    // multi-step or batch
+    if (!canUseMultiStepHeavyTools(user)) {
+      return new Response(JSON.stringify({ error: 'Upgrade to Basic to use advanced heavy tools.' }), { status: 403 });
+    }
+  }
+}
+Keep the flags on the engine/config level so we don’t hard-code tool slugs in logic.
+────────────────────────────────
+10) CLOUD DASHBOARD UI – LOCKED STATES & UPGRADE CTA
+────────────────────────────────
+Locate the cloud dashboard components, e.g.:
+app/clouds/[cloudId]/page.tsx
+components/cloud/CloudDashboard.tsx
+components/tools/ToolCard.tsx
+For each tool in the dashboard:
+Read its config/engine metadata to know if it’s:
+free simple utility
+heavy tool
+AI tool
+Read current user tier via resolveUserTier(user) (or a hook).
+For tools the user can’t fully use:
+Render them with a translucent overlay + lock icon
+On click, instead of navigating directly, open an upgrade modal.
+Create a simple upgrade modal component, e.g.:
+components/pricing/UpgradeModal.tsx
+It should:
+Show current tier vs target tier.
+Show relevant benefits (memory, workflows, AI).
+Use OFFERS_REGISTRY to read prices for labels.
+IMPORTANT:
+Do NOT embed raw gradients or per-cloud styles in the modal; use the existing theme tokens (CLOUD_THEMES).
+UI must respect the existing “no UI drift” rules: styling from themes, logic from engines, layout from renderer.
+────────────────────────────────
+11) STRIPE / CHECKOUT INTEGRATION HOOK
+────────────────────────────────
+If there is already a shared Stripe helper (from other Code2Cash tools), reuse it.
+Search for:
+Stripe
+/api/checkout
+startCheckout
+If one exists, add a thin wrapper for VCM Suite subscription:
+For example:
+lib/pricing/startCheckout.ts:
+import { getOfferByTier, getBundleOffer } from './offersRegistry';
+
+// Pseudocode – adapt to existing Stripe integration
+export async function startTierCheckout(tier: 'starter' | 'basic' | 'pro') {
+  const offer = getOfferByTier(tier);
+  // Call existing checkout route or Stripe helper using offer.id (priceId)
+}
+
+export async function startBundleCheckout(bundle: 'twoClouds' | 'threeClouds' | 'allClouds') {
+  const offer = getBundleOffer(bundle);
+  // Call existing checkout route or Stripe helper using offer.id
+}
+If there is NO Stripe integration yet:
+Create the helper with TODO comments and ensure all UI calls these helpers so wiring Stripe later is straightforward.
+────────────────────────────────
+12) ENSURE ARCHITECTURE RULES ARE RESPECTED
+────────────────────────────────
+Important constraints:
+All monetization rules MUST come from:
+CLOUD_ENTITLEMENTS
+OFFERS_REGISTRY
+resolveUserTier
+permissions.ts
+Do NOT:
+Hard-code tier names in components (no if (user.plan === 'pro') scattered around).
+Hard-code prices in JSX.
+Put gradients or tier-specific colors inline (must come from theme config).
+All UI differences for “locked” vs “unlocked” should be done via:
+shared components (e.g. ToolCard locked state)
+theme tokens (no inline one-off styles)
+────────────────────────────────
+13) QUICK SELF-CHECK AFTER IMPLEMENTATION
+────────────────────────────────
+As a non-logged-in user:
+I can use simple tools with watermarked/limited exports.
+I cannot access workflows / heavy tools / AI.
+Cloud dashboards still load and are browsable.
+As a “starter” user (mock the tier in code if needed):
+I can export full-res, no watermark.
+I can run up to 3 workflows per day (then blocked).
+I can use single-step heavy tools.
+I still cannot use AI tools.
+As a “basic” user:
+I have full memory + full workflows + multi-step heavy tools.
+No AI.
+As a “pro” user:
+Everything above + AI tools fully work.
+Bundles (when purchased later) just extend which clouds are considered unlocked.
+Make all changes with clean, typed helpers and keep the monetization logic centralized.
+When you’re done, ensure TypeScript passes and the app builds.
