@@ -5,6 +5,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { CartProvider } from "@/contexts/CartContext";
 import FloatingToolsButton from "@/components/FloatingToolsButton";
+import { AppProvider } from "@/components/providers/AppProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,11 +50,13 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <CartProvider>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <FloatingToolsButton />
+          <AppProvider>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <FloatingToolsButton />
+          </AppProvider>
         </CartProvider>
       </body>
     </html>

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { ToolForRenderer } from '@/lib/cms/getCmsToolBySlug';
 import { PRESETS_BY_SLUG, PlatformImagePreset, platformImagePresets } from '@/data/platformImagePresets';
+import { useUpgradeContext } from '@/context/UpgradeContext';
 
 interface PlatformResizerEngineProps {
   tool: ToolForRenderer;
@@ -419,6 +420,7 @@ function ResizerUI({ preset }: { preset: PlatformImagePreset }) {
   const [success, setSuccess] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { triggerAuthModal, triggerUpgradeModal } = useUpgradeContext();
 
   const processFile = (file: File) => {
     setError(null);
@@ -486,6 +488,17 @@ function ResizerUI({ preset }: { preset: PlatformImagePreset }) {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        if (response.status === 401 && errorData.error === 'AUTH_REQUIRED') {
+          triggerAuthModal();
+          return;
+        }
+        
+        if (response.status === 403 && errorData.error === 'UPGRADE_REQUIRED') {
+          triggerUpgradeModal(errorData.feature || 'export', errorData.requiredTier || 'starter');
+          return;
+        }
+        
         throw new Error(errorData.error || 'Failed to resize image');
       }
 
