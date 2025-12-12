@@ -67,7 +67,7 @@ export async function GET(
       );
     }
 
-    return new NextResponse(result.payload.buffer, {
+    return new NextResponse(new Uint8Array(result.payload.buffer), {
       headers: {
         'Content-Type': result.payload.mimeType,
         'Content-Disposition': `attachment; filename="${result.payload.filename}"`,

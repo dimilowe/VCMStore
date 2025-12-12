@@ -75,7 +75,7 @@ export async function GET(
       cleanupFiles(inputPath, outputPath);
     }, 1000);
 
-    return new NextResponse(result.payload.buffer, {
+    return new NextResponse(new Uint8Array(result.payload.buffer), {
       headers: {
         'Content-Type': result.payload.mimeType,
         'Content-Disposition': `attachment; filename="${result.payload.filename}"`,

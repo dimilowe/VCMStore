@@ -65,7 +65,7 @@ export async function GET(
     }, 1000);
 
     // Return the file as a download
-    return new NextResponse(result.payload.buffer, {
+    return new NextResponse(new Uint8Array(result.payload.buffer), {
       headers: {
         'Content-Type': result.payload.mimeType,
         'Content-Disposition': `attachment; filename="${result.payload.filename}"`,
