@@ -1,0 +1,158 @@
+You are editing the VCM Suite repo.
+
+GOAL: Wire the existing `applyExportPolicy()` helper into ALL export/download endpoints so that export behavior (watermark vs block vs full-res) is enforced centrally for every tool.
+
+Monetization infrastructure is already in place:
+
+- `lib/pricing/*` exists with:
+  - `resolveUserTier()`
+  - `canExportFullRes()`
+  - `shouldWatermarkExports()`
+- `lib/export/applyExportPolicy.ts` exists and is the SINGLE source of truth for export policy.
+- `subscription_tier` exists on users.
+- AI endpoints are already gated; reuse whatever auth pattern they use (e.g. `getCurrentUser()`).
+
+Your job: **find every endpoint or function that returns a downloadable file and make it pass through `applyExportPolicy()` before sending the response.**
+
+────────────────────────
+1) Locate ALL export/download endpoints
+────────────────────────
+
+Search the codebase for patterns indicating file export or download, including but not limited to:
+
+- `Content-Disposition`
+- `attachment; filename=`
+- `res.setHeader('Content-Disposition'`
+- `new Response(` with binary data / buffers
+- `NextResponse` with files
+- Functions named like:
+  - `export*`
+  - `download*`
+  - `generate*File`
+  - `getDownload`
+- Any API routes under `/api/export` or similar
+
+Open each file that creates a downloadable file or binary response (images, zips, docs, etc.).
+
+────────────────────────
+2) Identify the export payload point
+────────────────────────
+
+For each export endpoint, find the point where the binary/file payload is constructed.
+
+Typical patterns:
+
+- `const buffer = ...` then `return new Response(buffer, { headers: { ... } })`
+- `const file = ...` then `res.send(file)` or similar
+- Any function building `{ buffer, mimeType, filename }` or equivalent.
+
+You need to intercept **right before** the response is sent.
+
+────────────────────────
+3) Import and use applyExportPolicy()
+────────────────────────
+
+At the top of each export endpoint file, add:
+
+```ts
+import { applyExportPolicy } from '@/lib/export/applyExportPolicy';
+import { resolveUserTier } from '@/lib/pricing/getUserTier';
+Use the SAME auth helper you used when gating the AI endpoints (for example getCurrentUser() or similar). Do NOT invent a new pattern; re-use the existing auth utilities from those AI routes.
+Example integration pattern (adjust to each endpoint):
+
+export async function GET(req: NextRequest) {
+  const user = await getCurrentUser(); // reuse existing auth util
+
+  // build your payload as before
+  const buffer = await buildFileBufferSomehow();
+  const mimeType = 'application/pdf'; // or whatever it already was
+  const filename = 'export.pdf';      // or whatever it already was
+
+  const payload = { buffer, mimeType, filename };
+
+  const processed = applyExportPolicy(user, payload);
+
+  if (!processed) {
+    // user is not allowed to export (e.g. free tier with no fullres export rights)
+    // Respond with 401 if not logged in, 403 if logged in but insufficient tier
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: 'AUTH_REQUIRED',
+          message: 'Log in to export your files.',
+        }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: 'UPGRADE_REQUIRED',
+        feature: 'export',
+        requiredTier: 'starter', // exports unlock at Starter+
+      }),
+      { status: 403, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // If allowed, send the processed payload (possibly watermarked).
+  return new Response(processed.buffer, {
+    status: 200,
+    headers: {
+      'Content-Type': processed.mimeType,
+      'Content-Disposition': `attachment; filename="${processed.filename}"`,
+    },
+  });
+}
+Rules:
+Do NOT duplicate the policy logic. Never check tiers directly in the endpoint.
+Always call applyExportPolicy(user, payload) and branch on its return value.
+For unauthenticated users, return 401 with AUTH_REQUIRED.
+For logged-in but under-tier users, return 403 with UPGRADE_REQUIRED + requiredTier: 'starter'.
+If a given endpoint is using a different response style (e.g. res from Node/Express in an API handler), adapt the same logic:
+Build payload → call applyExportPolicy() → if null, send JSON error; else send the file.
+────────────────────────
+4) Make sure EVERY export path uses the policy
+────────────────────────
+For each export endpoint you touched:
+
+Confirm there is exactly ONE place where the file is returned.
+Confirm that place now goes through applyExportPolicy().
+Make sure there are no leftover “early returns” that send files without policy.
+Re-run the search patterns to verify nothing was missed:
+Content-Disposition
+attachment; filename=
+exportFile
+download
+If anything still returns files directly, update it to use the same pattern.
+────────────────────────
+5) Basic sanity checks
+────────────────────────
+
+Implement and verify the following behavior:
+
+Not logged in:
+Try any export endpoint.
+Should return 401 with { error: 'AUTH_REQUIRED', ... }.
+Logged in, subscription_tier = 'free':
+Exports should be blocked or watermarked according to applyExportPolicy + CLOUD_ENTITLEMENTS.
+If blocked, you must see 403 with { error: 'UPGRADE_REQUIRED', feature: 'export', requiredTier: 'starter' }.
+Logged in, manual test:
+Temporarily set subscription_tier = 'starter' in the DB for a test user.
+Confirm you now get full-res exports where allowed.
+Do NOT change the core policy logic in applyExportPolicy. Only wire it in.
+────────────────────────
+6) Keep to the architecture rules
+────────────────────────
+
+No hard-coded tier comparisons like if (user.subscription_tier === 'pro') in endpoints.
+No pricing numbers in endpoints or components.
+All export gating must rely on:
+resolveUserTier()
+CLOUD_ENTITLEMENTS
+applyExportPolicy()
+When done, ensure TypeScript compiles and the app builds successfully.
+
+---
+
+Once that’s run, you’ll have **one gate** controlling exports across the whole Suite. After that, changing export rules (e.g. free gets watermarked, Starter gets full-res, etc.) is just editing `CLOUD_ENTITLEMENTS` + `applyExportPolicy`, not touching 20 endpoints.
