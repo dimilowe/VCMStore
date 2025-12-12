@@ -10,7 +10,7 @@ function getEngineMetaBySlug(slug: string): { heavyMode: HeavyMode; hasAi: boole
   if (toolRow) {
     return {
       heavyMode: toolRow.heavyMode ?? 'none',
-      hasAi: toolRow.id === 'ai-analysis' || toolRow.id === 'ai-generate',
+      hasAi: toolRow.hasAi ?? false,
     };
   }
   
@@ -24,7 +24,7 @@ function getEngineMetaByEngineType(engine: string | null): { heavyMode: HeavyMod
   if (engineConfig) {
     return {
       heavyMode: engineConfig.heavyMode ?? 'none',
-      hasAi: engineConfig.id === 'ai-analysis' || engineConfig.id === 'ai-generate',
+      hasAi: engineConfig.hasAi ?? false,
     };
   }
   

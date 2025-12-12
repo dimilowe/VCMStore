@@ -15,6 +15,7 @@ export interface EngineConfig {
   apiRoutes?: string[];
   capabilities: string[];
   heavyMode?: HeavyMode;
+  hasAi?: boolean;
 }
 
 export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
@@ -83,6 +84,7 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     outputTypes: ["analysis", "text", "display"],
     capabilities: ["analyze", "score", "recommend"],
     heavyMode: "single",
+    hasAi: true,
   },
   "ai-generate": {
     id: "ai-generate",
@@ -92,6 +94,7 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     outputTypes: ["text", "image", "display", "download"],
     capabilities: ["generate", "create", "compose"],
     heavyMode: "single",
+    hasAi: true,
   },
   "file-convert": {
     id: "file-convert",
