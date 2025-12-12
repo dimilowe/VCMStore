@@ -5,3 +5,4 @@ export * from './getUserTier';
 export * from './permissions';
 export * from './startCheckout';
 export * from './getCurrentUserWithTier';
+export * from './heavyTools';

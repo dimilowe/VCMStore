@@ -3,6 +3,9 @@ import { writeFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { compressImage, formatFileSize, detectFormat, getOutputExtension, CompressionLevel } from '@/lib/image-compressor';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { getCurrentUserWithTier } from '@/lib/pricing/getCurrentUserWithTier';
+import { checkHeavyToolAccess, heavyToolAccessToResponse } from '@/lib/pricing/heavyTools';
+import { ENGINE_REGISTRY } from '@/engines';
 
 const UPLOAD_DIR = '/tmp/image-uploads';
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -47,6 +50,14 @@ function isAllowedFile(file: File): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getCurrentUserWithTier();
+
+    const engineConfig = ENGINE_REGISTRY["image-compress"];
+    const heavyAccess = checkHeavyToolAccess(user, engineConfig.heavyMode);
+    if (!heavyAccess.allowed) {
+      return heavyToolAccessToResponse(heavyAccess);
+    }
+
     const forwardedFor = request.headers.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
     

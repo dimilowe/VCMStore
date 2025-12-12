@@ -1,0 +1,127 @@
+Yeah, that plan is basically right, just needs one tweak so you don’t accidentally create a second “truth table” for which tool is heavy.
+Big picture:
+heavyMode belongs in the engine config (source of truth)
+Gating belongs in a shared helper
+Routes should never hard-code which tier is needed
+Let’s go through your bullets.
+✅ What you’ve got right
+1. Use existing entitlements + permissions
+heavyTools in CLOUD_ENTITLEMENTS ✅
+canUseHeavyTools() / canUseMultiStepHeavyTools() in permissions.ts ✅
+Good. Don’t add more tier logic anywhere else.
+2. Add heavyMode to EngineConfig
+Correct. This is exactly where it should live.
+type HeavyMode = 'none' | 'single' | 'multi';
+
+export interface EngineConfig {
+  // existing fields…
+  heavyMode?: HeavyMode; // default to 'none' if omitted
+}
+3. Tag engines, not routes
+Your examples are fine as long as you do them on the engine objects:
+heavyMode: 'none' → calculators, text tools, tiny transforms
+heavyMode: 'single' → platform resizer, image compress, single large operation
+heavyMode: 'multi' → zip, batch converters, multi-file flows
+Do NOT hard-code this again in the route. Routes should just read engineConfig.heavyMode.
+⚠️ Where I’d slightly change your plan
+You said:
+Create applyHeavyToolGating() helper - Similar pattern to applyExportPolicy(), returns 401/403 with consistent error shapes
+Wire gating into heavy tool API routes - Add the check at the start of routes like /api/gif-compress, /api/platform-image/resize, etc.
+The intent is right, but don’t guess heavy tools per-route. Instead:
+Helper takes user + heavyMode, doesn’t decide heavyMode itself.
+Routes will:
+load the engine config
+read config.heavyMode
+pass that into the helper
+Suggested helper shape
+// lib/pricing/heavyTools.ts
+import { canUseHeavyTools, canUseMultiStepHeavyTools } from './permissions';
+import { resolveUserTier } from './getUserTier';
+
+type HeavyMode = 'none' | 'single' | 'multi';
+
+export function checkHeavyToolAccess(user: any, heavyMode: HeavyMode) {
+  if (heavyMode === 'none') return { allowed: true };
+
+  const tier = resolveUserTier(user);
+
+  if (!user) {
+    return {
+      allowed: false,
+      status: 401,
+      code: 'AUTH_REQUIRED' as const,
+      message: 'Log in to use this advanced tool.',
+    };
+  }
+
+  if (heavyMode === 'single') {
+    if (!canUseHeavyTools(user)) {
+      return {
+        allowed: false,
+        status: 403,
+        code: 'UPGRADE_REQUIRED' as const,
+        feature: 'heavyTool' as const,
+        requiredTier: 'starter' as const,
+        message: 'Upgrade to Starter to use heavy tools.',
+      };
+    }
+  }
+
+  if (heavyMode === 'multi') {
+    if (!canUseMultiStepHeavyTools(user)) {
+      return {
+        allowed: false,
+        status: 403,
+        code: 'UPGRADE_REQUIRED' as const,
+        feature: 'heavyTool' as const,
+        requiredTier: 'basic' as const,
+        message: 'Upgrade to Basic to use multi-step heavy tools.',
+      };
+    }
+  }
+
+  return { allowed: true, tier };
+}
+Route pattern
+In a heavy tool API route:
+import { getCurrentUserWithTier } from '@/lib/auth/getCurrentUserWithTier';
+import { getEngineConfigBySlug } from '@/lib/engines'; // whatever you actually use
+import { checkHeavyToolAccess } from '@/lib/pricing/heavyTools';
+
+export async function POST(req: NextRequest) {
+  const user = await getCurrentUserWithTier();
+
+  const { slug } = await req.json(); // or from params
+  const engine = getEngineConfigBySlug(slug);
+
+  const heavyMode = engine.heavyMode ?? 'none';
+
+  const access = checkHeavyToolAccess(user, heavyMode);
+
+  if (!access.allowed) {
+    return new Response(
+      JSON.stringify({
+        error: access.code,
+        message: access.message,
+        feature: (access as any).feature,
+        requiredTier: (access as any).requiredTier,
+      }),
+      {
+        status: access.status,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+
+  // run heavy tool as normal…
+}
+Same pattern for /api/gif-compress, /api/platform-image/resize, etc.:
+Don’t decide “this route is heavy” manually.
+Pull heavyMode from the engine config and call the helper.
+TL;DR
+Your overall plan is good.
+The only real risk is duplicating heavy classification per route. Make engine config the single source of truth and pass heavyMode into a shared checkHeavyToolAccess helper.
+Keep error shapes consistent with what you already wired:
+401 + AUTH_REQUIRED → login modal
+403 + UPGRADE_REQUIRED + feature + requiredTier → UpgradeModal
+Do that and heavy tools will be locked in a way that matches everything else you’ve built: centralized, config-driven, and easy to tweak later.

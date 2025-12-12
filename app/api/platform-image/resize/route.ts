@@ -3,16 +3,17 @@ import sharp from "sharp";
 import { getPresetById } from "@/data/platformImagePresets";
 import { applyExportPolicy } from "@/lib/export/applyExportPolicy";
 import { getCurrentUserWithTier } from "@/lib/pricing/getCurrentUserWithTier";
+import { checkHeavyToolAccess, heavyToolAccessToResponse } from "@/lib/pricing/heavyTools";
+import { ENGINE_REGISTRY } from "@/engines";
 
 export async function POST(request: NextRequest) {
   try {
-    // Export gating - check auth and tier
     const user = await getCurrentUserWithTier();
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: "AUTH_REQUIRED", message: "Log in to export your files." }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
+
+    const engineConfig = ENGINE_REGISTRY["platform-resizer"];
+    const heavyAccess = checkHeavyToolAccess(user, engineConfig.heavyMode);
+    if (!heavyAccess.allowed) {
+      return heavyToolAccessToResponse(heavyAccess);
     }
 
     const formData = await request.formData();

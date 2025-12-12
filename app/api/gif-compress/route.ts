@@ -3,10 +3,13 @@ import { writeFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { compressGif, formatFileSize, CompressionLevel } from '@/lib/gif-compressor';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { getCurrentUserWithTier } from '@/lib/pricing/getCurrentUserWithTier';
+import { checkHeavyToolAccess, heavyToolAccessToResponse } from '@/lib/pricing/heavyTools';
+import { ENGINE_REGISTRY } from '@/engines';
 
 const UPLOAD_DIR = '/tmp/gif-uploads';
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const FILE_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const FILE_EXPIRY_MS = 10 * 60 * 1000;
 
 function generateId(): string {
   return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
@@ -17,7 +20,6 @@ async function cleanupFiles(...paths: string[]) {
     try {
       await unlink(filePath);
     } catch {
-      // File may not exist, ignore
     }
   }
 }
@@ -32,11 +34,17 @@ function scheduleCleanup(jobId: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get client IP for rate limiting
+    const user = await getCurrentUserWithTier();
+
+    const engineConfig = ENGINE_REGISTRY["image-compress"];
+    const heavyAccess = checkHeavyToolAccess(user, engineConfig.heavyMode);
+    if (!heavyAccess.allowed) {
+      return heavyToolAccessToResponse(heavyAccess);
+    }
+
     const forwardedFor = request.headers.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
     
-    // Check rate limit
     const rateLimit = checkRateLimit(ip);
     if (!rateLimit.allowed) {
       const minutesLeft = Math.ceil(rateLimit.resetIn / 60000);

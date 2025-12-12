@@ -2,6 +2,8 @@ import { EngineType, InputType, OutputType, toolsRegistry } from "@/data/toolsRe
 
 export type { EngineType, InputType, OutputType };
 
+export type HeavyMode = 'none' | 'single' | 'multi';
+
 export interface EngineConfig {
   id: EngineType;
   name: string;
@@ -12,6 +14,7 @@ export interface EngineConfig {
   presetsFile?: string;
   apiRoutes?: string[];
   capabilities: string[];
+  heavyMode?: HeavyMode;
 }
 
 export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
@@ -24,7 +27,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     sharedComponent: "components/PlatformImageToolClient.tsx",
     presetsFile: "data/platformImagePresets.ts",
     apiRoutes: ["/api/platform-image/resize"],
-    capabilities: ["resize", "crop", "format-convert"]
+    capabilities: ["resize", "crop", "format-convert"],
+    heavyMode: "single",
   },
   "image-compress": {
     id: "image-compress",
@@ -32,7 +36,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Compress images to reduce file size",
     inputTypes: ["image"],
     outputTypes: ["download"],
-    capabilities: ["compress", "optimize", "batch"]
+    capabilities: ["compress", "optimize", "batch"],
+    heavyMode: "single",
   },
   "image-convert": {
     id: "image-convert",
@@ -40,7 +45,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Convert between image formats",
     inputTypes: ["image", "multi"],
     outputTypes: ["download"],
-    capabilities: ["convert", "batch", "format-change"]
+    capabilities: ["convert", "batch", "format-change"],
+    heavyMode: "multi",
   },
   "text-transform": {
     id: "text-transform",
@@ -48,7 +54,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Transform and manipulate text",
     inputTypes: ["text"],
     outputTypes: ["text"],
-    capabilities: ["transform", "format", "generate"]
+    capabilities: ["transform", "format", "generate"],
+    heavyMode: "none",
   },
   "text-analysis": {
     id: "text-analysis",
@@ -56,7 +63,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Analyze text for metrics and insights",
     inputTypes: ["text"],
     outputTypes: ["analysis"],
-    capabilities: ["count", "analyze", "metrics"]
+    capabilities: ["count", "analyze", "metrics"],
+    heavyMode: "none",
   },
   "calculator": {
     id: "calculator",
@@ -64,7 +72,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Numerical calculations and estimations",
     inputTypes: ["number", "selection"],
     outputTypes: ["analysis"],
-    capabilities: ["calculate", "estimate", "project"]
+    capabilities: ["calculate", "estimate", "project"],
+    heavyMode: "none",
   },
   "ai-analysis": {
     id: "ai-analysis",
@@ -72,7 +81,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "AI-powered content analysis",
     inputTypes: ["text", "image", "url"],
     outputTypes: ["analysis", "text", "display"],
-    capabilities: ["analyze", "score", "recommend"]
+    capabilities: ["analyze", "score", "recommend"],
+    heavyMode: "single",
   },
   "ai-generate": {
     id: "ai-generate",
@@ -80,7 +90,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "AI-powered content generation",
     inputTypes: ["text", "selection"],
     outputTypes: ["text", "image", "display", "download"],
-    capabilities: ["generate", "create", "compose"]
+    capabilities: ["generate", "create", "compose"],
+    heavyMode: "single",
   },
   "file-convert": {
     id: "file-convert",
@@ -88,7 +99,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Convert between file formats",
     inputTypes: ["file"],
     outputTypes: ["download"],
-    capabilities: ["convert", "extract", "merge"]
+    capabilities: ["convert", "extract", "merge"],
+    heavyMode: "multi",
   },
   "file-edit": {
     id: "file-edit",
@@ -96,7 +108,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Edit and manipulate files",
     inputTypes: ["file"],
     outputTypes: ["download"],
-    capabilities: ["edit", "rearrange", "modify"]
+    capabilities: ["edit", "rearrange", "modify"],
+    heavyMode: "single",
   },
   "community": {
     id: "community",
@@ -104,7 +117,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "User-generated and community-driven tools",
     inputTypes: ["selection", "text"],
     outputTypes: ["interactive", "text"],
-    capabilities: ["browse", "submit", "vote"]
+    capabilities: ["browse", "submit", "vote"],
+    heavyMode: "none",
   },
   "static": {
     id: "static",
@@ -112,7 +126,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Reference guides and documentation",
     inputTypes: ["none"],
     outputTypes: ["display"],
-    capabilities: ["reference", "guide", "lookup"]
+    capabilities: ["reference", "guide", "lookup"],
+    heavyMode: "none",
   },
   "standalone": {
     id: "standalone",
@@ -120,7 +135,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     description: "Custom one-off tools with unique logic",
     inputTypes: ["multi", "text", "image"],
     outputTypes: ["interactive", "image", "text", "display"],
-    capabilities: ["custom"]
+    capabilities: ["custom"],
+    heavyMode: "none",
   },
   "zip": {
     id: "zip",
@@ -130,7 +146,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     outputTypes: ["download"],
     sharedComponent: "components/engines/ZipEngine.tsx",
     presetsFile: "engines/zip/config.ts",
-    capabilities: ["compress", "archive", "bundle"]
+    capabilities: ["compress", "archive", "bundle"],
+    heavyMode: "multi",
   },
   "outfit": {
     id: "outfit",
@@ -141,7 +158,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     sharedComponent: "components/engines/OutfitEngine.tsx",
     presetsFile: "engines/outfit/config.ts",
     apiRoutes: ["/api/tools/outfit-analyzer"],
-    capabilities: ["analyze", "recommend", "shop"]
+    capabilities: ["analyze", "recommend", "shop"],
+    heavyMode: "single",
   },
   "price-engine": {
     id: "price-engine",
@@ -151,7 +169,8 @@ export const ENGINE_REGISTRY: Record<EngineType, EngineConfig> = {
     outputTypes: ["analysis", "display"],
     sharedComponent: "components/engines/PriceEngine.tsx",
     presetsFile: "engines/price-engine/config.ts",
-    capabilities: ["track", "monitor", "compare", "alert"]
+    capabilities: ["track", "monitor", "compare", "alert"],
+    heavyMode: "single",
   }
 };
 
