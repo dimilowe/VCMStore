@@ -62,10 +62,10 @@ export default function CloudFeaturedTools({
           });
 
           const handleClick = (e: React.MouseEvent) => {
-            if (lockState.locked) {
+            if (lockState.locked && lockState.requiredTier && lockState.requiredTier !== 'free') {
               e.preventDefault();
               const feature = lockState.feature === 'heavyTool' ? 'heavyTools' : lockState.feature;
-              openUpgradeModal(feature, lockState.requiredTier);
+              openUpgradeModal(feature, lockState.requiredTier as 'starter' | 'basic' | 'pro');
             }
           };
           
