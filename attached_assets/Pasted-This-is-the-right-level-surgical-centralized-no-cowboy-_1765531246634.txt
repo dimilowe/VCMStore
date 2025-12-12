@@ -1,0 +1,97 @@
+This is the right level: surgical, centralized, no cowboy logic.
+Let’s tighten it with specifics so you don’t step on any landmines.
+👍 Your approach (sanity check)
+For each of these:
+app/api/producer-tag/download/[filename]/route.ts
+app/api/image-download/[id]/route.ts
+app/api/gif-download/[id]/route.ts
+app/api/platform-image/resize/route.ts
+You’re planning to:
+Read current structure – see how they build the file (Buffer/stream, mime, filename).
+Add auth using getCurrentUserWithTier() – same pattern as AI endpoints.
+Run through applyExportPolicy() – which returns an object like:
+const result = applyExportPolicy(user, {
+  buffer,
+  mimeType,
+  filename,
+});
+
+// e.g.:
+// { allowed: boolean, payload?: { buffer, mimeType, filename }, reason?: 'AUTH' | 'TIER' }
+(Adjust to however it’s actually typed.)
+Return 401 / 403 depending on the reason.
+Send the processed payload if allowed.
+Verify no other path returns files without going through this.
+That’s correct.
+🔧 Concrete pattern you should follow
+Inside each GET handler, you want something like:
+import { NextRequest } from 'next/server';
+import { getCurrentUserWithTier } from '@/lib/auth/getCurrentUserWithTier';
+import { applyExportPolicy } from '@/lib/export/applyExportPolicy';
+
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const user = await getCurrentUserWithTier(); // same as AI endpoints
+
+  // 1) Build the original payload exactly as before
+  const { buffer, mimeType, filename } = await buildWhateverFile(params.id); // existing logic
+
+  // 2) Run through export policy
+  const result = applyExportPolicy(user, { buffer, mimeType, filename });
+
+  if (!result.allowed) {
+    // stay consistent with how AI endpoints did it
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: 'AUTH_REQUIRED',
+          message: 'Log in to export this file.',
+        }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: 'UPGRADE_REQUIRED',
+        feature: 'export',
+        requiredTier: 'starter',
+      }),
+      { status: 403, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
+  const { buffer: finalBuffer, mimeType: finalMime, filename: finalName } = result.payload;
+
+  // 3) Return the processed file (possibly watermarked)
+  return new Response(finalBuffer, {
+    status: 200,
+    headers: {
+      'Content-Type': finalMime,
+      'Content-Disposition': `attachment; filename="${finalName}"`,
+    },
+  });
+}
+Adjust names/types to whatever applyExportPolicy actually returns (allowed, payload, watermarked, etc.).
+🧠 Endpoint-specific notes
+Producer tag downloads
+These are high-value. You absolutely want:
+full gating
+no anonymous exports
+clear requiredTier: 'starter' or higher.
+Image / GIF downloads
+Same pattern. Make sure every path that turns an ID into a binary response now hits the policy.
+Platform image resize
+Watch this one:
+If it sometimes returns inline previews (for UI) vs downloads, decide if previews should be:
+allowed for free (maybe watermarked)
+or still gated.
+Even if it’s not using Content-Disposition, still treat it as an export: pass through policy and just don’t set the attachment header if it’s intended as inline display.
+⚠️ Gotchas to avoid
+Don’t read the stream twice; always build the buffer once, then hand that into applyExportPolicy.
+Don’t re-implement tier logic in each endpoint. If you catch yourself checking user.subscription_tier directly, stop and push that into applyExportPolicy / entitlements.
+Keep error shapes consistent with your AI endpoints, so the frontend has one upgrade flow.
+Verdict
+Yes: your plan is good.
+Do exactly that, following the pattern above, and once these four are wired you’ll:
+Have one gate controlling all exports.
+Be able to change export behavior later by editing only CLOUD_ENTITLEMENTS + applyExportPolicy, not touching endpoints again.

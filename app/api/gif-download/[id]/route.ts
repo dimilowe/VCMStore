@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile, unlink, stat } from 'fs/promises';
 import path from 'path';
+import { applyExportPolicy } from '@/lib/export/applyExportPolicy';
+import { getCurrentUserWithTier } from '@/lib/pricing/getCurrentUserWithTier';
 
 const UPLOAD_DIR = '/tmp/gif-uploads';
 
@@ -9,6 +11,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Export gating - check auth and tier
+    const user = await getCurrentUserWithTier();
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: 'AUTH_REQUIRED', message: 'Log in to export your files.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { id } = await params;
     
     // Validate ID format to prevent path traversal
@@ -29,6 +40,20 @@ export async function GET(
     // Read the compressed file
     const fileBuffer = await readFile(compressedPath);
 
+    // Apply export policy
+    const result = applyExportPolicy(user, {
+      buffer: fileBuffer,
+      mimeType: 'image/gif',
+      filename: `compressed-${id}.gif`
+    });
+
+    if (!result.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'UPGRADE_REQUIRED', feature: 'export', requiredTier: 'starter' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Clean up both files after sending
     setTimeout(async () => {
       try {
@@ -40,11 +65,11 @@ export async function GET(
     }, 1000);
 
     // Return the file as a download
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(result.payload.buffer, {
       headers: {
-        'Content-Type': 'image/gif',
-        'Content-Disposition': `attachment; filename="compressed-${id}.gif"`,
-        'Content-Length': fileBuffer.length.toString(),
+        'Content-Type': result.payload.mimeType,
+        'Content-Disposition': `attachment; filename="${result.payload.filename}"`,
+        'Content-Length': result.payload.buffer.length.toString(),
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     });

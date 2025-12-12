@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile, unlink, readdir } from 'fs/promises';
 import path from 'path';
+import { applyExportPolicy } from '@/lib/export/applyExportPolicy';
+import { getCurrentUserWithTier } from '@/lib/pricing/getCurrentUserWithTier';
 
 const UPLOAD_DIR = '/tmp/image-uploads';
 
@@ -18,6 +20,15 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Export gating - check auth and tier
+    const user = await getCurrentUserWithTier();
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: 'AUTH_REQUIRED', message: 'Log in to export your files.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { id } = await context.params;
 
     if (!id || !/^[a-z0-9]+$/i.test(id)) {
@@ -46,15 +57,29 @@ export async function GET(
 
     const filename = `compressed-image${ext}`;
 
+    // Apply export policy
+    const result = applyExportPolicy(user, {
+      buffer: fileBuffer,
+      mimeType: contentType,
+      filename
+    });
+
+    if (!result.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'UPGRADE_REQUIRED', feature: 'export', requiredTier: 'starter' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     setTimeout(() => {
       cleanupFiles(inputPath, outputPath);
     }, 1000);
 
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(result.payload.buffer, {
       headers: {
-        'Content-Type': contentType,
-        'Content-Disposition': `attachment; filename="${filename}"`,
-        'Content-Length': fileBuffer.length.toString(),
+        'Content-Type': result.payload.mimeType,
+        'Content-Disposition': `attachment; filename="${result.payload.filename}"`,
+        'Content-Length': result.payload.buffer.length.toString(),
         'Cache-Control': 'no-cache, no-store, must-revalidate'
       }
     });

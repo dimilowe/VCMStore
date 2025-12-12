@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile, stat, unlink } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { applyExportPolicy } from '@/lib/export/applyExportPolicy';
+import { getCurrentUserWithTier } from '@/lib/pricing/getCurrentUserWithTier';
 
 const OUTPUT_DIR = '/tmp/producer-tag-output';
 
@@ -10,6 +12,15 @@ export async function GET(
   { params }: { params: Promise<{ filename: string }> }
 ) {
   try {
+    // Export gating - check auth and tier
+    const user = await getCurrentUserWithTier();
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: 'AUTH_REQUIRED', message: 'Log in to export your files.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { filename } = await params;
 
     const safePattern = /^output_[a-zA-Z0-9_-]+\.mp3$/;
@@ -41,11 +52,26 @@ export async function GET(
 
     const fileBuffer = await readFile(filePath);
 
-    return new NextResponse(fileBuffer, {
+    // Apply export policy
+    const payload = {
+      buffer: fileBuffer,
+      mimeType: 'audio/mpeg',
+      filename: 'tagged_audio.mp3'
+    };
+    const result = applyExportPolicy(user, payload);
+
+    if (!result.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'UPGRADE_REQUIRED', feature: 'export', requiredTier: 'starter' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    return new NextResponse(result.payload.buffer, {
       headers: {
-        'Content-Type': 'audio/mpeg',
-        'Content-Disposition': `attachment; filename="tagged_audio.mp3"`,
-        'Content-Length': fileBuffer.length.toString(),
+        'Content-Type': result.payload.mimeType,
+        'Content-Disposition': `attachment; filename="${result.payload.filename}"`,
+        'Content-Length': result.payload.buffer.length.toString(),
         'Cache-Control': 'no-store'
       }
     });

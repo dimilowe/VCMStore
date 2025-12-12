@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import { getPresetById } from "@/data/platformImagePresets";
+import { applyExportPolicy } from "@/lib/export/applyExportPolicy";
+import { getCurrentUserWithTier } from "@/lib/pricing/getCurrentUserWithTier";
 
 export async function POST(request: NextRequest) {
   try {
+    // Export gating - check auth and tier
+    const user = await getCurrentUserWithTier();
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: "AUTH_REQUIRED", message: "Log in to export your files." }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const presetId = formData.get("presetId") as string | null;
@@ -46,10 +57,24 @@ export async function POST(request: NextRequest) {
       .jpeg({ quality: 90 })
       .toBuffer();
 
-    return new Response(new Uint8Array(resizedBuffer), {
+    // Apply export policy
+    const result = applyExportPolicy(user, {
+      buffer: resizedBuffer,
+      mimeType: "image/jpeg",
+      filename: `${preset.id}-resized.jpg`
+    });
+
+    if (!result.allowed) {
+      return new Response(
+        JSON.stringify({ error: "UPGRADE_REQUIRED", feature: "export", requiredTier: "starter" }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(new Uint8Array(result.payload.buffer), {
       headers: {
-        "Content-Type": "image/jpeg",
-        "Content-Disposition": `attachment; filename="${preset.id}-resized.jpg"`,
+        "Content-Type": result.payload.mimeType,
+        "Content-Disposition": `attachment; filename="${result.payload.filename}"`,
       },
     });
   } catch (error) {
