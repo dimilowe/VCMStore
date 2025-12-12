@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useUIStore } from '@/lib/state/uiStore';
 import { AuthModal } from '@/components/auth-modal';
 import UpgradeModal from '@/components/modals/UpgradeModal';
@@ -18,7 +19,12 @@ export function AppProvider({ children, currentTier = 'free' }: AppProviderProps
     upgradeRequiredTier,
     closeAuthModal,
     closeUpgradeModal,
+    setUserTier,
   } = useUIStore();
+
+  useEffect(() => {
+    setUserTier(currentTier);
+  }, [currentTier, setUserTier]);
 
   const handleAuthSuccess = (userId: string) => {
     closeAuthModal();

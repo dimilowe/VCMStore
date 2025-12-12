@@ -1,0 +1,54 @@
+What’s solid ✅
+Add engine metadata in the tools API
+Enhancing /api/clouds/[cloud]/tools to attach heavyMode and hasAi by looking up each tool’s engine in ENGINE_REGISTRY is exactly what you want.
+DB = “what tools exist + slugs”
+ENGINE_REGISTRY = “what this tool is (heavy/AI)”
+The API is the glue.
+Use getToolLockState in the client
+Keeping lock logic in a single helper is correct. The dashboards/cards should just ask:
+“Given userTier, heavyMode, hasAi – is this locked, and what tier is required?”
+Extending FeaturedTool type
+Adding heavyMode and hasAi to the FeaturedTool type is the right move. Those belong on the tool object, not in ad-hoc checks inside components.
+Lock UI in CloudFeaturedTools
+Making CloudFeaturedTools a client component that:
+calls getToolLockState(userTier, { heavyMode, hasAi })
+renders lock badge + overlay
+calls openUpgradeModal(feature, requiredTier) on click
+— that’s exactly the UX layer you want.
+The part to do carefully ⚠️
+“Make userTier accessible - Add it to the Zustand store so components can access it without prop drilling.”
+That’s fine if you do it like this:
+Server layout/AppProvider already knows currentTier from the DB.
+On the client, AppProvider (or a top-level client wrapper) should do a single hydration:
+'use client';
+import { useUIStore } from '@/lib/state/uiStore';
+
+export function AppProvider({ userTier, children }: { userTier: UserTier; children: React.ReactNode }) {
+  const setUserTier = useUIStore((s) => s.setUserTier);
+
+  useEffect(() => {
+    setUserTier(userTier);
+  }, [userTier, setUserTier]);
+
+  return <>{children}</>;
+}
+And in the store:
+interface UIState {
+  userTier: UserTier;
+  setUserTier: (tier: UserTier) => void;
+  // existing modal stuff...
+}
+Do NOT refetch user or compute tier again client-side. The server is the truth; the store is just a cached mirror for access.
+That way:
+CloudFeaturedTools can just call const userTier = useUIStore((s) => s.userTier);
+No prop-drilling.
+No duplicate tier logic.
+So, your plan in short:
+API: add heavyMode + hasAi into /api/clouds/[cloud]/tools by joining DB tools with ENGINE_REGISTRY. ✅
+Store: expose userTier in Zustand, hydrated once from AppProvider. ✅
+Helper: getToolLockState(userTier, { heavyMode, hasAi }). ✅
+UI: in CloudFeaturedTools / ToolCard:
+compute lock state
+show lock badge + overlay if locked
+on click → openUpgradeModal(feature, requiredTier)
+That’s the right structure. You’re not breaking the architecture and it lines up with everything we already wired on the backend.

@@ -16,12 +16,16 @@ type CloudDashboardProps = {
   cms: CMSObject & { engine_config: CloudDashboardEngineConfig };
 };
 
+type HeavyMode = 'none' | 'single' | 'multi';
+
 type TaggedTool = {
   slug: string;
   title: string;
   description: string;
   featured: boolean;
   segment?: string;
+  heavyMode?: HeavyMode;
+  hasAi?: boolean;
 };
 
 export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
@@ -67,6 +71,8 @@ export default function CloudDashboardEngine({ cms }: CloudDashboardProps) {
     title: tool.title,
     description: tool.description,
     isPro: tool.featured,
+    heavyMode: tool.heavyMode,
+    hasAi: tool.hasAi,
   }));
 
   return (
